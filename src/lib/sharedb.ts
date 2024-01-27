@@ -32,7 +32,7 @@ export const db = function createDB() {
   }>({ connected, doc: null, presences: {}, presenceTargets: {} });
 
   return {
-    subscribe,
+    subscribe, set, update,
     connect: (id: string) => {
 
       const socket = new ReconnectingWebSocket('ws://localhost:8080', [], {
