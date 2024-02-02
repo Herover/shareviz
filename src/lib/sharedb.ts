@@ -6,6 +6,8 @@ import {json1} from 'sharedb-client-browser/dist/ot-json1-umd.cjs';
  // @ts-ignore
 import sharedb from 'sharedb-client-browser/dist/sharedb-client-umd.cjs';
 import { WebSocket } from 'ws';
+import { createScope } from './dataScope';
+import { Config } from 'vizzu';
 // import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
 
@@ -126,45 +128,41 @@ export const db = function createDB() {
 
     duplicateSpec: (sourceIndex: number, insertAt: number) => doc.submitOp(["specs", insertAt, { i: doc.data.specs[sourceIndex] }]),
     setConfigTitle: (configIndex: number, title: string) => doc.submitOp(["specs", configIndex, "title", { r: 0, i: title }]),
-    setConfigX: (configIndex: number, index: number, value: string | null) => {
-      if (value == null || value == "") {
-        doc.submitOp(["specs", configIndex, "channels", "x", "set", index, { r: 0 }]);
-      } else {
-        doc.submitOp(["specs", configIndex, "channels", "x", "set", index, { r: 0, i: value }]);
-      }
-    },
-    addConfigX: (configIndex: number, index: number, value: string) => {
-      doc.submitOp(["specs", configIndex, "channels", "x", "set", index, { i: value }]);
-    },
-    setConfigY: (configIndex: number, index: number, value: string | null) => {
-      if (value == null || value == "") {
-        doc.submitOp(["specs", configIndex, "channels", "y", "set", index, { r: 0 }]);
-      } else {
-        doc.submitOp(["specs", configIndex, "channels", "y", "set", index, { r: 0, i: value }]);
-      }
-    },
-    addConfigY: (configIndex: number, index: number, value: string) => {
-      doc.submitOp(["specs", configIndex, "channels", "y", "set", index, { i: value }]);
-    },
-    setConfigColor: (configIndex: number, index: number, value: string | null) => {
-      if (value == null || value == "") {
-        doc.submitOp(["specs", configIndex, "channels", "color", "set", index, { r: 0 }]);
-      } else {
-        doc.submitOp(["specs", configIndex, "channels", "color", "set", index, { r: 0, i: value }]);
-      }
-    },
-    addConfigColor: (configIndex: number, index: number, value: string) => {
-      doc.submitOp(["specs", configIndex, "channels", "color", "set", index, { i: value }]);
-    },
-    setConfigLabel: (configIndex: number, index: number, value: string | null) => {
-      if (value == null || value == "") {
-        doc.submitOp(["specs", configIndex, "channels", "label", "set", index, { r: 0 }]);
-      } else {
-        doc.submitOp(["specs", configIndex, "channels", "label", "set", index, { r: 0, i: value }]);
-      }
-    },
-    addConfigLabel: (configIndex: number, index: number, value: string) => {
-      doc.submitOp(["specs", configIndex, "channels", "label", "set", index, { i: value }]);
+    channelScope: (configIndex: number, channelKey: string) => {
+      const scoped = createScope<Config.Channel>(db, ["specs", configIndex, "channels", channelKey]);
+      return {
+        ...scoped,
+        add: (index: number, value: string) => {
+          doc.submitOp(["specs", configIndex, "channels", channelKey, "set", index, { i: value }]);
+        },
+        set: (index: number, value: string | null) => {
+          if (!doc.data.specs[configIndex].channels[channelKey]) {
+            doc.submitOp(["specs", configIndex, "channels", channelKey, { r: 0, i: { set: [value] }}]);
+          } else if(value == null || value == "") {
+            doc.submitOp(["specs", configIndex, "channels", channelKey, "set", index, { r: 0 }]);
+          } else {
+            doc.submitOp(["specs", configIndex, "channels", channelKey, "set", index, { r: 0, i: value }]);
+          }
+        },
+        setAxis: (val: string | boolean | undefined) => {
+          if (doc.data.specs[configIndex].channels[channelKey].axis == val) return;
+          doc.submitOp(
+            ["specs", configIndex, "channels", channelKey, "axis", {
+              r: typeof doc.data.specs[configIndex].channels[channelKey].axis == "undefined" ? undefined : 0,
+              i: val,
+            }],
+          );
+        },
+        setLabels: (val: string | boolean | undefined) => {
+          if (doc.data.specs[configIndex].channels[channelKey].labels == val) return;
+          doc.submitOp(
+            ["specs", configIndex, "channels", channelKey, "labels", {
+              r: typeof doc.data.specs[configIndex].channels[channelKey].labels == "undefined" ? undefined : 0,
+              i: val,
+            }],
+          );
+        },
+      };
     },
     setConfigGeometry: (configIndex: number, value: string) => {
       doc.submitOp(["specs", configIndex, "geometry", { r: 0, i: value }]);

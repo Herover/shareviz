@@ -6,7 +6,7 @@
   {/each}
 </p>
 {#each specs as spec, index}
-  <Config configChart={spec} configData={$data} {index}/>
+  <Config configChart={createScope(db, ["doc", "specs", index])} configData={$data} {index}/>
 {/each}
 <button on:click={() => db.duplicateSpec(specs.length-1, specs.length)}>+</button>
 

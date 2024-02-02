@@ -43,6 +43,7 @@ function createDoc(callback) {
               y: { set: ["Country"] },
               color: { set: ["Stock"] },
               label: { set: ["Value"] },
+              size: { set: [] },
             },
             title: "Value by country",
             geometry: "rectangle",
