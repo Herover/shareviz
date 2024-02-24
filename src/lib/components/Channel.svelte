@@ -20,9 +20,13 @@
   let labels = configChannel?.labels;
   $: configScope.setLabels(labels);
   let ticks = configChannel?.ticks;
+  $: configScope.setTicks(ticks);
   let interlacing = configChannel?.interlacing;
+  $: configScope.setInterlacing(interlacing);
   let guides = configChannel?.guides;
+  $: configScope.setGuides(guides);
   let markerGuides = configChannel?.markerGuides;
+  $: configScope.setMarkerGuides(markerGuides);
 </script>
 
 <div class="holder">

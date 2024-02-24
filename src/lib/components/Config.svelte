@@ -12,7 +12,7 @@
 </script>
 
 <div class="holder">
-  <p>Title <input value={$configChart?.title} on:change={e => db.setConfigTitle(index, e.currentTarget.value)}/></p>
+  <p>Title <input value={$configChart?.title} on:keyup={e => db.setConfigTitle(index, e.currentTarget.value)}/></p>
 
 <!--   <p>
     X

@@ -97,6 +97,7 @@ export const db = function createDB() {
       localPresence = presence.create();
     
       const onData = () => {
+        console.log("onData")
         set({
           doc: doc.data,
           connected,
@@ -158,6 +159,42 @@ export const db = function createDB() {
           doc.submitOp(
             ["specs", configIndex, "channels", channelKey, "labels", {
               r: typeof doc.data.specs[configIndex].channels[channelKey].labels == "undefined" ? undefined : 0,
+              i: val,
+            }],
+          );
+        },
+        setTicks: (val: string | boolean | undefined) => {
+          if (doc.data.specs[configIndex].channels[channelKey].ticks == val) return;
+          doc.submitOp(
+            ["specs", configIndex, "channels", channelKey, "ticks", {
+              r: typeof doc.data.specs[configIndex].channels[channelKey].ticks == "undefined" ? undefined : 0,
+              i: val,
+            }],
+          );
+        },
+        setInterlacing: (val: string | boolean | undefined) => {
+          if (doc.data.specs[configIndex].channels[channelKey].interlacing == val) return;
+          doc.submitOp(
+            ["specs", configIndex, "channels", channelKey, "interlacing", {
+              r: typeof doc.data.specs[configIndex].channels[channelKey].interlacing == "undefined" ? undefined : 0,
+              i: val,
+            }],
+          );
+        },
+        setGuides: (val: string | boolean | undefined) => {
+          if (doc.data.specs[configIndex].channels[channelKey].guides == val) return;
+          doc.submitOp(
+            ["specs", configIndex, "channels", channelKey, "guides", {
+              r: typeof doc.data.specs[configIndex].channels[channelKey].guides == "undefined" ? undefined : 0,
+              i: val,
+            }],
+          );
+        },
+        setMarkerGuides: (val: string | boolean | undefined) => {
+          if (doc.data.specs[configIndex].channels[channelKey].markerGuides == val) return;
+          doc.submitOp(
+            ["specs", configIndex, "channels", channelKey, "markerGuides", {
+              r: typeof doc.data.specs[configIndex].channels[channelKey].markerGuides == "undefined" ? undefined : 0,
               i: val,
             }],
           );
