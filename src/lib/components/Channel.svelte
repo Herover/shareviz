@@ -6,27 +6,22 @@
 
   import { db } from "$lib/sharedb";
   import type { TableByRecords } from "vizzu/dist/types/data";
+  import TextInput from "./TextInput.svelte";
+  import RadioInput from "./RadioInput.svelte";
 
-  export let configChannel: Config.Channel | undefined;
+  export let configChannel: Config.Channel = {};
   export let configData: TableByRecords | undefined;
   export let title = "";
   export let configScope: ReturnType<typeof db.channelScope>;
 
   let showMore = false;
-  const radioGroup = radioGroups++;
 
-  let axis = configChannel?.axis;
-  $: configScope.setAxis(axis);
-  let labels = configChannel?.labels;
-  $: configScope.setLabels(labels);
-  let ticks = configChannel?.ticks;
-  $: configScope.setTicks(ticks);
-  let interlacing = configChannel?.interlacing;
-  $: configScope.setInterlacing(interlacing);
-  let guides = configChannel?.guides;
-  $: configScope.setGuides(guides);
-  let markerGuides = configChannel?.markerGuides;
-  $: configScope.setMarkerGuides(markerGuides);
+  $: axis = configChannel?.axis;
+  $: labels = configChannel?.labels;
+  $: ticks = configChannel?.ticks;
+  $: interlacing = configChannel?.interlacing;
+  $: guides = configChannel?.guides;
+  $: markerGuides = configChannel?.markerGuides;
 </script>
 
 <div class="holder">
@@ -52,35 +47,55 @@
 
   {#if showMore}
     <div class="advanced">
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label>Title <TextInput value={configChannel?.title} onChange={(val) => configScope.setTitle(val)}/></label>
       <p>Axis</p>
-      <label><input bind:group={axis} type="radio" name="{"axis"+radioGroup}" value={"auto"}/>Auto</label>
-      <label><input bind:group={axis} type="radio" name="{"axis"+radioGroup}" value={true}/>Yes</label>
-      <label><input bind:group={axis} type="radio" name="{"axis"+radioGroup}" value={false}/>No</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.setAxis(val)} value={axis} group={title + "axis"} setValue={"auto"}/>Auto</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.setAxis(val)} value={axis} group={title + "axis"} setValue={true}/>Yes</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.setAxis(val)} value={axis} group={title + "axis"} setValue={false}/>No</label>
 
       <p>Labels</p>
-      <label><input bind:group={labels} type="radio" name="{"labels"+radioGroup}" value={"auto"}/>Auto</label>
-      <label><input bind:group={labels} type="radio" name="{"labels"+radioGroup}" value="{true}"/>Yes</label>
-      <label><input bind:group={labels} type="radio" name="{"labels"+radioGroup}" value="{false}"/>No</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.setLabels(val)} value={labels} group={title + "labels"} setValue={"auto"}/>Auto</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.setLabels(val)} value={labels} group={title + "labels"} setValue="{true}"/>Yes</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.setLabels(val)} value={labels} group={title + "labels"} setValue="{false}"/>No</label>
 
       <p>Ticks</p>
-      <label><input bind:group={ticks} type="radio" name="{"ticks"+radioGroup}" value={"auto"}/>Auto</label>
-      <label><input bind:group={ticks} type="radio" name="{"ticks"+radioGroup}" value="{true}"/>Yes</label>
-      <label><input bind:group={ticks} type="radio" name="{"ticks"+radioGroup}" value="{false}"/>No</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.  setTicks(val)} value={ticks} group={title + "ticks"} setValue={"auto"}/>Auto</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.  setTicks(val)} value={ticks} group={title + "ticks"} setValue="{true}"/>Yes</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.  setTicks(val)} value={ticks} group={title + "ticks"} setValue="{false}"/>No</label>
 
       <p>Interlacing</p>
-      <label><input bind:group={interlacing} type="radio" name="{"interlacing"+radioGroup}" value={"auto"}/>Auto</label>
-      <label><input bind:group={interlacing} type="radio" name="{"interlacing"+radioGroup}" value="{true}"/>Yes</label>
-      <label><input bind:group={interlacing} type="radio" name="{"interlacing"+radioGroup}" value="{false}"/>No</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.  setInterlacing(val)} value={interlacing} group={title + "interlacing"} setValue={"auto"}/>Auto</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.  setInterlacing(val)} value={interlacing} group={title + "interlacing"} setValue="{true}"/>Yes</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.  setInterlacing(val)} value={interlacing} group={title + "interlacing"} setValue="{false}"/>No</label>
 
       <p>Guides</p>
-      <label><input bind:group={guides} type="radio" name="{"guides"+radioGroup}" value={"auto"}/>Auto</label>
-      <label><input bind:group={guides} type="radio" name="{"guides"+radioGroup}" value="{true}"/>Yes</label>
-      <label><input bind:group={guides} type="radio" name="{"guides"+radioGroup}" value="{false}"/>No</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.  setGuides(val)} value={guides} group={title + "guides"} setValue={"auto"}/>Auto</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.  setGuides(val)} value={guides} group={title + "guides"} setValue="{true}"/>Yes</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.  setGuides(val)} value={guides} group={title + "guides"} setValue="{false}"/>No</label>
 
       <p>Marker Guides</p>
-      <label><input bind:group={markerGuides} type="radio" name="{"markerGuides"+radioGroup}" value={"auto"}/>Auto</label>
-      <label><input bind:group={markerGuides} type="radio" name="{"markerGuides"+radioGroup}" value="{true}"/>Yes</label>
-      <label><input bind:group={markerGuides} type="radio" name="{"markerGuides"+radioGroup}" value="{false}"/>No</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.  setMarkerGuides(val)} value={markerGuides} group={title + "markerGuides"} setValue={"auto"}/>Auto</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.  setMarkerGuides(val)} value={markerGuides} group={title + "markerGuides"} setValue="{true}"/>Yes</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label><RadioInput onChange={val => configScope.  setMarkerGuides(val)} value={markerGuides} group={title + "markerGuides"} setValue="{false}"/>No</label>
     </div>
   {/if}
 </div>

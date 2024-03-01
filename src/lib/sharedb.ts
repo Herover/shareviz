@@ -146,6 +146,8 @@ export const db = function createDB() {
           }
         },
         setAxis: (val: string | boolean | undefined) => {
+          if (val == "true") val = true;
+          if (val == "false") val = false;
           if (doc.data.specs[configIndex].channels[channelKey].axis == val) return;
           doc.submitOp(
             ["specs", configIndex, "channels", channelKey, "axis", {
@@ -155,6 +157,8 @@ export const db = function createDB() {
           );
         },
         setLabels: (val: string | boolean | undefined) => {
+          if (val == "true") val = true;
+          if (val == "false") val = false;
           if (doc.data.specs[configIndex].channels[channelKey].labels == val) return;
           doc.submitOp(
             ["specs", configIndex, "channels", channelKey, "labels", {
@@ -164,6 +168,8 @@ export const db = function createDB() {
           );
         },
         setTicks: (val: string | boolean | undefined) => {
+          if (val == "true") val = true;
+          if (val == "false") val = false;
           if (doc.data.specs[configIndex].channels[channelKey].ticks == val) return;
           doc.submitOp(
             ["specs", configIndex, "channels", channelKey, "ticks", {
@@ -173,6 +179,8 @@ export const db = function createDB() {
           );
         },
         setInterlacing: (val: string | boolean | undefined) => {
+          if (val == "true") val = true;
+          if (val == "false") val = false;
           if (doc.data.specs[configIndex].channels[channelKey].interlacing == val) return;
           doc.submitOp(
             ["specs", configIndex, "channels", channelKey, "interlacing", {
@@ -182,6 +190,8 @@ export const db = function createDB() {
           );
         },
         setGuides: (val: string | boolean | undefined) => {
+          if (val == "true") val = true;
+          if (val == "false") val = false;
           if (doc.data.specs[configIndex].channels[channelKey].guides == val) return;
           doc.submitOp(
             ["specs", configIndex, "channels", channelKey, "guides", {
@@ -191,6 +201,8 @@ export const db = function createDB() {
           );
         },
         setMarkerGuides: (val: string | boolean | undefined) => {
+          if (val == "true") val = true;
+          if (val == "false") val = false;
           if (doc.data.specs[configIndex].channels[channelKey].markerGuides == val) return;
           doc.submitOp(
             ["specs", configIndex, "channels", channelKey, "markerGuides", {
@@ -198,6 +210,15 @@ export const db = function createDB() {
               i: val,
             }],
           );
+        },
+        setTitle: (value: string | null) => {
+          if (!doc.data.specs[configIndex].channels[channelKey].title && value) {
+            doc.submitOp(["specs", configIndex, "channels", channelKey, "title", { i: value}]);
+          } else if(doc.data.specs[configIndex].channels[channelKey].title && (value == null || value == "")) {
+            doc.submitOp(["specs", configIndex, "channels", channelKey, "title", { r: 0 }]);
+          } else if(doc.data.specs[configIndex].channels[channelKey].title && value) {
+            doc.submitOp(["specs", configIndex, "channels", channelKey, "title", { r: 0, i: value }]);
+          }
         },
       };
     },

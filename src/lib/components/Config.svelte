@@ -5,6 +5,7 @@
   import { db } from "$lib/sharedb";
 	import { createScope } from '$lib/dataScope';
   import Channel from "./Channel.svelte";
+  import TextInput from "./TextInput.svelte";
 
   export let configChart: ReturnType<typeof createScope<Config.Chart>>;
   export let configData: TableByRecords | undefined;
@@ -12,7 +13,8 @@
 </script>
 
 <div class="holder">
-  <p>Title <input value={$configChart?.title} on:keyup={e => db.setConfigTitle(index, e.currentTarget.value)}/></p>
+  <!-- svelte-ignore a11y-label-has-associated-control -->
+  <p><label>Title <TextInput value={$configChart?.title} onChange={(val) => db.setConfigTitle(index, val)}/></label></p>
 
 <!--   <p>
     X
