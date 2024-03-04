@@ -2,6 +2,7 @@
   export let onChange: (val: any) => void;
   export let setValue: any;
   export let value: any;
+  /** All radio buttons related to each other is in a group. This name must be unique on the current page. */
   export let group: string;
 </script>
 
