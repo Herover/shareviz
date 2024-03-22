@@ -28,7 +28,7 @@
   import Vizzu from 'vizzu';
   // @ts-ignore
   import VizzuModule from '$lib/../../node_modules/vizzu/dist/cvizzu.wasm?url'
-  import Config from '$lib/components/Config.svelte';
+  import Config from '$lib/components/vizzu/Config.svelte';
   import type { TableByRecords } from 'vizzu/dist/types/data';
 
   const disconnect = db.connect('1');

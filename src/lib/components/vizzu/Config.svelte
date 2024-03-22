@@ -5,7 +5,7 @@
   import { db } from "$lib/sharedb";
 	import { createScope } from '$lib/dataScope';
   import Channel from "./Channel.svelte";
-  import TextInput from "./TextInput.svelte";
+  import TextInput from "../TextInput.svelte";
 
   export let configChart: ReturnType<typeof createScope<Config.Chart>>;
   export let configData: TableByRecords | undefined;

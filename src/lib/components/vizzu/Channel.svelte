@@ -6,8 +6,8 @@
 
   import { db } from "$lib/sharedb";
   import type { TableByRecords } from "vizzu/dist/types/data";
-  import TextInput from "./TextInput.svelte";
-  import RadioInput from "./RadioInput.svelte";
+  import TextInput from "../TextInput.svelte";
+  import RadioInput from "../RadioInput.svelte";
 
   export let configChannel: Config.Channel = {};
   export let configData: TableByRecords | undefined;
