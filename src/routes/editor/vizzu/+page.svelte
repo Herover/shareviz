@@ -22,7 +22,7 @@
 </style>
 
 <script lang="ts">
-	import { db } from '$lib/sharedb';
+	import { db } from '$lib/sharedbVizzu';
 	import { createScope } from '$lib/dataScope';
 	import { onDestroy, onMount } from 'svelte';
   import Vizzu from 'vizzu';

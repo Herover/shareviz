@@ -4,7 +4,7 @@
 <script lang="ts">
   import type { Config } from "vizzu";
 
-  import { db } from "$lib/sharedb";
+  import { db } from "$lib/sharedbVizzu";
   import type { TableByRecords } from "vizzu/dist/types/data";
   import TextInput from "../TextInput.svelte";
   import RadioInput from "../RadioInput.svelte";

@@ -2,7 +2,7 @@
   import { Chart, Config } from "vizzu";
   import type { SeriesMetaInfo, TableByRecords } from "vizzu/dist/types/data";
 
-  import { db } from "$lib/sharedb";
+  import { db } from "$lib/sharedbVizzu";
 	import { createScope } from '$lib/dataScope';
   import Channel from "./Channel.svelte";
   import TextInput from "../TextInput.svelte";
