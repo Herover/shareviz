@@ -1,37 +1,63 @@
 <script lang="ts">
   import HBar from "$lib/components/chart/HBar.svelte";
   import { db } from "$lib/chartStore";
+  import type { Root } from "$lib/chart.d.ts";
   import { dsvFormat } from "d3-dsv";
   import ChartEditor from "$lib/components/chart/ChartEditor.svelte";
 
-  const disconnect = db.connect('1');
-  
-  $: chartSpec = $db.doc;
-  $: console.log(chartSpec)
+  const disconnect = db.connect("1");
+
+  $: chartSpec = $db.doc as Root;
+  $: console.log(chartSpec, JSON.stringify(chartSpec));
 
   let sizeHeight = 0;
   const onSizeInfo = (height: number) => (sizeHeight = height);
 
-  $: data = chartSpec == null ? [] : dsvFormat("\t").parse(chartSpec.data.raw, (row) => {
-    return chartSpec.data.rows.reduce((acc: any, rowInfo: any) => {
-      if (rowInfo.type == "number") {
-        acc[rowInfo.key] = Number.parseFloat(row[rowInfo.key]);
-      } else if (rowInfo.type == "text") {
-        acc[rowInfo.key] = row[rowInfo.key];
-      }
+  const group = <T extends any, U>(
+    key: string,
+    d: T[],
+    f: (key: string, group: T[]) => U,
+  ): U[] => {
+    const groups = d.reduce(
+      (acc, line: any) => {
+        if (acc[line[key]]) {
+          acc[line[key]].push(line);
+        } else {
+          acc[line[key]] = [line];
+        }
+        return acc;
+      },
+      {} as { [key: string]: T[] },
+    );
 
-      return acc;
-    }, {} as any);
-  });
+    return Object.keys(groups).map((k) => f(k, groups[k]));
+  };
 
-  $: height = chartSpec == null ? [] : 
-    chartSpec.style.subTitleSize * 3 +
-    chartSpec.style.titleSize +
-    sizeHeight +
-    16 +
-    chartSpec.style.marginBottom +
-    chartSpec.style.marginTop +
-    chartSpec.style.sourceMargin;
+  $: data =
+    chartSpec == null
+      ? []
+      : dsvFormat("\t").parse(chartSpec.data.raw, (row) => {
+          return chartSpec.data.rows.reduce((acc: any, rowInfo: any) => {
+            if (rowInfo.type == "number") {
+              acc[rowInfo.key] = Number.parseFloat(row[rowInfo.key]);
+            } else if (rowInfo.type == "text") {
+              acc[rowInfo.key] = row[rowInfo.key];
+            }
+
+            return acc;
+          }, {} as any);
+        });
+
+  $: height =
+    chartSpec == null
+      ? 0
+      : chartSpec.style.subTitleSize * 3 +
+        chartSpec.style.titleSize +
+        sizeHeight +
+        16 +
+        chartSpec.style.marginBottom +
+        chartSpec.style.marginTop +
+        chartSpec.style.sourceMargin;
 </script>
 
 <div class="main">
@@ -51,7 +77,11 @@
             }
           </style>
         </defs>
-        <rect width={chartSpec.chart.width} {height} fill="{chartSpec.style.bgColor}" />
+        <rect
+          width={chartSpec.chart.width}
+          {height}
+          fill={chartSpec.style.bgColor}
+        />
         <g
           transform="translate({chartSpec.style.marginLeft}, {chartSpec.style
             .marginTop})"
@@ -87,12 +117,15 @@
                   chartSpec.style.marginLeft -
                   chartSpec.style.marginRight -
                   chartSpec.chart.hBar.labelWidth}
-                values={data.map((d) => ({
-                  label: d[chartSpec.chart.hBar.categories],
-                  value: chartSpec.chart.hBar.value.map((k) => ({
-                    label: k,
-                    value: d[k],
-                  })),
+                values={group(chartSpec.chart.hBar.categories, data, (k, g) =>({
+                  label: k,
+                  value: group(chartSpec.chart.hBar.subCategories, g, (kk, gg) => {
+                    let sum = gg.reduce((acc, d) => acc + d[chartSpec.chart.hBar.value], 0)
+                    return {
+                      label: kk,
+                      value: sum,
+                    };
+                  }),
                 }))}
                 on:size={(e) => onSizeInfo(e.detail.height)}
               />
