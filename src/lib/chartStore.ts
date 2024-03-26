@@ -121,6 +121,17 @@ export const db = function createDB() {
       const scoped = createScope<Config.Channel>(db, ["chart"]);
       return {
         ...scoped,
+        hBar: () => {
+          const hbarScope = createScope<Config.Channel>(scoped, ["hBar"]);
+
+          return {
+            ...hbarScope,
+            setLabelWidth: (value: number) => doc.submitOp(["chart", "hBar", "labelWidth", { r: 0, i: value }]),
+            setCategories: (value: string) => doc.submitOp(["chart", "hBar", "categories", { r: 0, i: value }]),
+            setSubCategories: (value: string) => doc.submitOp(["chart", "hBar", "subCategories", { r: 0, i: value }]),
+            setValue: (value: string) => doc.submitOp(["chart", "hBar", "value", { r: 0, i: value }]),
+          }
+        },
         setConfigTitle: (value: string) => doc.submitOp(["chart", "title", { r: 0, i: value }]),
         setConfigSubTitle: (value: string) => doc.submitOp(["chart", "subTitle", { r: 0, i: value }]),
         setConfigHeight: (value: number) => doc.submitOp(["chart", "height", { r: 0, i: value }]),

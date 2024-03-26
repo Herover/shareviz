@@ -1,8 +1,10 @@
 <script lang="ts">
+  import type { Chart } from "$lib/chart";
   import { db } from "$lib/chartStore";
+  import HBarEditor from "./HBarEditor.svelte";
 
   export let chartScope: ReturnType<typeof db.chart>;
-  export let chart: any;
+  export let chart: Chart;
 </script>
 
 <p>
@@ -57,6 +59,10 @@
     type="number"
   />
 </p>
+
+{#if chart.chartType == "hBar"}
+  <HBarEditor {chart} dbHBar={chartScope.hBar()}/>
+{/if}
 
 <style>
   input {

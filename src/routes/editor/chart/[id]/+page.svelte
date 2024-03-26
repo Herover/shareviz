@@ -6,12 +6,14 @@
   import ChartEditor from "$lib/components/chart/ChartEditor.svelte";
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
 
-  const disconnect = db.connect("1");
+  export let data;
+
+  const disconnect = db.connect(data.id);
 
   $: chartSpec = $db.doc as Root;
   $: console.log(chartSpec, JSON.stringify(chartSpec));
 
-  $: data =
+  $: chartData =
     chartSpec == null
       ? []
       : dsvFormat("\t").parse(chartSpec.data.raw, (row) => {
@@ -36,7 +38,7 @@
     </div>
 
     <div class="chart-viewer">
-      <ChartViewer {chartSpec} {data} />
+      <ChartViewer {chartSpec} data={chartData} />
     </div>
 
     <div class="chart-controls-pane">
