@@ -1,51 +1,51 @@
 <script lang="ts">
-  import type { Chart } from "$lib/chart";
+  import type { Root } from "$lib/chart";
   import { db } from "$lib/chartStore";
   import HBarEditor from "./HBarEditor.svelte";
 
   export let chartScope: ReturnType<typeof db.chart>;
-  export let chart: Chart;
+  export let spec: Root;
 </script>
 
 <p>
   Title: <input
-    value={chart.title}
+    value={spec.chart.title}
     on:keyup={(e) => chartScope.setConfigTitle(e.currentTarget.value)}
   />
 </p>
 <p>
   Sub title: <input
-    value={chart.subTitle}
+    value={spec.chart.subTitle}
     on:keyup={(e) => chartScope.setConfigSubTitle(e.currentTarget.value)}
   />
 </p>
 <p>
   Source text (left): <input
-    value={chart.sourceTextLeft}
+    value={spec.chart.sourceTextLeft}
     on:keyup={(e) => chartScope.setSourceTextLeft(e.currentTarget.value)}
   />
 </p>
 <p>
   Source link (left): <input
-    value={chart.sourceTextLeftLink}
+    value={spec.chart.sourceTextLeftLink}
     on:keyup={(e) => chartScope.setSourceTextLeftLink(e.currentTarget.value)}
   />
 </p>
 <p>
   Source text (right): <input
-    value={chart.sourceTextRight}
+    value={spec.chart.sourceTextRight}
     on:keyup={(e) => chartScope.setSourceTextRight(e.currentTarget.value)}
   />
 </p>
 <p>
   Source link (right): <input
-    value={chart.sourceTextRightLink}
+    value={spec.chart.sourceTextRightLink}
     on:keyup={(e) => chartScope.setSourceTextLeftRight(e.currentTarget.value)}
   />
 </p>
 <p>
   Height: <input
-    value={chart.height}
+    value={spec.chart.height}
     on:keyup={(e) => chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
     on:change={(e) => chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
     type="number"
@@ -53,15 +53,15 @@
 </p>
 <p>
   Width: <input
-    value={chart.width}
+    value={spec.chart.width}
     on:keyup={(e) => chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
     on:change={(e) => chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
     type="number"
   />
 </p>
 
-{#if chart.chartType == "hBar"}
-  <HBarEditor {chart} dbHBar={chartScope.hBar()}/>
+{#if spec.chart.chartType == "hBar"}
+  <HBarEditor spec={spec} dbHBar={chartScope.hBar()}/>
 {/if}
 
 <style>

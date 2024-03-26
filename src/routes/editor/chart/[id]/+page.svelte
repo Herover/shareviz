@@ -33,7 +33,7 @@
   {#if chartSpec != null}
     <div class="chart-controls-pane">
       <div class="chart-controls-primary chart-controls">
-        <ChartEditor chart={chartSpec.chart} chartScope={db.chart()} />
+        <ChartEditor spec={chartSpec} chartScope={db.chart()} />
       </div>
     </div>
 

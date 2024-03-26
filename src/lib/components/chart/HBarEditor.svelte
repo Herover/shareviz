@@ -1,34 +1,40 @@
 <script lang="ts">
-  import type { Chart } from "$lib/chart";
+  import type { Root } from "$lib/chart";
   import type { db } from "$lib/chartStore";
 
-  export let chart: Chart;
+  export let spec: Root;
   export let dbHBar: ReturnType<ReturnType<typeof db.chart>["hBar"]>;
 </script>
 
 <p>
   Label width: <input
-    value={chart.hBar.labelWidth}
+    value={spec.chart.hBar.labelWidth}
     on:keyup={(e) => dbHBar.setLabelWidth(Number.parseInt(e.currentTarget.value))}
     on:change={(e) => dbHBar.setLabelWidth(Number.parseInt(e.currentTarget.value))}
     type="number"
   />
 </p>
 <p>
-  Categories from: <input
-    value={chart.hBar.categories}
-    on:keyup={(e) => dbHBar.setCategories(e.currentTarget.value)}
-  />
+  Categories from:
+  <select value={spec.chart.hBar.categories} on:change={(e) => dbHBar.setCategories(e.currentTarget.value)}>
+    {#each spec.data.rows as row}
+      <option>{row.key}</option>
+    {/each}
+  </select>
 </p>
 <p>
-  Sub categories from: <input
-    value={chart.hBar.subCategories}
-    on:keyup={(e) => dbHBar.setSubCategories(e.currentTarget.value)}
-  />
+  Sub categories from:
+  <select value={spec.chart.hBar.subCategories} on:change={(e) => dbHBar.setSubCategories(e.currentTarget.value)}>
+    {#each spec.data.rows as row}
+      <option>{row.key}</option>
+    {/each}
+  </select>
 </p>
 <p>
-  Values from: <input
-    value={chart.hBar.value}
-    on:keyup={(e) => dbHBar.setValue(e.currentTarget.value)}
-  />
+  Values from:
+  <select value={spec.chart.hBar.value} on:change={(e) => dbHBar.setValue(e.currentTarget.value)}>
+    {#each spec.data.rows.filter(r => r.type == "number") as row}
+      <option>{row.key}</option>
+    {/each}
+  </select>
 </p>
