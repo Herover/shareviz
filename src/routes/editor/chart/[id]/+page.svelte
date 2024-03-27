@@ -74,7 +74,6 @@
   .chart-controls {
     background-color: white;
     position: fixed;
-    border: 1px solid black;
     box-sizing: border-box;
     padding: 10px;
     z-index: 10;
@@ -83,10 +82,12 @@
   }
   .chart-controls-primary {
     width: 400px;
+    border-right: 1px solid black;
   }
   .chart-controls-secondary {
     right: 0px;
     width: 400px;
+    border-left: 1px solid black;
   }
 
   .chart-viewer {

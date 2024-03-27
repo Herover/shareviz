@@ -130,6 +130,7 @@ export const db = function createDB() {
             setCategories: (value: string) => doc.submitOp(["chart", "hBar", "categories", { r: 0, i: value }]),
             setSubCategories: (value: string) => doc.submitOp(["chart", "hBar", "subCategories", { r: 0, i: value }]),
             setValue: (value: string) => doc.submitOp(["chart", "hBar", "value", { r: 0, i: value }]),
+            setRepeat: (value: string) => doc.submitOp(["chart", "hBar", "repeat", { r: 0, i: value }]),
           }
         },
         setConfigTitle: (value: string) => doc.submitOp(["chart", "title", { r: 0, i: value }]),
@@ -140,6 +141,8 @@ export const db = function createDB() {
         setSourceTextLeftLink: (value: string) => doc.submitOp(["chart", "sourceTextLeftLink", { r: 0, i: value }]),
         setSourceTextRight: (value: string) => doc.submitOp(["chart", "sourceTextRight", { r: 0, i: value }]),
         setSourceTextLeftRight: (value: string) => doc.submitOp(["chart", "sourceTextLeftRight", { r: 0, i: value }]),
+        setScaleFrom: (scaleIndex: number, value: number) => doc.submitOp(["chart", "scales", scaleIndex, "dataRange", 0, { r: 0, i: value }]),
+        setScaleTo: (scaleIndex: number, value: number) => doc.submitOp(["chart", "scales", scaleIndex, "dataRange", 1, { r: 0, i: value }]),
       };
     },
   };

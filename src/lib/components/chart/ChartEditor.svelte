@@ -46,22 +46,26 @@
 <p>
   Height: <input
     value={spec.chart.height}
-    on:keyup={(e) => chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
-    on:change={(e) => chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
+    on:keyup={(e) =>
+      chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
+    on:change={(e) =>
+      chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
     type="number"
   />
 </p>
 <p>
   Width: <input
     value={spec.chart.width}
-    on:keyup={(e) => chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
-    on:change={(e) => chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
+    on:keyup={(e) =>
+      chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
+    on:change={(e) =>
+      chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
     type="number"
   />
 </p>
 
 {#if spec.chart.chartType == "hBar"}
-  <HBarEditor spec={spec} dbHBar={chartScope.hBar()}/>
+  <HBarEditor {spec} dbHBar={chartScope.hBar()} chart={chartScope} />
 {/if}
 
 <style>

@@ -1,39 +1,24 @@
 <script lang="ts">
   import type { Root } from "$lib/chart";
+  import { group } from "$lib/utils";
   import HBar from "./HBar.svelte";
 
   export let chartSpec: Root;
   export let data: any[];
 
+  const repeatSpacing = 24;
+
   let sizeHeight = 0;
+  $: sizeMul = group(chartSpec.chart.hBar.repeat, data, (k, d) => 0).length;
   const onSizeInfo = (height: number) => (sizeHeight = height);
-
-  const group = <T extends any, U>(
-    key: string,
-    d: T[],
-    f: (key: string, group: T[]) => U,
-  ): U[] => {
-    const groups = d.reduce(
-      (acc, line: any) => {
-        if (acc[line[key]]) {
-          acc[line[key]].push(line);
-        } else {
-          acc[line[key]] = [line];
-        }
-        return acc;
-      },
-      {} as { [key: string]: T[] },
-    );
-
-    return Object.keys(groups).map((k) => f(k, groups[k]));
-  };
 
   $: height =
     chartSpec == null
       ? 0
       : chartSpec.style.subTitleSize * 3 +
         chartSpec.style.titleSize +
-        sizeHeight +
+        (sizeHeight + repeatSpacing) * sizeMul -
+        repeatSpacing +
         16 +
         chartSpec.style.marginBottom +
         chartSpec.style.marginTop +
@@ -78,33 +63,46 @@
         fill="#aaffaa"
       /> -->
       {#if (chartSpec.chart.chartType = "hBar")}
-        <HBar
-          labelWidth={chartSpec.chart.hBar.labelWidth}
-          valueWidth={chartSpec.chart.width -
-            chartSpec.style.marginLeft -
-            chartSpec.style.marginRight -
-            chartSpec.chart.hBar.labelWidth}
-          values={group(chartSpec.chart.hBar.categories, data, (k, g) => ({
-            label: k,
-            value: group(chartSpec.chart.hBar.subCategories, g, (kk, gg) => {
-              let sum = gg.reduce(
-                (acc, d) => acc + d[chartSpec.chart.hBar.value],
-                0,
-              );
-              return {
-                label: kk,
-                value: sum,
-              };
-            }),
-          }))}
-          on:size={(e) => onSizeInfo(e.detail.height)}
-        />
+        {#each group( chartSpec.chart.hBar.repeat, data, (k, d) => ({ k, d }), ) as { k, d }, i}
+          <g transform="translate(0, {(sizeHeight + repeatSpacing) * i})">
+            <HBar
+              {chartSpec}
+              hBarSpec={chartSpec.chart.hBar}
+              labelWidth={chartSpec.chart.hBar.labelWidth}
+              valueWidth={chartSpec.chart.width -
+                chartSpec.style.marginLeft -
+                chartSpec.style.marginRight -
+                chartSpec.chart.hBar.labelWidth}
+              values={group(chartSpec.chart.hBar.categories, d, (k, g) => ({
+                label: k,
+                value: group(
+                  chartSpec.chart.hBar.subCategories,
+                  g,
+                  (kk, gg) => {
+                    let sum = gg.reduce(
+                      (acc, d) => acc + d[chartSpec.chart.hBar.value],
+                      0,
+                    );
+                    return {
+                      label: kk,
+                      value: sum,
+                    };
+                  },
+                ),
+              }))}
+              label={k}
+              showLegend={i == 0}
+              on:size={(e) => onSizeInfo(e.detail.height)}
+            />
+          </g>
+        {/each}
       {/if}
     </g>
     <g
       transform="translate({0},{chartSpec.style.subTitleSize * 3 +
         chartSpec.style.titleSize +
-        sizeHeight +
+        (sizeHeight + repeatSpacing) * sizeMul -
+        repeatSpacing +
         chartSpec.style.sourceMargin})"
     >
       <text dominant-baseline="hanging">

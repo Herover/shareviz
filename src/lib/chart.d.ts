@@ -21,6 +21,7 @@ export interface Chart {
   width: number
   height: number
   chartType: string
+  scales: Scale[]
   hBar: HBar
   line: Line
   sourceTextLeft: string
@@ -29,11 +30,18 @@ export interface Chart {
   sourceTextRightLink: string
 }
 
+export interface Scale {
+  name: string
+  dataKey: string
+  dataRange: number[]
+}
+
 export interface HBar {
   categories: string
   subCategories: string
   value: string
   labelWidth: number
+  repeat: string
 }
 
 export interface Line {

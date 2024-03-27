@@ -63,11 +63,26 @@ Verden udenfor Danmark	Region Nordjylland	1427582	2023`,
           width: 390,
           height: 500,
           chartType: "hBar",
+          scales: [
+            {
+              name: "x",
+              dataKey: "antal",
+              type: "linear",
+              dataRange: [0, 15000000],
+            },
+            {
+              name: "color",
+              dataKey: "",
+              type: "categoriesColor",
+              values: ["#ff8888", "#aa2222"],
+            },
+          ],
           hBar: {
             categories: "område",
             subCategories: "tid",
             value: "antal",
             labelWidth: 170,
+            repeat: "gæstens nationalitet",
           },
           line: {
             x: {},
