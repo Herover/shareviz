@@ -5,6 +5,11 @@ export interface Root {
 }
 
 export interface Data {
+  sets: Set[]
+}
+
+export interface Set {
+  id: string
   type: string
   raw: string
   rows: Row[]
@@ -33,10 +38,13 @@ export interface Chart {
 export interface Scale {
   name: string
   dataKey: string
-  dataRange: number[]
+  type: string
+  dataRange?: number[]
+  values?: string[]
 }
 
 export interface HBar {
+  dataSet: string
   categories: string
   subCategories: string
   value: string

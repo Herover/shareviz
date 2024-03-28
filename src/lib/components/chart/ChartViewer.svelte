@@ -4,12 +4,13 @@
   import HBar from "./HBar.svelte";
 
   export let chartSpec: Root;
-  export let data: any[];
+  export let data: { [key: string]: any[] };
 
   const repeatSpacing = 32;
 
   let sizeHeight = 0;
-  $: sizeMul = group(chartSpec.chart.hBar.repeat, data, (k, d) => 0).length;
+  $: hBarData = data[chartSpec.chart.hBar.dataSet];
+  $: sizeMul = group(chartSpec.chart.hBar.repeat, hBarData, (k, d) => 0).length;
   const onSizeInfo = (height: number) => (sizeHeight = height);
 
   $: height =
@@ -62,8 +63,8 @@
         height={sizeHeight}
         fill="#aaffaa"
       /> -->
-      {#if (chartSpec.chart.chartType == "hBar")}
-        {#each group( chartSpec.chart.hBar.repeat, data, (k, d) => ({ k, d }), ) as { k, d }, i}
+      {#if chartSpec.chart.chartType == "hBar"}
+        {#each group( chartSpec.chart.hBar.repeat, hBarData, (k, d) => ({ k, d }), ) as { k, d }, i}
           <g transform="translate(0, {(sizeHeight + repeatSpacing) * i})">
             <HBar
               {chartSpec}

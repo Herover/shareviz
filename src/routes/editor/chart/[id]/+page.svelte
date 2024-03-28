@@ -2,7 +2,7 @@
   import HBar from "$lib/components/chart/HBar.svelte";
   import { db } from "$lib/chartStore";
   import type { Root } from "$lib/chart.d.ts";
-  import { dsvFormat } from "d3-dsv";
+  import { dsvFormat, type DSVParsedArray } from "d3-dsv";
   import ChartEditor from "$lib/components/chart/ChartEditor.svelte";
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
 
@@ -15,18 +15,27 @@
 
   $: chartData =
     chartSpec == null
-      ? []
-      : dsvFormat("\t").parse(chartSpec.data.raw, (row) => {
-          return chartSpec.data.rows.reduce((acc: any, rowInfo: any) => {
-            if (rowInfo.type == "number") {
-              acc[rowInfo.key] = Number.parseFloat(row[rowInfo.key]);
-            } else if (rowInfo.type == "text") {
-              acc[rowInfo.key] = row[rowInfo.key];
-            }
+      ? {}
+      : chartSpec.data.sets.reduce(
+          (acc, data) => {
+            acc[data.id] = dsvFormat("\t").parse<any, string>(
+              data.raw,
+              (row) => {
+                return data.rows.reduce((acc: any, rowInfo: any) => {
+                  if (rowInfo.type == "number") {
+                    acc[rowInfo.key] = Number.parseFloat(row[rowInfo.key]);
+                  } else if (rowInfo.type == "text") {
+                    acc[rowInfo.key] = row[rowInfo.key];
+                  }
 
+                  return acc;
+                }, {} as any);
+              },
+            );
             return acc;
-          }, {} as any);
-        });
+          },
+          {} as { [key: string]: DSVParsedArray<any> },
+        );
 </script>
 
 <div class="main">

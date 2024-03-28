@@ -1,8 +1,9 @@
 <script lang="ts">
-  import type { Root } from "$lib/chart";
+  import type { Root, Set } from "$lib/chart";
   import type { db } from "$lib/chartStore";
 
   export let spec: Root;
+  export let dataSet: Set;
   export let chart: ReturnType<typeof db.chart>;
   export let dbHBar: ReturnType<ReturnType<typeof db.chart>["hBar"]>;
 
@@ -32,7 +33,7 @@
       on:change={(e) => dbHBar.setCategories(e.currentTarget.value)}
     >
       <option>{""}</option>
-      {#each spec.data.rows as row}
+      {#each dataSet.rows as row}
         <option>{row.key}</option>
       {/each}
     </select>
@@ -46,7 +47,7 @@
       on:change={(e) => dbHBar.setSubCategories(e.currentTarget.value)}
     >
       <option>{""}</option>
-      {#each spec.data.rows as row}
+      {#each dataSet.rows as row}
         <option>{row.key}</option>
       {/each}
     </select>
@@ -59,7 +60,7 @@
       value={spec.chart.hBar.value}
       on:change={(e) => dbHBar.setValue(e.currentTarget.value)}
     >
-      {#each spec.data.rows.filter((r) => r.type == "number") as row}
+      {#each dataSet.rows.filter((r) => r.type == "number") as row}
         <option>{row.key}</option>
       {/each}
     </select>
@@ -99,7 +100,7 @@
       on:change={(e) => dbHBar.setRepeat(e.currentTarget.value)}
     >
       <option>{""}</option>
-      {#each spec.data.rows as row}
+      {#each dataSet.rows as row}
         <option>{row.key}</option>
       {/each}
     </select>
