@@ -6,7 +6,7 @@
   export let chartSpec: Root;
   export let data: any[];
 
-  const repeatSpacing = 24;
+  const repeatSpacing = 32;
 
   let sizeHeight = 0;
   $: sizeMul = group(chartSpec.chart.hBar.repeat, data, (k, d) => 0).length;
@@ -62,7 +62,7 @@
         height={sizeHeight}
         fill="#aaffaa"
       /> -->
-      {#if (chartSpec.chart.chartType = "hBar")}
+      {#if (chartSpec.chart.chartType == "hBar")}
         {#each group( chartSpec.chart.hBar.repeat, data, (k, d) => ({ k, d }), ) as { k, d }, i}
           <g transform="translate(0, {(sizeHeight + repeatSpacing) * i})">
             <HBar
