@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Root } from "$lib/chart";
   import { group } from "$lib/utils";
-  import HBar from "./HBar.svelte";
+  import HBar from "./HBar/HBar.svelte";
 
   export let chartSpec: Root;
   export let data: { [key: string]: any[] };

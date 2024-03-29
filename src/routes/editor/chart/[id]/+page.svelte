@@ -1,5 +1,5 @@
 <script lang="ts">
-  import HBar from "$lib/components/chart/HBar.svelte";
+  import HBar from "$lib/components/chart/HBar/HBar.svelte";
   import { db } from "$lib/chartStore";
   import type { Root } from "$lib/chart.d.ts";
   import { dsvFormat, type DSVParsedArray } from "d3-dsv";
@@ -71,18 +71,17 @@
 <style>
   .main {
     display: flex;
-    /* justify-content: space-between; */
+    flex-direction: row;
+    align-content: space-between;
+    flex-wrap: wrap;
+    background-color: #eeeeee;
   }
   .chart-controls-pane {
-    /* width: 100%; */
-    /* flex-basis: 400px; */
-    flex-grow: 0;
     height: 100vh;
+    width: fit-content;
   }
 
   .chart-controls {
-    background-color: white;
-    position: fixed;
     box-sizing: border-box;
     padding: 10px;
     z-index: 10;
@@ -92,18 +91,21 @@
   .chart-controls-primary {
     width: 400px;
     border-right: 1px solid black;
+    background-color: white;
   }
   .chart-controls-secondary {
     right: 0px;
+    position: fixed;
     width: 400px;
+    display: none;
     border-left: 1px solid black;
   }
 
   .chart-viewer {
-    flex-grow: 1;
     display: flex;
+    flex: 1 1 auto;
     justify-content: center;
     align-items: center;
-    background-color: #eeeeee;
+    align-self: stretch;
   }
 </style>

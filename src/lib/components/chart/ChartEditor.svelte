@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Root } from "$lib/chart";
   import { db } from "$lib/chartStore";
-  import HBarEditor from "./HBarEditor.svelte";
+  import HBarEditor from "./HBar/HBarEditor.svelte";
 
   export let chartScope: ReturnType<typeof db.chart>;
   export let spec: Root;
