@@ -108,6 +108,7 @@
     flex: 1 1 auto;
     justify-content: center;
     align-items: start;
+    align-items: safe center; /* Safari unsupported */
     align-self: stretch;
   }
 </style>
