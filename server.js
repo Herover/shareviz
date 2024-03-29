@@ -16,8 +16,11 @@ function createDoc(callback) {
     if (doc.type === null) {
       doc.create({
         data: {
-          type: "tsv",
-          raw: `gæstens nationalitet	område	antal	tid
+          sets: [
+            {
+              id: "1",
+              type: "tsv",
+              raw: `gæstens nationalitet	område	antal	tid
 Danmark	Region Hovedstaden	7079455	2022
 Danmark	Region Sjælland	2762168	2022
 Danmark	Region Syddanmark	7176068	2022
@@ -38,22 +41,24 @@ Verden udenfor Danmark	Region Sjælland	754574	2023
 Verden udenfor Danmark	Region Syddanmark	4169743	2023
 Verden udenfor Danmark	Region Midtjylland	1423986	2023
 Verden udenfor Danmark	Region Nordjylland	1427582	2023`,
-          rows: [
-            {
-              key: "gæstens nationalitet",
-              type: "text",
-            },
-            {
-              key: "område",
-              type: "text",
-            },
-            {
-              key: "tid",
-              type: "text",
-            },
-            {
-              key: "antal",
-              type: "number",
+              rows: [
+                {
+                  key: "gæstens nationalitet",
+                  type: "text",
+                },
+                {
+                  key: "område",
+                  type: "text",
+                },
+                {
+                  key: "tid",
+                  type: "text",
+                },
+                {
+                  key: "antal",
+                  type: "number",
+                },
+              ],
             },
           ],
         },
@@ -78,6 +83,7 @@ Verden udenfor Danmark	Region Nordjylland	1427582	2023`,
             },
           ],
           hBar: {
+            dataSet: "1",
             categories: "område",
             subCategories: "tid",
             value: "antal",
