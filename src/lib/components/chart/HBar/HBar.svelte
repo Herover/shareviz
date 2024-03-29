@@ -21,7 +21,7 @@
   const barMargin = 0;
   const blockMargin = 16;
   const scaleHeight = 16;
-  let legendHeight = showLegend ? 24 : 0;
+  let legendHeight = showLegend ? 0 : -16;
 
   $: bars =
     values.length != 0 && values[0].value.length != 0
@@ -48,6 +48,12 @@
       )?.values || ["#000", "#888"],
     );
 
+  $: height =
+    (blockHeight + blockMargin) * values.length -
+    blockMargin +
+    // bars * barMargin +
+    legendHeight +
+    scaleHeight;
   onMount(() =>
     dispatch("size", {
       height:
@@ -69,67 +75,83 @@
   $: console.log("hbar", values);
 </script>
 
-<g transform="translate({0},{0})">
-  {#if legendHeight != 0}
-    {#if showLegend}
+<div class="legend">
+  {#if showLegend}
+    <p class="legend-left">
       {#each color.domain().map((d) => ({ k: d, c: color(d) })) as d, i}
-        <rect x={i * 80} y={0} width={16} height={15} fill={d.c || ""} />
-        <text x={i * 80 + 24} dominant-baseline="hanging">{d.k}</text>
+        <div style="background-color:{d.c}" class="legend-box" /><span>{d.k}</span>
       {/each}
-    {/if}
+    </p>
   {/if}
 
-  <text
-    x={valueWidth + labelWidth}
-    font-weight="bold"
-    dominant-baseline="hanging"
-    text-anchor="end">{label}</text
-  >
-</g>
+  <p style="font-weight:bold;" class="legend-right">
+    {label}
+  </p>
+</div>
 
-<g transform="translate({labelWidth},{legendHeight})">
-  <!-- <path d="m 0,0 l {valueWidth},0" stroke="black" stroke-width="1" /> -->
+<svg width={valueWidth + labelWidth} {height}>
+  <g transform="translate({labelWidth},{legendHeight})">
+    <!-- <path d="m 0,0 l {valueWidth},0" stroke="black" stroke-width="1" /> -->
 
-  {#each valueScale.ticks(3) as tick}
-    <path
-      d="m {valueScale(tick)},{scaleHeight} l 0,{(blockHeight + blockMargin) *
-        values.length -
-        blockMargin}"
-      stroke="#aaaaaa"
-      stroke-width="1"
-    />
-    {#if showLegend}
-      <text
-        text-anchor="middle"
-        dominant-baseline="hanging"
-        font-size={scaleHeight}
-        x={valueScale(tick)}>{formatNumber(tick)}</text
-      >
-    {/if}
-  {/each}
-</g>
-
-<g transform="translate({0},{scaleHeight + legendHeight})">
-  {#each values as d, i}
-    <g transform="translate({0},{i * (blockHeight + blockMargin)})">
-      <text
-        x={0}
-        y={blockHeight / 2}
-        dominant-baseline="middle"
-        text-anchor="start">{d.label}</text
-      >
-
-      {#each d.value as dd, ii}
-        <rect
-          x={labelWidth}
-          y={ii * valueHeight + barMargin}
-          height={barHeight}
-          width={valueScale(dd.value)}
-          fill={color(dd.label)}
+    {#each valueScale.ticks(3) as tick}
+      <path
+        d="m {valueScale(tick)},{scaleHeight} l 0,{(blockHeight + blockMargin) *
+          values.length -
+          blockMargin}"
+        stroke="#aaaaaa"
+        stroke-width="1"
+      />
+      {#if showLegend}
+        <text
+          text-anchor="middle"
+          dominant-baseline="hanging"
+          font-size={scaleHeight}
+          x={valueScale(tick)}>{formatNumber(tick)}</text
         >
-          <title>{dd.label}: {dd.value}</title>
-        </rect>
-      {/each}
-    </g>
-  {/each}
-</g>
+      {/if}
+    {/each}
+  </g>
+
+  <g transform="translate({0},{scaleHeight + legendHeight})">
+    {#each values as d, i}
+      <g transform="translate({0},{i * (blockHeight + blockMargin)})">
+        <text
+          x={0}
+          y={blockHeight / 2}
+          dominant-baseline="middle"
+          text-anchor="start">{d.label}</text
+        >
+
+        {#each d.value as dd, ii}
+          <rect
+            x={labelWidth}
+            y={ii * valueHeight + barMargin}
+            height={barHeight}
+            width={valueScale(dd.value)}
+            fill={color(dd.label)}
+          >
+            <title>{dd.label}: {dd.value}</title>
+          </rect>
+        {/each}
+      </g>
+    {/each}
+  </g>
+</svg>
+
+<style>
+  .legend {
+    display: flex;
+  }
+  .legend-right {
+    margin-left: auto;
+  }
+  .legend-box {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 4px;
+    margin-left: 4px;
+    position: relative;
+    top: 0.1em;
+  }
+</style>

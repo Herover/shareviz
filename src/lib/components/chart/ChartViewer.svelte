@@ -26,102 +26,94 @@
         chartSpec.style.sourceMargin;
 </script>
 
-<svg width={chartSpec.chart.width} {height}>
-  <defs>
-    <style>
-      svg {
-        font-family: Arial, Helvetica, sans-serif;
-      }
-    </style>
-  </defs>
-  <rect width={chartSpec.chart.width} {height} fill={chartSpec.style.bgColor} />
-  <g
-    transform="translate({chartSpec.style.marginLeft}, {chartSpec.style
-      .marginTop})"
+<div
+  class="chart"
+  style:width="{chartSpec.chart.width}px"
+  style:background-color={chartSpec.style.bgColor}
+  style:padding-left="{chartSpec.style.marginLeft}px"
+  style:padding-right="{chartSpec.style.marginRight}px"
+  style:padding-top="{chartSpec.style.marginTop}px"
+  style:padding-bottom="{chartSpec.style.marginBottom}px"
+>
+  <p
+    style:font-size="{chartSpec.style.titleSize}px"
+    style:font-weight={chartSpec.style.titleBold ? "bold" : "normal"}
+    class="title"
   >
-    <text
-      font-size={chartSpec.style.titleSize}
-      font-weight={chartSpec.style.titleBold ? "bold" : "normal"}
-      y={chartSpec.style.titleSize}>{chartSpec.chart.title}</text
-    >
-    <text
-      font-size={chartSpec.style.subTitleSize}
-      font-weight={chartSpec.style.subTitleBold ? "bold" : "normal"}
-      y={chartSpec.style.subTitleSize * 2 + chartSpec.style.titleSize}
-      >{chartSpec.chart.subTitle}</text
-    >
-    <g
-      transform="translate({0},{chartSpec.style.subTitleSize * 3 +
-        chartSpec.style.titleSize})"
-    >
-      <!-- <rect
-        x={0}
-        y={0}
-        width={chartSpec.chart.width -
-          chartSpec.style.marginLeft -
-          chartSpec.style.marginRight}
-        height={sizeHeight}
-        fill="#aaffaa"
-      /> -->
-      {#if chartSpec.chart.chartType == "hBar"}
-        {#each group( chartSpec.chart.hBar.repeat, hBarData, (k, d) => ({ k, d }), ) as { k, d }, i}
-          <g transform="translate(0, {(sizeHeight + repeatSpacing) * i})">
-            <HBar
-              {chartSpec}
-              hBarSpec={chartSpec.chart.hBar}
-              labelWidth={chartSpec.chart.hBar.labelWidth}
-              valueWidth={chartSpec.chart.width -
-                chartSpec.style.marginLeft -
-                chartSpec.style.marginRight -
-                chartSpec.chart.hBar.labelWidth}
-              values={group(chartSpec.chart.hBar.categories, d, (k, g) => ({
-                label: k,
-                value: group(
-                  chartSpec.chart.hBar.subCategories,
-                  g,
-                  (kk, gg) => {
-                    let sum = gg.reduce(
-                      (acc, d) => acc + d[chartSpec.chart.hBar.value],
-                      0,
-                    );
-                    return {
-                      label: kk,
-                      value: sum,
-                    };
-                  },
-                ),
-              }))}
-              label={k}
-              showLegend={i == 0}
-              on:size={(e) => onSizeInfo(e.detail.height)}
-            />
-          </g>
-        {/each}
+    {#each chartSpec.chart.title.split("\n") as line, i}
+      {#if i != 0}
+        <br />
       {/if}
-    </g>
-    <g
-      transform="translate({0},{chartSpec.style.subTitleSize * 3 +
-        chartSpec.style.titleSize +
-        (sizeHeight + repeatSpacing) * sizeMul -
-        repeatSpacing +
-        chartSpec.style.sourceMargin})"
-    >
-      <text dominant-baseline="hanging">
-        <a href={chartSpec.chart.sourceTextLeftLink} fill="#888888"
-          >{chartSpec.chart.sourceTextLeft}</a
-        >
-      </text>
-      <text
-        x={chartSpec.chart.width -
+      {line}
+    {/each}
+  </p>
+  <p
+    style:font-size="{chartSpec.style.subTitleSize}px"
+    style:font-weight={chartSpec.style.subTitleBold ? "bold" : "normal"}
+  >
+    {#each chartSpec.chart.subTitle.split("\n") as line, i}
+      {#if i != 0}
+        <br />
+      {/if}
+      {line}
+    {/each}
+  </p>
+  {#if chartSpec.chart.chartType == "hBar"}
+    {#each group( chartSpec.chart.hBar.repeat, hBarData, (k, d) => ({ k, d }), ) as { k, d }, i}
+      <HBar
+        {chartSpec}
+        hBarSpec={chartSpec.chart.hBar}
+        labelWidth={chartSpec.chart.hBar.labelWidth}
+        valueWidth={chartSpec.chart.width -
           chartSpec.style.marginLeft -
-          chartSpec.style.marginRight}
-        dominant-baseline="hanging"
-        text-anchor="end"
+          chartSpec.style.marginRight -
+          chartSpec.chart.hBar.labelWidth}
+        values={group(chartSpec.chart.hBar.categories, d, (k, g) => ({
+          label: k,
+          value: group(chartSpec.chart.hBar.subCategories, g, (kk, gg) => {
+            let sum = gg.reduce(
+              (acc, d) => acc + d[chartSpec.chart.hBar.value],
+              0,
+            );
+            return {
+              label: kk,
+              value: sum,
+            };
+          }),
+        }))}
+        label={k}
+        showLegend={i == 0}
+        on:size={(e) => onSizeInfo(e.detail.height)}
+      />
+    {/each}
+  {/if}
+  <div class="source">
+    <p class="source-left">
+      <a href={chartSpec.chart.sourceTextLeftLink} style="color:#888888"
+        >{chartSpec.chart.sourceTextLeft}</a
       >
-        <a href={chartSpec.chart.sourceTextRightLink} fill="#888888"
-          >{chartSpec.chart.sourceTextRight}</a
-        >
-      </text>
-    </g>
-  </g>
-</svg>
+    </p>
+    <p class="source-right">
+      <a href={chartSpec.chart.sourceTextRightLink} style="color:#888888"
+        >{chartSpec.chart.sourceTextRight}</a
+      >
+    </p>
+  </div>
+</div>
+
+<style>
+  .chart {
+    font-family: Arial, Helvetica, sans-serif;
+    box-sizing: border-box;
+  }
+  .source {
+    display: flex;
+    gap: 16px;
+  }
+  .source-right {
+    margin-left: auto;
+  }
+  p.title {
+    margin-top: 0px;
+  }
+</style>

@@ -13,7 +13,7 @@
 
 <p>
   <label>
-    Title: <input
+    Title: <textarea
       value={spec.chart.title}
       on:keyup={(e) => chartScope.setConfigTitle(e.currentTarget.value)}
     />
@@ -21,7 +21,7 @@
 </p>
 <p>
   <label>
-    Sub title: <input
+    Sub title: <textarea
       value={spec.chart.subTitle}
       on:keyup={(e) => chartScope.setConfigSubTitle(e.currentTarget.value)}
     />
@@ -94,9 +94,12 @@
 {/if}
 
 <style>
-  input {
+  input, textarea {
     width: 100%;
     box-sizing: border-box;
+  }
+  textarea {
+    resize: vertical;
   }
   /* p {
     margin-top: 1em;
