@@ -102,10 +102,12 @@
   }
 
   .chart-viewer {
+    height: 100vh;
+    overflow-y: scroll;
     display: flex;
     flex: 1 1 auto;
     justify-content: center;
-    align-items: center;
+    align-items: start;
     align-self: stretch;
   }
 </style>

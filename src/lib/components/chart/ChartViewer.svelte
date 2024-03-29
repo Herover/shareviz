@@ -12,18 +12,6 @@
   $: hBarData = data[chartSpec.chart.hBar.dataSet];
   $: sizeMul = group(chartSpec.chart.hBar.repeat, hBarData, (k, d) => 0).length;
   const onSizeInfo = (height: number) => (sizeHeight = height);
-
-  $: height =
-    chartSpec == null
-      ? 0
-      : chartSpec.style.subTitleSize * 3 +
-        chartSpec.style.titleSize +
-        (sizeHeight + repeatSpacing) * sizeMul -
-        repeatSpacing +
-        16 +
-        chartSpec.style.marginBottom +
-        chartSpec.style.marginTop +
-        chartSpec.style.sourceMargin;
 </script>
 
 <div
@@ -109,6 +97,9 @@
   .source {
     display: flex;
     gap: 16px;
+  }
+  .source p {
+    margin-bottom: 0px;
   }
   .source-right {
     margin-left: auto;
