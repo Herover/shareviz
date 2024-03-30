@@ -8,6 +8,8 @@
 
   export let data;
 
+  let viewScale = 100;
+
   const disconnect = db.connect(data.id);
 
   $: chartSpec = $db.doc as Root;
@@ -47,7 +49,17 @@
     </div>
 
     <div class="chart-viewer">
-      <ChartViewer {chartSpec} data={chartData} />
+      <div class="view-controls">
+        <div>Zoom</div>
+        <div><button on:click={() => (viewScale -= 10)}>-</button></div>
+        <div><input value={viewScale} size="2" /></div>
+        <div><button on:click={() => (viewScale += 10)}>+</button></div>
+      </div>
+      <div class="chart-view">
+        <div style:scale={viewScale / 100}>
+          <ChartViewer {chartSpec} data={chartData} />
+        </div>
+      </div>
     </div>
 
     <div class="chart-controls-pane">
@@ -104,11 +116,29 @@
   .chart-viewer {
     height: 100vh;
     overflow-y: scroll;
-    display: flex;
+    align-self: stretch;
     flex: 1 1 auto;
+  }
+  .chart-view {
+    height: 100vh;
+    display: flex;
     justify-content: center;
     align-items: start;
     align-items: safe center; /* Safari unsupported */
-    align-self: stretch;
+  }
+  .view-controls {
+    height: 2em;
+    width: calc(100% - 400px);
+    z-index: 10;
+    position: absolute;
+    top: 0px;
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    /* gap: 0.5em; */
+    align-items: center;
+  }
+  .view-controls div {
+    margin: 0.25em;
   }
 </style>
