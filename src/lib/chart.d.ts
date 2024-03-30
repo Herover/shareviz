@@ -53,10 +53,21 @@ export interface HBar {
 }
 
 export interface Line {
+  dataSet: string
   x: X
+  y: Y
+  categories: string
 }
 
-export interface X {}
+export interface X {
+  key: string
+  scale: string
+}
+
+export interface Y {
+  key: string
+  scale: string
+}
 
 export interface Style {
   marginTop: number

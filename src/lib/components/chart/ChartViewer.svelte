@@ -2,21 +2,22 @@
   import type { Root } from "$lib/chart";
   import { group } from "$lib/utils";
   import HBar from "./HBar/HBar.svelte";
+  import Line from "./Line/Line.svelte";
 
   export let chartSpec: Root;
   export let data: { [key: string]: any[] };
+  export let width = 0;
 
   const repeatSpacing = 32;
 
   let sizeHeight = 0;
   $: hBarData = data[chartSpec.chart.hBar.dataSet];
-  $: sizeMul = group(chartSpec.chart.hBar.repeat, hBarData, (k, d) => 0).length;
-  const onSizeInfo = (height: number) => (sizeHeight = height);
+  $: chartWidth = width || chartSpec.chart.width;
 </script>
 
 <div
   class="chart"
-  style:width="{chartSpec.chart.width}px"
+  style:width="{chartWidth}px"
   style:background-color={chartSpec.style.bgColor}
   style:padding-left="{chartSpec.style.marginLeft}px"
   style:padding-right="{chartSpec.style.marginRight}px"
@@ -52,7 +53,7 @@
         {chartSpec}
         hBarSpec={chartSpec.chart.hBar}
         labelWidth={chartSpec.chart.hBar.labelWidth}
-        valueWidth={chartSpec.chart.width -
+        valueWidth={chartWidth -
           chartSpec.style.marginLeft -
           chartSpec.style.marginRight -
           chartSpec.chart.hBar.labelWidth}
@@ -71,9 +72,27 @@
         }))}
         label={k}
         showLegend={i == 0}
-        on:size={(e) => onSizeInfo(e.detail.height)}
       />
     {/each}
+    <!-- {:else if chartSpec.chart.chartType == "line"} -->
+    <Line
+      {chartSpec}
+      lineSpec={chartSpec.chart.line}
+      values={group(
+        chartSpec.chart.line.categories,
+        data[chartSpec.chart.line.dataSet],
+        (k, g) => ({
+          label: k,
+          value: g.map((d) => ({
+            x: Number.parseInt(d[chartSpec.chart.line.x.key]),
+            y: Number.parseInt(d[chartSpec.chart.line.y.key]),
+          })),
+        }),
+      )}
+      width={chartWidth -
+        chartSpec.style.marginLeft -
+        chartSpec.style.marginRight}
+    />
   {/if}
   <div class="source">
     <p class="source-left">
