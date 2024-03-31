@@ -50,6 +50,7 @@ export interface HBar {
   value: string
   labelWidth: number
   repeat: string
+  scale: string
 }
 
 export interface Line {

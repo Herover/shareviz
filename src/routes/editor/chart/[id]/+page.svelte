@@ -5,6 +5,7 @@
   import { dsvFormat, type DSVParsedArray } from "d3-dsv";
   import ChartEditor from "$lib/components/chart/ChartEditor.svelte";
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
+  import DataSetEditor from "$lib/components/chart/DataSetsEditor.svelte";
 
   export let data;
 
@@ -45,6 +46,8 @@
     <div class="chart-controls-pane">
       <div class="chart-controls-primary chart-controls">
         <ChartEditor spec={chartSpec} chartScope={db.chart()} />
+        <br />
+        <DataSetEditor chartData={chartSpec.data} store={db} />
       </div>
     </div>
 

@@ -33,7 +33,7 @@
   $: valueScale = scaleLinear()
     .range([0, valueWidth])
     .domain(
-      chartSpec.chart.scales.find((s) => s.dataKey == hBarSpec.value)
+      chartSpec.chart.scales.find((s) => s.name == hBarSpec.scale)
         ?.dataRange || [0, 1],
     );
   $: color = scaleOrdinal<string>()

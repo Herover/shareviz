@@ -8,7 +8,7 @@
   export let dbHBar: ReturnType<ReturnType<typeof db.chart>["hBar"]>;
 
   $: scaleIndex = spec.chart.scales.findIndex(
-    (s) => s.dataKey == spec.chart.hBar.value,
+    (s) => s.name == spec.chart.hBar.scale,
   );
   $: scale = spec.chart.scales[scaleIndex];
 </script>
@@ -60,6 +60,7 @@
       value={spec.chart.hBar.value}
       on:change={(e) => dbHBar.setValue(e.currentTarget.value)}
     >
+      <option>{""}</option>
       {#each dataSet.rows.filter((r) => r.type == "number") as row}
         <option>{row.key}</option>
       {/each}
