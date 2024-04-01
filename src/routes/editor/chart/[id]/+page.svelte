@@ -7,12 +7,17 @@
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
   import DataSetEditor from "$lib/components/chart/DataSetsEditor.svelte";
   import EditorCollapsible from "$lib/components/chart/EditorCollapsible.svelte";
+    import { onDestroy } from "svelte";
 
   export let data;
 
   let viewScale = 100;
 
   const disconnect = db.connect(data.id);
+
+  onDestroy(() => {
+    disconnect();
+  })
 
   $: chartSpec = $db.doc as Root;
   $: console.log(chartSpec, JSON.stringify(chartSpec));

@@ -37,8 +37,10 @@ export const db = function createDB() {
   return {
     subscribe, set, update,
     connect: (id: string) => {
+      const host = typeof window == "undefined" ? "localhost" : window.location.host.split(":")[0];
+      console.log(`HOST IS ws://${host}:8080`)
 
-      const socket = new ReconnectingWebSocket('ws://localhost:8080', [], {
+      const socket = new ReconnectingWebSocket(`ws://${host}:8080`, [], {
         // ShareDB handles dropped messages, and buffering them while the socket
         // is closed has undefined behavior
         maxEnqueuedMessages: 0,
