@@ -7,7 +7,6 @@
   export let store: typeof db;
 </script>
 
-<b>Data sets</b>
 {#each chartData.sets as dataSet, i}
   {#if i != 0}
     <br />

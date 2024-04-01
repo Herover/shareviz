@@ -6,6 +6,7 @@
   import ChartEditor from "$lib/components/chart/ChartEditor.svelte";
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
   import DataSetEditor from "$lib/components/chart/DataSetsEditor.svelte";
+  import EditorCollapsible from "$lib/components/chart/EditorCollapsible.svelte";
 
   export let data;
 
@@ -45,9 +46,15 @@
   {#if chartSpec != null}
     <div class="chart-controls-pane">
       <div class="chart-controls-primary chart-controls">
-        <ChartEditor spec={chartSpec} chartScope={db.chart()} />
-        <br />
-        <DataSetEditor chartData={chartSpec.data} store={db} />
+        <EditorCollapsible group="controls" key="data" label="Data sets">
+          <DataSetEditor chartData={chartSpec.data} store={db} />
+        </EditorCollapsible>
+        <EditorCollapsible group="controls" key="main" label="Chart settings">
+          <ChartEditor spec={chartSpec} chartScope={db.chart()} />
+        </EditorCollapsible>
+        <EditorCollapsible group="controls" key="main" label="Export">
+          <a href="/view/chart/{data.id}">Embed link</a>
+        </EditorCollapsible>
       </div>
     </div>
 
