@@ -7,7 +7,7 @@
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
   import DataSetEditor from "$lib/components/chart/DataSetsEditor.svelte";
   import EditorCollapsible from "$lib/components/chart/EditorCollapsible.svelte";
-    import { onDestroy } from "svelte";
+  import { onDestroy } from "svelte";
 
   export let data;
 
@@ -17,7 +17,7 @@
 
   onDestroy(() => {
     disconnect();
-  })
+  });
 
   $: chartSpec = $db.doc as Root;
   $: console.log(chartSpec, JSON.stringify(chartSpec));
@@ -51,10 +51,20 @@
   {#if chartSpec != null}
     <div class="chart-controls-pane">
       <div class="chart-controls-primary chart-controls">
-        <EditorCollapsible group="controls" key="data" label="Data sets">
+        <EditorCollapsible
+          group="controls"
+          key="data"
+          label="Data sets"
+          startOpen={chartSpec.data.sets.length == 0}
+        >
           <DataSetEditor chartData={chartSpec.data} store={db} />
         </EditorCollapsible>
-        <EditorCollapsible group="controls" key="main" label="Chart settings">
+        <EditorCollapsible
+          group="controls"
+          key="main"
+          label="Chart settings"
+          startOpen={chartSpec.data.sets.length != 0}
+        >
           <ChartEditor spec={chartSpec} chartScope={db.chart()} />
         </EditorCollapsible>
         <EditorCollapsible group="controls" key="main" label="Export">
