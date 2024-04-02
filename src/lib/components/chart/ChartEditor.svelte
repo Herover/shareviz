@@ -5,10 +5,6 @@
 
   export let chartScope: ReturnType<typeof db.chart>;
   export let spec: Root;
-
-  $: hBarDataSet = spec.data.sets.find(
-    (set) => (set.id = spec.chart.hBar.dataSet),
-  );
 </script>
 
 <p>
@@ -89,7 +85,6 @@
     {spec}
     dbHBar={chartScope.hBar()}
     chart={chartScope}
-    dataSet={hBarDataSet}
   />
 {/if}
 

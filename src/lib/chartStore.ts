@@ -134,6 +134,7 @@ export const db = function createDB() {
             setSubCategories: (value: string) => doc.submitOp(["chart", "hBar", "subCategories", { r: 0, i: value }]),
             setValue: (value: string) => doc.submitOp(["chart", "hBar", "value", { r: 0, i: value }]),
             setRepeat: (value: string) => doc.submitOp(["chart", "hBar", "repeat", { r: 0, i: value }]),
+            setDataSet: (value: string) => doc.submitOp(["chart", "hBar", "dataSet", { r: 0, i: value }]),
           }
         },
         setConfigTitle: (value: string) => doc.submitOp(["chart", "title", { r: 0, i: value }]),
