@@ -168,7 +168,13 @@ Region Nordjylland	2023	4989245`,
               name: "color",
               dataKey: "",
               type: "categoriesColor",
-              values: ["#ff8888", "#aa2222"],
+              colors: {
+                default: "#888888",
+                byKey: [
+                  { k: "2023", c: "#aa2222", legend: "2023" },
+                  { k: "2022", c: "#ff8888", legend: "2022" },
+                ],
+              },
             },
             {
               name: "lineX",

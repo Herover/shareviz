@@ -36,17 +36,18 @@
       chartSpec.chart.scales.find((s) => s.name == hBarSpec.scale)
         ?.dataRange || [0, 1],
     );
-  $: color = scaleOrdinal<string>()
-    .domain(
-      values.length != 0 && values[0].value.length != 0
-        ? values[0].value.map((d) => d.label)
-        : [],
-    )
-    .range(
-      chartSpec.chart.scales.find(
-        (s) => s.type == "categoriesColor" /* hBarSpec.subCategories */,
-      )?.values || ["#000", "#888"],
-    );
+  // "#ff8888", "#aa2222"
+  $: colors = chartSpec.chart.scales.find((s) => s.name == "color")?.colors || {
+    default: "#888",
+    byKey: [],
+  };
+  $: color = (d: { label: string }) => {
+    const c = colors.byKey.find((e) => e.k == d.label);
+    if (c) {
+      return c.c;
+    }
+    return colors.default;
+  };
 
   $: height =
     (blockHeight + blockMargin) * values.length -
@@ -78,8 +79,11 @@
 <div class="legend">
   {#if showLegend}
     <p class="legend-left">
-      {#each color.domain().map((d) => ({ k: d, c: color(d) })) as d, i}
-        <div style="background-color:{d.c}" class="legend-box" /><span>{d.k}</span>
+      {#each colors.byKey as d}
+        {#if d.legend}
+          <div style="background-color:{d.c}" class="legend-box" />
+          <span>{d.legend}</span>
+        {/if}
       {/each}
     </p>
   {/if}
@@ -128,7 +132,7 @@
             y={ii * valueHeight + barMargin}
             height={barHeight}
             width={valueScale(dd.value)}
-            fill={color(dd.label)}
+            fill={color(dd)}
           >
             <title>{dd.label}: {dd.value}</title>
           </rect>

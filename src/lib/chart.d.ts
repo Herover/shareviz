@@ -40,7 +40,18 @@ export interface Scale {
   dataKey: string
   type: string
   dataRange?: number[]
-  values?: string[]
+  colors?: Colors
+}
+
+export interface Colors {
+  default: string
+  byKey: ByKey[]
+}
+
+export interface ByKey {
+  k: string
+  c: string
+  legend: string
 }
 
 export interface HBar {
