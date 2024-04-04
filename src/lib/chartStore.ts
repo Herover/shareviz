@@ -150,9 +150,11 @@ export const db = function createDB() {
         setColorScaleKey: (scaleIndex: number, colorIndex: number, value: string) => doc.submitOp(["chart", "scales", scaleIndex, "colors", "byKey", colorIndex, "k", { r: 0, i: value }]),
         setColorScaleColor: (scaleIndex: number, colorIndex: number, value: string) => doc.submitOp(["chart", "scales", scaleIndex, "colors", "byKey", colorIndex, "c", { r: 0, i: value }]),
         setColorScaleLegend: (scaleIndex: number, colorIndex: number, value: string) => doc.submitOp(["chart", "scales", scaleIndex, "colors", "byKey", colorIndex, "legend", { r: 0, i: value }]),
-        addColorScaleColor: (scaleIndex: number, colorIndex: number) => doc.submitOp(["chart", "scales", scaleIndex, "colors", "byKey", colorIndex, { i: { c: "", k: "" } }]),
+        addColorScaleColor: (scaleIndex: number, colorIndex: number, k = "", c = "", legend = "") => doc.submitOp(["chart", "scales", scaleIndex, "colors", "byKey", colorIndex, { i: { c, k, legend } }]),
         removeColorScaleColor: (scaleIndex: number, colorIndex: number) => doc.submitOp(["chart", "scales", scaleIndex, "colors", "byKey", colorIndex, { r: 0 }]),
         setColorScaleDefaultColor: (scaleIndex: number, value: string) => doc.submitOp(["chart", "scales", scaleIndex, "colors", "default", { r: 0, i: value }]),
+        moveColorUp: (scaleIndex: number, colorIndex: number) => doc.submitOp(["chart", "scales", scaleIndex, "colors", "byKey", [ colorIndex, { p: 0 } ], [ colorIndex - 1, { d: 0 } ]]),
+        moveColorDown: (scaleIndex: number, colorIndex: number) => doc.submitOp(["chart", "scales", scaleIndex, "colors", "byKey", [ colorIndex, { p: 0 } ], [ colorIndex + 1, { d: 0 } ]]),
       };
     },
     dataSet: (index: number) => {

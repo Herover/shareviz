@@ -70,6 +70,13 @@
       );
     }
   };
+
+  $: moveColorKeyUp = (i: number) => {
+    chart.moveColorUp(colorScaleIndex, i);
+  };
+  $: moveColorKeyDown = (i: number) => {
+    chart.moveColorDown(colorScaleIndex, i);
+  };
 </script>
 
 <p>
@@ -176,8 +183,9 @@
   <p>Colors</p>
   {#if colorScale && colorScale.colors}
     <table class="color-control">
-      <tr><th>Key</th><th>Color</th><th></th><th>Label</th></tr>
+      <tr><th></th><th>Key</th><th>Color</th><th></th><th>Label</th></tr>
       <tr>
+        <td></td>
         <td><input value={"default"} disabled /> </td>
         <td>
           <input
@@ -205,6 +213,18 @@
       </tr>
       {#each colorScale.colors.byKey as color, i}
         <tr>
+          <td style="width:38px;">
+            <button
+              disabled={i == 0}
+              on:click={(e) => moveColorKeyUp(i)}
+              class="color-control-arrow">&#x25B2;</button
+            >
+            <button
+              disabled={i == colorScale.colors.byKey.length - 1}
+              on:click={(e) => moveColorKeyDown(i)}
+              class="color-control-arrow">&#x25BC;</button
+            >
+          </td>
           <td>
             <input
               value={color.k}
@@ -307,5 +327,12 @@
     width: 1em;
     height: 1em;
     display: inline-block;
+  }
+  .color-control-arrow {
+    width: 16px;
+    border: 0px;
+    background: none;
+    margin: 0px;
+    padding: 0px;
   }
 </style>
