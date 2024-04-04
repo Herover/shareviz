@@ -1,10 +1,14 @@
 <script lang="ts">
-  import type { Root } from "$lib/chart";
+  import type { Data, Root } from "$lib/chart";
   import { db } from "$lib/chartStore";
+  import type { DSVParsedArray } from "d3-dsv";
   import HBarEditor from "./HBar/HBarEditor.svelte";
 
   export let chartScope: ReturnType<typeof db.chart>;
   export let spec: Root;
+  export let chartData: {
+    [key: string]: DSVParsedArray<any>;
+  };
 </script>
 
 <p>
@@ -85,6 +89,7 @@
     {spec}
     dbHBar={chartScope.hBar()}
     chart={chartScope}
+    {chartData}
   />
 {/if}
 

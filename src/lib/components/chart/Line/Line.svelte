@@ -18,6 +18,9 @@
   const bottomMargin = 24;
   const leftMargin = 24;
   const rightMargin = 0;
+  const lineWidth = 4
+  const lineColor = "#000000";
+  const fillColor = "rgba(255, 0, 0, 0.3)"
   const fill = true;
   const stackValues = false;
   $: stacked = values
@@ -104,15 +107,14 @@
                   .reverse(),
               ),
           )}
-          stroke-width="3"
-          fill="rgba(255, 0, 0, 0.3)"
+          fill={fillColor}
         />
       {/each}
       {#each stacked as d, i}
         <path
           d={draw(d.value.map((e) => ({ x: e.x, y: e.to })))}
-          stroke="black"
-          stroke-width="3"
+          stroke={lineColor}
+          stroke-width={lineWidth}
           fill="none"
         />
       {/each}
@@ -126,13 +128,12 @@
                 { x: xScale.domain()[0], y: 0, from: 0, to: 0 },
               ]),
             )}
-            stroke-width="3"
-            fill="rgba(255, 0, 0, 0.3)"
+            fill={fillColor}
           />
         {/each}
       {/if}
       {#each stacked as d}
-        <path d={draw(d.value)} stroke="black" stroke-width="3" fill="none" />
+        <path d={draw(d.value)} stroke={lineColor} stroke-width={lineWidth} fill="none" />
       {/each}
     {/if}
   </g>

@@ -1,10 +1,15 @@
 <script lang="ts">
-  import type { Root, Set } from "$lib/chart";
+  import type { Data, Root, Set } from "$lib/chart";
   import type { db } from "$lib/chartStore";
+  import { group } from "$lib/utils";
+  import type { DSVParsedArray } from "d3-dsv";
 
   export let spec: Root;
   export let chart: ReturnType<typeof db.chart>;
   export let dbHBar: ReturnType<ReturnType<typeof db.chart>["hBar"]>;
+  export let chartData: {
+    [key: string]: DSVParsedArray<any>;
+  };
 
   const deleteColor = (i: number, ci: number) => {
     chart.removeColorScaleColor(i, ci);
@@ -23,6 +28,48 @@
     (s) => s.type == "categoriesColor",
   );
   $: colorScale = spec.chart.scales[colorScaleIndex];
+
+  $: automateColorKeys = () => {
+    if (
+      spec.chart.hBar.subCategories &&
+      spec.chart.hBar.dataSet &&
+      chartData[spec.chart.hBar.dataSet]
+    ) {
+      const dataSet = chartData[spec.chart.hBar.dataSet];
+      const groups = group(spec.chart.hBar.subCategories, dataSet, (k) => k);
+      groups.forEach((k) => {
+        if (
+          !spec.chart.scales[colorScaleIndex].colors?.byKey.find(
+            (d) => d.k == k,
+          )
+        ) {
+          const keyIndex =
+            spec.chart.scales[colorScaleIndex].colors?.byKey.length || 0;
+          chart.addColorScaleColor(colorScaleIndex, keyIndex, k, "#FF0000", k);
+        }
+      });
+    }
+  };
+
+  $: removeExtraColorKeys = () => {
+    if (
+      spec.chart.hBar.subCategories &&
+      spec.chart.hBar.dataSet &&
+      chartData[spec.chart.hBar.dataSet]
+    ) {
+      const dataSet = chartData[spec.chart.hBar.dataSet];
+      const groups = group(spec.chart.hBar.subCategories, dataSet, (k) => k);
+      let removed = 0;
+      spec.chart.scales[colorScaleIndex].colors?.byKey.forEach(
+        (c, keyIndex) => {
+          if (!groups.find((k) => c.k == k)) {
+            chart.removeColorScaleColor(colorScaleIndex, keyIndex - removed);
+            removed++;
+          }
+        },
+      );
+    }
+  };
 </script>
 
 <p>
@@ -224,6 +271,8 @@
       on:click={() => addColor(colorScaleIndex, colorScale.colors.byKey.length)}
       >Add new</button
     >
+    <button on:click={automateColorKeys}>Add missing data keys</button>
+    <button on:click={removeExtraColorKeys}>Remove extra data keys</button>
   {/if}
   <p>
     <label

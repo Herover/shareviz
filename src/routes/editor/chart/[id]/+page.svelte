@@ -65,7 +65,7 @@
           label="Chart settings"
           startOpen={chartSpec.data.sets.length != 0}
         >
-          <ChartEditor spec={chartSpec} chartScope={db.chart()} />
+          <ChartEditor spec={chartSpec} chartScope={db.chart()} chartData={chartData} />
         </EditorCollapsible>
         <EditorCollapsible group="controls" key="main" label="Export">
           <a href="/view/chart/{data.id}">Embed link</a>
