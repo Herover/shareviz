@@ -27,8 +27,7 @@ export interface Chart {
   height: number
   chartType: string
   scales: Scale[]
-  hBar: HBar
-  line: Line
+  elements: Element[]
   sourceTextLeft: string
   sourceTextLeftLink: string
   sourceTextRight: string
@@ -52,6 +51,12 @@ export interface ByKey {
   k: string
   c: string
   legend: string
+}
+
+export interface Element {
+  type: string
+  hBar?: HBar
+  line?: Line
 }
 
 export interface HBar {

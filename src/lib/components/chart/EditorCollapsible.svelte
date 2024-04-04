@@ -3,6 +3,7 @@
   export let key: string | number;
   export let label: string;
   export let startOpen: boolean = false;
+  export let lvl = 1;
 
   let open = startOpen || false;
 </script>
@@ -15,7 +16,11 @@
   >
     <!-- h3 is technically not allowed inside a button, but appears like the most accessible solution if we want a
       clickable header -->
-    <h3>{open ? "-" : "+"} {label}</h3>
+    {#if lvl == 1}
+      <h3>{open ? "-" : "+"} {label}</h3>
+    {:else if lvl == 2}
+      <h4>{open ? "-" : "+"} {label}</h4>
+    {/if}
   </button>
   <div class="content">
     {#if open}
@@ -38,7 +43,8 @@
   .content {
     width: 100%;
   }
-  h3 {
+  h3,
+  h4 {
     margin: 0px;
     padding-top: 1em;
   }

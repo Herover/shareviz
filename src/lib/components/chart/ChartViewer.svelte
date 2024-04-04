@@ -11,7 +11,6 @@
   const repeatSpacing = 32;
 
   let sizeHeight = 0;
-  $: hBarData = data[chartSpec.chart.hBar.dataSet];
   $: chartWidth = width || chartSpec.chart.width;
 </script>
 
@@ -47,53 +46,52 @@
       {line}
     {/each}
   </p>
-  {#if chartSpec.chart.chartType == "hBar"}
-    {#each group( chartSpec.chart.hBar.repeat, hBarData, (k, d) => ({ k, d }), ) as { k, d }, i}
-      <HBar
+  {#each chartSpec.chart.elements as element}
+    {#if element.type == "hBar"}
+      {#each group( element.hBar.repeat, data[element.hBar.dataSet], (k, d) => ({ k, d }), ) as { k, d }, i}
+        <HBar
+          {chartSpec}
+          hBarSpec={element.hBar}
+          labelWidth={element.hBar.labelWidth}
+          valueWidth={chartWidth -
+            chartSpec.style.marginLeft -
+            chartSpec.style.marginRight -
+            element.hBar.labelWidth}
+          values={group(element.hBar.categories, d, (k, g) => ({
+            label: k,
+            value: group(element.hBar.subCategories, g, (kk, gg) => {
+              let sum = gg.reduce((acc, d) => acc + d[element.hBar.value], 0);
+              return {
+                label: kk,
+                value: sum,
+              };
+            }),
+          }))}
+          label={k}
+          showLegend={i == 0}
+        />
+      {/each}
+    {:else if element.type == "line"}
+      <Line
         {chartSpec}
-        hBarSpec={chartSpec.chart.hBar}
-        labelWidth={chartSpec.chart.hBar.labelWidth}
-        valueWidth={chartWidth -
-          chartSpec.style.marginLeft -
-          chartSpec.style.marginRight -
-          chartSpec.chart.hBar.labelWidth}
-        values={group(chartSpec.chart.hBar.categories, d, (k, g) => ({
-          label: k,
-          value: group(chartSpec.chart.hBar.subCategories, g, (kk, gg) => {
-            let sum = gg.reduce(
-              (acc, d) => acc + d[chartSpec.chart.hBar.value],
-              0,
-            );
-            return {
-              label: kk,
-              value: sum,
-            };
+        lineSpec={element.line}
+        values={group(
+          element.line.categories,
+          data[element.line.dataSet],
+          (k, g) => ({
+            label: k,
+            value: g.map((d) => ({
+              x: Number.parseInt(d[element.line.x.key]),
+              y: Number.parseInt(d[element.line.y.key]),
+            })),
           }),
-        }))}
-        label={k}
-        showLegend={i == 0}
+        )}
+        width={chartWidth -
+          chartSpec.style.marginLeft -
+          chartSpec.style.marginRight}
       />
-    {/each}
-    <!-- {:else if chartSpec.chart.chartType == "line"} -->
-    <Line
-      {chartSpec}
-      lineSpec={chartSpec.chart.line}
-      values={group(
-        chartSpec.chart.line.categories,
-        data[chartSpec.chart.line.dataSet],
-        (k, g) => ({
-          label: k,
-          value: g.map((d) => ({
-            x: Number.parseInt(d[chartSpec.chart.line.x.key]),
-            y: Number.parseInt(d[chartSpec.chart.line.y.key]),
-          })),
-        }),
-      )}
-      width={chartWidth -
-        chartSpec.style.marginLeft -
-        chartSpec.style.marginRight}
-    />
-  {/if}
+    {/if}
+  {/each}
   <div class="source">
     <p class="source-left">
       <a href={chartSpec.chart.sourceTextLeftLink} style="color:#888888"

@@ -8,7 +8,7 @@ import sharedb from 'sharedb-client-browser/dist/sharedb-client-umd.cjs';
 import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
 import { Config } from 'vizzu';
-import type { Set } from './chart';
+import type { HBar, Set } from './chart';
 // import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
 
@@ -124,17 +124,17 @@ export const db = function createDB() {
       const scoped = createScope<Config.Channel>(db, ["chart"]);
       return {
         ...scoped,
-        hBar: () => {
-          const hbarScope = createScope<Config.Channel>(scoped, ["hBar"]);
+        hBar: (elementIndex: number) => {
+          const hbarScope = createScope<HBar>(scoped, ["chart", "elements", elementIndex, "hBar"]);
 
           return {
             ...hbarScope,
-            setLabelWidth: (value: number) => doc.submitOp(["chart", "hBar", "labelWidth", { r: 0, i: value }]),
-            setCategories: (value: string) => doc.submitOp(["chart", "hBar", "categories", { r: 0, i: value }]),
-            setSubCategories: (value: string) => doc.submitOp(["chart", "hBar", "subCategories", { r: 0, i: value }]),
-            setValue: (value: string) => doc.submitOp(["chart", "hBar", "value", { r: 0, i: value }]),
-            setRepeat: (value: string) => doc.submitOp(["chart", "hBar", "repeat", { r: 0, i: value }]),
-            setDataSet: (value: string) => doc.submitOp(["chart", "hBar", "dataSet", { r: 0, i: value }]),
+            setLabelWidth: (value: number) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "labelWidth", { r: 0, i: value }]),
+            setCategories: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "categories", { r: 0, i: value }]),
+            setSubCategories: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "subCategories", { r: 0, i: value }]),
+            setValue: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "value", { r: 0, i: value }]),
+            setRepeat: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "repeat", { r: 0, i: value }]),
+            setDataSet: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "dataSet", { r: 0, i: value }]),
           }
         },
         setConfigTitle: (value: string) => doc.submitOp(["chart", "title", { r: 0, i: value }]),

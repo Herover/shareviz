@@ -11,7 +11,7 @@ createDoc(startServer);
 function createDoc(callback) {
   var connection = backend.connect();
   var doc = connection.get('examples', '1');
-  doc.fetch(function(err) {
+  doc.fetch(function (err) {
     if (err) throw err;
     if (doc.type === null) {
       doc.create({
@@ -189,27 +189,34 @@ Region Nordjylland	2023	4989245`,
               dataRange: [0, 15000000],
             },
           ],
-          hBar: {
-            dataSet: "1",
-            categories: "område",
-            subCategories: "tid",
-            value: "antal",
-            labelWidth: 170,
-            repeat: "gæstens nationalitet",
-            scale: "x",
-          },
-          line: {
-            dataSet: "2",
-            x: {
-              key: "tid",
-              scale: "lineX",
+          elements: [
+            {
+              type: "hBar",
+              hBar: {
+                dataSet: "1",
+                categories: "område",
+                subCategories: "tid",
+                value: "antal",
+                labelWidth: 170,
+                repeat: "gæstens nationalitet",
+                scale: "x",
+              },
+            }, {
+              type: "line",
+              line: {
+                dataSet: "2",
+                x: {
+                  key: "tid",
+                  scale: "lineX",
+                },
+                y: {
+                  key: "antal",
+                  scale: "lineY",
+                },
+                categories: "område"
+              },
             },
-            y: {
-              key: "antal",
-              scale: "lineY",
-            },
-            categories: "område"
-          },
+          ],
           sourceTextLeft: "Kilde: statistikbanken.dk/turist",
           sourceTextLeftLink: "https://statistikbanken.dk/turist",
           sourceTextRight: "leonora.app",
@@ -262,7 +269,7 @@ Region Nordjylland	2023	4989245`,
             coordSystem: "cartesian",
           }
         ] */
-        
+
       }, json1.type.uri, callback);
       return;
     }
@@ -275,57 +282,57 @@ function startServer() {
   // Create a web server to serve files and listen to WebSocket connections
   // Connect any incoming WebSocket connection to ShareDB
   var wss = new WebSocketServer({ port: 8080 });
-  wss.on('connection', function(ws) {
+  wss.on('connection', function (ws) {
     var stream = new WebSocketJSONStream(ws);
     backend.listen(stream);
   });
 
-  backend.use('connect', function(ctx, next) {
+  backend.use('connect', function (ctx, next) {
     console.log('connect');
     next();
   });
-  backend.use('receive', function(ctx, next) {
+  backend.use('receive', function (ctx, next) {
     console.log('receive');
     next();
   });
-  backend.use('reply', function(ctx, next) {
+  backend.use('reply', function (ctx, next) {
     console.log('reply');
     next();
   });
-  backend.use('receivePresence', function(ctx, next) {
+  backend.use('receivePresence', function (ctx, next) {
     console.log('receivePresence');
     next();
   });
-  backend.use('sendPresence', function(ctx, next) {
+  backend.use('sendPresence', function (ctx, next) {
     console.log('sendPresence');
     next();
   });
-  backend.use('query', function(ctx, next) {
+  backend.use('query', function (ctx, next) {
     console.log('query');
     next();
   });
-  backend.use('readSnapshots', function(ctx, next) {
+  backend.use('readSnapshots', function (ctx, next) {
     console.log('readSnapshots');
     next();
   });
-  backend.use('op', function(ctx, next) {
+  backend.use('op', function (ctx, next) {
     console.log('op');
     next();
   });
 
-  backend.use('submit', function(ctx, next) {
+  backend.use('submit', function (ctx, next) {
     console.log('submit', /* ctx, */ JSON.stringify(ctx.op.op));
     setTimeout(next, 100);
   });
-  backend.use('apply', function(ctx, next) {
+  backend.use('apply', function (ctx, next) {
     console.log('apply');
     next();
   });
-  backend.use('commit', function(ctx, next) {
+  backend.use('commit', function (ctx, next) {
     console.log('commit'/* , ctx.snapshot */);
     next();
   });
-  backend.use('afterWrite', function(ctx, next) {
+  backend.use('afterWrite', function (ctx, next) {
     console.log('afterWrite');
     next();
   });

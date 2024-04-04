@@ -3,6 +3,7 @@
   import { db } from "$lib/chartStore";
   import type { DSVParsedArray } from "d3-dsv";
   import HBarEditor from "./HBar/HBarEditor.svelte";
+  import EditorCollapsible from "./EditorCollapsible.svelte";
 
   export let chartScope: ReturnType<typeof db.chart>;
   export let spec: Root;
@@ -84,17 +85,37 @@
   </label>
 </p>
 
-{#if spec.chart.chartType == "hBar"}
-  <HBarEditor
-    {spec}
-    dbHBar={chartScope.hBar()}
-    chart={chartScope}
-    {chartData}
-  />
-{/if}
+{#each spec.chart.elements as element, i}
+  {#if element.type == "hBar"}
+    <EditorCollapsible
+      group="element-controls"
+      key={"element-" + i}
+      label={`#${i + 1}`}
+      startOpen={true}
+      lvl={2}
+    >
+      <HBarEditor
+        {spec}
+        hBarSpec={element.hBar}
+        dbHBar={chartScope.hBar(i)}
+        chart={chartScope}
+        {chartData}
+      />
+    </EditorCollapsible>
+  {:else if element.type == "line"}
+    <EditorCollapsible
+      group="element-controls"
+      key={"element-" + i}
+      label={`#${i + 1}`}
+      startOpen={true}
+      lvl={2}
+    ></EditorCollapsible>
+  {/if}
+{/each}
 
 <style>
-  input, textarea {
+  input,
+  textarea {
     width: 100%;
     box-sizing: border-box;
   }
