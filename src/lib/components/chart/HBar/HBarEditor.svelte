@@ -318,7 +318,7 @@
     width: 100%;
     box-sizing: border-box;
   }
-  .color-control button {
+  .color-control > td button {
     width: 100%;
     box-sizing: border-box;
   }
