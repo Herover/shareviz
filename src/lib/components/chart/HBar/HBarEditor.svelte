@@ -30,12 +30,12 @@
 
   $: automateColorKeys = () => {
     if (
-      hBarSpec.subCategories &&
       hBarSpec.dataSet &&
       chartData[hBarSpec.dataSet]
     ) {
+      const key = hBarSpec.subCategories || hBarSpec.categories;
       const dataSet = chartData[hBarSpec.dataSet];
-      const groups = group(hBarSpec.subCategories, dataSet, (k) => k);
+      const groups = group(key, dataSet, (k) => k);
       groups.forEach((k) => {
         if (
           !spec.chart.scales[colorScaleIndex].colors?.byKey.find(
@@ -52,12 +52,12 @@
 
   $: removeExtraColorKeys = () => {
     if (
-      hBarSpec.subCategories &&
       hBarSpec.dataSet &&
       chartData[hBarSpec.dataSet]
     ) {
+      const key = hBarSpec.subCategories || hBarSpec.categories;
       const dataSet = chartData[hBarSpec.dataSet];
-      const groups = group(hBarSpec.subCategories, dataSet, (k) => k);
+      const groups = group(key, dataSet, (k) => k);
       let removed = 0;
       spec.chart.scales[colorScaleIndex].colors?.byKey.forEach(
         (c, keyIndex) => {

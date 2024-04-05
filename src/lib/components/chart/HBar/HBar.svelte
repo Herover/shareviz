@@ -133,7 +133,7 @@
             y={ii * valueHeight + barMargin}
             height={barHeight}
             width={valueScale(dd.value)}
-            fill={color(dd)}
+            fill={color(dd.label ? dd : d)}
           >
             <title>{dd.label}: {dd.value}</title>
           </rect>
