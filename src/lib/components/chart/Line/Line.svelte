@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Line, Root } from "$lib/chart";
-  import { formatNumber } from "$lib/utils";
+  import { formatNumber, group } from "$lib/utils";
   import { scaleLinear } from "d3-scale";
   import { line } from "d3-shape";
 
@@ -18,9 +18,9 @@
   const bottomMargin = 24;
   const leftMargin = 24;
   const rightMargin = 0;
-  const lineWidth = 4
+  const lineWidth = 3;
   const lineColor = "#000000";
-  const fillColor = "rgba(255, 0, 0, 0.3)"
+  const fillColor = "rgba(255, 0, 0, 0.3)";
   const fill = true;
   const stackValues = false;
   $: stacked = values
@@ -33,12 +33,17 @@
             : line.value.map((d) => 0);
         acc.push({
           label: line.label,
-          value: line.value.map((d, i) => ({
-            x: d.x,
-            y: d.y,
-            to: d.y + lastLine[i],
-            from: lastLine[i],
-          })),
+          value: group("x", line.value, (k, d) => ({ k, d })).map((d, i) => {
+            // Sum values if this line has multiple of the same X value, ex.
+            // same year multiple times.
+            const summed = d.d.reduce((acc, dd) => acc + dd.y, 0);
+            return {
+              x: d.d[0].x,
+              y: summed,
+              to: summed + lastLine[i],
+              from: lastLine[i],
+            };
+          }),
         });
         return acc;
       },
@@ -124,8 +129,8 @@
           <path
             d={draw(
               d.value.concat([
-                { x: xScale.domain()[1], y: 0, from: 0, to: 0 },
-                { x: xScale.domain()[0], y: 0, from: 0, to: 0 },
+                { ...d.value[d.value.length - 1], y: 0 },
+                { ...d.value[0], y: 0 },
               ]),
             )}
             fill={fillColor}
@@ -133,7 +138,12 @@
         {/each}
       {/if}
       {#each stacked as d}
-        <path d={draw(d.value)} stroke={lineColor} stroke-width={lineWidth} fill="none" />
+        <path
+          d={draw(d.value)}
+          stroke={lineColor}
+          stroke-width={lineWidth}
+          fill="none"
+        />
       {/each}
     {/if}
   </g>
