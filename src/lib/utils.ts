@@ -40,7 +40,7 @@ export const group = <T extends any, U>(
   d: T[],
   f: (key: string, group: T[]) => U = (k, d) => d as U,
 ): U[] => {
-  const groups = d.reduce(
+  const groups = (d || []).reduce(
     (acc, line: any) => {
       const usedKey = line[key] || key
       if (acc[usedKey]) {

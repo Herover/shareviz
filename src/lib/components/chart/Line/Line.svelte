@@ -21,14 +21,12 @@
   const lineWidth = 3;
   const lineColor = "#000000";
   const fillColor = "rgba(255, 0, 0, 0.3)";
-  const fill = true;
-  const stackValues = false;
   $: stacked = values
     .sort((a, b) => a.value[0].y - b.value[0].y)
     .reduce(
       (acc, line, i) => {
         const lastLine =
-          stackValues && i != 0
+          lineSpec.stack && i != 0
             ? acc[i - 1].value.map((d) => d.to)
             : line.value.map((d) => 0);
         acc.push({
@@ -95,7 +93,7 @@
         >
       </g>
     {/each}
-    {#if stackValues}
+    {#if lineSpec.stack}
       {#each stacked as d, i}
         <path
           d={draw(
@@ -124,7 +122,7 @@
         />
       {/each}
     {:else}
-      {#if fill}
+      {#if lineSpec.fill}
         {#each stacked as d}
           <path
             d={draw(

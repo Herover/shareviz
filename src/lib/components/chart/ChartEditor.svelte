@@ -4,6 +4,7 @@
   import type { DSVParsedArray } from "d3-dsv";
   import HBarEditor from "./HBar/HBarEditor.svelte";
   import EditorCollapsible from "./EditorCollapsible.svelte";
+  import LineEditor from "./Line/LineEditor.svelte";
 
   export let chartScope: ReturnType<typeof db.chart>;
   export let spec: Root;
@@ -109,7 +110,15 @@
       label={`#${i + 1}`}
       startOpen={true}
       lvl={2}
-    ></EditorCollapsible>
+    >
+      <LineEditor
+        {spec}
+        lineSpec={element.line}
+        dbLine={chartScope.line(i)}
+        chart={chartScope}
+        {chartData}
+      />
+    </EditorCollapsible>
   {/if}
 {/each}
 

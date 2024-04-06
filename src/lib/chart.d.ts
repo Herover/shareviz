@@ -74,6 +74,8 @@ export interface Line {
   x: X
   y: Y
   categories: string
+  stack: boolean
+  fill: boolean
 }
 
 export interface X {

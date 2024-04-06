@@ -8,7 +8,7 @@ import sharedb from 'sharedb-client-browser/dist/sharedb-client-umd.cjs';
 import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
 import { Config } from 'vizzu';
-import type { HBar, Set } from './chart';
+import type { HBar, Line, Set } from './chart';
 // import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
 
@@ -136,6 +136,19 @@ export const db = function createDB() {
             setRepeat: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "repeat", { r: 0, i: value }]),
             setDataSet: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "dataSet", { r: 0, i: value }]),
           }
+        },
+        line: (elementIndex: number) => {
+          const hbarScope = createScope<Line>(scoped, ["chart", "elements", elementIndex, "line"]);
+
+          return {
+            ...hbarScope,
+            setDataSet: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "line", "dataSet", { r: 0, i: value }]),
+            setXKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "line", "x", "key", { r: 0, i: value }]),
+            setYKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "line", "y", "key", { r: 0, i: value }]),
+            setCategoriesKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "line", "categories", { r: 0, i: value }]),
+            setFill: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "line", "fill", { r: 0, i: value }]),
+            setStack: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "line", "stack", { r: 0, i: value }]),
+          };
         },
         setConfigTitle: (value: string) => doc.submitOp(["chart", "title", { r: 0, i: value }]),
         setConfigSubTitle: (value: string) => doc.submitOp(["chart", "subTitle", { r: 0, i: value }]),
