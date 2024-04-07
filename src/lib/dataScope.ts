@@ -3,10 +3,10 @@ import { derived, type Readable } from "svelte/store";
 
 export const createScope = <T>(db: Readable<any>, scope: string | Array<string | number>) => {
   const path = typeof scope == "string" ? scope.split(".") : scope;
-  let val: null | T = null;
+  let val: T;
   return {
     path: typeof db["path"] == "undefined" ? path : db["path"].concat(path),
-    ...derived<any, T | null>(db, ($db, set, update) => {
+    ...derived<any, T>(db, ($db, set, update) => {
       // @ts-ignore
       const newScopedVal = path.reduce<T>((acc, part) => acc?.[part], $db);
       if (val == null) {

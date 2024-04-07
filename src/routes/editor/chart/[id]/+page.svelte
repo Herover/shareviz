@@ -45,6 +45,7 @@
           },
           {} as { [key: string]: DSVParsedArray<any> },
         );
+  let chart = db.chart();
 </script>
 
 <div class="main">
@@ -65,10 +66,17 @@
           label="Chart settings"
           startOpen={chartSpec.data.sets.length != 0}
         >
-          <ChartEditor spec={chartSpec} chartScope={db.chart()} chartData={chartData} />
+          <ChartEditor spec={chartSpec} chartScope={db.chart()} {chartData} />
         </EditorCollapsible>
         <EditorCollapsible group="controls" key="main" label="Export">
           <a href="/view/chart/{data.id}">Embed link</a>
+          <input
+            value={window.location.protocol +
+              "//" +
+              window.location.host +
+              "/view/chart/" +
+              data.id}
+          />
         </EditorCollapsible>
       </div>
     </div>

@@ -5,22 +5,21 @@
   import type { DSVParsedArray } from "d3-dsv";
 
   export let spec: Root;
-  export let lineSpec: Line;
   export let chart: ReturnType<typeof db.chart>;
   export let dbLine: ReturnType<ReturnType<typeof db.chart>["line"]>;
   export let chartData: {
     [key: string]: DSVParsedArray<any>;
   };
 
-  $: dataSet = spec.data.sets.find((set) => set.id == lineSpec.dataSet);
+  $: dataSet = spec.data.sets.find((set) => set.id == $dbLine.dataSet);
   $: console.log(dataSet?.rows);
 
   $: xScaleIndex = spec.chart.scales.findIndex(
-    (s) => s.name == lineSpec.x.scale,
+    (s) => s.name == $dbLine.x.scale,
   );
   $: xScale = spec.chart.scales[xScaleIndex] || { dataRange: [0, 1] };
   $: yScaleIndex = spec.chart.scales.findIndex(
-    (s) => s.name == lineSpec.y.scale,
+    (s) => s.name == $dbLine.y.scale,
   );
   $: yScale = spec.chart.scales[yScaleIndex] || { dataRange: [0, 1] };
 </script>
@@ -29,7 +28,7 @@
   <label>
     Data set:
     <select
-      value={lineSpec.dataSet}
+      value={$dbLine.dataSet}
       on:change={(e) => dbLine.setDataSet(e.currentTarget.value)}
     >
       <option>{""}</option>
@@ -45,7 +44,7 @@
     <label>
       X values from:
       <select
-        value={lineSpec.x.key}
+        value={$dbLine.x.key}
         on:change={(e) => dbLine.setXKey(e.currentTarget.value)}
       >
         <option>{""}</option>
@@ -59,7 +58,7 @@
     <label>
       Y values from:
       <select
-        value={lineSpec.y.key}
+        value={$dbLine.y.key}
         on:change={(e) => dbLine.setYKey(e.currentTarget.value)}
       >
         <option>{""}</option>
@@ -73,7 +72,7 @@
     <label>
       Categories from:
       <select
-        value={lineSpec.categories}
+        value={$dbLine.categories}
         on:change={(e) => dbLine.setCategoriesKey(e.currentTarget.value)}
       >
         <option>{""}</option>
@@ -156,7 +155,7 @@
   <label>
     Fill:
     <input
-      bind:checked={lineSpec.fill}
+      bind:checked={$dbLine.fill}
       on:change={(e) => dbLine.setFill(e.currentTarget.checked)}
       type="checkbox"
     />
@@ -166,7 +165,7 @@
   <label>
     Stack:
     <input
-      bind:checked={lineSpec.stack}
+      bind:checked={$dbLine.stack}
       on:change={(e) => dbLine.setStack(e.currentTarget.checked)}
       type="checkbox"
     />

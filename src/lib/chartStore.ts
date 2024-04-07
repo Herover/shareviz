@@ -8,7 +8,7 @@ import sharedb from 'sharedb-client-browser/dist/sharedb-client-umd.cjs';
 import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
 import { Config } from 'vizzu';
-import type { HBar, Line, Set } from './chart';
+import type { HBar, Line, Root, Set, Chart } from './chart';
 // import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
 
@@ -29,7 +29,7 @@ export const db = function createDB() {
 
   const { subscribe, set, update } = writable<{
     connected: boolean,
-    doc: /* Doc */ any | null,
+    doc: /* Doc */ Root | null,
     presences: unknown,
     presenceTargets: unknown,
   }>({ connected, doc: null, presences: {}, presenceTargets: {} });
@@ -121,11 +121,11 @@ export const db = function createDB() {
     },
 
     chart: () => {
-      const scoped = createScope<Config.Channel>(db, ["chart"]);
+      const scoped = createScope<Chart>(db, ["doc", "chart",]);
       return {
         ...scoped,
         hBar: (elementIndex: number) => {
-          const hbarScope = createScope<HBar>(scoped, ["chart", "elements", elementIndex, "hBar"]);
+          const hbarScope = createScope<HBar>(scoped, ["elements", elementIndex, "hBar"]);
 
           return {
             ...hbarScope,
@@ -138,7 +138,7 @@ export const db = function createDB() {
           }
         },
         line: (elementIndex: number) => {
-          const hbarScope = createScope<Line>(scoped, ["chart", "elements", elementIndex, "line"]);
+          const hbarScope = createScope<Line>(scoped, ["elements", elementIndex, "line"]);
 
           return {
             ...hbarScope,

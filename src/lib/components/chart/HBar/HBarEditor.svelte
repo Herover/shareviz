@@ -5,7 +5,6 @@
   import type { DSVParsedArray } from "d3-dsv";
 
   export let spec: Root;
-  export let hBarSpec: HBar;
   export let chart: ReturnType<typeof db.chart>;
   export let dbHBar: ReturnType<ReturnType<typeof db.chart>["hBar"]>;
   export let chartData: {
@@ -19,9 +18,9 @@
     chart.addColorScaleColor(i, ci);
   };
 
-  $: dataSet = spec.data.sets.find((set) => set.id == hBarSpec.dataSet);
+  $: dataSet = spec.data.sets.find((set) => set.id == $dbHBar.dataSet);
 
-  $: scaleIndex = spec.chart.scales.findIndex((s) => s.name == hBarSpec.scale);
+  $: scaleIndex = spec.chart.scales.findIndex((s) => s.name == $dbHBar.scale);
   $: scale = spec.chart.scales[scaleIndex] || { dataRange: [0, 1] };
   $: colorScaleIndex = spec.chart.scales.findIndex(
     (s) => s.type == "categoriesColor",
@@ -29,12 +28,9 @@
   $: colorScale = spec.chart.scales[colorScaleIndex];
 
   $: automateColorKeys = () => {
-    if (
-      hBarSpec.dataSet &&
-      chartData[hBarSpec.dataSet]
-    ) {
-      const key = hBarSpec.subCategories || hBarSpec.categories;
-      const dataSet = chartData[hBarSpec.dataSet];
+    if ($dbHBar.dataSet && chartData[$dbHBar.dataSet]) {
+      const key = $dbHBar.subCategories || $dbHBar.categories;
+      const dataSet = chartData[$dbHBar.dataSet];
       const groups = group(key, dataSet, (k) => k);
       groups.forEach((k) => {
         if (
@@ -51,12 +47,9 @@
   };
 
   $: removeExtraColorKeys = () => {
-    if (
-      hBarSpec.dataSet &&
-      chartData[hBarSpec.dataSet]
-    ) {
-      const key = hBarSpec.subCategories || hBarSpec.categories;
-      const dataSet = chartData[hBarSpec.dataSet];
+    if ($dbHBar.dataSet && chartData[$dbHBar.dataSet]) {
+      const key = $dbHBar.subCategories || $dbHBar.categories;
+      const dataSet = chartData[$dbHBar.dataSet];
       const groups = group(key, dataSet, (k) => k);
       let removed = 0;
       spec.chart.scales[colorScaleIndex].colors?.byKey.forEach(
@@ -82,7 +75,7 @@
   <label>
     Data set:
     <select
-      value={hBarSpec.dataSet}
+      value={$dbHBar.dataSet}
       on:change={(e) => dbHBar.setDataSet(e.currentTarget.value)}
     >
       <option>{""}</option>
@@ -95,7 +88,7 @@
 <p>
   <label>
     Label width: <input
-      value={hBarSpec.labelWidth}
+      value={$dbHBar.labelWidth}
       on:keyup={(e) =>
         dbHBar.setLabelWidth(Number.parseInt(e.currentTarget.value))}
       on:change={(e) =>
@@ -109,7 +102,7 @@
     <label>
       Categories from:
       <select
-        value={hBarSpec.categories}
+        value={$dbHBar.categories}
         on:change={(e) => dbHBar.setCategories(e.currentTarget.value)}
       >
         <option>{""}</option>
@@ -123,7 +116,7 @@
     <label>
       Sub categories from:
       <select
-        value={hBarSpec.subCategories}
+        value={$dbHBar.subCategories}
         on:change={(e) => dbHBar.setSubCategories(e.currentTarget.value)}
       >
         <option>{""}</option>
@@ -137,7 +130,7 @@
     <label>
       Values from:
       <select
-        value={hBarSpec.value}
+        value={$dbHBar.value}
         on:change={(e) => dbHBar.setValue(e.currentTarget.value)}
       >
         <option>{""}</option>
@@ -297,7 +290,7 @@
     <label
       >Repeat for each:
       <select
-        value={hBarSpec.repeat}
+        value={$dbHBar.repeat}
         on:change={(e) => dbHBar.setRepeat(e.currentTarget.value)}
       >
         <option>{""}</option>

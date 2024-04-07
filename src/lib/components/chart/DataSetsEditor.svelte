@@ -11,5 +11,5 @@
   {#if i != 0}
     <br />
   {/if}
-  <DataSetEditor {dataSet} dataStore={store.dataSet(i)} />
+  <DataSetEditor dataStore={store.dataSet(i)} />
 {/each}

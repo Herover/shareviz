@@ -3,22 +3,21 @@
   import type { db } from "$lib/chartStore";
 
   export let dataStore: ReturnType<typeof db.dataSet>;
-  export let dataSet: Set;
 
   const updateColumns = (newRaw: string) => {
     dataStore.setRaw(newRaw);
-    const names = getColumnNames(dataSet, newRaw);
+    const names = getColumnNames($dataStore, newRaw);
     let removed = 0;
-    dataSet.rows.forEach((col, i) => {
+    $dataStore.rows.forEach((col, i) => {
       if (!names.includes(col.key)) {
         dataStore.removeColumn(i - removed);
         removed++;
       }
     });
     names.forEach((name) => {
-      const existing = dataSet.rows.findIndex((col) => col.key == name);
+      const existing = $dataStore.rows.findIndex((col) => col.key == name);
       if (existing == -1) {
-        dataStore.addColumn(dataSet.rows.length - removed, name, "text");
+        dataStore.addColumn($dataStore.rows.length - removed, name, "text");
       }
     });
   };
@@ -34,11 +33,11 @@
   };
 </script>
 
-<p><label>ID <input disabled value={dataSet.id} /></label></p>
+<p><label>ID <input disabled value={$dataStore.id} /></label></p>
 <p>
   <label
     >Raw data <textarea
-      value={dataSet.raw}
+      value={$dataStore.raw}
       on:change={(e) => updateColumns(e.currentTarget.value)}
       rows="4"
     /></label
@@ -48,7 +47,7 @@
   <label
     >Format
     <select
-      value={dataSet.type}
+      value={$dataStore.type}
       on:change={(e) => dataStore.setType(e.currentTarget.value)}
     >
       {#each ["tsv"] as row}
@@ -59,7 +58,7 @@
 </p>
 <p>Columns:</p>
 <ul>
-  {#each dataSet.rows as column, i}
+  {#each $dataStore.rows as column, i}
     <li>
       "{column.key}"
       <select

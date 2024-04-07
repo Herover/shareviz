@@ -16,7 +16,7 @@
 <p>
   <label>
     Title: <textarea
-      value={spec.chart.title}
+      value={$chartScope.title}
       on:keyup={(e) => chartScope.setConfigTitle(e.currentTarget.value)}
     />
   </label>
@@ -24,7 +24,7 @@
 <p>
   <label>
     Sub title: <textarea
-      value={spec.chart.subTitle}
+      value={$chartScope.subTitle}
       on:keyup={(e) => chartScope.setConfigSubTitle(e.currentTarget.value)}
     />
   </label>
@@ -32,7 +32,7 @@
 <p>
   <label>
     Source text (left): <input
-      value={spec.chart.sourceTextLeft}
+      value={$chartScope.sourceTextLeft}
       on:keyup={(e) => chartScope.setSourceTextLeft(e.currentTarget.value)}
     />
   </label>
@@ -40,7 +40,7 @@
 <p>
   <label>
     Source link (left): <input
-      value={spec.chart.sourceTextLeftLink}
+      value={$chartScope.sourceTextLeftLink}
       on:keyup={(e) => chartScope.setSourceTextLeftLink(e.currentTarget.value)}
     />
   </label>
@@ -48,7 +48,7 @@
 <p>
   <label>
     Source text (right): <input
-      value={spec.chart.sourceTextRight}
+      value={$chartScope.sourceTextRight}
       on:keyup={(e) => chartScope.setSourceTextRight(e.currentTarget.value)}
     />
   </label>
@@ -56,7 +56,7 @@
 <p>
   <label>
     Source link (right): <input
-      value={spec.chart.sourceTextRightLink}
+      value={$chartScope.sourceTextRightLink}
       on:keyup={(e) => chartScope.setSourceTextLeftRight(e.currentTarget.value)}
     />
   </label>
@@ -64,7 +64,7 @@
 <p>
   <label>
     Height: <input
-      value={spec.chart.height}
+      value={$chartScope.height}
       on:keyup={(e) =>
         chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
       on:change={(e) =>
@@ -76,7 +76,7 @@
 <p>
   <label>
     Width: <input
-      value={spec.chart.width}
+      value={$chartScope.width}
       on:keyup={(e) =>
         chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
       on:change={(e) =>
@@ -86,7 +86,7 @@
   </label>
 </p>
 
-{#each spec.chart.elements as element, i}
+{#each $chartScope.elements as element, i}
   {#if element.type == "hBar"}
     <EditorCollapsible
       group="element-controls"
@@ -97,7 +97,6 @@
     >
       <HBarEditor
         {spec}
-        hBarSpec={element.hBar}
         dbHBar={chartScope.hBar(i)}
         chart={chartScope}
         {chartData}
@@ -113,7 +112,6 @@
     >
       <LineEditor
         {spec}
-        lineSpec={element.line}
         dbLine={chartScope.line(i)}
         chart={chartScope}
         {chartData}
