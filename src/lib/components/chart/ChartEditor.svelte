@@ -11,6 +11,13 @@
   export let chartData: {
     [key: string]: DSVParsedArray<any>;
   };
+
+  const addBarChart = () => {
+    chartScope.addBarChart($chartScope.elements.length);
+  };
+  const addLineChart = () => {
+    chartScope.addLineChart($chartScope.elements.length);
+  };
 </script>
 
 <p>
@@ -118,6 +125,8 @@
       />
     </EditorCollapsible>
   {/if}
+  <button on:click={() => addBarChart()}>+ Bars</button>
+  <button on:click={() => addLineChart()}>+ Lines</button>
 {/each}
 
 <style>

@@ -166,6 +166,39 @@ export const db = function createDB() {
         setColorScaleDefaultColor: (scaleIndex: number, value: string) => doc.submitOp(["chart", "scales", scaleIndex, "colors", "default", { r: 0, i: value }]),
         moveColorUp: (scaleIndex: number, colorIndex: number) => doc.submitOp(["chart", "scales", scaleIndex, "colors", "byKey", [ colorIndex, { p: 0 } ], [ colorIndex - 1, { d: 0 } ]]),
         moveColorDown: (scaleIndex: number, colorIndex: number) => doc.submitOp(["chart", "scales", scaleIndex, "colors", "byKey", [ colorIndex, { p: 0 } ], [ colorIndex + 1, { d: 0 } ]]),
+        addBarChart: (elementIndex: number) => doc.submitOp(["chart", "elements", elementIndex, {
+          i: {
+            type: "hBar",
+            hBar: {
+              dataSet: "",
+              categories: "",
+              subCategories: "",
+              value: "",
+              labelWidth: 170,
+              repeat: "",
+              scale: "x", // FIXME
+            },
+          },
+        }]),
+        addLineChart: (elementIndex: number) => doc.submitOp(["chart", "elements", elementIndex, {
+          i: {
+            type: "line",
+            line: {
+              dataSet: "",
+              x: {
+                key: "",
+                scale: "lineX",
+              },
+              y: {
+                key: "",
+                scale: "lineY",
+              },
+              categories: "",
+              fill: false,
+              stack: false,
+            },
+          },
+        }]),
       };
     },
     dataSet: (index: number) => {
