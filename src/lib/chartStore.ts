@@ -199,6 +199,9 @@ export const db = function createDB() {
             },
           },
         }]),
+        removeChartElement: (elementIndex: number) => doc.submitOp(["chart", "elements", elementIndex, { r: 0 }]),
+        moveElementUp: (elementIndex: number) => doc.submitOp(["chart", "elements", [ elementIndex, { p: 0 } ], [ elementIndex - 1, { d: 0 } ]]),
+        moveElementDown: (elementIndex: number) => doc.submitOp(["chart", "elements", [ elementIndex, { p: 0 } ], [ elementIndex + 1, { d: 0 } ]]),
       };
     },
     dataSet: (index: number) => {

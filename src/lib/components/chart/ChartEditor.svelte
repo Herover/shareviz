@@ -18,6 +18,15 @@
   const addLineChart = () => {
     chartScope.addLineChart($chartScope.elements.length);
   };
+  const removeElement = (i: number) => {
+    chartScope.removeChartElement(i);
+  };
+  const moveElementUp = (i: number) => {
+    chartScope.moveElementUp(i);
+  };
+  const moveElementDown = (i: number) => {
+    chartScope.moveElementDown(i);
+  };
 </script>
 
 <p>
@@ -108,6 +117,16 @@
         chart={chartScope}
         {chartData}
       />
+      <div slot="actions">
+        <button on:click={() => removeElement(i)}>Delete</button>
+        <button disabled={i == 0} on:click={() => moveElementUp(i)}
+          >Move up</button
+        >
+        <button
+          disabled={i == $chartScope.elements.length - 1}
+          on:click={() => moveElementDown(i)}>Move down</button
+        >
+      </div>
     </EditorCollapsible>
   {:else if element.type == "line"}
     <EditorCollapsible
@@ -123,11 +142,22 @@
         chart={chartScope}
         {chartData}
       />
+      <div slot="actions">
+        <button on:click={() => removeElement(i)}>Delete</button>
+        <button disabled={i == 0} on:click={() => moveElementUp(i)}
+          >Move up</button
+        >
+        <button
+          disabled={i == $chartScope.elements.length - 1}
+          on:click={() => moveElementDown(i)}>Move down</button
+        >
+      </div>
     </EditorCollapsible>
   {/if}
-  <button on:click={() => addBarChart()}>+ Bars</button>
-  <button on:click={() => addLineChart()}>+ Lines</button>
 {/each}
+
+<button on:click={() => addBarChart()}>+ Bars</button>
+<button on:click={() => addLineChart()}>+ Lines</button>
 
 <style>
   input,
