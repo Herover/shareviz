@@ -3,6 +3,11 @@
   import { formatNumber, group } from "$lib/utils";
   import { scaleLinear } from "d3-scale";
   import { line } from "d3-shape";
+  import Axis, {
+    AxisLocation,
+    AxisOrientation,
+    type GridConf,
+  } from "../Axis.svelte";
 
   export let values: {
     label: string;
@@ -21,6 +26,74 @@
   const lineWidth = 3;
   const lineColor = "#000000";
   const fillColor = "rgba(255, 0, 0, 0.3)";
+
+  const yAxisConf: GridConf = {
+    location: AxisLocation.END,
+    labelSpace: 64,
+    orientation: AxisOrientation.HORIZONTAL,
+    major: {
+      grid: true,
+      enabled: true,
+      tickSize: 8,
+      color: "#aaaaaa",
+      labelDivide: 1000000,
+      labelThousands: ",",
+      auto: {
+        from: 0,
+        each: 5000000,
+        labels: true,
+      },
+      ticks: [],
+    },
+    minor: {
+      grid: false,
+      enabled: false,
+      tickSize: 8,
+      color: "#aaaaaa",
+      labelDivide: 1,
+      labelThousands: "",
+      auto: {
+        from: 0,
+        each: 1000000,
+        labels: false,
+      },
+      ticks: [],
+    },
+  };
+  const xAxisConf: GridConf = {
+    location: AxisLocation.END,
+    labelSpace: 64,
+    orientation: AxisOrientation.VERTICAL,
+    major: {
+      grid: false,
+      enabled: true,
+      tickSize: 8,
+      color: "#aaaaaa",
+      labelDivide: 1,
+      labelThousands: "",
+      auto: {
+        from: 2010,
+        each: 5,
+        labels: true,
+      },
+      ticks: [],
+    },
+    minor: {
+      grid: false,
+      enabled: true,
+      tickSize: 4,
+      color: "#aaaaaa",
+      labelDivide: 1,
+      labelThousands: "",
+      auto: {
+        from: 2010,
+        each: 1,
+        labels: false,
+      },
+      ticks: [],
+    },
+  };
+
   $: stacked = values
     .sort((a, b) => a.value[0].y - b.value[0].y)
     .reduce(
@@ -75,24 +148,13 @@
 
 <svg {width} {height}>
   <g transform="translate(0, {topMargin})">
-    {#each yScale.ticks(3) as tick}
-      <g transform="translate(0, {yScale(tick)})">
-        <line x1={0} y1={0} x2={width} y2={0} stroke="#888888" />
-        <text x={width - labelWidth + 16} y={-6}>{formatNumber(tick)}</text>
-      </g>
-    {/each}
-    {#each xScale.ticks(3) as tick}
-      <g
-        transform="translate({xScale(tick)}, {height -
-          topMargin -
-          bottomMargin})"
-      >
-        <line x1={0} y1={0} x2={0} y2={6} stroke="#888888" />
-        <text x={0} y={6} dominant-baseline="hanging" text-anchor="middle"
-          >{tick}</text
-        >
-      </g>
-    {/each}
+    <Axis {height} {width} scale={yScale} conf={yAxisConf} />
+    <Axis
+      height={height - topMargin - bottomMargin}
+      {width}
+      scale={xScale}
+      conf={xAxisConf}
+    />
     {#if lineSpec.stack}
       {#each stacked as d, i}
         <path

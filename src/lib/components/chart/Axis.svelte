@@ -3,6 +3,7 @@
     major: AxisConf;
     minor: AxisConf;
     location: AxisLocation;
+    labelSpace: number;
     orientation: AxisOrientation;
   }
   export interface AxisConf {
@@ -10,6 +11,8 @@
     enabled: boolean;
     tickSize: number;
     color: string;
+    labelDivide: number;
+    labelThousands: string;
     ticks: {
       n: number;
       l: string;
@@ -17,7 +20,7 @@
     auto: {
       from: number;
       each: number;
-      labels: true;
+      labels: boolean;
     };
   }
   export enum AxisLocation {
@@ -36,7 +39,7 @@
   import { formatNumber } from "$lib/utils";
 
   export let conf: GridConf;
-  /* export let width: number; */
+  export let width: number;
   export let height: number;
   export let scale: ScaleContinuousNumeric<number, number> | undefined;
 
@@ -57,7 +60,14 @@
         ];
       } else {
         for (let i = conf.major.auto.from; i <= to; i += conf.major.auto.each) {
-          autoMajorTicks.push({ n: i, l: formatNumber(i) });
+          autoMajorTicks.push({
+            n: i,
+            l: formatNumber(
+              i,
+              conf.major.labelDivide,
+              conf.major.labelThousands,
+            ),
+          });
         }
       }
     }
@@ -77,7 +87,14 @@
         ];
       } else {
         for (let i = conf.minor.auto.from; i <= to; i += conf.minor.auto.each) {
-          autoMinorTicks.push({ n: i, l: formatNumber(i) });
+          autoMinorTicks.push({
+            n: i,
+            l: formatNumber(
+              i,
+              conf.minor.labelDivide,
+              conf.minor.labelThousands,
+            ),
+          });
         }
       }
     }
@@ -89,22 +106,48 @@
 {#if conf && scale}
   {#if conf.orientation == AxisOrientation.VERTICAL}
     {#if conf.minor.enabled}
-      {#each minorTicks as tick}
-        <path
-          d="m {scale(tick.n)},{lineOffset} l 0,{conf.minor.grid ? height : conf.minor.tickSize}"
-          stroke={conf.minor.color}
-          stroke-width="1"
-        />
-      {/each}
+      {#if conf.location == AxisLocation.START}
+        {#each minorTicks as tick}
+          <path
+            d="m {scale(tick.n)},{lineOffset} l 0,{conf.minor.grid
+              ? height
+              : conf.minor.tickSize}"
+            stroke={conf.minor.color}
+            stroke-width="1"
+          />
+        {/each}
+      {:else}
+        {#each minorTicks as tick}
+          <path
+            d="m {scale(tick.n)},{height} l 0,{conf.minor.grid
+              ? -height
+              : -conf.minor.tickSize}"
+            stroke={conf.minor.color}
+            stroke-width="1"
+          />
+        {/each}
+      {/if}
     {/if}
 
     {#if conf.major.enabled}
       {#each majorTicks as tick}
-        <path
-          d="m {scale(tick.n)},{lineOffset} l 0,{conf.major.grid ? height : conf.major.tickSize}"
-          stroke={conf.major.color}
-          stroke-width="1"
-        />
+        {#if conf.location == AxisLocation.START}
+          <path
+            d="m {scale(tick.n)},{lineOffset} l 0,{conf.major.grid
+              ? height
+              : conf.major.tickSize}"
+            stroke={conf.major.color}
+            stroke-width="1"
+          />
+        {:else}
+          <path
+            d="m {scale(tick.n)},{height} l 0,{conf.major.grid
+              ? -height
+              : -conf.major.tickSize}"
+            stroke={conf.major.color}
+            stroke-width="1"
+          />
+        {/if}
         {#if conf.location == AxisLocation.START && tick.l}
           <text
             text-anchor="middle"
@@ -122,6 +165,43 @@
         {/if}
       {/each}
     {/if}
-  <!-- {:else} -->
+  {:else}
+    {#if conf.major.enabled}
+      {#each autoMajorTicks as tick}
+        <g transform="translate(0, {scale(tick.n)})">
+          <line
+            x1={0}
+            y1={0}
+            x2={conf.major.grid ? width : conf.major.tickSize}
+            y2={0}
+            stroke={conf.major.color}
+          />
+          {#if conf.location == AxisLocation.START && tick.l}
+            <text x={conf.labelSpace} y={-6}>{tick.l}</text>
+          {:else if conf.location == AxisLocation.END && tick.l}
+            <text x={width - conf.labelSpace} y={-6}>{tick.l}</text>
+          {/if}
+        </g>
+      {/each}
+    {/if}
+
+    {#if conf.minor.enabled}
+      {#each autoMinorTicks as tick}
+        <g transform="translate(0, {scale(tick.n)})">
+          <line
+            x1={0}
+            y1={0}
+            x2={conf.minor.grid ? width : conf.minor.tickSize}
+            y2={0}
+            stroke={conf.minor.color}
+          />
+          {#if conf.location == AxisLocation.START && tick.l}
+            <text x={conf.labelSpace} y={-6}>{tick.l}</text>
+          {:else if conf.location == AxisLocation.END && tick.l}
+            <text x={width - conf.labelSpace} y={-6}>{tick.l}</text>
+          {/if}
+        </g>
+      {/each}
+    {/if}
   {/if}
 {/if}
