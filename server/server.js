@@ -3,41 +3,11 @@ import { WebSocketServer } from 'ws';
 import WebSocketJSONStream from '@teamwork/websocket-json-stream';
 import json1 from 'ot-json1';
 
-import { handler } from '../build/handler.js';
-import express from "express";
-import { createServer } from 'http'
-
 ShareDB.types.register(json1.type);
 let backend = new ShareDB({ presence: true });
 
-export const webSocketDevServer = () => {
-  return {
-    name: "websocket",
-    configureServer: {
-      handler: (server) => {
-        if (!server.httpServer) return
-        createDoc(() => startServer(server.httpServer));
-      },
-
-    }
-  }
-};
-
-if (process.env.SHAREVIZ_RUN_SERVER) {
-  const port = 5173;
-  const app = express();
-  const server = createServer(app);
-
-  createDoc(() => startServer(server));
-  app.use(handler);
-
-  server.listen(port, (e) => {
-    console.log(`listening on port ${port}`, e);
-  });
-}
-
 // Create initial document then fire callback
-function createDoc(callback) {
+export function createDoc(callback) {
   var connection = backend.connect();
   var doc = connection.get('examples', '1');
   doc.fetch(function (err) {
@@ -309,7 +279,7 @@ Region Nordjylland	2023	4989245`,
   });
 }
 
-function startServer(server) {
+export function startServer(server) {
   /* console.log("STARTSERVER",server) */
   // Create a web server to serve files and listen to WebSocket connections
   // Connect any incoming WebSocket connection to ShareDB
