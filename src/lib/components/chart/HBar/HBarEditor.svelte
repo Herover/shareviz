@@ -3,6 +3,7 @@
   import type { db } from "$lib/chartStore";
   import { group } from "$lib/utils";
   import type { DSVParsedArray } from "d3-dsv";
+  import AxisEditor from "../AxisEditor.svelte";
 
   export let spec: Root;
   export let chart: ReturnType<typeof db.chart>;
@@ -301,6 +302,8 @@
     </label>
   </p>
 {/if}
+
+<AxisEditor conf={dbHBar.axis()} />
 
 <style>
   .color-control {

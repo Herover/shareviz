@@ -35,6 +35,7 @@
       color: "#aaaaaa",
       labelDivide: 1000000,
       labelThousands: ",",
+      afterLabel: " mio.",
       auto: {
         from: 0,
         each: 5000000,
@@ -49,6 +50,7 @@
       color: "#aaaaaa",
       labelDivide: 1,
       labelThousands: "",
+      afterLabel: " mio.",
       auto: {
         from: 0,
         each: 1000000,

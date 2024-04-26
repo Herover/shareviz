@@ -20,18 +20,18 @@ export const formatNumber = (val: number, divide = Divide.None, thousandsDelim =
     res = res + fractionDelim + fraction;
   } */
 
-  switch (divide) {
-    case Divide.Thousands:
-      res += "tus"
-      break;
+  // switch (divide) {
+  //   case Divide.Thousands:
+  //     res += "tus"
+  //     break;
 
-    case Divide.Millions:
-      res += " mio."
-      break;
+  //   case Divide.Millions:
+  //     res += " mio."
+  //     break;
 
-    default:
-      break;
-  }
+  //   default:
+  //     break;
+  // }
 
   return res;
 }

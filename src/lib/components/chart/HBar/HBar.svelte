@@ -24,9 +24,7 @@
   const blockMargin = 16;
   let legendHeight = 0;
 
-  const axisConf = hBarSpec.axis;
-
-  const scaleHeight = axisConf.location == AxisLocation.NONE ? 0 : 16;
+  const scaleHeight = hBarSpec.axis.location == AxisLocation.NONE ? 0 : 16;
 
   $: bars =
     values.length != 0 && values[0].value.length != 0
@@ -105,12 +103,12 @@
       width={valueWidth}
       height={(blockHeight + blockMargin) * values.length - blockMargin}
       scale={valueScale}
-      conf={axisConf}
+      conf={hBarSpec.axis}
     />
   </g>
 
   <g
-    transform="translate({0},{axisConf.location == AxisLocation.START
+    transform="translate({0},{hBarSpec.axis.location == AxisLocation.START
       ? scaleHeight
       : 0})"
   >

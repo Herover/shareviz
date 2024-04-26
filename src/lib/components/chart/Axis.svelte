@@ -16,6 +16,7 @@
   let autoMajorTicks: { n: number; l: string }[] = [];
   $: {
     if (conf && scale) {
+      console.log("major auto", conf.major.auto)
       autoMajorTicks = [];
       const to = scale.domain()[1];
       const expectedTicks =
@@ -28,11 +29,11 @@
         for (let i = conf.major.auto.from; i <= to; i += conf.major.auto.each) {
           autoMajorTicks.push({
             n: i,
-            l: formatNumber(
+            l: conf.major.auto.labels ? formatNumber(
               i,
               conf.major.labelDivide,
               conf.major.labelThousands,
-            ),
+            ) + conf.major.afterLabel : "",
           });
         }
       }

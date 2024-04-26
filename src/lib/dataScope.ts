@@ -21,5 +21,5 @@ export const createScope = <T>(db: Readable<any>, scope: string | Array<string |
         update(() => newScopedVal);
       }
     }),
-  };
+  } as { path: string[] } & ReturnType<typeof derived<any, T>>;
 };

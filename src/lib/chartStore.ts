@@ -8,7 +8,7 @@ import sharedb from 'sharedb-client-browser/dist/sharedb-client-umd.cjs';
 import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
 import { Config } from 'vizzu';
-import type { HBar, Line, Root, Set, Chart } from './chart';
+import type { HBar, Line, Root, Set, Chart, Axis, AxisGrid } from './chart';
 // import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
 
@@ -133,7 +133,8 @@ export const db = function createDB() {
             setValue: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "value", { r: 0, i: value }]),
             setRepeat: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "repeat", { r: 0, i: value }]),
             setDataSet: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "dataSet", { r: 0, i: value }]),
-          }
+            axis: () => axis(hbarScope, doc),
+          };
         },
         line: (elementIndex: number) => {
           const hbarScope = createScope<Line>(scoped, ["elements", elementIndex, "line"]);
@@ -219,3 +220,33 @@ export const db = function createDB() {
     addDataSet: (index: number) => doc.submitOp(["data", "sets", index, { i: { id: "" + Date.now(), type: "tsv", raw: "", rows: [] } }]),
   };
 }();
+
+export const axis = (scope: ReturnType<typeof createScope>, doc: any) => {
+  const axisScope = createScope<Axis>(scope, ["axis"]);
+
+  return {
+    ...axisScope,
+    setLocation: (value: string) => doc.submitOp([...axisScope.path.slice(1), "location", { r: 0, i: value }]),
+    setOrientation: (value: string) => doc.submitOp([...axisScope.path.slice(1), "orientation", { r: 0, i: value }]),
+    setLabelSpace: (value: number) => doc.submitOp([...axisScope.path.slice(1), "labelSpace", { r: 0, i: value }]),
+    major: axisGrid(axisScope, doc),
+  };
+};
+
+export const axisGrid = (scope: ReturnType<typeof createScope>, doc: any) => {
+  const majorScope = createScope<AxisGrid>(scope, ["major"]);
+
+  return {
+    ...majorScope,
+    setGrid: (value: boolean) => doc.submitOp([...majorScope.path.slice(1), "grid", { r: 0, i: value }]),
+    setEnabled: (value: boolean) => doc.submitOp([...majorScope.path.slice(1), "enabled", { r: 0, i: value }]),
+    setTickSize: (value: number) => doc.submitOp([...majorScope.path.slice(1), "tickSize", { r: 0, i: value }]),
+    setColor: (value: string) => doc.submitOp([...majorScope.path.slice(1), "color", { r: 0, i: value }]),
+    setLabelDivide: (value: number) => doc.submitOp([...majorScope.path.slice(1), "labelDivide", { r: 0, i: value }]),
+    setLabelThousands: (value: string) => doc.submitOp([...majorScope.path.slice(1), "labelThousands", { r: 0, i: value }]),
+    setAutoFrom: (value: number) => doc.submitOp([...majorScope.path.slice(1), "auto", "from", { r: 0, i: value }]),
+    setAutoEach: (value: number) => doc.submitOp([...majorScope.path.slice(1), "auto", "each", { r: 0, i: value }]),
+    setAutoLabels: (value: boolean) => doc.submitOp([...majorScope.path.slice(1), "auto", "labels", { r: 0, i: value }]),
+    setAfterLabel: (value: string) => doc.submitOp([...majorScope.path.slice(1), "afterLabel", { r: 0, i: value }]),
+  };
+};

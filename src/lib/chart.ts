@@ -74,6 +74,7 @@ export interface AxisGrid {
   color: string
   labelDivide: number
   labelThousands: string
+  afterLabel: string
   auto: {
     from: number
     each: number
