@@ -70,6 +70,7 @@
       color: "#aaaaaa",
       labelDivide: 1,
       labelThousands: "",
+      afterLabel: "",
       auto: {
         from: 2010,
         each: 5,
@@ -84,6 +85,7 @@
       color: "#aaaaaa",
       labelDivide: 1,
       labelThousands: "",
+      afterLabel: "",
       auto: {
         from: 2010,
         each: 1,
