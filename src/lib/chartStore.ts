@@ -216,5 +216,6 @@ export const db = function createDB() {
         removeColumn: (colIndex: number) => doc.submitOp(["data", "sets", index, "rows", colIndex, { r: true }]),
       };
     },
+    addDataSet: (index: number) => doc.submitOp(["data", "sets", index, { i: { id: "" + Date.now(), type: "tsv", raw: "", rows: [] } }]),
   };
 }();

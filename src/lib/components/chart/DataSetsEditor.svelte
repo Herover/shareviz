@@ -5,6 +5,10 @@
 
   export let chartData: Data;
   export let store: typeof db;
+
+  const addDataSet = () => {
+    store.addDataSet(chartData.sets.length);
+  };
 </script>
 
 {#each chartData.sets as dataSet, i}
@@ -13,3 +17,5 @@
   {/if}
   <DataSetEditor dataStore={store.dataSet(i)} />
 {/each}
+
+<button on:click={() => addDataSet()}>+ Data set</button>
