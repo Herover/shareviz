@@ -1,12 +1,9 @@
 <script lang="ts">
-  import type { Line, Root } from "$lib/chart";
+  import { AxisLocation, AxisOrientation, type Line, type Root } from "$lib/chart";
   import { formatNumber, group } from "$lib/utils";
   import { scaleLinear } from "d3-scale";
   import { line } from "d3-shape";
   import Axis, {
-    AxisLocation,
-    AxisOrientation,
-    type GridConf,
   } from "../Axis.svelte";
 
   export let values: {
@@ -27,7 +24,7 @@
   const lineColor = "#000000";
   const fillColor = "rgba(255, 0, 0, 0.3)";
 
-  const yAxisConf: GridConf = {
+  const yAxisConf = {
     location: AxisLocation.END,
     labelSpace: 64,
     orientation: AxisOrientation.HORIZONTAL,
@@ -60,7 +57,7 @@
       ticks: [],
     },
   };
-  const xAxisConf: GridConf = {
+  const xAxisConf = {
     location: AxisLocation.END,
     labelSpace: 64,
     orientation: AxisOrientation.VERTICAL,

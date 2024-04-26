@@ -3,11 +3,8 @@
   import { formatNumber } from "$lib/utils";
   import { createEventDispatcher, onMount } from "svelte";
   import type { Root, HBar } from "$lib/chart";
-  import Axis, {
-    AxisLocation,
-    AxisOrientation,
-    type GridConf,
-  } from "../Axis.svelte";
+  import { AxisLocation } from "$lib/chart";
+  import Axis from "../Axis.svelte";
 
   export let labelWidth: number;
   export let valueWidth: number;
@@ -27,39 +24,7 @@
   const blockMargin = 16;
   let legendHeight = 0;
 
-  const axisConf: GridConf = {
-    location: AxisLocation.START,
-    labelSpace: 0,
-    orientation: AxisOrientation.VERTICAL,
-    major: {
-      grid: true,
-      enabled: true,
-      tickSize: 8,
-      color: "#aaaaaa",
-      labelDivide: 1000000,
-      labelThousands: ",",
-      auto: {
-        from: 0,
-        each: 5000000,
-        labels: true,
-      },
-      ticks: [],
-    },
-    minor: {
-      grid: false,
-      enabled: false,
-      tickSize: 8,
-      color: "#aaaaaa",
-      labelDivide: 1000000,
-      labelThousands: ",",
-      auto: {
-        from: 0,
-        each: 1000000,
-        labels: false,
-      },
-      ticks: [],
-    },
-  };
+  const axisConf = hBarSpec.axis;
 
   const scaleHeight = axisConf.location == AxisLocation.NONE ? 0 : 16;
 

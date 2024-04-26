@@ -59,7 +59,45 @@ export interface Element {
   line?: Line
 }
 
+export interface Axis {
+  location: AxisLocation
+  labelSpace: number
+  orientation: AxisOrientation
+  major: AxisGrid
+  minor: AxisGrid
+}
+
+export interface AxisGrid {
+  grid: boolean
+  enabled: boolean
+  tickSize: number
+  color: string
+  labelDivide: number
+  labelThousands: string
+  auto: {
+    from: number
+    each: number
+    labels: boolean
+  }
+  ticks: {
+    n: number;
+    l: string;
+  }[]
+}
+
+export enum AxisLocation {
+  NONE = "none",
+  START = "start",
+  END = "end",
+}
+
+export enum AxisOrientation {
+  VERTICAL = "vertical",
+  HORIZONTAL = "horizontal",
+}
+
 export interface HBar {
+  axis: Axis
   dataSet: string
   categories: string
   subCategories: string

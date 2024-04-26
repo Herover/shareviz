@@ -1,44 +1,10 @@
-<script lang="ts" context="module">
-  export interface GridConf {
-    major: AxisConf;
-    minor: AxisConf;
-    location: AxisLocation;
-    labelSpace: number;
-    orientation: AxisOrientation;
-  }
-  export interface AxisConf {
-    grid: boolean;
-    enabled: boolean;
-    tickSize: number;
-    color: string;
-    labelDivide: number;
-    labelThousands: string;
-    ticks: {
-      n: number;
-      l: string;
-    }[];
-    auto: {
-      from: number;
-      each: number;
-      labels: boolean;
-    };
-  }
-  export enum AxisLocation {
-    NONE = "none",
-    START = "start",
-    END = "end",
-  }
-  export enum AxisOrientation {
-    VERTICAL = "vertical",
-    HORIZONTAL = "horizontal",
-  }
-</script>
-
 <script lang="ts">
   import type { ScaleContinuousNumeric } from "d3-scale";
   import { formatNumber } from "$lib/utils";
+  import type { Axis } from "$lib/chart";
+  import { AxisLocation, AxisOrientation } from "$lib/chart";
 
-  export let conf: GridConf;
+  export let conf: Axis;
   export let width: number;
   export let height: number;
   export let scale: ScaleContinuousNumeric<number, number> | undefined;
