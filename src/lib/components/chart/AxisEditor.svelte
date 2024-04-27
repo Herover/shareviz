@@ -45,6 +45,8 @@
     />
 </p>
 
-Major gridlines:
-
+<u>Major gridlines:</u>
 <AxisGridEditor conf={conf.major} />
+
+<u>Minor gridlines:</u>
+<AxisGridEditor conf={conf.minor} />
