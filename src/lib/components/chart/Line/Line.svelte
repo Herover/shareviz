@@ -24,77 +24,6 @@
   const lineColor = "#000000";
   const fillColor = "rgba(255, 0, 0, 0.3)";
 
-  const yAxisConf = {
-    location: AxisLocation.END,
-    labelSpace: 64,
-    orientation: AxisOrientation.HORIZONTAL,
-    major: {
-      grid: true,
-      enabled: true,
-      tickSize: 8,
-      color: "#aaaaaa",
-      labelDivide: 1000000,
-      labelThousands: ",",
-      afterLabel: " mio.",
-      auto: {
-        from: 0,
-        each: 5000000,
-        labels: true,
-      },
-      ticks: [],
-    },
-    minor: {
-      grid: false,
-      enabled: false,
-      tickSize: 8,
-      color: "#aaaaaa",
-      labelDivide: 1,
-      labelThousands: "",
-      afterLabel: " mio.",
-      auto: {
-        from: 0,
-        each: 1000000,
-        labels: false,
-      },
-      ticks: [],
-    },
-  };
-  const xAxisConf = {
-    location: AxisLocation.END,
-    labelSpace: 64,
-    orientation: AxisOrientation.VERTICAL,
-    major: {
-      grid: false,
-      enabled: true,
-      tickSize: 8,
-      color: "#aaaaaa",
-      labelDivide: 1,
-      labelThousands: "",
-      afterLabel: "",
-      auto: {
-        from: 2010,
-        each: 5,
-        labels: true,
-      },
-      ticks: [],
-    },
-    minor: {
-      grid: false,
-      enabled: true,
-      tickSize: 4,
-      color: "#aaaaaa",
-      labelDivide: 1,
-      labelThousands: "",
-      afterLabel: "",
-      auto: {
-        from: 2010,
-        each: 1,
-        labels: false,
-      },
-      ticks: [],
-    },
-  };
-
   $: stacked = values
     .sort((a, b) => a.value[0].y - b.value[0].y)
     .reduce(
@@ -149,12 +78,12 @@
 
 <svg {width} {height}>
   <g transform="translate(0, {topMargin})">
-    <Axis {height} {width} scale={yScale} conf={yAxisConf} />
+    <Axis {height} {width} scale={yScale} conf={lineSpec.y.axis} />
     <Axis
       height={height - topMargin - bottomMargin}
       {width}
       scale={xScale}
-      conf={xAxisConf}
+      conf={lineSpec.x.axis}
     />
     {#if lineSpec.stack}
       {#each stacked as d, i}

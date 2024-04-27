@@ -3,6 +3,7 @@
   import type { db } from "$lib/chartStore";
   import { group } from "$lib/utils";
   import type { DSVParsedArray } from "d3-dsv";
+    import AxisEditor from "../AxisEditor.svelte";
 
   export let spec: Root;
   export let chart: ReturnType<typeof db.chart>;
@@ -171,3 +172,9 @@
     />
   </label>
 </p>
+
+<b>X axis</b>
+<AxisEditor conf={dbLine.xAxis} />
+
+<b>Y axis</b>
+<AxisEditor conf={dbLine.yAxis} />

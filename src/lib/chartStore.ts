@@ -133,7 +133,7 @@ export const db = function createDB() {
             setValue: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "value", { r: 0, i: value }]),
             setRepeat: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "repeat", { r: 0, i: value }]),
             setDataSet: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "dataSet", { r: 0, i: value }]),
-            axis: () => axis(hbarScope, doc),
+            axis: () => axis(hbarScope, ["axis"], doc),
           };
         },
         line: (elementIndex: number) => {
@@ -147,6 +147,8 @@ export const db = function createDB() {
             setCategoriesKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "line", "categories", { r: 0, i: value }]),
             setFill: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "line", "fill", { r: 0, i: value }]),
             setStack: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "line", "stack", { r: 0, i: value }]),
+            xAxis: axis(hbarScope, ["x", "axis"], doc),
+            yAxis: axis(hbarScope, ["y", "axis"], doc),
           };
         },
         setConfigTitle: (value: string) => doc.submitOp(["chart", "title", { r: 0, i: value }]),
@@ -178,6 +180,41 @@ export const db = function createDB() {
               labelWidth: 170,
               repeat: "",
               scale: "x", // FIXME
+              axis: {
+                location: "start",
+                labelSpace: 0,
+                orientation: "vertical",
+                major: {
+                  grid: true,
+                  enabled: true,
+                  tickSize: 8,
+                  color: "#aaaaaa",
+                  labelDivide: 1000000,
+                  labelThousands: ",",
+                  afterLabel: " mio.",
+                  auto: {
+                    from: 0,
+                    each: 5000000,
+                    labels: true,
+                  },
+                  ticks: [],
+                },
+                minor: {
+                  grid: false,
+                  enabled: false,
+                  tickSize: 8,
+                  color: "#aaaaaa",
+                  labelDivide: 1000000,
+                  labelThousands: ",",
+                  afterLabel: " mio.",
+                  auto: {
+                    from: 0,
+                    each: 1000000,
+                    labels: false,
+                  },
+                  ticks: [],
+                },
+              },
             },
           },
         }]),
@@ -189,10 +226,80 @@ export const db = function createDB() {
               x: {
                 key: "",
                 scale: "lineX",
+                axis: {
+                  location: "end",
+                  labelSpace: 64,
+                  orientation: "vertical",
+                  major: {
+                    grid: false,
+                    enabled: true,
+                    tickSize: 8,
+                    color: "#aaaaaa",
+                    labelDivide: 1,
+                    labelThousands: "",
+                    afterLabel: "",
+                    auto: {
+                      from: 0,
+                      each: 10,
+                      labels: true,
+                    },
+                    ticks: [],
+                  },
+                  minor: {
+                    grid: false,
+                    enabled: true,
+                    tickSize: 4,
+                    color: "#aaaaaa",
+                    labelDivide: 1,
+                    labelThousands: "",
+                    afterLabel: "",
+                    auto: {
+                      from: 0,
+                      each: 1,
+                      labels: false,
+                    },
+                    ticks: [],
+                  },
+                },
               },
               y: {
                 key: "",
                 scale: "lineY",
+                axis: {
+                  location: "end",
+                  labelSpace: 64,
+                  orientation: "horizontal",
+                  major: {
+                    grid: true,
+                    enabled: true,
+                    tickSize: 8,
+                    color: "#aaaaaa",
+                    labelDivide: 1,
+                    labelThousands: ",",
+                    afterLabel: "",
+                    auto: {
+                      from: 0,
+                      each: 10,
+                      labels: true,
+                    },
+                    ticks: [],
+                  },
+                  minor: {
+                    grid: false,
+                    enabled: false,
+                    tickSize: 8,
+                    color: "#aaaaaa",
+                    labelDivide: 1,
+                    labelThousands: "",
+                    afterLabel: "",
+                    auto: {
+                      from: 0,
+                      each: 1,
+                      labels: false,
+                    },
+                    ticks: [],
+                  },
+                },
               },
               categories: "",
               fill: false,
@@ -221,8 +328,8 @@ export const db = function createDB() {
   };
 }();
 
-export const axis = (scope: ReturnType<typeof createScope>, doc: any) => {
-  const axisScope = createScope<Axis>(scope, ["axis"]);
+export const axis = (scope: ReturnType<typeof createScope>, key: string[], doc: any) => {
+  const axisScope = createScope<Axis>(scope, key);
 
   return {
     ...axisScope,

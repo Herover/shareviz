@@ -118,11 +118,13 @@ export interface Line {
 }
 
 export interface X {
+  axis: Axis
   key: string
   scale: string
 }
 
 export interface Y {
+  axis: Axis
   key: string
   scale: string
 }
