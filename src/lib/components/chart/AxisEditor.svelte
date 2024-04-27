@@ -6,8 +6,6 @@
   export let conf: ReturnType<typeof axis>;
 </script>
 
-<p><b>Axis</b></p>
-
 <p>
   <label>
     Location:

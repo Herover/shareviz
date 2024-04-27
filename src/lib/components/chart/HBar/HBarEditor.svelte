@@ -303,6 +303,7 @@
   </p>
 {/if}
 
+<b>Axis</b>
 <AxisEditor conf={dbHBar.axis()} />
 
 <style>
