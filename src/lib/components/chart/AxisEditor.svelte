@@ -47,4 +47,4 @@
 <AxisGridEditor conf={conf.major} />
 
 <u>Minor gridlines:</u>
-<AxisGridEditor conf={conf.minor} />
+<AxisGridEditor conf={conf.minor} isMinor={true}/>
