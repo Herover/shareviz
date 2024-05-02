@@ -1,5 +1,19 @@
+<script lang="ts" context="module">
+  export const shapeData = (line: Line, data: { [key: string]: any[] }) => group(
+    line.categories,
+    data[line.dataSet],
+    (k, g) => ({
+      label: k,
+      value: g.map((d) => ({
+        x: Number.parseInt(d[line.x.key]),
+        y: Number.parseInt(d[line.y.key]),
+      })),
+    }),
+  );
+</script>
+
 <script lang="ts">
-  import { AxisLocation, AxisOrientation, type Line, type Root } from "$lib/chart";
+  import { type Line, type Root } from "$lib/chart";
   import { formatNumber, group } from "$lib/utils";
   import { scaleLinear } from "d3-scale";
   import { line } from "d3-shape";

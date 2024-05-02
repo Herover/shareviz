@@ -2,7 +2,7 @@
   import type { Root } from "$lib/chart";
   import { group } from "$lib/utils";
   import HBar from "./HBar/HBar.svelte";
-  import Line from "./Line/Line.svelte";
+  import Line, { shapeData as lineShapeData } from "./Line/Line.svelte";
 
   export let chartSpec: Root;
   export let data: { [key: string]: any[] };
@@ -75,17 +75,7 @@
       <Line
         {chartSpec}
         lineSpec={element.line}
-        values={group(
-          element.line.categories,
-          data[element.line.dataSet],
-          (k, g) => ({
-            label: k,
-            value: g.map((d) => ({
-              x: Number.parseInt(d[element.line.x.key]),
-              y: Number.parseInt(d[element.line.y.key]),
-            })),
-          }),
-        )}
+        values={lineShapeData(element.line, data)}
         width={chartWidth -
           chartSpec.style.marginLeft -
           chartSpec.style.marginRight}
