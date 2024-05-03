@@ -9,6 +9,7 @@ import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
 import { Config } from 'vizzu';
 import type { HBar, Line, Root, Set, Chart, Axis, AxisGrid } from './chart';
+import { notifications } from './notificationStore';
 // import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
 
@@ -62,6 +63,7 @@ export const db = function createDB() {
     
       // Create local Doc instance mapped to 'examples' collection document with id 'counter'
       doc = connection.get('examples', id);
+      doc.on("error", e => console.warn("doc error", e))
 
       
       presence = connection.getPresence('x-' + id);
@@ -97,8 +99,8 @@ export const db = function createDB() {
       })
       localPresence = presence.create();
     
-      const onData = () => {
-        console.log("onData")
+      const onData = (e?: Error) => {
+        if (e && e.message) notifications.addError(e.message);
         set({
           doc: doc.data,
           connected,
