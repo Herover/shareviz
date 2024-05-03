@@ -399,7 +399,13 @@ export function startServer(server) {
     next();
   });
   backend.use('receive', function (ctx, next) {
-    console.log('receive');
+    if (ctx.data.a == "s" && ctx.data.c == "examples") {
+      // TODO: add authentication
+      if (false) {
+        console.log("unauthorized")
+        return next("unauthorized");
+      }
+    }
     next();
   });
   backend.use('reply', function (ctx, next) {
