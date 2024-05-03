@@ -20,6 +20,7 @@ interface PresenceData {
 
 export const db = function createDB() {
   let doc: any; // Doc;
+  let connection: any;
   
   let presence: any; // Presence<PresenceData>;
   let localPresence: any; // LocalPresence<PresenceData>;
@@ -37,7 +38,7 @@ export const db = function createDB() {
 
   return {
     subscribe, set, update,
-    connect: (id: string) => {
+    connect: () => {
       const socket = new ReconnectingWebSocket(`ws://${window.location.host}/sharedb`, [], {
         // ShareDB handles dropped messages, and buffering them while the socket
         // is closed has undefined behavior
@@ -59,14 +60,18 @@ export const db = function createDB() {
         
 
       sharedb.types.register(json1.type);
-      const connection: /* Connection */ any = new sharedb.Connection(socket);
+      connection = new sharedb.Connection(socket);
     
+
+      return () => socket.close();
+    },
+    load: (docId: string) => {
       // Create local Doc instance mapped to 'examples' collection document with id 'counter'
-      doc = connection.get('examples', id);
+      doc = connection.get('examples', docId);
       doc.on("error", e => console.warn("doc error", e))
 
       
-      presence = connection.getPresence('x-' + id);
+      presence = connection.getPresence('x-' + docId);
       presence.subscribe((e: any) => console.log("presence subscribe callback", e));
       const presences: {[key: string]: PresenceData} = {};
       const presenceTargets: {[key: string]: string} = {};
@@ -116,8 +121,77 @@ export const db = function createDB() {
       // When document changes (by this client or any other, or the server),
       // update the number on the page
       doc.on('op', onData);
-
-      return () => socket.close();
+    },
+    create: () => {
+      return new Promise<string>((resolve, reject) => {
+        // TODO: id collision detection
+        const docId = ("" + Math.random()).split(".")[1];
+        doc = connection.get('examples', docId);
+        doc.on("error", e => console.warn("doc error", e));
+        doc.create({
+          data: { sets: [] },
+          chart: {
+            title: "TITLE GOES HERE",
+            subTitle: "AND SUBTITLE GOES HERE",
+            width: 390,
+            height: 500,
+            sourceTextLeft: "Source: <YOUR SOURCE>",
+            sourceTextLeftLink: "",
+            sourceTextRight: "YOUR NAME",
+            sourceTextRightLink: "",
+            chartType: "hBar",
+            // TODO: should be created dynamically
+            scales: [
+              {
+                name: "x",
+                dataKey: "antal",
+                type: "linear",
+                dataRange: [0, 15000000],
+              },
+              {
+                name: "color",
+                dataKey: "",
+                type: "categoriesColor",
+                colors: {
+                  default: "#888888",
+                  byKey: [
+                    { k: "2023", c: "#aa2222", legend: "2023" },
+                    { k: "2022", c: "#ff8888", legend: "2022" },
+                  ],
+                },
+              },
+              {
+                name: "lineX",
+                dataKey: "tid",
+                type: "linear",
+                dataRange: [2010, 2023],
+              },
+              {
+                name: "lineY",
+                dataKey: "antal",
+                type: "linear",
+                dataRange: [0, 15000000],
+              },
+            ],
+            elements: [],
+          },
+          style: {
+            marginTop: 16,
+            marginBottom: 16,
+            marginLeft: 16,
+            marginRight: 16,
+            titleSize: 24,
+            titleBold: true,
+            subTitleSize: 16,
+            subTitleBold: true,
+            sourceMargin: 8,
+            bgColor: "#ffffff",
+          },
+        } as Root, json1.type.uri, (err) => {
+          if (err) reject(err);
+          resolve(docId);
+        });
+      });
     },
 
     chart: () => {

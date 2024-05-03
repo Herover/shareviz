@@ -13,7 +13,8 @@
 
   let viewScale = 100;
 
-  const disconnect = db.connect(data.id);
+  const disconnect = db.connect();
+  db.load(data.id);
 
   onDestroy(() => {
     disconnect();
