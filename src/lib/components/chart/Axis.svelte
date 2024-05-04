@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ScaleContinuousNumeric } from "d3-scale";
+  import type { ScaleLinear, ScaleTime } from "d3-scale";
   import { formatNumber } from "$lib/utils";
   import type { Axis } from "$lib/chart";
   import { AxisLocation, AxisOrientation } from "$lib/chart";
@@ -7,61 +7,92 @@
   export let conf: Axis;
   export let width: number;
   export let height: number;
-  export let scale: ScaleContinuousNumeric<number, number> | undefined;
+  export let scale: ScaleLinear<number, number, never> | ScaleTime<number, number, never> | undefined;
 
   let size = 16;
   let lineOffset = conf.location == AxisLocation.START ? size : 0;
   const maxTicks = 200;
 
-  let autoMajorTicks: { n: number; l: string }[] = [];
+  let autoMajorTicks: { n: number | Date; l: string }[] = [];
   $: {
     if (conf && scale) {
-      console.log("major auto", conf.major.auto)
       autoMajorTicks = [];
+      const from = scale.domain()[0];
       const to = scale.domain()[1];
-      const expectedTicks =
-        1 + (to - conf.major.auto.from) / conf.major.auto.each;
-      if (expectedTicks > maxTicks) {
-        autoMajorTicks = [
-          { n: scale.domain()[0], l: `Too many ticks (${expectedTicks})` },
-        ];
-      } else {
-        for (let i = conf.major.auto.from; i <= to; i += conf.major.auto.each) {
+      if (typeof to == "number" && typeof from == "number") {
+        const expectedTicks =
+          1 + (to - from) / conf.major.auto.each;
+        if (expectedTicks > maxTicks) {
+          autoMajorTicks = [
+            { n: from, l: `Too many ticks (${expectedTicks})` },
+          ];
+        } else {
+          for (let i = from; i <= to; i += conf.major.auto.each) {
+            autoMajorTicks.push({
+              n: i,
+              l: conf.major.auto.labels ? formatNumber(
+                i,
+                conf.major.labelDivide,
+                conf.major.labelThousands,
+              ) + conf.major.afterLabel : "",
+            });
+          }
+        }
+      } else if (to instanceof Date && from instanceof Date) {
+        let d = new Date(from);
+        d.setDate(1);
+        d.setMonth(0);
+        let n = 0;
+        while (d <= to && n < maxTicks) {
           autoMajorTicks.push({
-            n: i,
-            l: conf.major.auto.labels ? formatNumber(
-              i,
-              conf.major.labelDivide,
-              conf.major.labelThousands,
-            ) + conf.major.afterLabel : "",
+            n: new Date(d),
+            l: conf.major.auto.labels ? d.getFullYear() + conf.major.afterLabel : "",
           });
+          d.setFullYear(d.getFullYear() + conf.major.auto.each);
+          n++;
         }
       }
     }
   }
   $: majorTicks = conf && scale ? [...conf.major.ticks, ...autoMajorTicks] : [];
 
-  let autoMinorTicks: { n: number; l: string }[] = [];
+  let autoMinorTicks: { n: number | Date; l: string }[] = [];
   $: {
     if (conf && scale) {
       autoMinorTicks = [];
+      const from = scale.domain()[0];
       const to = scale.domain()[1];
-      const expectedTicks =
-        1 + (to - conf.minor.auto.from) / conf.minor.auto.each;
-      if (expectedTicks > maxTicks) {
-        autoMinorTicks = [
-          { n: scale.domain()[0], l: `Too many ticks (${expectedTicks})` },
-        ];
-      } else {
-        for (let i = conf.minor.auto.from; i <= to; i += conf.minor.auto.each) {
+      if (typeof to == "number" && typeof from == "number") {
+        const expectedTicks =
+          1 + (to - from) / conf.minor.auto.each;
+        if (expectedTicks > maxTicks) {
+          autoMinorTicks = [
+            { n: from, l: `Too many ticks (${expectedTicks})` },
+          ];
+        } else {
+          for (let i = from; i <= to; i += conf.minor.auto.each) {
+            autoMinorTicks.push({
+              n: i,
+              l: conf.minor.auto.labels ? formatNumber(
+                i,
+                conf.minor.labelDivide,
+                conf.minor.labelThousands,
+              ) + conf.minor.afterLabel : "",
+            });
+          }
+        }
+      } else if (to instanceof Date && from instanceof Date) {
+        let d = new Date(from);
+        d.setDate(1);
+        d.setMonth(0);
+        let n = 0;
+        while (d <= to && n < maxTicks) {
           autoMinorTicks.push({
-            n: i,
-            l: formatNumber(
-              i,
-              conf.minor.labelDivide,
-              conf.minor.labelThousands,
-            ),
+            n: new Date(d),
+            l: conf.minor.auto.labels ? d.getFullYear() + conf.minor.afterLabel : "",
           });
+          d.setFullYear(d.getFullYear() + conf.minor.auto.each);
+          n++;
         }
       }
     }

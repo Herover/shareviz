@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Set } from "$lib/chart";
   import type { db } from "$lib/chartStore";
+  import { valueParsers } from "$lib/utils";
 
   export let dataStore: ReturnType<typeof db.dataSet>;
 
@@ -65,7 +66,7 @@
         value={column.type}
         on:change={(e) => dataStore.setColumnType(i, e.currentTarget.value)}
       >
-        {#each ["text", "number"] as type}
+        {#each Object.keys(valueParsers) as type}
           <option>{type}</option>
         {/each}
       </select>

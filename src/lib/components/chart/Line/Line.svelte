@@ -1,24 +1,21 @@
 <script lang="ts" context="module">
-  export const shapeData = (line: Line, data: { [key: string]: any[] }) => group(
-    line.categories,
-    data[line.dataSet],
-    (k, g) => ({
+  export const shapeData = (line: Line, data: { [key: string]: any[] }) =>
+    group(line.categories, data[line.dataSet], (k, g) => ({
       label: k,
       value: g.map((d) => ({
-        x: Number.parseInt(d[line.x.key]),
-        y: Number.parseInt(d[line.y.key]),
+        x: d[line.x.key],
+        y: d[line.y.key],
       })),
-    }),
-  );
+    }));
 </script>
 
 <script lang="ts">
   import { type Line, type Root } from "$lib/chart";
-  import { formatNumber, group } from "$lib/utils";
-  import { scaleLinear } from "d3-scale";
+  import { group, valueKinds, valueParsers } from "$lib/utils";
+  import { scaleLinear, scaleTime, type ScaleLinear, type ScaleTime } from "d3-scale";
   import { line } from "d3-shape";
-  import Axis, {
-  } from "../Axis.svelte";
+  import Axis from "../Axis.svelte";
+    import { max, min } from "d3-array";
 
   export let values: {
     label: string;
@@ -27,7 +24,7 @@
   export let chartSpec: Root;
   export let lineSpec: Line;
   export let width: number;
-
+  $: console.log("values", values);
   const height = 300;
   const labelWidth = 80;
   const topMargin = 24;
@@ -68,13 +65,29 @@
       }[],
     );
 
-  $: xScale = scaleLinear()
-    .range([leftMargin, width - labelWidth - rightMargin])
-    .domain(
-      chartSpec.chart.scales.find((s) => s.name == lineSpec.x.scale)
-        ?.dataRange ||
-        console.warn("x scale not found") || [0, 1],
-    );
+  $: minX = min(values, d => min(d.value, dd => dd.x)) || 0;
+  $: maxX = max(values, d => max(d.value, dd => dd.x)) || 1;
+  $: xScaleSpec = chartSpec.chart.scales.find(
+    (s) => s.name == lineSpec.x.scale,
+  );
+  $: xType =
+    valueParsers[
+      chartSpec.data.sets
+        .find((set) => set.id == lineSpec.dataSet)
+        ?.rows.find((r) => r.key == xScaleSpec?.dataKey)?.type || ""
+    ]?.type || "";
+  let xScale: ScaleLinear<number, number, never> | ScaleTime<number, number, never> = scaleLinear();
+  $: {
+    if (xType == valueKinds.NUMBER) {
+      xScale = scaleLinear()
+        .range([leftMargin, width - labelWidth - rightMargin])
+        .domain([minX, maxX]);
+    } else if (xType == valueKinds.DATE) {
+      xScale = scaleTime()
+        .range([leftMargin, width - labelWidth - rightMargin])
+        .domain([minX, maxX]);
+    }
+  }
   $: yScale = scaleLinear()
     .range([height - topMargin - bottomMargin, 0])
     .domain(

@@ -8,6 +8,7 @@
   import DataSetEditor from "$lib/components/chart/DataSetsEditor.svelte";
   import EditorCollapsible from "$lib/components/chart/EditorCollapsible.svelte";
   import { onDestroy } from "svelte";
+  import { valueParsers } from "$lib/utils.js";
 
   export let data;
 
@@ -31,12 +32,15 @@
             acc[data.id] = dsvFormat("\t").parse<any, string>(
               data.raw,
               (row) => {
-                return data.rows.reduce((acc: any, rowInfo: any) => {
-                  if (rowInfo.type == "number") {
-                    acc[rowInfo.key] = Number.parseFloat(row[rowInfo.key]);
-                  } else if (rowInfo.type == "text") {
+                return data.rows.reduce((acc: any, rowInfo) => {
+                  const parser = valueParsers[rowInfo.type];
+                  if (!parser) {
+                    // TODO: better warning?
+                    console.warn("could not find parser", rowInfo.key);
                     acc[rowInfo.key] = row[rowInfo.key];
+                    return acc;
                   }
+                  acc[rowInfo.key] = parser.fn(row[rowInfo.key]);
 
                   return acc;
                 }, {} as any);

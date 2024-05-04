@@ -55,3 +55,39 @@ export const group = <T extends any, U>(
 
   return Object.keys(groups).map((k) => f(k, groups[k]));
 };
+
+export enum valueKinds {
+  NUMBER = "number",
+  TEXT = "text",
+  DATE = "date",
+}
+export const valueParsers: { [name: string]: { fn: (string) => any, type: valueKinds } } = {
+  number: {
+    fn: (d: string) => Number.parseFloat(d),
+    type: valueKinds.NUMBER,
+  },
+  text: {
+    fn: (d: string) => d,
+    type: valueKinds.TEXT,
+  },
+  ISODate: {
+    fn: (d: string) => {
+      const parts = d.match(/(\d{4})\-(\d{2})\-(\d{2})/);
+      if (parts && parts.length == 4) {
+        return new Date(`${parts[1]}-${parts[2]}-${parts[3]}T00:00:00+00:00`);
+      }
+      return null;
+    },
+    type: valueKinds.DATE,
+  },
+  yyyyMmm: {
+    fn: (d: string) => {
+      const parts = d.match(/(\d{4})\M(\d{2})/);
+      if (parts && parts.length == 3) {
+        return new Date(`${parts[1]}-${parts[2]}-01T00:00:00+00:00`);
+      }
+      return null;
+    },
+    type: valueKinds.DATE,
+  },
+};
