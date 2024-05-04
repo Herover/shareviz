@@ -7,6 +7,7 @@
   import LineEditor from "./Line/LineEditor.svelte";
 
   export let chartScope: ReturnType<typeof db.chart>;
+  export let styleScope: ReturnType<typeof db.style>;
   export let spec: Root;
   export let chartData: {
     [key: string]: DSVParsedArray<any>;
@@ -34,6 +35,17 @@
     Title: <textarea
       value={$chartScope.title}
       on:keyup={(e) => chartScope.setConfigTitle(e.currentTarget.value)}
+      class="control"
+    />
+  </label>
+</p>
+<p>
+  <label>
+    Bold:
+    <input
+      bind:checked={$styleScope.titleBold}
+      on:change={(e) => styleScope.setTitleBold(e.currentTarget.checked)}
+      type="checkbox"
     />
   </label>
 </p>
@@ -42,6 +54,17 @@
     Sub title: <textarea
       value={$chartScope.subTitle}
       on:keyup={(e) => chartScope.setConfigSubTitle(e.currentTarget.value)}
+      class="control"
+    />
+  </label>
+</p>
+<p>
+  <label>
+    Bold:
+    <input
+      bind:checked={$styleScope.subTitleBold}
+      on:change={(e) => styleScope.setSubTitleBold(e.currentTarget.checked)}
+      type="checkbox"
     />
   </label>
 </p>
@@ -50,6 +73,7 @@
     Source text (left): <input
       value={$chartScope.sourceTextLeft}
       on:keyup={(e) => chartScope.setSourceTextLeft(e.currentTarget.value)}
+      class="control"
     />
   </label>
 </p>
@@ -58,6 +82,7 @@
     Source link (left): <input
       value={$chartScope.sourceTextLeftLink}
       on:keyup={(e) => chartScope.setSourceTextLeftLink(e.currentTarget.value)}
+      class="control"
     />
   </label>
 </p>
@@ -66,6 +91,7 @@
     Source text (right): <input
       value={$chartScope.sourceTextRight}
       on:keyup={(e) => chartScope.setSourceTextRight(e.currentTarget.value)}
+      class="control"
     />
   </label>
 </p>
@@ -74,6 +100,7 @@
     Source link (right): <input
       value={$chartScope.sourceTextRightLink}
       on:keyup={(e) => chartScope.setSourceTextLeftRight(e.currentTarget.value)}
+      class="control"
     />
   </label>
 </p>
@@ -86,6 +113,7 @@
       on:change={(e) =>
         chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
       type="number"
+      class="control"
     />
   </label>
 </p>
@@ -98,6 +126,7 @@
       on:change={(e) =>
         chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
       type="number"
+      class="control"
     />
   </label>
 </p>
@@ -160,8 +189,7 @@
 <button on:click={() => addLineChart()}>+ Lines</button>
 
 <style>
-  input,
-  textarea {
+  .control {
     width: 100%;
     box-sizing: border-box;
   }

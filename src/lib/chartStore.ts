@@ -8,7 +8,7 @@ import sharedb from 'sharedb-client-browser/dist/sharedb-client-umd.cjs';
 import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
 import { Config } from 'vizzu';
-import type { HBar, Line, Root, Set, Chart, Axis, AxisGrid } from './chart';
+import type { HBar, Line, Root, Set, Chart, Axis, AxisGrid, Style } from './chart';
 import { notifications } from './notificationStore';
 // import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
@@ -390,6 +390,15 @@ export const db = function createDB() {
         removeChartElement: (elementIndex: number) => doc.submitOp(["chart", "elements", elementIndex, { r: 0 }]),
         moveElementUp: (elementIndex: number) => doc.submitOp(["chart", "elements", [ elementIndex, { p: 0 } ], [ elementIndex - 1, { d: 0 } ]]),
         moveElementDown: (elementIndex: number) => doc.submitOp(["chart", "elements", [ elementIndex, { p: 0 } ], [ elementIndex + 1, { d: 0 } ]]),
+      };
+    },
+    style: () => {
+      const styleScope = createScope<Style>(db, ["doc", "style"]);
+      
+      return {
+        ...styleScope,
+        setTitleBold: (value: boolean) => doc.submitOp(["style", "titleBold", { r: 0, i: value }]),
+        setSubTitleBold: (value: boolean) => doc.submitOp(["style", "subTitleBold", { r: 0, i: value }]),
       };
     },
     dataSet: (index: number) => {
