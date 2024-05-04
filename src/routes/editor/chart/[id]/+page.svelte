@@ -110,7 +110,11 @@
       </div>
     </div>
   {:else}
-    <p>Loading, hopefully...</p>
+    {#if $db.missing}
+      <p>Could not find chart</p>
+    {:else}
+      <p>Loading, hopefully...</p>
+    {/if}
   {/if}
 </div>
 

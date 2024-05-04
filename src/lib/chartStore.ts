@@ -32,9 +32,11 @@ export const db = function createDB() {
   const { subscribe, set, update } = writable<{
     connected: boolean,
     doc: /* Doc */ Root | null,
+    /** True if document was fetched but is undefined */
+    missing: boolean,
     presences: unknown,
     presenceTargets: unknown,
-  }>({ connected, doc: null, presences: {}, presenceTargets: {} });
+  }>({ connected, doc: null, missing: false, presences: {}, presenceTargets: {} });
 
   return {
     subscribe, set, update,
@@ -106,8 +108,10 @@ export const db = function createDB() {
     
       const onData = (e?: Error) => {
         if (e && e.message) notifications.addError(e.message);
+        console.log("doc", doc, doc.data)
         set({
           doc: doc.data,
+          missing: typeof doc.data === "undefined",
           connected,
           presences,
           presenceTargets,
