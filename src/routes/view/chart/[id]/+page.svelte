@@ -6,7 +6,8 @@
 
   export let data;
 
-  const disconnect = db.connect(data.id);
+  const disconnect = db.connect();
+  db.load(data.id);
 
   $: chartSpec = $db.doc as Root;
   $: console.log(chartSpec, JSON.stringify(chartSpec));
