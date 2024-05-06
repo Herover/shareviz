@@ -140,4 +140,5 @@ export interface Style {
   subTitleBold: boolean
   sourceMargin: number
   bgColor: string
+  textColor: string
 }

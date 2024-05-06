@@ -41,30 +41,10 @@
 </p>
 <p>
   <label>
-    Bold:
-    <input
-      bind:checked={$styleScope.titleBold}
-      on:change={(e) => styleScope.setTitleBold(e.currentTarget.checked)}
-      type="checkbox"
-    />
-  </label>
-</p>
-<p>
-  <label>
     Sub title: <textarea
       value={$chartScope.subTitle}
       on:keyup={(e) => chartScope.setConfigSubTitle(e.currentTarget.value)}
       class="control"
-    />
-  </label>
-</p>
-<p>
-  <label>
-    Bold:
-    <input
-      bind:checked={$styleScope.subTitleBold}
-      on:change={(e) => styleScope.setSubTitleBold(e.currentTarget.checked)}
-      type="checkbox"
     />
   </label>
 </p>

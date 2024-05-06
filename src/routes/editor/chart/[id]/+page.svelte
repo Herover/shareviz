@@ -9,6 +9,7 @@
   import EditorCollapsible from "$lib/components/chart/EditorCollapsible.svelte";
   import { onDestroy } from "svelte";
   import { valueParsers } from "$lib/utils.js";
+  import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
 
   export let data;
 
@@ -64,6 +65,13 @@
           startOpen={chartSpec.data.sets.length == 0}
         >
           <DataSetEditor chartData={chartSpec.data} store={db} />
+        </EditorCollapsible>
+        <EditorCollapsible
+          group="controls"
+          key="style"
+          label="Style"
+        >
+          <StyleEditor spec={chartSpec} style={db.style()} />
         </EditorCollapsible>
         <EditorCollapsible
           group="controls"

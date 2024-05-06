@@ -22,9 +22,10 @@
   style:padding-right="{chartSpec.style.marginRight}px"
   style:padding-top="{chartSpec.style.marginTop}px"
   style:padding-bottom="{chartSpec.style.marginBottom}px"
+  style:color="{chartSpec.style.textColor}"
 >
   <p
-    style:font-size="{chartSpec.style.titleSize}px"
+    style:font-size="{chartSpec.style.titleSize}em"
     style:font-weight={chartSpec.style.titleBold ? "bold" : "normal"}
     class="title"
   >
@@ -36,7 +37,7 @@
     {/each}
   </p>
   <p
-    style:font-size="{chartSpec.style.subTitleSize}px"
+    style:font-size="{chartSpec.style.subTitleSize}em"
     style:font-weight={chartSpec.style.subTitleBold ? "bold" : "normal"}
   >
     {#each chartSpec.chart.subTitle.split("\n") as line, i}

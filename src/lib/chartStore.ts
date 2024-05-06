@@ -184,12 +184,13 @@ export const db = function createDB() {
             marginBottom: 16,
             marginLeft: 16,
             marginRight: 16,
-            titleSize: 24,
+            titleSize: 2,
             titleBold: true,
-            subTitleSize: 16,
+            subTitleSize: 1.1,
             subTitleBold: true,
             sourceMargin: 8,
             bgColor: "#ffffff",
+            textColor: "#000000",
           },
         } as Root, json1.type.uri, (err) => {
           if (err) reject(err);
@@ -399,6 +400,14 @@ export const db = function createDB() {
         ...styleScope,
         setTitleBold: (value: boolean) => doc.submitOp(["style", "titleBold", { r: 0, i: value }]),
         setSubTitleBold: (value: boolean) => doc.submitOp(["style", "subTitleBold", { r: 0, i: value }]),
+        setTitleSize: (value: number) => doc.submitOp(["style", "titleSize", { r: 0, i: value }]),
+        setSubTitleSize: (value: number) => doc.submitOp(["style", "subTitleSize", { r: 0, i: value }]),
+        setMarginLeft: (value: number) => doc.submitOp(["style", "marginLeft", { r: 0, i: value }]),
+        setMarginRight: (value: number) => doc.submitOp(["style", "marginRight", { r: 0, i: value }]),
+        setMarginTop: (value: number) => doc.submitOp(["style", "marginTop", { r: 0, i: value }]),
+        setMarginBottom: (value: number) => doc.submitOp(["style", "marginBottom", { r: 0, i: value }]),
+        setBGColor: (value: string) => doc.submitOp(["style", "bgColor", { r: 0, i: value }]),
+        setTextColor: (value: string) => doc.submitOp(["style", "textColor", { r: 0, i: value }]),
       };
     },
     dataSet: (index: number) => {
