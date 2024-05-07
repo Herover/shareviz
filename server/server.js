@@ -385,6 +385,10 @@ Region Nordjylland	2023	4989245`,
   });
 }
 
+/**
+ * 
+ * @param {import('http').Server} server 
+ */
 export function startServer(server) {
   /* console.log("STARTSERVER",server) */
   // Create a web server to serve files and listen to WebSocket connections
