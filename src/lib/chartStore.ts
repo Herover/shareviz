@@ -204,30 +204,30 @@ export const db = function createDB() {
       return {
         ...scoped,
         hBar: (elementIndex: number) => {
-          const hbarScope = createScope<HBar>(scoped, ["elements", elementIndex, "hBar"]);
+          const hbarScope = createScope<HBar>(scoped, ["elements", elementIndex, "d"]);
 
           return {
             ...hbarScope,
-            setLabelWidth: (value: number) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "labelWidth", { r: 0, i: value }]),
-            setCategories: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "categories", { r: 0, i: value }]),
-            setSubCategories: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "subCategories", { r: 0, i: value }]),
-            setValue: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "value", { r: 0, i: value }]),
-            setRepeat: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "repeat", { r: 0, i: value }]),
-            setDataSet: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "hBar", "dataSet", { r: 0, i: value }]),
+            setLabelWidth: (value: number) => doc.submitOp(["chart", "elements", elementIndex, "d", "labelWidth", { r: 0, i: value }]),
+            setCategories: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "categories", { r: 0, i: value }]),
+            setSubCategories: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "subCategories", { r: 0, i: value }]),
+            setValue: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "value", { r: 0, i: value }]),
+            setRepeat: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "repeat", { r: 0, i: value }]),
+            setDataSet: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "dataSet", { r: 0, i: value }]),
             axis: () => axis(hbarScope, ["axis"], doc),
           };
         },
         line: (elementIndex: number) => {
-          const hbarScope = createScope<Line>(scoped, ["elements", elementIndex, "line"]);
+          const hbarScope = createScope<Line>(scoped, ["elements", elementIndex, "d"]);
 
           return {
             ...hbarScope,
-            setDataSet: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "line", "dataSet", { r: 0, i: value }]),
-            setXKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "line", "x", "key", { r: 0, i: value }]),
-            setYKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "line", "y", "key", { r: 0, i: value }]),
-            setCategoriesKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "line", "categories", { r: 0, i: value }]),
-            setFill: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "line", "fill", { r: 0, i: value }]),
-            setStack: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "line", "stack", { r: 0, i: value }]),
+            setDataSet: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "dataSet", { r: 0, i: value }]),
+            setXKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "x", "key", { r: 0, i: value }]),
+            setYKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "y", "key", { r: 0, i: value }]),
+            setCategoriesKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "categories", { r: 0, i: value }]),
+            setFill: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "d", "fill", { r: 0, i: value }]),
+            setStack: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "d", "stack", { r: 0, i: value }]),
             xAxis: axis(hbarScope, ["x", "axis"], doc),
             yAxis: axis(hbarScope, ["y", "axis"], doc),
           };
@@ -253,7 +253,7 @@ export const db = function createDB() {
         addBarChart: (elementIndex: number) => doc.submitOp(["chart", "elements", elementIndex, {
           i: {
             type: "hBar",
-            hBar: {
+            d: {
               dataSet: "",
               categories: "",
               subCategories: "",
@@ -302,7 +302,7 @@ export const db = function createDB() {
         addLineChart: (elementIndex: number) => doc.submitOp(["chart", "elements", elementIndex, {
           i: {
             type: "line",
-            line: {
+            d: {
               dataSet: "",
               x: {
                 key: "",

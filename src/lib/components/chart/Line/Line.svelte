@@ -1,14 +1,3 @@
-<script lang="ts" context="module">
-  export const shapeData = (line: Line, data: { [key: string]: any[] }) =>
-    group(line.categories, data[line.dataSet], (k, g) => ({
-      label: k,
-      value: g.map((d) => ({
-        x: d[line.x.key],
-        y: d[line.y.key],
-      })),
-    }));
-</script>
-
 <script lang="ts">
   import { type Line, type Root } from "$lib/chart";
   import { group, valueKinds, valueParsers } from "$lib/utils";

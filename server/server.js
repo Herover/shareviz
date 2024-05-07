@@ -191,7 +191,7 @@ Region Nordjylland	2023	4989245`,
           elements: [
             {
               type: "hBar",
-              hBar: {
+              d: {
                 dataSet: "1",
                 categories: "område",
                 subCategories: "tid",
@@ -237,7 +237,7 @@ Region Nordjylland	2023	4989245`,
               },
             }, {
               type: "line",
-              line: {
+              d: {
                 dataSet: "2",
                 x: {
                   axis: {

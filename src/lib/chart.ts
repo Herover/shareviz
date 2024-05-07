@@ -55,8 +55,7 @@ export interface ByKey {
 
 export interface Element {
   type: string
-  hBar?: HBar
-  line?: Line
+  d: HBar | Line
 }
 
 export interface Axis {

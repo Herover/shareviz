@@ -1,8 +1,6 @@
 <script lang="ts">
   import type { Root } from "$lib/chart";
-  import { group } from "$lib/utils";
-  import HBar from "./HBar/HBar.svelte";
-  import Line, { shapeData as lineShapeData } from "./Line/Line.svelte";
+  import { getComponent } from "$lib/components/chart/chartComponents";
 
   export let chartSpec: Root;
   export let data: { [key: string]: any[] };
@@ -48,40 +46,13 @@
     {/each}
   </p>
   {#each chartSpec.chart.elements as element}
-    {#if element.type == "hBar"}
-      {#each group( element.hBar.repeat, data[element.hBar.dataSet], (k, d) => ({ k, d }), ) as { k, d }, i}
-        <HBar
-          {chartSpec}
-          hBarSpec={element.hBar}
-          labelWidth={element.hBar.labelWidth}
-          valueWidth={chartWidth -
-            chartSpec.style.marginLeft -
-            chartSpec.style.marginRight -
-            element.hBar.labelWidth}
-          values={group(element.hBar.categories, d, (k, g) => ({
-            label: k,
-            value: group(element.hBar.subCategories, g, (kk, gg) => {
-              let sum = gg.reduce((acc, d) => acc + d[element.hBar.value], 0);
-              return {
-                label: kk,
-                value: sum,
-              };
-            }),
-          }))}
-          label={k}
-          showLegend={i == 0}
-        />
-      {/each}
-    {:else if element.type == "line"}
-      <Line
-        {chartSpec}
-        lineSpec={element.line}
-        values={lineShapeData(element.line, data)}
-        width={chartWidth -
-          chartSpec.style.marginLeft -
-          chartSpec.style.marginRight}
-      />
-    {/if}
+    <svelte:component
+      this={getComponent(element.type)}
+      componentSpec={element.d}
+      chartSpec={chartSpec}
+      data={data}
+      chartWidth={chartWidth}
+    />
   {/each}
   <div class="source">
     <p class="source-left">
