@@ -41,6 +41,10 @@
       value={$dataStore.raw}
       on:change={(e) => updateColumns(e.currentTarget.value)}
       rows="4"
+      placeholder={$dataStore.type == "tsv" ? `column1\tcolumn2
+value1\tvalue2
+value3\tvalue4
+...` : ""}
     /></label
   >
 </p>
