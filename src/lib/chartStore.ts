@@ -199,6 +199,15 @@ export const db = function createDB() {
       });
     },
 
+    getRecent: (): Promise<any> => {
+      return new Promise((resolve, reject) => {
+        connection.createFetchQuery("examples", { $limit: 5 }, {}, (err, results) => {
+          if (err) reject(err);
+          resolve(results);
+        });
+      });
+    },
+
     chart: () => {
       const scoped = createScope<Chart>(db, ["doc", "chart",]);
       return {

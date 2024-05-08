@@ -8,6 +8,8 @@
     disconnect();
   });
 
+  const charts = db.getRecent();
+
   const newGraphic = async () => {
     const docId = await db.create();
     goto("/editor/chart/" + docId);
@@ -19,6 +21,14 @@
     <div class="container">
       <h1>Welcome</h1>
       <button on:click={() => newGraphic()}>New graphic</button>
+
+      {#await charts}
+        ...
+      {:then chartList} 
+        {#each chartList as chart, i}
+          <p><a href="/editor/chart/{chart.id}">{chart.data.chart.title}</a></p>
+        {/each}
+      {/await}
     </div>
   </div>
 </div>
