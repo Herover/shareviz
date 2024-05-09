@@ -14,6 +14,9 @@
     const docId = await db.create();
     goto("/editor/chart/" + docId);
   };
+  const authenticate = async () => {
+    return db.auth("1", "1");
+  };
 </script>
 
 <div class="main">
@@ -21,6 +24,7 @@
     <div class="container">
       <h1>Welcome</h1>
       <button on:click={() => newGraphic()}>New graphic</button>
+      <button on:click={() => authenticate()}>Sign in</button>
 
       {#await charts}
         ...
