@@ -40,20 +40,6 @@ export const db = function createDB() {
 
   return {
     subscribe, set, update,
-    auth: async (username: string, password: string) => {
-      const resp = await fetch(
-        "/api/auth",
-        {
-          method: "POST",
-          body: JSON.stringify({ username, password }),
-        },
-      );
-      if (resp.status < 200 || 299 < resp.status) {
-        return false;
-      }
-
-      return true;
-    },
     connect: () => {
       const socket = new ReconnectingWebSocket(`//${window.location.host}/sharedb?aaaa=bbbb`, ["ws"], {
         // ShareDB handles dropped messages, and buffering them while the socket
