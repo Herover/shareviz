@@ -433,6 +433,7 @@ export const axis = (scope: ReturnType<typeof createScope>, key: string[], doc: 
     ...axisScope,
     setLocation: (value: string) => doc.submitOp([...axisScope.path.slice(1), "location", { r: 0, i: value }]),
     setOrientation: (value: string) => doc.submitOp([...axisScope.path.slice(1), "orientation", { r: 0, i: value }]),
+    setRepeat: (value: string) => doc.submitOp([...axisScope.path.slice(1), "repeat", { r: 0, i: value }]),
     setLabelSpace: (value: number) => doc.submitOp([...axisScope.path.slice(1), "labelSpace", { r: 0, i: value }]),
     major: axisGrid(axisScope, "major", doc),
     minor: axisGrid(axisScope, "minor", doc),

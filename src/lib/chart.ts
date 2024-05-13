@@ -58,12 +58,19 @@ export interface Element {
   d: HBar | Line
 }
 
+export enum AxisRepeatMode {
+  ALL = "all",
+  FIRST = "first",
+  LAST = "last",
+}
+
 export interface Axis {
   location: AxisLocation
   labelSpace: number
   orientation: AxisOrientation
   major: AxisGrid
   minor: AxisGrid
+  repeat: AxisRepeatMode
 }
 
 export interface AxisGrid {

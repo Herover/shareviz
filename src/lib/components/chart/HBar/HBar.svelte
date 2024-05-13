@@ -16,6 +16,7 @@
   export let hBarSpec: HBar;
   export let label: string;
   export let showLegend: boolean;
+  export let showAxisLabels: boolean;
 
   const dispatch = createEventDispatcher();
 
@@ -24,7 +25,8 @@
   const blockMargin = 16;
   let legendHeight = 0;
 
-  const scaleHeight = hBarSpec.axis.location == AxisLocation.NONE ? 0 : 16;
+  $: scaleHeight =
+    !showAxisLabels || hBarSpec.axis.location == AxisLocation.NONE ? 0 : 16;
 
   $: bars =
     values.length != 0 && values[0].value.length != 0
@@ -104,6 +106,7 @@
       height={(blockHeight + blockMargin) * values.length - blockMargin}
       scale={valueScale}
       conf={hBarSpec.axis}
+      showLabels={showAxisLabels}
     />
   </g>
 

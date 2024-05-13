@@ -1,9 +1,16 @@
 <script lang="ts">
-  import { AxisLocation, AxisOrientation } from "$lib/chart";
+  import { AxisLocation, AxisOrientation, AxisRepeatMode } from "$lib/chart";
   import type { axis } from "$lib/chartStore";
   import AxisGridEditor from "./AxisGridEditor.svelte";
 
   export let conf: ReturnType<typeof axis>;
+  export let showRepeatControl = false;
+
+  const repeatSettings = [
+    { l: "Always show", k: AxisRepeatMode.ALL },
+    { l: "Only on first", k: AxisRepeatMode.FIRST },
+    { l: "Only on last", k: AxisRepeatMode.LAST },
+  ]
 </script>
 
 <p>
@@ -41,6 +48,20 @@
       value={$conf.labelSpace}
       on:change={(e) => conf.setLabelSpace(Number.parseInt(e.currentTarget.value))}
     />
+</p>
+
+<p>
+  <label>
+    Repeat labels:
+    <select
+      value={$conf.repeat}
+      on:change={(e) => conf.setRepeat(e.currentTarget.value)}
+      disabled={!showRepeatControl}
+    >
+      {#each repeatSettings as repeat}
+        <option value={repeat.k}>{repeat.l}</option>
+      {/each}
+    </select>
 </p>
 
 <u>Major gridlines:</u>

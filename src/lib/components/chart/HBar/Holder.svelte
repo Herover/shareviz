@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Root, HBar as hBarType } from "$lib/chart";
+  import { AxisRepeatMode } from "$lib/chart";
   import { group } from "$lib/utils";
   import HBar from "./HBar.svelte";
 
@@ -9,9 +10,22 @@
     [key: string]: any[];
   };
   export let chartWidth: number;
+
+  $: groups = group(
+    componentSpec.repeat,
+    data[componentSpec.dataSet],
+    (k, d) => ({ k, d }),
+  );
+
+  $: showAxis = (type: AxisRepeatMode, i: number) => {
+    if (type == AxisRepeatMode.ALL) return true;
+    else if (type == AxisRepeatMode.FIRST && i == 0) return true;
+    else if (type == AxisRepeatMode.LAST && i == group.length - 1) return true;
+    return false;
+  };
 </script>
 
-{#each group( componentSpec.repeat, data[componentSpec.dataSet], (k, d) => ({ k, d }), ) as { k, d }, i}
+{#each groups as { k, d }, i}
   <HBar
     {chartSpec}
     hBarSpec={componentSpec}
@@ -32,5 +46,6 @@
     }))}
     label={k}
     showLegend={i == 0}
+    showAxisLabels={showAxis(componentSpec.axis.repeat, i)}
   />
 {/each}

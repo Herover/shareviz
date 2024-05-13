@@ -304,7 +304,7 @@
 {/if}
 
 <b>Axis</b>
-<AxisEditor conf={dbHBar.axis()} />
+<AxisEditor conf={dbHBar.axis()} showRepeatControl={$dbHBar.repeat != ""} />
 
 <style>
   .color-control {

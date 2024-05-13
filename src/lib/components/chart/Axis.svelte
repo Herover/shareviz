@@ -8,9 +8,10 @@
   export let width: number;
   export let height: number;
   export let scale: ScaleLinear<number, number, never> | ScaleTime<number, number, never> | undefined;
+  export let showLabels = true;
 
   let size = 16;
-  let lineOffset = conf.location == AxisLocation.START ? size : 0;
+  $: lineOffset = showLabels && conf.location == AxisLocation.START ? size : 0;
   const maxTicks = 200;
 
   let autoMajorTicks: { n: number | Date; l: string }[] = [];
@@ -146,20 +147,22 @@
             stroke-width="1"
           />
         {/if}
-        {#if conf.location == AxisLocation.START && tick.l}
-          <text
-            text-anchor="middle"
-            dominant-baseline="hanging"
-            font-size={size}
-            x={scale(tick.n)}>{tick.l}</text
-          >
-        {:else if conf.location == AxisLocation.END && tick.l}
-          <text
-            text-anchor="middle"
-            y={height + size}
-            font-size={size}
-            x={scale(tick.n)}>{tick.l}</text
-          >
+        {#if showLabels}
+          {#if conf.location == AxisLocation.START && tick.l}
+            <text
+              text-anchor="middle"
+              dominant-baseline="hanging"
+              font-size={size}
+              x={scale(tick.n)}>{tick.l}</text
+            >
+          {:else if conf.location == AxisLocation.END && tick.l}
+            <text
+              text-anchor="middle"
+              y={height + size}
+              font-size={size}
+              x={scale(tick.n)}>{tick.l}</text
+            >
+          {/if}
         {/if}
       {/each}
     {/if}
@@ -174,10 +177,12 @@
             y2={0}
             stroke={conf.major.color}
           />
-          {#if conf.location == AxisLocation.START && tick.l}
-            <text x={conf.labelSpace} y={-6}>{tick.l}</text>
-          {:else if conf.location == AxisLocation.END && tick.l}
-            <text x={width - conf.labelSpace} y={-6}>{tick.l}</text>
+          {#if showLabels}
+            {#if conf.location == AxisLocation.START && tick.l}
+              <text x={conf.labelSpace} y={-6}>{tick.l}</text>
+            {:else if conf.location == AxisLocation.END && tick.l}
+              <text x={width - conf.labelSpace} y={-6}>{tick.l}</text>
+            {/if}
           {/if}
         </g>
       {/each}
@@ -193,10 +198,12 @@
             y2={0}
             stroke={conf.minor.color}
           />
-          {#if conf.location == AxisLocation.START && tick.l}
-            <text x={conf.labelSpace} y={-6}>{tick.l}</text>
-          {:else if conf.location == AxisLocation.END && tick.l}
-            <text x={width - conf.labelSpace} y={-6}>{tick.l}</text>
+          {#if showLabels}
+            {#if conf.location == AxisLocation.START && tick.l}
+              <text x={conf.labelSpace} y={-6}>{tick.l}</text>
+            {:else if conf.location == AxisLocation.END && tick.l}
+              <text x={width - conf.labelSpace} y={-6}>{tick.l}</text>
+            {/if}
           {/if}
         </g>
       {/each}
