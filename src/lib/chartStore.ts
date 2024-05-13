@@ -41,7 +41,7 @@ export const db = function createDB() {
   return {
     subscribe, set, update,
     connect: () => {
-      const socket = new ReconnectingWebSocket(`ws://${window.location.host}/sharedb`, [], {
+      const socket = new ReconnectingWebSocket(`//${window.location.host}/sharedb?aaaa=bbbb`, ["ws"], {
         // ShareDB handles dropped messages, and buffering them while the socket
         // is closed has undefined behavior
         maxEnqueuedMessages: 0,
@@ -133,6 +133,9 @@ export const db = function createDB() {
         doc = connection.get('examples', docId);
         doc.on("error", e => console.warn("doc error", e));
         doc.create({
+          meta: {
+            publicRead: false,
+          },
           data: { sets: [] },
           chart: {
             title: "TITLE GOES HERE",
@@ -195,6 +198,15 @@ export const db = function createDB() {
         } as Root, json1.type.uri, (err) => {
           if (err) reject(err);
           resolve(docId);
+        });
+      });
+    },
+
+    getRecent: (): Promise<any> => {
+      return new Promise((resolve, reject) => {
+        connection.createFetchQuery("examples", { $limit: 5 }, {}, (err, results) => {
+          if (err) reject(err);
+          resolve(results);
         });
       });
     },

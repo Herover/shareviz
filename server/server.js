@@ -14,6 +14,10 @@ export function createDoc(callback) {
     if (err) throw err;
     if (doc.type === null) {
       doc.create({
+        meta: {
+          publicRead: true,
+
+        },
         data: {
           sets: [
             {
@@ -397,18 +401,33 @@ export function startServer(server) {
   // Create a web server to serve files and listen to WebSocket connections
   // Connect any incoming WebSocket connection to ShareDB
   var wss = new WebSocketServer({ server, path: "/sharedb" });
-  wss.on('connection', function (ws) {
+  wss.on('connection', function (ws, req) {
     var stream = new WebSocketJSONStream(ws);
-    backend.listen(stream);
+
+    const cookies = req.headers.cookie.split(";").reduce((acc, part) => {
+      const [key, value] = part.trim().split("=")
+      acc[key] = value;
+      return acc;
+    }, {});
+    // TODO: actually auth user with db
+    req.__sharevizUserId = cookies["x-token"];
+
+    backend.listen(stream, req);
   });
 
   backend.use('connect', function (ctx, next) {
     console.log('connect');
+    if (ctx.req.__sharevizUserId) {
+      ctx.agent.custom = {
+        userId: ctx.req.__sharevizUserId,
+      };
+    }
     next();
   });
   backend.use('receive', function (ctx, next) {
+    console.log('receive')
     if (ctx.data.a == "s" && ctx.data.c == "examples") {
-      // TODO: add authentication
+      // TODO: add authentication using `ctx.agent.custom.userId`
       if (false) {
         console.log("unauthorized")
         return next("unauthorized");
@@ -418,6 +437,10 @@ export function startServer(server) {
   });
   backend.use('reply', function (ctx, next) {
     console.log('reply');
+    if (ctx.reply.a == "qf" && ctx.reply?.data?.length) {
+      ctx.reply.data = ctx.reply?.data?.filter(e => e.data?.meta?.publicRead);
+    }
+    
     next();
   });
   backend.use('receivePresence', function (ctx, next) {

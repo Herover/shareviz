@@ -1,7 +1,12 @@
 export interface Root {
+  meta: Meta
   data: Data
   chart: Chart
   style: Style
+}
+
+export interface Meta {
+  publicRead: boolean
 }
 
 export interface Data {
