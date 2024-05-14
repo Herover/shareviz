@@ -404,11 +404,11 @@ export function startServer(server) {
   wss.on('connection', function (ws, req) {
     var stream = new WebSocketJSONStream(ws);
 
-    const cookies = req.headers.cookie.split(";").reduce((acc, part) => {
-      const [key, value] = part.trim().split("=")
+    const cookies = req.headers.cookie ? req.headers.cookie.split(";").reduce((acc, part) => {
+      const [key, value] = part.trim().split("=");
       acc[key] = value;
       return acc;
-    }, {});
+    }, {}) : {};
     // TODO: actually auth user with db
     req.__sharevizUserId = cookies["x-token"];
 
