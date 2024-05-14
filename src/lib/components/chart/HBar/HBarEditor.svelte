@@ -4,6 +4,8 @@
   import { group } from "$lib/utils";
   import type { DSVParsedArray } from "d3-dsv";
   import AxisEditor from "../AxisEditor.svelte";
+    import { formatData } from "./data";
+    import { max } from "d3-array";
 
   export let spec: Root;
   export let chart: ReturnType<typeof db.chart>;
@@ -27,6 +29,15 @@
     (s) => s.type == "categoriesColor",
   );
   $: colorScale = spec.chart.scales[colorScaleIndex];
+
+  $: groups = formatData($dbHBar, chartData);
+  $: {
+    const computed = max(groups, d => max(d.d, dd => max(dd.value, ddd => ddd.value)));
+    console.log(computed, scale.dataRange?.[1], scale.dataRange?.[1] == computed);
+    if (typeof computed == "number" && !Number.isNaN(computed) && computed != scale.dataRange?.[1]) {
+      chart.setScaleTo(scaleIndex, computed);
+    }
+  }
 
   $: automateColorKeys = () => {
     if ($dbHBar.dataSet && chartData[$dbHBar.dataSet]) {

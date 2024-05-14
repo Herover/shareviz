@@ -3,6 +3,7 @@
   import { AxisRepeatMode } from "$lib/chart";
   import { group } from "$lib/utils";
   import HBar from "./HBar.svelte";
+  import { formatData } from "./data";
 
   export let chartSpec: Root;
   export let componentSpec: hBarType;
@@ -11,11 +12,7 @@
   };
   export let chartWidth: number;
 
-  $: groups = group(
-    componentSpec.repeat,
-    data[componentSpec.dataSet],
-    (k, d) => ({ k, d }),
-  );
+  $: groups = formatData(componentSpec, data);
 
   $: showAxis = (type: AxisRepeatMode, i: number) => {
     if (type == AxisRepeatMode.ALL) return true;
@@ -34,16 +31,7 @@
       chartSpec.style.marginLeft -
       chartSpec.style.marginRight -
       componentSpec.labelWidth}
-    values={group(componentSpec.categories, d, (k, g) => ({
-      label: k,
-      value: group(componentSpec.subCategories, g, (kk, gg) => {
-        let sum = gg.reduce((acc, d) => acc + d[componentSpec.value], 0);
-        return {
-          label: kk,
-          value: sum,
-        };
-      }),
-    }))}
+    values={d}
     label={k}
     showLegend={i == 0}
     showAxisLabels={showAxis(componentSpec.axis.repeat, i)}
