@@ -16,6 +16,10 @@ export const formatNumber = (val: number, divide = Divide.None, thousandsDelim =
     res = wholes[i] + res;
   }
 
+  if (fraction) {
+    res += fractionDelim + fraction;
+  }
+
   /* if (fraction) {
     res = res + fractionDelim + fraction;
   } */
