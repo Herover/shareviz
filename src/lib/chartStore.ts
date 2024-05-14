@@ -277,6 +277,7 @@ export const db = function createDB() {
                 location: "start",
                 labelSpace: 0,
                 orientation: "vertical",
+                repeat: "first",
                 major: {
                   grid: true,
                   enabled: true,
@@ -323,6 +324,7 @@ export const db = function createDB() {
                   location: "end",
                   labelSpace: 64,
                   orientation: "vertical",
+                  repeat: "first",
                   major: {
                     grid: false,
                     enabled: true,
@@ -362,6 +364,7 @@ export const db = function createDB() {
                   location: "end",
                   labelSpace: 64,
                   orientation: "horizontal",
+                  repeat: "first",
                   major: {
                     grid: true,
                     enabled: true,
