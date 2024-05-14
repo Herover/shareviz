@@ -99,7 +99,6 @@
     }
   }
   $: minorTicks = conf && scale ? [...conf.minor.ticks, ...autoMinorTicks] : [];
-  $: console.log(autoMinorTicks, autoMajorTicks);
 </script>
 
 {#if conf && scale}

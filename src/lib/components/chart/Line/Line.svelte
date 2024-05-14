@@ -13,7 +13,7 @@
   export let chartSpec: Root;
   export let lineSpec: Line;
   export let width: number;
-  $: console.log("values", values);
+
   const height = 300;
   const labelWidth = 80;
   const topMargin = 24;
@@ -89,7 +89,6 @@
     .x((d) => xScale(d.x))
     .y((d) => yScale(d.y));
 
-  $: console.log("line", stacked, yScale.domain());
 </script>
 
 <svg {width} {height}>

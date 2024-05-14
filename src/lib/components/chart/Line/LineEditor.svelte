@@ -13,7 +13,6 @@
   };
 
   $: dataSet = spec.data.sets.find((set) => set.id == $dbLine.dataSet);
-  $: console.log(dataSet?.rows);
 
   $: xScaleIndex = spec.chart.scales.findIndex(
     (s) => s.name == $dbLine.x.scale,

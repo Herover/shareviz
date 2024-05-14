@@ -79,7 +79,6 @@
       legendHeight +
       scaleHeight,
   });
-  $: console.log("hbar", values);
 </script>
 
 <div class="legend">

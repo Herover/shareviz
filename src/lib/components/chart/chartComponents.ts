@@ -40,9 +40,7 @@ registerComponent(HBar)
 
 export const getComponent = (key: string) => {
   if (key in components) {
-    console.log("returning", key, components[key].component)
     return components[key].component;
   }
-  console.warn("could not find", key, components)
   return ErrorText;
 }

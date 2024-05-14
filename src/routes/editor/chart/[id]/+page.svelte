@@ -23,7 +23,7 @@
   });
 
   $: chartSpec = $db.doc as Root;
-  $: console.log(chartSpec, JSON.stringify(chartSpec));
+  // $: console.log(chartSpec, JSON.stringify(chartSpec));
 
   $: chartData =
     chartSpec == null

@@ -33,7 +33,6 @@
   $: groups = formatData($dbHBar, chartData);
   $: {
     const computed = max(groups, d => max(d.d, dd => max(dd.value, ddd => ddd.value)));
-    console.log(computed, scale.dataRange?.[1], scale.dataRange?.[1] == computed);
     if (typeof computed == "number" && !Number.isNaN(computed) && computed != scale.dataRange?.[1]) {
       chart.setScaleTo(scaleIndex, computed);
     }
