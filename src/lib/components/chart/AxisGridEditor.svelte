@@ -91,5 +91,17 @@
         />
       </label>
     </p>
+
+    <p>
+      Manual marks
+      <br>
+      {#each $conf.ticks as kv, i}
+        <label>Value <input value={kv.n} on:change={(e) => conf.setTickValue(i, Number.parseInt(e.currentTarget.value))} type="number" style="width: 80px;" /></label>
+        <label>Text <input value={kv.l} on:change={(e) => conf.setTickLabel(i, e.currentTarget.value)} type="text" style="width: 80px;" /></label>
+        <button on:click={() => conf.removeTick(i)}>delete</button>
+        <br>
+      {/each}
+      <button on:click={() => conf.addTick($conf.ticks.length)}>+ add</button>
+    </p>
   {/if}
 {/if}

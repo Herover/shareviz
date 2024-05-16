@@ -470,5 +470,9 @@ export const axisGrid = (scope: ReturnType<typeof createScope>, key: string, doc
     setAutoEach: (value: number) => doc.submitOp([...majorScope.path.slice(1), "auto", "each", { r: 0, i: value }]),
     setAutoLabels: (value: boolean) => doc.submitOp([...majorScope.path.slice(1), "auto", "labels", { r: 0, i: value }]),
     setAfterLabel: (value: string) => doc.submitOp([...majorScope.path.slice(1), "afterLabel", { r: 0, i: value }]),
+    addTick: (index: number) => doc.submitOp([...majorScope.path.slice(1), "ticks", index, { i: { n: 0, l: "" } }]),
+    removeTick: (index: number) => doc.submitOp([...majorScope.path.slice(1), "ticks", index, { i: 0 }]),
+    setTickValue: (tickIndex: number, value: number) => doc.submitOp([...majorScope.path.slice(1), "ticks", tickIndex, "n", { r: 0, i: value }]),
+    setTickLabel: (tickIndex: number, value: string) => doc.submitOp([...majorScope.path.slice(1), "ticks", tickIndex, "l", { r: 0, i: value }]),
   };
 };
