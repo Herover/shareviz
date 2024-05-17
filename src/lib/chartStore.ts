@@ -8,7 +8,7 @@ import sharedb from 'sharedb-client-browser/dist/sharedb-client-umd.cjs';
 import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
 import { Config } from 'vizzu';
-import type { HBar, Line, Root, Set, Chart, Axis, AxisGrid, Style } from './chart';
+import type { HBar, Line, Root, Set, Chart, Axis, AxisGrid, Style, LineStyleKey } from './chart';
 import { notifications } from './notificationStore';
 // import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
@@ -242,6 +242,16 @@ export const db = function createDB() {
             setStack: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "d", "stack", { r: 0, i: value }]),
             xAxis: axis(hbarScope, ["x", "axis"], doc),
             yAxis: axis(hbarScope, ["y", "axis"], doc),
+            defaultLineStyle: () => lineStyle(hbarScope, ["style", "default"], doc),
+            lineStyle: (i: number) => lineStyle(hbarScope, ["style", "byKey", i], doc),
+            addLineStyle: (i: number) => doc.submitOp(["chart", "elements", elementIndex, "d", "style", "byKey", i, {
+              i: {
+                k: "",
+                color: "#000",
+                width: 1,
+                label: { text: "", location: "right", color: "#000" },
+              },
+            }]),
           };
         },
         setConfigTitle: (value: string) => doc.submitOp(["chart", "title", { r: 0, i: value }]),
@@ -400,6 +410,15 @@ export const db = function createDB() {
               categories: "",
               fill: false,
               stack: false,
+              style: {
+                default: {
+                  k: "",
+                  color: "#000",
+                  width: 1,
+                  label: { text: "", location: "right", color: "#000" },
+                },
+                byKey: []
+              },
             },
           },
         }]),
@@ -474,5 +493,20 @@ export const axisGrid = (scope: ReturnType<typeof createScope>, key: string, doc
     removeTick: (index: number) => doc.submitOp([...majorScope.path.slice(1), "ticks", index, { i: 0 }]),
     setTickValue: (tickIndex: number, value: number) => doc.submitOp([...majorScope.path.slice(1), "ticks", tickIndex, "n", { r: 0, i: value }]),
     setTickLabel: (tickIndex: number, value: string) => doc.submitOp([...majorScope.path.slice(1), "ticks", tickIndex, "l", { r: 0, i: value }]),
+  };
+};
+
+export const lineStyle = (scope: ReturnType<typeof createScope>, key: (string | number)[], doc: any) => {
+  const styleScope = createScope<LineStyleKey>(scope, key);
+
+  return {
+    ...styleScope,
+    setLabelLocation: (value: string) => doc.submitOp([...styleScope.path.slice(1), "label", "location", { r: 0, i: value }]),
+    setLabelText: (value: string) => doc.submitOp([...styleScope.path.slice(1), "label", "text", { r: 0, i: value }]),
+    setKey: (value: string) => doc.submitOp([...styleScope.path.slice(1), "k", { r: 0, i: value }]),
+    setColor: (value: string) => doc.submitOp([...styleScope.path.slice(1), "color", { r: 0, i: value }]),
+    setLabelColor: (value: string) => doc.submitOp([...styleScope.path.slice(1), "label", "color", { r: 0, i: value }]),
+    setwidth: (value: number) => doc.submitOp([...styleScope.path.slice(1), "width", { r: 0, i: value }]),
+    delete: () => doc.submitOp([...styleScope.path.slice(1), { r: 0 }]),
   };
 };

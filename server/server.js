@@ -325,8 +325,30 @@ Region Nordjylland	2023	4989245`,
                   scale: "lineY",
                 },
                 categories: "område",
-                fill: true,
+                fill: false,
                 stack: false,
+                style: {
+                  default: {
+                    k: "",
+                    color: "#000",
+                    width: 3,
+                    label: {
+                      location: "right",
+                      text: "",
+                      color: "#000",
+                    },
+                  },
+                  byKey: [{
+                    k: "Region Hovedstaden",
+                    color: "#ff8888",
+                    width: 4,
+                    label: {
+                      location: "right",
+                      text: "Hovedstaden",
+                      color: "#ff8888",
+                    },
+                  }]
+                },
               },
             },
           ],

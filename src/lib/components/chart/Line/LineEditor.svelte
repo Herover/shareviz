@@ -1,9 +1,11 @@
 <script lang="ts">
-  import type { Data, Line, Root, Set } from "$lib/chart";
-  import type { db } from "$lib/chartStore";
-  import { group } from "$lib/utils";
+  import LineStyleEditor from "./LineStyleEditor.svelte";
+
+  import { type Root } from "$lib/chart";
+  import { db } from "$lib/chartStore";
   import type { DSVParsedArray } from "d3-dsv";
-    import AxisEditor from "../AxisEditor.svelte";
+  import AxisEditor from "../AxisEditor.svelte";
+  import { formatData } from "./data";
 
   export let spec: Root;
   export let chart: ReturnType<typeof db.chart>;
@@ -11,6 +13,12 @@
   export let chartData: {
     [key: string]: DSVParsedArray<any>;
   };
+
+  $: values = formatData($dbLine, chartData);
+
+  $: unspecifiecKeys = values
+    .filter((v) => !$dbLine.style.byKey.find((s) => s.k == v.key))
+    .map((v) => v.key);
 
   $: dataSet = spec.data.sets.find((set) => set.id == $dbLine.dataSet);
 
@@ -171,6 +179,17 @@
     />
   </label>
 </p>
+
+<p>Line style</p>
+<LineStyleEditor style={dbLine.defaultLineStyle()}></LineStyleEditor>
+{#each $dbLine.style.byKey as style, i}
+  <LineStyleEditor style={dbLine.lineStyle(i)} {unspecifiecKeys}
+  ></LineStyleEditor>
+{/each}
+<button on:click={() => dbLine.addLineStyle($dbLine.style.byKey.length)}
+  >+</button
+>
+<br />
 
 <b>X axis</b>
 <AxisEditor conf={dbLine.xAxis} />

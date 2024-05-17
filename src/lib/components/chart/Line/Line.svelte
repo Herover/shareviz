@@ -1,13 +1,19 @@
 <script lang="ts">
-  import { type Line, type Root } from "$lib/chart";
+  import { LabelLocation, type Line, type Root } from "$lib/chart";
   import { group, valueKinds, valueParsers } from "$lib/utils";
-  import { scaleLinear, scaleTime, type ScaleLinear, type ScaleTime } from "d3-scale";
+  import {
+    scaleLinear,
+    scaleTime,
+    type ScaleLinear,
+    type ScaleTime,
+  } from "d3-scale";
   import { line } from "d3-shape";
   import Axis from "../Axis.svelte";
-    import { max, min } from "d3-array";
+  import { max, min } from "d3-array";
 
   export let values: {
     label: string;
+    key: string;
     value: { x: number; y: number }[];
   }[];
   export let chartSpec: Root;
@@ -34,6 +40,7 @@
             : line.value.map((d) => 0);
         acc.push({
           label: line.label,
+          key: line.key,
           value: group("x", line.value, (k, d) => ({ k, d })).map((d, i) => {
             // Sum values if this line has multiple of the same X value, ex.
             // same year multiple times.
@@ -50,12 +57,13 @@
       },
       [] as {
         label: string;
+        key: string;
         value: { x: number; y: number; to: number; from: number }[];
       }[],
     );
 
-  $: minX = min(values, d => min(d.value, dd => dd.x)) || 0;
-  $: maxX = max(values, d => max(d.value, dd => dd.x)) || 1;
+  $: minX = min(values, (d) => min(d.value, (dd) => dd.x)) || 0;
+  $: maxX = max(values, (d) => max(d.value, (dd) => dd.x)) || 1;
   $: xScaleSpec = chartSpec.chart.scales.find(
     (s) => s.name == lineSpec.x.scale,
   );
@@ -65,7 +73,9 @@
         .find((set) => set.id == lineSpec.dataSet)
         ?.rows.find((r) => r.key == xScaleSpec?.dataKey)?.type || ""
     ]?.type || "";
-  let xScale: ScaleLinear<number, number, never> | ScaleTime<number, number, never> = scaleLinear();
+  let xScale:
+    | ScaleLinear<number, number, never>
+    | ScaleTime<number, number, never> = scaleLinear();
   $: {
     if (xType == valueKinds.NUMBER) {
       xScale = scaleLinear()
@@ -89,6 +99,18 @@
     .x((d) => xScale(d.x))
     .y((d) => yScale(d.y));
 
+  $: getStyle = (k: string) => {
+    const style = lineSpec.style.byKey.find((s) => s.k == k);
+    if (style) return style;
+    else {
+      const def = {
+        ...lineSpec.style.default,
+      };
+      def.label.text = def.label.text == "" ? "" : k;
+
+      return def;
+    }
+  };
 </script>
 
 <svg {width} {height}>
@@ -123,8 +145,8 @@
       {#each stacked as d, i}
         <path
           d={draw(d.value.map((e) => ({ x: e.x, y: e.to })))}
-          stroke={lineColor}
-          stroke-width={lineWidth}
+          stroke={getStyle(d.key).color}
+          stroke-width={getStyle(d.key).width}
           fill="none"
         />
       {/each}
@@ -145,12 +167,40 @@
       {#each stacked as d}
         <path
           d={draw(d.value)}
-          stroke={lineColor}
-          stroke-width={lineWidth}
+          stroke={getStyle(d.key).color}
+          stroke-width={getStyle(d.key).width}
           fill="none"
         />
       {/each}
     {/if}
+
+    {#each stacked as d}
+      {#if getStyle(d.key).label.location == LabelLocation.Right}
+        <text
+          x={xScale(d.value[d.value.length - 1].x) + 16}
+          y={yScale(d.value[d.value.length - 1].y)}
+          d={draw(d.value)}
+          fill={getStyle(d.key).label.color}
+          paint-order="stroke"
+          stroke="#fff"
+          stroke-width={3}
+          dominant-baseline="middle"
+          text-anchor="start">{getStyle(d.key).label.text}</text
+        >
+      {:else if getStyle(d.key).label.location == LabelLocation.Left}
+        <text
+          x={xScale(d.value[0].x) - 16}
+          y={yScale(d.value[0].y)}
+          d={draw(d.value)}
+          fill={getStyle(d.key).label.color}
+          paint-order="stroke"
+          stroke="#fff"
+          stroke-width={3}
+          dominant-baseline="middle"
+          text-anchor="end">{getStyle(d.key).label.text}</text
+        >
+      {/if}
+    {/each}
   </g>
 </svg>
 

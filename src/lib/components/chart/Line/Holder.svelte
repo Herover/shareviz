@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Root, Line as lineType } from "$lib/chart";
-  import { group } from "$lib/utils";
   import Line from "./Line.svelte";
+  import { formatData } from "./data";
 
   export let chartSpec: Root;
   export let componentSpec: lineType;
@@ -14,16 +14,6 @@
 <Line
   {chartSpec}
   lineSpec={componentSpec}
-  values={group(
-    componentSpec.categories,
-    data[componentSpec.dataSet],
-    (k, g) => ({
-      label: k,
-      value: g.map((d) => ({
-        x: d[componentSpec.x.key],
-        y: d[componentSpec.y.key],
-      })),
-    }),
-  )}
+  values={formatData(componentSpec, data)}
   width={chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight}
 />

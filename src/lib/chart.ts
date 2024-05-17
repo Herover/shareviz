@@ -119,6 +119,29 @@ export interface HBar {
   scale: string
 }
 
+export enum LabelLocation {
+  Left = "left",
+  Right = "right",
+}
+
+export interface LabelStyle {
+  location: LabelLocation
+  text: string
+  color: string
+}
+
+export interface LineStyleKey {
+  k: string
+  color: string
+  width: number
+  label: LabelStyle
+}
+
+export interface LineStyle {
+  default: LineStyleKey
+  byKey: LineStyleKey[]
+}
+
 export interface Line {
   dataSet: string
   x: X
@@ -126,6 +149,7 @@ export interface Line {
   categories: string
   stack: boolean
   fill: boolean
+  style: LineStyle
 }
 
 export interface X {
