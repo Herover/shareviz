@@ -178,7 +178,7 @@
       {#if getStyle(d.key).label.location == LabelLocation.Right}
         <text
           x={xScale(d.value[d.value.length - 1].x) + 16}
-          y={yScale(d.value[d.value.length - 1].y)}
+          y={yScale(d.value[d.value.length - 1].to)}
           d={draw(d.value)}
           fill={getStyle(d.key).label.color}
           paint-order="stroke"
@@ -190,7 +190,7 @@
       {:else if getStyle(d.key).label.location == LabelLocation.Left}
         <text
           x={xScale(d.value[0].x) - 16}
-          y={yScale(d.value[0].y)}
+          y={yScale(d.value[0].to)}
           d={draw(d.value)}
           fill={getStyle(d.key).label.color}
           paint-order="stroke"
