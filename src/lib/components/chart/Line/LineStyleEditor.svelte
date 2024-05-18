@@ -1,6 +1,7 @@
 <script lang="ts">
   import { LabelLocation, type LineStyleKey } from "$lib/chart";
   import { lineStyle } from "$lib/chartStore";
+  import ColorPicker from "../ColorPicker.svelte";
 
   export let style: ReturnType<typeof lineStyle>;
   export let unspecifiecKeys: string[] = [];
@@ -44,18 +45,11 @@
     {/each}
   </select>
 
-  <input
-    value={$style.color}
-    on:change={(e) => updateColor(e.currentTarget.value)}
-    on:keyup={(e) => updateColor(e.currentTarget.value)}
-    style="width: 80px;"
-  />
+  <ColorPicker color={$style.color} on:change={(e) => updateColor(e.detail)} />
 
-  <input
-    value={$style.label.color}
-    on:change={(e) => updateLabelColor(e.currentTarget.value)}
-    on:keyup={(e) => updateLabelColor(e.currentTarget.value)}
-    style="width: 80px;"
+  <ColorPicker
+    color={$style.label.color}
+    on:change={(e) => updateLabelColor(e.detail)}
   />
 
   <input
