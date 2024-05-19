@@ -1,7 +1,7 @@
 <script lang="ts">
   import { LabelLocation, type LineStyleKey } from "$lib/chart";
   import { lineStyle } from "$lib/chartStore";
-  import ColorPicker from "../ColorPicker.svelte";
+  import ColorPicker from "../ColorPicker/ColorPicker.svelte";
 
   export let style: ReturnType<typeof lineStyle>;
   export let unspecifiecKeys: string[] = [];
