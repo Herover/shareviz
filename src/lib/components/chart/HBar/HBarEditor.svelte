@@ -4,8 +4,9 @@
   import { group } from "$lib/utils";
   import type { DSVParsedArray } from "d3-dsv";
   import AxisEditor from "../AxisEditor.svelte";
-    import { formatData } from "./data";
-    import { max } from "d3-array";
+  import { formatData } from "./data";
+  import { max } from "d3-array";
+  import ColorPicker from "../ColorPicker/ColorPicker.svelte";
 
   export let spec: Root;
   export let chart: ReturnType<typeof db.chart>;
@@ -32,8 +33,14 @@
 
   $: groups = formatData($dbHBar, chartData);
   $: {
-    const computed = max(groups, d => max(d.d, dd => max(dd.value, ddd => ddd.value)));
-    if (typeof computed == "number" && !Number.isNaN(computed) && computed != scale.dataRange?.[1]) {
+    const computed = max(groups, (d) =>
+      max(d.d, (dd) => max(dd.value, (ddd) => ddd.value)),
+    );
+    if (
+      typeof computed == "number" &&
+      !Number.isNaN(computed) &&
+      computed != scale.dataRange?.[1]
+    ) {
       chart.setScaleTo(scaleIndex, computed);
     }
   }
@@ -206,10 +213,11 @@
           />
         </td>
         <td>
-          <div
-            class="indicator"
-            style:background-color={colorScale.colors.default}
-          ></div>
+          <ColorPicker
+            color={colorScale.colors.default}
+            on:change={(e) =>
+              chart.setColorScaleDefaultColor(colorScaleIndex, e.detail)}
+          />
         </td>
         <td> </td>
         <td> </td>
@@ -263,7 +271,11 @@
             />
           </td>
           <td>
-            <div class="indicator" style:background-color={color.c}></div>
+            <ColorPicker
+              color={color.c}
+              on:change={(e) =>
+                chart.setColorScaleColor(colorScaleIndex, i, e.detail)}
+            />
           </td>
           <td
             ><input

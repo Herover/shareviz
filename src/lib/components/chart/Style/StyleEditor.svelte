@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Root, Style } from "$lib/chart";
   import type { db } from "$lib/chartStore";
+  import ColorPicker from "../ColorPicker/ColorPicker.svelte";
 
   export let spec: Root;
   export let style: ReturnType<typeof db.style>;
@@ -15,7 +16,7 @@
         style.setTitleSize(Number.parseFloat(e.currentTarget.value))}
       on:keyup={(e) =>
         style.setTitleSize(Number.parseFloat(e.currentTarget.value))}
-      step=0.1
+      step="0.1"
       type="number"
       class="control"
     />
@@ -40,7 +41,7 @@
         style.setSubTitleSize(Number.parseFloat(e.currentTarget.value))}
       on:keyup={(e) =>
         style.setSubTitleSize(Number.parseFloat(e.currentTarget.value))}
-      step=0.1
+      step="0.1"
       type="number"
       class="control"
     />
@@ -111,28 +112,18 @@
 </p>
 
 <p>
-  <label>
-    Background color:
-    <input
-      value={$style.bgColor}
-      on:change={(e) => style.setBGColor(e.currentTarget.value)}
-      on:keyup={(e) => style.setBGColor(e.currentTarget.value)}
-      type="color"
-      style="width: 90px"
-    />
-  </label>
+  Background color:
+  <ColorPicker
+    color={$style.bgColor}
+    on:change={(e) => style.setBGColor(e.detail)}
+  />
 </p>
 <p>
-  <label>
-    Text color:
-    <input
-      value={$style.textColor}
-      on:change={(e) => style.setTextColor(e.currentTarget.value)}
-      on:keyup={(e) => style.setTextColor(e.currentTarget.value)}
-      type="color"
-      style="width: 90px"
-    />
-  </label>
+  Text color:
+  <ColorPicker
+    color={$style.textColor}
+    on:change={(e) => style.setTextColor(e.detail)}
+  />
 </p>
 
 <style>
