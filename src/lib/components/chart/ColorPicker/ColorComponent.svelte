@@ -5,6 +5,7 @@
   export let h: number;
   export let c: number;
   export let l: number;
+  export let title: string;
 
   $: hex = chroma(h, c, l, "hcl").hex();
 
@@ -21,6 +22,7 @@
   style:background-color={`${hex}`}
   on:click={() => dispatch("click", hex)}
   on:keydown={onKey}
+  title={title}
   class="color-component"
   role="button"
   tabindex="0"

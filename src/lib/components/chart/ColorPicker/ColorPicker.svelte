@@ -78,16 +78,19 @@
           h={h - hueStep}
           {c}
           {l}
+          title="Hue left"
         /><ColorComponent
           on:click={(e) => dispatch("change", e.detail)}
           {h}
           {c}
           {l}
+          title="Current color"
         /><ColorComponent
           on:click={(e) => dispatch("change", e.detail)}
           h={h + hueStep}
           {c}
           {l}
+          title="Hue right"
         />
       </div>
       <div class="component-row">
@@ -96,16 +99,19 @@
           {h}
           c={c - chromaStep}
           {l}
+          title="Chroma/saturation down"
         /><ColorComponent
           on:click={(e) => dispatch("change", e.detail)}
           {h}
           {c}
           {l}
+          title="Current color"
         /><ColorComponent
           on:click={(e) => dispatch("change", e.detail)}
           {h}
           c={c + chromaStep}
           {l}
+          title="Chroma/saturation up"
         />
       </div>
       <div class="component-row">
@@ -114,16 +120,19 @@
           {h}
           {c}
           l={l - lightnessStep}
+          title="Lightness down"
         /><ColorComponent
           on:click={(e) => dispatch("change", e.detail)}
           {h}
           {c}
           {l}
+          title="Current color"
         /><ColorComponent
           on:click={(e) => dispatch("change", e.detail)}
           {h}
           {c}
           l={l + lightnessStep}
+          title="Lightness up"
         />
       </div>
     </div>
