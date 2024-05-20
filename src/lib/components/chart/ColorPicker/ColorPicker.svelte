@@ -14,6 +14,10 @@
   }
   $: [h, c, l] = cc;
 
+  const hueStep = 18;
+  const chromaStep = 5;
+  const lightnessStep = 5;
+
   let open = false;
   let input: HTMLInputElement | undefined;
   let container: HTMLDivElement | undefined;
@@ -74,7 +78,7 @@
             dispatch("change", e.detail);
             input?.focus();
           }}
-          h={h - 18}
+          h={h - hueStep}
           {c}
           {l}
         /><ColorComponent
@@ -90,7 +94,7 @@
             dispatch("change", e.detail);
             input?.focus();
           }}
-          h={h + 18}
+          h={h + hueStep}
           {c}
           {l}
         />
@@ -102,7 +106,7 @@
             input?.focus();
           }}
           {h}
-          c={c - 10}
+          c={c - chromaStep}
           {l}
         /><ColorComponent
           on:click={(e) => {
@@ -118,7 +122,7 @@
             input?.focus();
           }}
           {h}
-          c={c + 10}
+          c={c + chromaStep}
           {l}
         />
       </div>
@@ -130,7 +134,7 @@
           }}
           {h}
           {c}
-          l={l - 10}
+          l={l - lightnessStep}
         /><ColorComponent
           on:click={(e) => {
             dispatch("change", e.detail);
@@ -146,7 +150,7 @@
           }}
           {h}
           {c}
-          l={l + 10}
+          l={l + lightnessStep}
         />
       </div>
     </div>
