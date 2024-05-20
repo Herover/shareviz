@@ -165,6 +165,8 @@
     height: 1em;
     display: inline-block;
     cursor: pointer;
+    box-sizing: border-box;
+    border: 1px solid black;
   }
   .color-display {
     width: 100%;
