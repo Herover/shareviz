@@ -9,12 +9,18 @@
   $: hex = chroma(h, c, l, "hcl").hex();
 
   const dispatch = createEventDispatcher<{ click: string }>();
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === " ") {
+      e.preventDefault();
+      dispatch("click", hex);
+    }
+  };
 </script>
 
 <div
   style:background-color={`${hex}`}
   on:click={() => dispatch("click", hex)}
-  on:keydown={() => dispatch("click", hex)}
+  on:keydown={onKey}
   class="color-component"
   role="button"
   tabindex="0"

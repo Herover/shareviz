@@ -74,26 +74,17 @@
 
       <div class="component-row">
         <ColorComponent
-          on:click={(e) => {
-            dispatch("change", e.detail);
-            input?.focus();
-          }}
+          on:click={(e) => dispatch("change", e.detail)}
           h={h - hueStep}
           {c}
           {l}
         /><ColorComponent
-          on:click={(e) => {
-            dispatch("change", e.detail);
-            input?.focus();
-          }}
+          on:click={(e) => dispatch("change", e.detail)}
           {h}
           {c}
           {l}
         /><ColorComponent
-          on:click={(e) => {
-            dispatch("change", e.detail);
-            input?.focus();
-          }}
+          on:click={(e) => dispatch("change", e.detail)}
           h={h + hueStep}
           {c}
           {l}
@@ -101,26 +92,17 @@
       </div>
       <div class="component-row">
         <ColorComponent
-          on:click={(e) => {
-            dispatch("change", e.detail);
-            input?.focus();
-          }}
+          on:click={(e) => dispatch("change", e.detail)}
           {h}
           c={c - chromaStep}
           {l}
         /><ColorComponent
-          on:click={(e) => {
-            dispatch("change", e.detail);
-            input?.focus();
-          }}
+          on:click={(e) => dispatch("change", e.detail)}
           {h}
           {c}
           {l}
         /><ColorComponent
-          on:click={(e) => {
-            dispatch("change", e.detail);
-            input?.focus();
-          }}
+          on:click={(e) => dispatch("change", e.detail)}
           {h}
           c={c + chromaStep}
           {l}
@@ -128,26 +110,17 @@
       </div>
       <div class="component-row">
         <ColorComponent
-          on:click={(e) => {
-            dispatch("change", e.detail);
-            input?.focus();
-          }}
+          on:click={(e) => dispatch("change", e.detail)}
           {h}
           {c}
           l={l - lightnessStep}
         /><ColorComponent
-          on:click={(e) => {
-            dispatch("change", e.detail);
-            input?.focus();
-          }}
+          on:click={(e) => dispatch("change", e.detail)}
           {h}
           {c}
           {l}
         /><ColorComponent
-          on:click={(e) => {
-            dispatch("change", e.detail);
-            input?.focus();
-          }}
+          on:click={(e) => dispatch("change", e.detail)}
           {h}
           {c}
           l={l + lightnessStep}
