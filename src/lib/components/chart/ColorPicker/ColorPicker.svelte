@@ -5,14 +5,44 @@
 
   export let color: string;
 
+  // From https://github.com/d3/d3-scale-chromatic/blob/main/src/categorical/Paired.js
+  export let scheme = [
+    "#a6cee3",
+    "#1f78b4",
+    "#b2df8a",
+    "#33a02c",
+    "#fb9a99",
+    "#e31a1c",
+    "#fdbf6f",
+    "#ff7f00",
+    "#cab2d6",
+    "#6a3d9a",
+    "#ffff99",
+    "#b15928",
+  ];
+
+  export let chartColors: string[] = [];
+
   let cc = [0, 0, 0];
 
   $: try {
-    cc = chroma(color).hcl();
+    if (color.startsWith("lch")) {
+      const parts = color.match(/(\d+\.?\d*)/g);
+      if (parts && parts.length == 3) {
+        cc = [
+          Math.max(Math.min(Number.parseFloat(parts[0]), 100), 0),
+          Math.max(Math.min(Number.parseFloat(parts[1]), 100), 0),
+          Number.parseFloat(parts[2]) % 360,
+        ];
+      }
+    } else {
+      cc = chroma(color).lch();
+    }
   } catch (e) {
+    console.warn(e);
     cc = [0, 0, 0];
   }
-  $: [h, c, l] = cc;
+  $: [l, c, h] = cc;
 
   const hueStep = 18;
   const chromaStep = 5;
@@ -135,6 +165,32 @@
           title="Lightness up"
         />
       </div>
+
+      {#each scheme as c}
+        <div class="holder">
+          <div
+            style:background-color={c}
+            on:click={() => dispatch("change", c)}
+            on:keyup={(e) => e.key === " " && dispatch("change", c)}
+            class="color-display"
+            role="button"
+            tabindex="0"
+          ></div>
+        </div>
+      {/each}
+
+      {#each chartColors as c}
+        <div class="holder">
+          <div
+            style:background-color={c}
+            on:click={() => dispatch("change", c)}
+            on:keyup={(e) => e.key === " " && dispatch("change", c)}
+            class="color-display"
+            role="button"
+            tabindex="0"
+          ></div>
+        </div>
+      {/each}
     </div>
   {/if}
 </div>

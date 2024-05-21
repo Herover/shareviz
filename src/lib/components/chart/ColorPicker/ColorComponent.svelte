@@ -7,22 +7,22 @@
   export let l: number;
   export let title: string;
 
-  $: hex = chroma(h, c, l, "hcl").hex();
+  $: lch = `lch(${Math.max(Math.min(l || 0, 100), 0)}% ${Math.max(Math.min(c || 0, 100), 0)} ${((h || 0) + 360) % 360})`;
 
   const dispatch = createEventDispatcher<{ click: string }>();
   const onKey = (e: KeyboardEvent) => {
     if (e.key === " ") {
       e.preventDefault();
-      dispatch("click", hex);
+      dispatch("click", lch);
     }
   };
 </script>
 
 <div
-  style:background-color={`${hex}`}
-  on:click={() => dispatch("click", hex)}
+  style:background-color={`${lch}`}
+  on:click={() => dispatch("click", lch)}
   on:keydown={onKey}
-  title={title}
+  {title}
   class="color-component"
   role="button"
   tabindex="0"

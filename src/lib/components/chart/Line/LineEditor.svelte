@@ -30,6 +30,7 @@
     (s) => s.name == $dbLine.y.scale,
   );
   $: yScale = spec.chart.scales[yScaleIndex] || { dataRange: [0, 1] };
+  $: chartColors = $dbLine.style.byKey.map((s) => s.color);
 </script>
 
 <p>
@@ -181,9 +182,10 @@
 </p>
 
 <p>Line style</p>
-<LineStyleEditor style={dbLine.defaultLineStyle()}></LineStyleEditor>
+<LineStyleEditor style={dbLine.defaultLineStyle()} {chartColors}
+></LineStyleEditor>
 {#each $dbLine.style.byKey as style, i}
-  <LineStyleEditor style={dbLine.lineStyle(i)} {unspecifiecKeys}
+  <LineStyleEditor style={dbLine.lineStyle(i)} {chartColors} {unspecifiecKeys}
   ></LineStyleEditor>
 {/each}
 <button on:click={() => dbLine.addLineStyle($dbLine.style.byKey.length)}

@@ -5,6 +5,7 @@
 
   export let style: ReturnType<typeof lineStyle>;
   export let unspecifiecKeys: string[] = [];
+  export let chartColors: string[];
 
   $: updateColor = (color: string) => {
     if ($style.label.color == $style.color) {
@@ -45,10 +46,15 @@
     {/each}
   </select>
 
-  <ColorPicker color={$style.color} on:change={(e) => updateColor(e.detail)} />
+  <ColorPicker
+    color={$style.color}
+    {chartColors}
+    on:change={(e) => updateColor(e.detail)}
+  />
 
   <ColorPicker
     color={$style.label.color}
+    {chartColors}
     on:change={(e) => updateLabelColor(e.detail)}
   />
 
