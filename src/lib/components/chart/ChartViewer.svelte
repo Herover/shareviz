@@ -21,6 +21,7 @@
   style:padding-top="{chartSpec.style.marginTop}px"
   style:padding-bottom="{chartSpec.style.marginBottom}px"
   style:color="{chartSpec.style.textColor}"
+  style:fill="{chartSpec.style.textColor}"
 >
   <p
     style:font-size="{chartSpec.style.titleSize}em"

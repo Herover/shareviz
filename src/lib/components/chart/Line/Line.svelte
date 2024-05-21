@@ -182,7 +182,7 @@
           d={draw(d.value)}
           fill={getStyle(d.key).label.color}
           paint-order="stroke"
-          stroke="#fff"
+          stroke="{chartSpec.style.bgColor}"
           stroke-width={3}
           dominant-baseline="middle"
           text-anchor="start">{getStyle(d.key).label.text}</text
@@ -194,7 +194,7 @@
           d={draw(d.value)}
           fill={getStyle(d.key).label.color}
           paint-order="stroke"
-          stroke="#fff"
+          stroke="{chartSpec.style.bgColor}"
           stroke-width={3}
           dominant-baseline="middle"
           text-anchor="end">{getStyle(d.key).label.text}</text
