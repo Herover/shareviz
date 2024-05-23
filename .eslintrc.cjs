@@ -32,7 +32,16 @@ module.exports = {
         allowString: false,
         allowNumber: false
       }
-    ]
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      "error", // or "warn"
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+    "@typescript-eslint/no-explicit-any": "off",
   },
   ignorePatterns: [],
   env: {
