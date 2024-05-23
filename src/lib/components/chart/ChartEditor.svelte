@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Data, Root } from "$lib/chart";
+  import type { Root } from "$lib/chart";
   import { db } from "$lib/chartStore";
   import type { DSVParsedArray } from "d3-dsv";
   import HBarEditor from "./HBar/HBarEditor.svelte";
@@ -7,7 +7,6 @@
   import LineEditor from "./Line/LineEditor.svelte";
 
   export let chartScope: ReturnType<typeof db.chart>;
-  export let styleScope: ReturnType<typeof db.style>;
   export let spec: Root;
   export let chartData: {
     [key: string]: DSVParsedArray<any>;

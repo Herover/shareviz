@@ -1,5 +1,7 @@
 <script lang="ts">
+  // eslint-disable-next-line svelte/valid-compile
   export let group: string | number;
+  // eslint-disable-next-line svelte/valid-compile
   export let key: string | number;
   export let label: string;
   export let startOpen: boolean = false;

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Data, HBar, Root, Set } from "$lib/chart";
+  import type {Root } from "$lib/chart";
   import type { db } from "$lib/chartStore";
   import { group } from "$lib/utils";
   import type { DSVParsedArray } from "d3-dsv";
@@ -12,6 +12,7 @@
   export let chart: ReturnType<typeof db.chart>;
   export let dbHBar: ReturnType<ReturnType<typeof db.chart>["hBar"]>;
   export let chartData: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: DSVParsedArray<any>;
   };
 
@@ -25,7 +26,7 @@
   $: dataSet = spec.data.sets.find((set) => set.id == $dbHBar.dataSet);
 
   $: scaleIndex = spec.chart.scales.findIndex((s) => s.name == $dbHBar.scale);
-  $: scale = spec.chart.scales[scaleIndex] || { dataRange: [0, 1] };
+  $: scale = typeof spec.chart.scales[scaleIndex] == "undefined" ? { dataRange: [0, 1] } : spec.chart.scales[scaleIndex];
   $: colorScaleIndex = spec.chart.scales.findIndex(
     (s) => s.type == "categoriesColor",
   );
@@ -46,8 +47,8 @@
   }
 
   $: automateColorKeys = () => {
-    if ($dbHBar.dataSet && chartData[$dbHBar.dataSet]) {
-      const key = $dbHBar.subCategories || $dbHBar.categories;
+    if (typeof $dbHBar.dataSet != "undefined" && typeof chartData[$dbHBar.dataSet] != "undefined") {
+      const key = typeof $dbHBar.subCategories != "undefined" ? $dbHBar.subCategories : $dbHBar.categories;
       const dataSet = chartData[$dbHBar.dataSet];
       const groups = group(key, dataSet, (k) => k);
       groups.forEach((k) => {
@@ -56,8 +57,9 @@
             (d) => d.k == k,
           )
         ) {
+          const n = spec.chart.scales[colorScaleIndex].colors?.byKey.length;
           const keyIndex =
-            spec.chart.scales[colorScaleIndex].colors?.byKey.length || 0;
+            typeof n != "undefined" ? n : 0;
           chart.addColorScaleColor(colorScaleIndex, keyIndex, k, "#FF0000", k);
         }
       });
@@ -65,14 +67,14 @@
   };
 
   $: removeExtraColorKeys = () => {
-    if ($dbHBar.dataSet && chartData[$dbHBar.dataSet]) {
-      const key = $dbHBar.subCategories || $dbHBar.categories;
+    if (typeof $dbHBar.dataSet != "undefined" && typeof chartData[$dbHBar.dataSet] != "undefined") {
+      const key = typeof $dbHBar.subCategories != "undefined" ? $dbHBar.subCategories : $dbHBar.categories;
       const dataSet = chartData[$dbHBar.dataSet];
       const groups = group(key, dataSet, (k) => k);
       let removed = 0;
       spec.chart.scales[colorScaleIndex].colors?.byKey.forEach(
         (c, keyIndex) => {
-          if (!groups.find((k) => c.k == k)) {
+          if (typeof groups.find((k) => c.k == k) != "undefined") {
             chart.removeColorScaleColor(colorScaleIndex, keyIndex - removed);
             removed++;
           }
@@ -227,12 +229,12 @@
           <td style="width:38px;">
             <button
               disabled={i == 0}
-              on:click={(e) => moveColorKeyUp(i)}
+              on:click={() => moveColorKeyUp(i)}
               class="color-control-arrow">&#x25B2;</button
             >
             <button
               disabled={i == colorScale.colors.byKey.length - 1}
-              on:click={(e) => moveColorKeyDown(i)}
+              on:click={() => moveColorKeyDown(i)}
               class="color-control-arrow">&#x25BC;</button
             >
           </td>
@@ -295,7 +297,7 @@
             />
           </td>
           <td>
-            <button on:click={(e) => deleteColor(colorScaleIndex, i)}>
+            <button on:click={() => deleteColor(colorScaleIndex, i)}>
               Delete
             </button>
           </td>
@@ -340,11 +342,6 @@
   .color-control > td button {
     width: 100%;
     box-sizing: border-box;
-  }
-  .color-control .indicator {
-    width: 1em;
-    height: 1em;
-    display: inline-block;
   }
   .color-control-arrow {
     width: 16px;

@@ -6,11 +6,13 @@
   import type { DSVParsedArray } from "d3-dsv";
   import AxisEditor from "../AxisEditor.svelte";
   import { formatData } from "./data";
+  import { orDefault } from "$lib/utils";
 
   export let spec: Root;
   export let chart: ReturnType<typeof db.chart>;
   export let dbLine: ReturnType<ReturnType<typeof db.chart>["line"]>;
   export let chartData: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: DSVParsedArray<any>;
   };
 
@@ -25,11 +27,21 @@
   $: xScaleIndex = spec.chart.scales.findIndex(
     (s) => s.name == $dbLine.x.scale,
   );
-  $: xScale = spec.chart.scales[xScaleIndex] || { dataRange: [0, 1] };
+  $: xScale = orDefault(spec.chart.scales[xScaleIndex], {
+      dataRange: [0, 1],
+      name: "",
+      dataKey: "",
+      type: ""
+  });
   $: yScaleIndex = spec.chart.scales.findIndex(
     (s) => s.name == $dbLine.y.scale,
   );
-  $: yScale = spec.chart.scales[yScaleIndex] || { dataRange: [0, 1] };
+  $: yScale = orDefault(spec.chart.scales[yScaleIndex], {
+      dataRange: [0, 1],
+      name: "",
+      dataKey: "",
+      type: ""
+  });
   $: chartColors = $dbLine.style.byKey.map((s) => s.color);
 </script>
 
@@ -93,7 +105,7 @@
   </p>
 {/if}
 <p>
-  {#if xScale && xScale.dataRange}
+  {#if xScale.dataRange}
     <label
       >X scale from:
       <input
@@ -127,7 +139,7 @@
   {/if}
 </p>
 <p>
-  {#if yScale && yScale.dataRange}
+  {#if yScale.dataRange}
     <label
       >Y scale from:
       <input
@@ -184,7 +196,7 @@
 <p>Line style</p>
 <LineStyleEditor style={dbLine.defaultLineStyle()} {chartColors}
 ></LineStyleEditor>
-{#each $dbLine.style.byKey as style, i}
+{#each $dbLine.style.byKey as _style, i}
   <LineStyleEditor style={dbLine.lineStyle(i)} {chartColors} {unspecifiecKeys}
   ></LineStyleEditor>
 {/each}

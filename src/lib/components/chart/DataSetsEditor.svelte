@@ -11,7 +11,7 @@
   };
 </script>
 
-{#each chartData.sets as dataSet, i}
+{#each chartData.sets as _dataSet, i}
   {#if i != 0}
     <br />
   {/if}

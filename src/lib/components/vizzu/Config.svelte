@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Chart, Config } from "vizzu";
-  import type { SeriesMetaInfo, TableByRecords } from "vizzu/dist/types/data";
+  import { Config } from "vizzu";
+  import type { TableByRecords } from "vizzu/dist/types/data";
 
   import { db } from "$lib/sharedbVizzu";
 	import { createScope } from '$lib/dataScope';

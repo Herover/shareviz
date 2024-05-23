@@ -1,6 +1,6 @@
 <script lang="ts">
   import { LabelLocation, type Line, type Root } from "$lib/chart";
-  import { group, valueKinds, valueParsers } from "$lib/utils";
+  import { group, orDefault, orNumber, valueKinds, valueParsers } from "$lib/utils";
   import {
     scaleLinear,
     scaleTime,
@@ -26,8 +26,6 @@
   const bottomMargin = 24;
   const leftMargin = 24;
   const rightMargin = 0;
-  const lineWidth = 3;
-  const lineColor = "#000000";
   const fillColor = "rgba(255, 0, 0, 0.3)";
 
   $: stacked = values
@@ -37,7 +35,7 @@
         const lastLine =
           lineSpec.stack && i != 0
             ? acc[i - 1].value.map((d) => d.to)
-            : line.value.map((d) => 0);
+            : line.value.map(() => 0);
         acc.push({
           label: line.label,
           key: line.key,
@@ -62,17 +60,17 @@
       }[],
     );
 
-  $: minX = min(values, (d) => min(d.value, (dd) => dd.x)) || 0;
-  $: maxX = max(values, (d) => max(d.value, (dd) => dd.x)) || 1;
+  $: minX = orNumber(min(values, (d) => min(d.value, (dd) => dd.x)));
+  $: maxX = orNumber(max(values, (d) => max(d.value, (dd) => dd.x)), 1);
   $: xScaleSpec = chartSpec.chart.scales.find(
     (s) => s.name == lineSpec.x.scale,
   );
   $: xType =
-    valueParsers[
-      chartSpec.data.sets
+    orDefault(valueParsers[
+      orDefault(chartSpec.data.sets
         .find((set) => set.id == lineSpec.dataSet)
-        ?.rows.find((r) => r.key == xScaleSpec?.dataKey)?.type || ""
-    ]?.type || "";
+        ?.rows.find((r) => r.key == xScaleSpec?.dataKey)?.type, "")
+    ]?.type, "" as valueKinds);
   let xScale:
     | ScaleLinear<number, number, never>
     | ScaleTime<number, number, never> = scaleLinear();
@@ -130,10 +128,13 @@
               .map((e) => ({ x: e.x, y: e.to }))
               .concat(
                 (
-                  stacked[i - 1]?.value || [
-                    { x: xScale.domain()[0], to: 0 },
-                    { x: xScale.domain()[1], to: 0 },
-                  ]
+                  orDefault(
+                    stacked[i - 1]?.value,
+                    [
+                      { x: xScale.domain()[0], to: 0 },
+                      { x: xScale.domain()[1], to: 0 },
+                    ]
+                  )
                 )
                   .map((e) => ({ x: e.x, y: e.to }))
                   .reverse(),
@@ -142,7 +143,7 @@
           fill={fillColor}
         />
       {/each}
-      {#each stacked as d, i}
+      {#each stacked as d}
         <path
           d={draw(d.value.map((e) => ({ x: e.x, y: e.to })))}
           stroke={getStyle(d.key).color}

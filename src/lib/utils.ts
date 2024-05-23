@@ -95,3 +95,11 @@ export const valueParsers: { [name: string]: { fn: (string) => any, type: valueK
     type: valueKinds.DATE,
   },
 };
+
+export const orDefault = <T>(n: T | undefined, def: T): T => {
+  if (typeof n == "undefined" || Number.isNaN(n)) {
+    return def;
+   }
+   return n;
+};
+export const orNumber = (n: number | undefined, def = 0) => orDefault(n, def);

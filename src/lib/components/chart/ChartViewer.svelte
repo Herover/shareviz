@@ -1,15 +1,13 @@
 <script lang="ts">
   import type { Root } from "$lib/chart";
   import { getComponent } from "$lib/components/chart/chartComponents";
+  import { orNumber } from "$lib/utils";
 
   export let chartSpec: Root;
   export let data: { [key: string]: any[] };
-  export let width = 0;
+  export let width: number | undefined = undefined;
 
-  const repeatSpacing = 32;
-
-  let sizeHeight = 0;
-  $: chartWidth = width || chartSpec.chart.width;
+  $: chartWidth = orNumber(width, chartSpec.chart.width);
 </script>
 
 <div

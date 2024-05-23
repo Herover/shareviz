@@ -8,6 +8,7 @@
   export let chartSpec: Root;
   export let componentSpec: hBarType;
   export let data: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any[];
   };
   export let chartWidth: number;

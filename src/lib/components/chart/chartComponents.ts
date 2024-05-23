@@ -1,4 +1,4 @@
-import { type ComponentType, SvelteComponent } from "svelte";
+import { SvelteComponent } from "svelte";
 
 import type { Root } from "$lib/chart";
 
@@ -23,7 +23,7 @@ interface ChartComponent {
   }>,
   /** Component for editor */
   editorComponent: SvelteComponent<any>,
-};
+}
 
 const components: { [key: string]: ChartComponent } = {};
 
@@ -35,8 +35,9 @@ export const registerComponent = (component: ChartComponent) => {
   components[component.key] = component;
 };
 
-registerComponent(Line)
-registerComponent(HBar)
+// FIXME: remove type conversions when ChartComponent is fixed
+registerComponent(Line as unknown as ChartComponent)
+registerComponent(HBar as unknown as ChartComponent)
 
 export const getComponent = (key: string) => {
   if (key in components) {

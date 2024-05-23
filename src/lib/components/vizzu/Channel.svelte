@@ -1,4 +1,5 @@
 <script lang="ts" context="module">
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let radioGroups = 0;
 </script>
 <script lang="ts">
@@ -8,6 +9,7 @@
   import type { TableByRecords } from "vizzu/dist/types/data";
   import TextInput from "../TextInput.svelte";
   import RadioInput from "../RadioInput.svelte";
+  import { orNumber } from "$lib/utils";
 
   export let configChannel: Config.Channel = {};
   export let configData: TableByRecords | undefined;
@@ -34,7 +36,7 @@
           <option value={series.name}>{series.name}</option>
         {/each}
       </select>
-    {/each}<button on:click={() => configScope.add(configChannel?.set?.length || 0, (configData?.series || [])[0].name)}>+</button>
+    {/each}<button on:click={() => configScope.add(orNumber(configChannel?.set?.length), (configData?.series || [])[0].name)}>+</button>
   </p>
 
   <button class="show-more" on:click={() => showMore = !showMore}>

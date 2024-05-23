@@ -16,7 +16,7 @@
 
   let autoMajorTicks: { n: number | Date; l: string }[] = [];
   $: {
-    if (conf && scale) {
+    if (scale) {
       autoMajorTicks = [];
       const from = scale.domain()[0];
       const to = scale.domain()[1];
@@ -55,11 +55,11 @@
       }
     }
   }
-  $: majorTicks = conf && scale ? [...conf.major.ticks, ...autoMajorTicks] : [];
+  $: majorTicks = scale ? [...conf.major.ticks, ...autoMajorTicks] : [];
 
   let autoMinorTicks: { n: number | Date; l: string }[] = [];
   $: {
-    if (conf && scale) {
+    if (scale) {
       autoMinorTicks = [];
       const from = scale.domain()[0];
       const to = scale.domain()[1];
@@ -98,10 +98,10 @@
       }
     }
   }
-  $: minorTicks = conf && scale ? [...conf.minor.ticks, ...autoMinorTicks] : [];
+  $: minorTicks = scale ? [...conf.minor.ticks, ...autoMinorTicks] : [];
 </script>
 
-{#if conf && scale}
+{#if scale}
   {#if conf.orientation == AxisOrientation.VERTICAL}
     {#if conf.minor.enabled}
       {#if conf.location == AxisLocation.START}

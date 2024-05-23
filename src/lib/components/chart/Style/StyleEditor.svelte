@@ -1,9 +1,7 @@
 <script lang="ts">
-  import type { Root, Style } from "$lib/chart";
   import type { db } from "$lib/chartStore";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
 
-  export let spec: Root;
   export let style: ReturnType<typeof db.style>;
 </script>
 

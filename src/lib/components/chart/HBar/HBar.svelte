@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { scaleLinear, scaleOrdinal } from "d3-scale";
-  import { formatNumber } from "$lib/utils";
+  import { scaleLinear } from "d3-scale";
   import { createEventDispatcher, onMount } from "svelte";
   import type { Root, HBar } from "$lib/chart";
   import { AxisLocation } from "$lib/chart";
@@ -129,7 +128,7 @@
             y={ii * valueHeight + barMargin}
             height={barHeight}
             width={valueScale(dd.value)}
-            fill={color(dd.label ? dd : d)}
+            fill={color(dd.label != "" ? dd : d)}
           >
             <title>{dd.label}: {dd.value}</title>
           </rect>

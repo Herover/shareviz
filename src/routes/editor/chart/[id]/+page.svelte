@@ -1,5 +1,4 @@
 <script lang="ts">
-  import HBar from "$lib/components/chart/HBar/HBar.svelte";
   import { db } from "$lib/chartStore";
   import type { Root } from "$lib/chart.d.ts";
   import { dsvFormat, type DSVParsedArray } from "d3-dsv";
@@ -30,12 +29,14 @@
       ? {}
       : chartSpec.data.sets.reduce(
           (acc, data) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             acc[data.id] = dsvFormat("\t").parse<any, string>(
               data.raw,
               (row) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 return data.rows.reduce((acc: any, rowInfo) => {
                   const parser = valueParsers[rowInfo.type];
-                  if (!parser) {
+                  if (typeof parser == "undefined") {
                     // TODO: better warning?
                     console.warn("could not find parser", rowInfo.key);
                     acc[rowInfo.key] = row[rowInfo.key];
@@ -44,14 +45,15 @@
                   acc[rowInfo.key] = parser.fn(row[rowInfo.key]);
 
                   return acc;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 }, {} as any);
               },
             );
             return acc;
           },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           {} as { [key: string]: DSVParsedArray<any> },
         );
-  let chart = db.chart();
 </script>
 
 <div class="main">
