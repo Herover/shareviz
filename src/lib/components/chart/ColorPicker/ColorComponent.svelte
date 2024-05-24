@@ -1,13 +1,13 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import { orDefault } from "$lib/utils";
+  import { orNumber } from "$lib/utils";
 
   export let h: number;
   export let c: number;
   export let l: number;
   export let title: string;
 
-  $: lch = `lch(${Math.max(Math.min(orDefault(l), 100), 0)}% ${Math.max(Math.min(orDefault(c), 100), 0)} ${(orDefault(h) + 360) % 360})`;
+  $: lch = `lch(${Math.max(Math.min(orNumber(l), 100), 0)}% ${Math.max(Math.min(orNumber(c), 100), 0)} ${(orNumber(h) + 360) % 360})`;
 
   const dispatch = createEventDispatcher<{ click: string }>();
   const onKey = (e: KeyboardEvent) => {
