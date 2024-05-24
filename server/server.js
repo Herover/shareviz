@@ -450,10 +450,10 @@ export function startServer(server) {
     console.log('receive')
     if (ctx.data.a == "s" && ctx.data.c == "examples") {
       // TODO: add authentication using `ctx.agent.custom.userId`
-      if (false) {
-        console.log("unauthorized")
-        return next("unauthorized");
-      }
+      // if (false) {
+      //   console.log("unauthorized")
+      //   return next("unauthorized");
+      // }
     }
     next();
   });
