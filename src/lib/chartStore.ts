@@ -1,13 +1,12 @@
-import { readable, writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 import ReconnectingWebSocket from 'reconnecting-websocket';
- // @ts-ignore
+// @ts-expect-error missing types
 import {json1} from 'sharedb-client-browser/dist/ot-json1-umd.cjs';
- // @ts-ignore
+ // @ts-expect-error missing types
 import sharedb from 'sharedb-client-browser/dist/sharedb-client-umd.cjs';
 import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
-import { Config } from 'vizzu';
 import type { HBar, Line, Root, Set, Chart, Axis, AxisGrid, Style, LineStyleKey } from './chart';
 import { notifications } from './notificationStore';
 // import { type Doc } from "sharedb";
@@ -23,11 +22,11 @@ export const db = function createDB() {
   let connection: any;
   
   let presence: any; // Presence<PresenceData>;
-  let localPresence: any; // LocalPresence<PresenceData>;
+  //let localPresence: any; // LocalPresence<PresenceData>;
 
   let connected = false;
 
-  let myColor = `hsl(${Math.random() * 360} 100% 50%)`;
+  //let myColor = `hsl(${Math.random() * 360} 100% 50%)`;
 
   const { subscribe, set, update } = writable<{
     connected: boolean,
@@ -49,12 +48,11 @@ export const db = function createDB() {
       });
       socket.addEventListener("error", e =>  console.warn(e.message, e))
       
-      // @ts-ignore
       socket.addEventListener("open", () => update(d => {
         d.connected = connected = true;
         return d;
       }));
-      // @ts-ignore
+
       socket.addEventListener("close", () => update(d => {
         d.connected = connected = false;
         return d;
@@ -70,7 +68,7 @@ export const db = function createDB() {
     load: (docId: string) => {
       // Create local Doc instance mapped to 'examples' collection document with id 'counter'
       doc = connection.get('examples', docId);
-      doc.on("error", e => console.warn("doc error", e))
+      doc.on("error", (e: Error) => console.warn("doc error", e))
 
       
       presence = connection.getPresence('x-' + docId);
@@ -81,19 +79,17 @@ export const db = function createDB() {
         if (data === null) {
           delete presenceTargets[presences[presenceId].selected];
           delete presences[presenceId]
-          // @ts-ignore
           update(d => {
             d.presences = presences;
             d.presenceTargets = presenceTargets;
             return d;
           });
         } else {
-          if (presences[presenceId] && presenceTargets[presences[presenceId].selected]) {
+          if (typeof presences[presenceId] != "undefined" && typeof presenceTargets[presences[presenceId].selected] != "undefined") {
             delete presenceTargets[presences[presenceId].selected];
           }
           presences[presenceId] = { selected: data.selected, color: data.color };
           presenceTargets[data.selected] = presenceId;
-          // @ts-ignore
           update(d => {
             d.presences = presences;
             d.presenceTargets = presenceTargets;
@@ -104,10 +100,10 @@ export const db = function createDB() {
       presence.on("error", (e: any) => {
         console.log("presence error", e)
       })
-      localPresence = presence.create();
+      // localPresence = presence.create();
     
       const onData = (e?: Error) => {
-        if (e && e.message) notifications.addError(e.message);
+        if (e && typeof e.message == "string") notifications.addError(e.message);
         console.log("doc", doc, doc.data)
         set({
           doc: doc.data,
@@ -131,7 +127,7 @@ export const db = function createDB() {
         // TODO: id collision detection
         const docId = ("" + Math.random()).split(".")[1];
         doc = connection.get('examples', docId);
-        doc.on("error", e => console.warn("doc error", e));
+        doc.on("error", (e: Error) => console.warn("doc error", e));
         doc.create({
           meta: {
             publicRead: false,
@@ -195,7 +191,7 @@ export const db = function createDB() {
             bgColor: "#ffffff",
             textColor: "#000000",
           },
-        } as Root, json1.type.uri, (err) => {
+        } as Root, json1.type.uri, (err: Error | undefined) => {
           if (err) reject(err);
           resolve(docId);
         });
@@ -204,7 +200,7 @@ export const db = function createDB() {
 
     getRecent: (): Promise<any> => {
       return new Promise((resolve, reject) => {
-        connection.createFetchQuery("examples", { $limit: 5 }, {}, (err, results) => {
+        connection.createFetchQuery("examples", { $limit: 5 }, {}, (err: Error | undefined, results: any) => {
           if (err) reject(err);
           resolve(results);
         });

@@ -16,7 +16,7 @@ export const formatNumber = (val: number, divide = Divide.None, thousandsDelim =
     res = wholes[i] + res;
   }
 
-  if (fraction) {
+  if (typeof fraction != "undefined" && fraction.length > 0) {
     res += fractionDelim + fraction;
   }
 
@@ -39,15 +39,15 @@ export const formatNumber = (val: number, divide = Divide.None, thousandsDelim =
 
   return res;
 }
-export const group = <T extends any, U>(
+export const group = <T, U>(
   key: string,
   d: T[],
   f: (key: string, group: T[]) => U = (k, d) => d as U,
 ): U[] => {
-  const groups = (d || []).reduce(
+  const groups = (orDefault(d, [])).reduce(
     (acc, line: any) => {
-      const usedKey = line[key] || key
-      if (acc[usedKey]) {
+      const usedKey = orDefault(line[key], key);
+      if (typeof acc[usedKey] != "undefined") {
         acc[usedKey].push(line);
       } else {
         acc[usedKey] = [line];
@@ -65,7 +65,7 @@ export enum valueKinds {
   TEXT = "text",
   DATE = "date",
 }
-export const valueParsers: { [name: string]: { fn: (string) => any, type: valueKinds } } = {
+export const valueParsers: { [name: string]: { fn: (s: string) => any, type: valueKinds } } = {
   number: {
     fn: (d: string) => Number.parseFloat(d),
     type: valueKinds.NUMBER,
@@ -76,7 +76,7 @@ export const valueParsers: { [name: string]: { fn: (string) => any, type: valueK
   },
   ISODate: {
     fn: (d: string) => {
-      const parts = d.match(/(\d{4})\-(\d{2})\-(\d{2})/);
+      const parts = d.match(/(\d{4})-(\d{2})-(\d{2})/);
       if (parts && parts.length == 4) {
         return new Date(`${parts[1]}-${parts[2]}-${parts[3]}T00:00:00+00:00`);
       }
@@ -86,7 +86,7 @@ export const valueParsers: { [name: string]: { fn: (string) => any, type: valueK
   },
   yyyyMmm: {
     fn: (d: string) => {
-      const parts = d.match(/(\d{4})\M(\d{2})/);
+      const parts = d.match(/(\d{4})M(\d{2})/);
       if (parts && parts.length == 3) {
         return new Date(`${parts[1]}-${parts[2]}-01T00:00:00+00:00`);
       }

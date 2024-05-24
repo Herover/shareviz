@@ -89,8 +89,7 @@
     .range([height - topMargin - bottomMargin, 0])
     .domain(
       chartSpec.chart.scales.find((s) => s.name == lineSpec.y.scale)
-        ?.dataRange ||
-        console.warn("y scale not found") || [0, 1],
+        ?.dataRange || [0, 1],
     );
 
   $: draw = line<{ x: number; y: number }>()

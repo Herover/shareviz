@@ -51,7 +51,7 @@
       {#await charts}
         ...
       {:then chartList}
-        {#each chartList as chart, i}
+        {#each chartList as chart}
           <p><a href="/editor/chart/{chart.id}">{chart.data.chart.title}</a></p>
         {/each}
       {/await}

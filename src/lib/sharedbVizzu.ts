@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { readable, writable } from 'svelte/store';
 
 import ReconnectingWebSocket from 'reconnecting-websocket';

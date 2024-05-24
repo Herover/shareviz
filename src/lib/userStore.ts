@@ -1,6 +1,7 @@
 import { writable } from "svelte/store";
 
 import { notifications } from "./notificationStore";
+import { orDefault } from "./utils";
 
 export const user = function create() {
   const { subscribe, set, update } = writable<{
@@ -28,7 +29,7 @@ export const user = function create() {
           return old;
         });
 
-        notifications.addError(data.message || `Unknown error with ${resp.status} ${resp.statusText}`);
+        notifications.addError(orDefault(data.message, `Unknown error with ${resp.status} ${resp.statusText}`));
 
         return false;
       }
@@ -52,7 +53,7 @@ export const user = function create() {
       const data = await resp.json();
 
       if (resp.status < 200 || 299 < resp.status) {
-        notifications.addError(data.message || `Unknown error with ${resp.status} ${resp.statusText}`);
+        notifications.addError(orDefault(data.message, `Unknown error with ${resp.status} ${resp.statusText}`));
 
         return false;
       }

@@ -1,4 +1,5 @@
 <script lang="ts">
+  /** eslint-disable @typescript-eslint/strict-boolean-expressions */
   import type {Root } from "$lib/chart";
   import type { db } from "$lib/chartStore";
   import { group } from "$lib/utils";
@@ -193,7 +194,7 @@
     </label>
   </p>
   <p>Colors</p>
-  {#if colorScale && colorScale.colors}
+  {#if colorScale.colors}
     <table class="color-control">
       <tr><th></th><th>Key</th><th>Color</th><th></th><th>Label</th></tr>
       <tr>

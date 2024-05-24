@@ -73,7 +73,7 @@
           key="style"
           label="Style"
         >
-          <StyleEditor spec={chartSpec} style={db.style()} />
+          <StyleEditor style={db.style()} />
         </EditorCollapsible>
         <EditorCollapsible
           group="controls"
@@ -81,7 +81,7 @@
           label="Chart settings"
           startOpen={chartSpec.data.sets.length != 0}
         >
-          <ChartEditor spec={chartSpec} chartScope={db.chart()} styleScope={db.style()} {chartData} />
+          <ChartEditor spec={chartSpec} chartScope={db.chart()} {chartData} />
         </EditorCollapsible>
         <EditorCollapsible group="controls" key="main" label="Export">
           <a href="/view/chart/{data.id}">Embed link</a>

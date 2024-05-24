@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LabelLocation, type LineStyleKey } from "$lib/chart";
+  import { LabelLocation } from "$lib/chart";
   import { lineStyle } from "$lib/chartStore";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
 

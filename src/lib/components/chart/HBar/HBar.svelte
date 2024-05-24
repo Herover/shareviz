@@ -41,11 +41,10 @@
         ?.dataRange || [0, 1],
     );
   // "#ff8888", "#aa2222"
-  $: colors = chartSpec.chart.scales.find((s) => s.name == "color")?.colors ||
-    console.warn("color scale not found") || {
-      default: "#888",
-      byKey: [],
-    };
+  $: colors = chartSpec.chart.scales.find((s) => s.name == "color")?.colors || {
+    default: "#888",
+    byKey: [],
+  };
   $: color = (d: { label: string }) => {
     const c = colors.byKey.find((e) => e.k == d.label);
     if (c) {

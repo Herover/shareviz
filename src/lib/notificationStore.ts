@@ -2,10 +2,10 @@ import { writable } from 'svelte/store';
 
 export enum NotificationLevel {
   ERROR = "error",
-};
+}
 
 export const notifications = (() => {
-  const { subscribe, set, update } = writable<{ message: string, type: NotificationLevel }[]>([]);
+  const { subscribe, update } = writable<{ message: string, type: NotificationLevel }[]>([]);
 
   return {
     subscribe,

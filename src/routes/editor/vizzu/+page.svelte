@@ -5,7 +5,7 @@
     <button on:click={() => specIndex = i}>{i}</button>
   {/each}
 </p>
-{#each specs as spec, index}
+{#each specs as _spec, index}
   <Config configChart={createScope(db, ["doc", "specs", index])} configData={$data} {index}/>
 {/each}
 <button on:click={() => db.duplicateSpec(specs.length-1, specs.length)}>+</button>
@@ -22,6 +22,7 @@
 </style>
 
 <script lang="ts">
+  /* eslint-disable */
 	import { db } from '$lib/sharedbVizzu';
 	import { createScope } from '$lib/dataScope';
 	import { onDestroy, onMount } from 'svelte';

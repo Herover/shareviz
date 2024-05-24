@@ -3,13 +3,16 @@
   import type { Root } from "$lib/chart.d.ts";
   import { dsvFormat, type DSVParsedArray } from "d3-dsv";
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
+  import { onDestroy } from "svelte";
 
   export let data;
 
   const disconnect = db.connect();
   db.load(data.id);
 
-  $: chartSpec = $db.doc as Root;
+  onDestroy(() => disconnect());
+
+  $: chartSpec = $db.doc as Root | null;
 
   $: chartData =
     chartSpec == null

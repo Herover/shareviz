@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Data, Set } from "$lib/chart";
+  import type { Data } from "$lib/chart";
   import type { db } from "$lib/chartStore";
   import DataSetEditor from "./DataSetEditor.svelte";
 
