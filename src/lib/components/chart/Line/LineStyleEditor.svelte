@@ -4,7 +4,7 @@
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
 
   export let style: ReturnType<typeof lineStyle>;
-  export let unspecifiecKeys: string[] = [];
+  export let unspecifiecKeys: null | string[] = null;
   export let chartColors: string[];
 
   $: updateColor = (color: string) => {
@@ -19,7 +19,7 @@
 </script>
 
 <div class="line-style-editor">
-  {#if unspecifiecKeys.length != 0}
+  {#if unspecifiecKeys != null}
     <select
       value={$style.k}
       on:change={(e) => style.setKey(e.currentTarget.value)}
@@ -66,7 +66,7 @@
     style="width: 80px;"
   />
 
-  {#if unspecifiecKeys.length != 0}
+  {#if unspecifiecKeys != null}
     <button on:click={() => style.delete()}>Delete</button>
   {/if}
 </div>
