@@ -2,6 +2,7 @@ import ShareDB from 'sharedb';
 import { WebSocketServer } from 'ws';
 import WebSocketJSONStream from '@teamwork/websocket-json-stream';
 import json1 from 'ot-json1';
+import {} from "../src/lib/server/user"; // TODO: empty for side-effects
 
 ShareDB.types.register(json1.type);
 let backend = new ShareDB({ presence: true });

@@ -1,10 +1,11 @@
 import { json } from '@sveltejs/kit';
+import { db } from "$lib/server/user.js";
 
 export async function POST({ request, cookies }) {
   const { username, password } = await request.json();
 
-  // TODO
-  if (password !== "123") {
+  const user = await db.getUser({ username });
+  if (typeof password != "string" || typeof user.password != "string" || user.password !== password) {
     cookies.set("x-token", "", { path: "/" });
     return json({ message: "unauthorized" }, { status: 403 });
   }
@@ -14,5 +15,5 @@ export async function POST({ request, cookies }) {
 
   cookies.set("x-token", token, { path: "/" });
 
-  return json({ userId , name }, { status: 200 });
+  return json({ userId, name }, { status: 200 });
 }
