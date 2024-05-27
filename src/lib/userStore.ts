@@ -6,9 +6,36 @@ import { orDefault } from "./utils";
 export const user = function create() {
   const { subscribe, set, update } = writable<{
     signedIn: boolean,
-    name: string,
+    username: string,
     userId: string,
-  }>({ signedIn: false, name: "", userId: "" });
+  }>({ signedIn: false, username: "", userId: "" });
+
+  const fetchLoggedIn = async () => {
+    const resp = await fetch(
+      "/api/user",
+      {
+        method: "GET",
+      },
+    );
+
+    const data = await resp.json();
+
+    if (resp.status < 200 || 299 < resp.status) {
+      update(old => {
+        old.signedIn = false;
+        return old;
+      });
+
+      return false;
+    }
+
+    set({
+      signedIn: true,
+      userId: data.userId,
+      username: data.username,
+    });
+  };
+  fetchLoggedIn();
 
   return {
     subscribe,
@@ -38,7 +65,7 @@ export const user = function create() {
       set({
         signedIn: true,
         userId: data.userId,
-        name: data.name,
+        username: data.username,
       });
       return true;
     },
@@ -61,7 +88,7 @@ export const user = function create() {
       set({
         signedIn: false,
         userId: "",
-        name: "",
+        username: "",
       });
     },
   };

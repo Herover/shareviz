@@ -89,26 +89,29 @@ const cmds = (db: sqlite.Database) => {
         const cb = function (this: sqlite.RunResult, err: Error | null, row: any) {
           if (err) {
             reject(err);
+            return;
           }
-          console.log("cb", err, row)
+
           resolve(row);
-        }
-        db.all("SELECT * FROM users", (err, rows) => console.log("all", err, rows))
+        };
+
         if (typeof username == "string") {
           const stmt = db.prepare("SELECT * FROM users WHERE username = ?");
           stmt.get([username], function (err, row) {
-            console.log("pre", "SELECT * FROM users WHERE username = ?", username, err, row)
             cb.call(this, err, row);
           }).finalize();
+          return;
         }
 
         if (typeof id == "string") {
           const stmt = db.prepare("SELECT * FROM users WHERE id = ?");
           stmt.get([id], function (err, row) {
-            console.log("pre", "SELECT * FROM users WHERE id = ?", id, err, row)
             cb.call(this, err, row);
           }).finalize();
+          return;
         }
+
+        reject("no user identifier")
       });
     },
   }

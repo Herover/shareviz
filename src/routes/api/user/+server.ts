@@ -12,3 +12,15 @@ export async function POST({ request }) {
 
   return json({ userId }, { status: 200 });
 }
+
+export async function GET({ cookies }) {
+  const id = cookies.get("x-token"); // TODO
+
+  if (typeof id != "string") {
+    return json({ message: "invalid token" }, { status: 400 });
+  }
+
+  const user = await db.getUser({ id });
+
+  return json({ userId: user.id, username: user.username }, { status: 200 });
+}

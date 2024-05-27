@@ -34,7 +34,7 @@
 <div class="main">
   <div class="holder">
     <div class="container">
-      <h1>Welcome {$user.name}</h1>
+      <h1>Welcome {$user.username}</h1>
       {#if !$user.signedIn}
         <input bind:value={username} placeholder="username" />
         <input bind:value={password} placeholder="password" type="password" />

@@ -7,6 +7,13 @@ export interface Root {
 
 export interface Meta {
   publicRead: boolean
+  access: AccessItem[]
+}
+
+export interface AccessItem {
+  userId: string
+  read: boolean
+  write: boolean
 }
 
 export interface Data {

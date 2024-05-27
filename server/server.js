@@ -2,7 +2,7 @@ import ShareDB from 'sharedb';
 import { WebSocketServer } from 'ws';
 import WebSocketJSONStream from '@teamwork/websocket-json-stream';
 import json1 from 'ot-json1';
-import {} from "../src/lib/server/user"; // TODO: empty for side-effects
+import { db } from "../src/lib/server/user"; // TODO: side-effects
 
 ShareDB.types.register(json1.type);
 let backend = new ShareDB({ presence: true });
@@ -432,7 +432,6 @@ export function startServer(server) {
       acc[key] = value;
       return acc;
     }, {}) : {};
-    // TODO: actually auth user with db
     req.__sharevizUserId = cookies["x-token"];
 
     backend.listen(stream, req);
@@ -441,20 +440,35 @@ export function startServer(server) {
   backend.use('connect', function (ctx, next) {
     console.log('connect');
     if (ctx.req.__sharevizUserId) {
-      ctx.agent.custom = {
-        userId: ctx.req.__sharevizUserId,
-      };
+      db.getUser({ id: ctx.req.__sharevizUserId })
+        .then((user) => {
+          ctx.agent.custom = {
+            userId: user.id,
+          };
+          next();
+        })
+        .catch((e) => {
+          next(e);
+        });
+    } else {
+      next();
     }
-    next();
   });
   backend.use('receive', function (ctx, next) {
-    console.log('receive')
+    console.log('receive', JSON.stringify(ctx.data))
     if (ctx.data.a == "s" && ctx.data.c == "examples") {
       // TODO: add authentication using `ctx.agent.custom.userId`
       // if (false) {
       //   console.log("unauthorized")
       //   return next("unauthorized");
       // }
+    } else if (ctx.data.a == "op" && ctx.data.c == "examples" && typeof ctx.data.create != "undefined") {
+      ctx.data.create.data.meta = {
+        publicRead: false,
+        access: [
+          { userId: ctx.agent.custom.userId, read: true, write: true },
+        ],
+      };
     }
     next();
   });
@@ -488,7 +502,7 @@ export function startServer(server) {
   });
 
   backend.use('submit', function (ctx, next) {
-    console.log('submit', /* ctx, */ JSON.stringify(ctx.op.op));
+    console.log('submit', /* ctx, */ JSON.stringify(ctx.op));
     setTimeout(next, 100);
   });
   backend.use('apply', function (ctx, next) {
