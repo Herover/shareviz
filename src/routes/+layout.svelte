@@ -13,6 +13,9 @@
       tabindex="0"
     >
       Error: {notification.message}
+      {#if notification.n != 1}
+        ({notification.n} times)
+      {/if}
     </div>
   {/each}
 </div>
@@ -25,6 +28,7 @@
     top: 0px;
     left: 0px;
     width: 100%;
+    z-index: 100;
   }
   .notification {
     max-width: 400px;
