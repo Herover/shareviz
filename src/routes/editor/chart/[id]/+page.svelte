@@ -8,6 +8,7 @@
   import EditorCollapsible from "$lib/components/chart/EditorCollapsible.svelte";
   import { onDestroy } from "svelte";
   import { valueParsers } from "$lib/utils.js";
+  import { user } from "$lib/userStore";
   import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
 
   export let data;
@@ -54,12 +55,14 @@
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           {} as { [key: string]: DSVParsedArray<any> },
         );
+  $: canEdit = chartSpec == null ? false : typeof chartSpec.meta.access.find(a => a.userId == $user.userId) != "undefined";
 </script>
 
 <div class="main">
   {#if chartSpec != null}
     <div class="chart-controls-pane">
       <div class="chart-controls-primary chart-controls">
+        {#if canEdit}
         <EditorCollapsible
           group="controls"
           key="data"
@@ -93,6 +96,9 @@
               data.id}
           />
         </EditorCollapsible>
+        {:else}
+          <p>You do not have editor access to this chart.</p>
+        {/if}
       </div>
     </div>
 
