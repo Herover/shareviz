@@ -17,7 +17,7 @@ export function createDoc(callback) {
       doc.create({
         meta: {
           publicRead: true,
-
+          access: [],
         },
         data: {
           sets: [
@@ -455,7 +455,7 @@ export function startServer(server) {
     }
   });
   backend.use('receive', function (ctx, next) {
-    console.log('receive', JSON.stringify(ctx.data))
+    console.log('receive', /* JSON.stringify(ctx.data) */)
     if (ctx.data.a == "s" && ctx.data.c == "examples") {
       // TODO: add authentication using `ctx.agent.custom.userId`
       // if (false) {
@@ -463,6 +463,7 @@ export function startServer(server) {
       //   return next("unauthorized");
       // }
     } else if (ctx.data.a == "op" && ctx.data.c == "examples" && typeof ctx.data.create != "undefined") {
+      // When creating a new chart, always add current user to access list
       ctx.data.create.data.meta = {
         publicRead: false,
         access: [
@@ -473,12 +474,29 @@ export function startServer(server) {
     next();
   });
   backend.use('reply', function (ctx, next) {
-    console.log('reply');
+    console.log('reply', /* JSON.stringify(ctx.reply) */);
     if (ctx.reply.a == "qf" && ctx.reply?.data?.length) {
-      ctx.reply.data = ctx.reply?.data?.filter(e => e.data?.meta?.publicRead);
+      // When querying db, remove items user doesn't have access to
+      ctx.reply.data = ctx.reply?.data?.filter(
+        e => e.data?.meta?.publicRead || e.data?.meta?.access.find(e => e.userId == ctx.agent.custom.userId && e.read)
+      );
+      next();
+    } else if (ctx.reply.a == "s" && ctx.reply.c == "examples") {
+      // When accessing chart, check if user is allowed to read
+      if (ctx.reply?.data?.data?.meta?.publicRead) {
+        next();
+      } else {
+        const entry = ctx.reply?.data?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
+        if (entry?.read) {
+          next();
+        } else {
+          console.log(`unauthorized reply on ${ctx.request.c} ${ctx.request.d}`);
+          next("unauthorized");
+        }
+      }
+    } else {
+      next();
     }
-    
-    next();
   });
   backend.use('receivePresence', function (ctx, next) {
     console.log('receivePresence');
@@ -502,15 +520,49 @@ export function startServer(server) {
   });
 
   backend.use('submit', function (ctx, next) {
-    console.log('submit', /* ctx, */ JSON.stringify(ctx.op));
-    setTimeout(next, 100);
+    console.log('submit', /* ctx.snapshot */);
+    if (ctx.snapshot === null) {
+      next();
+      return;
+    }
+    const entry = ctx.snapshot?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
+    if (entry?.write) {
+      next();
+    } else {
+      console.log(`unauthorized submit on ${ctx.collection} ${ctx.id}`);
+      next("unauthorized");
+    }
   });
   backend.use('apply', function (ctx, next) {
-    console.log('apply');
-    next();
+    console.log('apply', /* ctx.agent.custom.userId, ctx.snapshot?.data?.chart?.title */);
+    ctx.extra.oldMeta = ctx.snapshot?.data?.meta;
+
+    if (typeof ctx.op.create == "object" && typeof ctx.snapshot?.data != "object") {
+      // Allow creating new charts
+      next();
+    } else if (typeof ctx.snapshot == "object") {
+      // Only allow editing charts with write access
+      const entry = ctx.snapshot?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
+      if (entry?.write) {
+        next();
+      } else {
+        console.log(`unauthorized apply on ${ctx.collection} ${ctx.id}`);
+        next("unauthorized");
+      }
+    } else {
+      console.log(`unknown apply on ${ctx.collection} ${ctx.id}`);
+      next("unauthorized");
+    }
+    // next();
   });
   backend.use('commit', function (ctx, next) {
-    console.log('commit'/* , ctx.snapshot */);
+    console.log('commit', /* ctx.snapshot */);
+    if (typeof ctx.extra.oldMeta == "object" && ctx.snapshot?.data !== null) {
+      // Ensure user can't edit meta object
+      // TODO: add some sort of check to detect disallowed changes
+      // TODO: make it possible for allowed users to change access settings
+      ctx.snapshot.data.meta = ctx.extra.oldMeta;
+    }
     next();
   });
   backend.use('afterWrite', function (ctx, next) {
