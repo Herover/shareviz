@@ -68,7 +68,7 @@ export const db = function createDB() {
     load: (docId: string) => {
       // Create local Doc instance mapped to 'examples' collection document with id 'counter'
       doc = connection.get('examples', docId);
-      doc.on("error", (e: Error) => console.warn("doc error", e))
+      doc.on("error", (e: Error) => notifications.addError(e.message))
 
       
       presence = connection.getPresence('x-' + docId);
@@ -131,6 +131,7 @@ export const db = function createDB() {
         doc.create({
           meta: {
             publicRead: false,
+            access: [],
           },
           data: { sets: [] },
           chart: {
