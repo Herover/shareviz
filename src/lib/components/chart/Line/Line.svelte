@@ -85,12 +85,15 @@
         .domain([minX, maxX]);
     }
   }
+  $: maxY = orNumber(max(stacked, (d) => max(d.value, (dd) => dd.y)), 1);
   $: yScale = scaleLinear()
     .range([height - topMargin - bottomMargin, 0])
     .domain(
-      chartSpec.chart.scales.find((s) => s.name == lineSpec.y.scale)
-        ?.dataRange || [0, 1],
-    );
+      [0, maxY],
+      // chartSpec.chart.scales.find((s) => s.name == lineSpec.y.scale)
+      //   ?.dataRange || [0, 1],
+    )
+    .nice();
 
   $: draw = line<{ x: number; y: number }>()
     .x((d) => xScale(d.x))
