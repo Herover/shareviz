@@ -17,7 +17,9 @@ export function createDoc(callback) {
       doc.create({
         meta: {
           publicRead: true,
-          access: [],
+          access: [
+            { userId: 1, write: true, read: true },
+          ],
         },
         data: {
           sets: [
@@ -543,6 +545,7 @@ export function startServer(server) {
     } else if (typeof ctx.snapshot == "object") {
       // Only allow editing charts with write access
       const entry = ctx.snapshot?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
+      console.log(ctx.agent.custom.userId, entry)
       if (entry?.write) {
         next();
       } else {
