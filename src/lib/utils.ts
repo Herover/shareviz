@@ -42,7 +42,7 @@ export const formatNumber = (val: number, divide = Divide.None, thousandsDelim =
 export const group = <T, U>(
   key: string,
   d: T[],
-  f: (key: string, group: T[]) => U = (k, d) => d as U,
+  f: (key: string, group: T[], i: number) => U = (k, d) => d as U,
 ): U[] => {
   const groups = (orDefault(d, [])).reduce(
     (acc, line: any) => {
@@ -57,7 +57,7 @@ export const group = <T, U>(
     {} as { [key: string]: T[] },
   );
 
-  return Object.keys(groups).map((k) => f(k, groups[k]));
+  return Object.keys(groups).map((k, i) => f(k, groups[k], i));
 };
 
 export enum valueKinds {

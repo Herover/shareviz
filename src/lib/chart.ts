@@ -120,6 +120,7 @@ export interface HBar {
   dataSet: string
   categories: string
   subCategories: string
+  stackSubCategories: boolean
   value: string
   labelWidth: number
   repeat: string

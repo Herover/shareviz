@@ -36,7 +36,7 @@
   $: groups = formatData($dbHBar, chartData);
   $: {
     const computed = max(groups, (d) =>
-      max(d.d, (dd) => max(dd.value, (ddd) => ddd.value)),
+      max(d.d, (dd) => max(dd.value, (ddd) => ddd.to)),
     );
     if (
       typeof computed == "number" &&
@@ -145,6 +145,16 @@
           <option>{row.key}</option>
         {/each}
       </select>
+    </label>
+  </p>
+  <p>
+    <label>
+      Stack sub categories:
+      <input
+        checked={$dbHBar.stackSubCategories}
+        on:change={(e) => dbHBar.setStackSubCategories(e.currentTarget.checked)}
+        type="checkbox"
+      >
     </label>
   </p>
   <p>

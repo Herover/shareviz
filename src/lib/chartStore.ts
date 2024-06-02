@@ -220,6 +220,7 @@ export const db = function createDB() {
             setLabelWidth: (value: number) => doc.submitOp(["chart", "elements", elementIndex, "d", "labelWidth", { r: 0, i: value }]),
             setCategories: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "categories", { r: 0, i: value }]),
             setSubCategories: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "subCategories", { r: 0, i: value }]),
+            setStackSubCategories: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "d", "stackSubCategories", { r: 0, i: value }]),
             setValue: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "value", { r: 0, i: value }]),
             setRepeat: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "repeat", { r: 0, i: value }]),
             setDataSet: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "dataSet", { r: 0, i: value }]),

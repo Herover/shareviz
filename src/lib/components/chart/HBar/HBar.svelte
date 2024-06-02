@@ -9,7 +9,7 @@
   export let valueWidth: number;
   export let values: {
     label: string;
-    value: { label: string; value: number }[];
+    value: { label: string; value: number, from: number; to: number }[];
   }[];
   export let chartSpec: Root;
   export let hBarSpec: HBar;
@@ -32,7 +32,7 @@
       ? values[0].value.length
       : 0;
   $: barHeight = valueHeight - barMargin * 2;
-  $: blockHeight = valueHeight * bars;
+  $: blockHeight = (hBarSpec.stackSubCategories ? 1 : bars) * valueHeight;
 
   $: valueScale = scaleLinear()
     .range([0, valueWidth])
@@ -123,10 +123,10 @@
 
         {#each d.value as dd, ii}
           <rect
-            x={labelWidth}
-            y={ii * valueHeight + barMargin}
+            x={labelWidth + valueScale(dd.from)}
+            y={((hBarSpec.stackSubCategories) ? 0 : ii) * valueHeight + barMargin}
             height={barHeight}
-            width={valueScale(dd.value)}
+            width={valueScale(dd.to - dd.from)}
             fill={color(dd.label != "" ? dd : d)}
           >
             <title>{dd.label}: {dd.value}</title>
