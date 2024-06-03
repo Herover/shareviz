@@ -9,7 +9,7 @@
   export let valueWidth: number;
   export let values: {
     label: string;
-    value: { label: string; value: number, from: number; to: number }[];
+    value: { label: string; value: number; from: number; to: number }[];
   }[];
   export let chartSpec: Root;
   export let hBarSpec: HBar;
@@ -124,7 +124,7 @@
         {#each d.value as dd, ii}
           <rect
             x={labelWidth + valueScale(dd.from)}
-            y={((hBarSpec.stackSubCategories) ? 0 : ii) * valueHeight + barMargin}
+            y={(hBarSpec.stackSubCategories ? 0 : ii) * valueHeight + barMargin}
             height={barHeight}
             width={valueScale(dd.to - dd.from)}
             fill={color(dd.label != "" ? dd : d)}

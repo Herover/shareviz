@@ -33,7 +33,7 @@
   );
   $: colorScale = spec.chart.scales[colorScaleIndex];
 
-  $: groups = formatData($dbHBar, chartData);
+  $: groups = formatData($dbHBar, chartData, colorScale.colors?.byKey || []);
   $: {
     const computed = max(groups, (d) =>
       max(d.d, (dd) => max(dd.value, (ddd) => ddd.to)),
