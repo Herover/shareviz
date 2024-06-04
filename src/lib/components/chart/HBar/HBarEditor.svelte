@@ -286,6 +286,7 @@
           <td>
             <ColorPicker
               color={color.c}
+              chartColors={colorScale.colors.byKey.map(c => c.c)}
               on:change={(e) =>
                 chart.setColorScaleColor(colorScaleIndex, i, e.detail)}
             />
