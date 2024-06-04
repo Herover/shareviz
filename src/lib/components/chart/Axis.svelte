@@ -111,7 +111,7 @@
               ? height
               : conf.minor.tickSize}"
             stroke={conf.minor.color}
-            stroke-width="1"
+            stroke-width={conf.minor.tickSize}
           />
         {/each}
       {:else}
@@ -121,7 +121,7 @@
               ? -height
               : -conf.minor.tickSize}"
             stroke={conf.minor.color}
-            stroke-width="1"
+            stroke-width={conf.minor.tickSize}
           />
         {/each}
       {/if}
@@ -135,7 +135,7 @@
               ? height
               : conf.major.tickSize}"
             stroke={conf.major.color}
-            stroke-width="1"
+            stroke-width={conf.major.tickSize}
           />
         {:else}
           <path
@@ -143,7 +143,7 @@
               ? -height
               : -conf.major.tickSize}"
             stroke={conf.major.color}
-            stroke-width="1"
+            stroke-width={conf.major.tickSize}
           />
         {/if}
         {#if showLabels}

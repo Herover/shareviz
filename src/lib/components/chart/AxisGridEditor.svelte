@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { axisGrid } from "$lib/chartStore";
+  import ColorPicker from "./ColorPicker/ColorPicker.svelte";
 
   export let conf: ReturnType<typeof axisGrid>;
   export let isMinor = false;
@@ -36,6 +37,14 @@
         type="number"
       />
     </label>
+  </p>
+
+  <p>
+    Label tick color:
+    <ColorPicker
+      color={$conf.color}
+      on:change={e => conf.setColor(e.detail)}
+    />
   </p>
 
   <p>
