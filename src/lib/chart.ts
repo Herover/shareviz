@@ -89,6 +89,7 @@ export interface AxisGrid {
   grid: boolean
   enabled: boolean
   tickSize: number
+  tickWidth: number
   color: string
   labelDivide: number
   labelThousands: string
