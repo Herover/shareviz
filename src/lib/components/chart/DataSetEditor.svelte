@@ -50,6 +50,16 @@ value3\tvalue4
 </p>
 <p>
   <label
+    >Name
+    <input
+      value={$dataStore.name}
+      on:change={(e) => dataStore.setName(e.currentTarget.value)}
+      on:keyup={(e) => dataStore.setName(e.currentTarget.value)}
+    />
+  </label>
+</p>
+<p>
+  <label
     >Format
     <select
       value={$dataStore.type}

@@ -26,6 +26,7 @@ export function createDoc(callback) {
             {
               id: "1",
               type: "tsv",
+              name: "Overnatninger, nationalitet",
               raw: `gæstens nationalitet	område	antal	tid
 Danmark	Region Hovedstaden	7079455	2022
 Danmark	Region Sjælland	2762168	2022
@@ -69,6 +70,7 @@ Verden udenfor Danmark	Region Nordjylland	1427582	2023`,
             {
               id: "2",
               type: "tsv",
+              name: "Overnatninger, historisk",
               raw: `område	tid	antal
 Region Hovedstaden	2010	7648237
 Region Hovedstaden	2011	8351552

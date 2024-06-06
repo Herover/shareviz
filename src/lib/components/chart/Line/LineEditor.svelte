@@ -54,7 +54,7 @@
     >
       <option>{""}</option>
       {#each spec.data.sets as set}
-        <option>{set.id}</option>
+        <option value={set.id}>{set.name}</option>
       {/each}
     </select>
   </label>

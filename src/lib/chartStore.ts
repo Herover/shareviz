@@ -455,12 +455,13 @@ export const db = function createDB() {
         ...dataSetScope,
         setRaw: (value: string) => doc.submitOp(["data", "sets", index, "raw", { r: 0, i: value }]),
         setType: (value: string) => doc.submitOp(["data", "sets", index, "type", { r: 0, i: value }]),
+        setName: (value: string) => doc.submitOp(["data", "sets", index, "name", { r: 0, i: value }]),
         setColumnType: (colIndex: number, value: string) => doc.submitOp(["data", "sets", index, "rows", colIndex, "type", { r: 0, i: value }]),
         addColumn: (colIndex: number, key: string, type: string) => doc.submitOp(["data", "sets", index, "rows", colIndex, { i: { key, type }}]),
         removeColumn: (colIndex: number) => doc.submitOp(["data", "sets", index, "rows", colIndex, { r: true }]),
       };
     },
-    addDataSet: (index: number) => doc.submitOp(["data", "sets", index, { i: { id: "" + Date.now(), type: "tsv", raw: "", rows: [] } }]),
+    addDataSet: (index: number) => doc.submitOp(["data", "sets", index, { i: { id: "" + Date.now(), type: "tsv", name:  `Data set ${index+1}`, raw: "", rows: [] } }]),
   };
 }();
 

@@ -24,6 +24,7 @@ export interface Set {
   id: string
   type: string
   raw: string
+  name: string
   rows: Row[]
 }
 
