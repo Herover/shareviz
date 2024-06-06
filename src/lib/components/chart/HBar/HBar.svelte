@@ -77,6 +77,15 @@
       legendHeight +
       scaleHeight,
   });
+
+  const legendStart = (str: string) => str.split(" ")[0];
+  const legendEnd = (str: string) => {
+    const parts = str.split(" ");
+    if (parts.length == 0) {
+      return "";
+    }
+    return parts.splice(1).join(" ");
+  };
 </script>
 
 <div class="legend">
@@ -84,8 +93,12 @@
     <p class="legend-left">
       {#each colors.byKey as d}
         {#if d.legend}
-          <div style="background-color:{d.c}" class="legend-box" />
-          <span>{d.legend}</span>
+          <span class="legend-title-start">
+            <div style="background-color:{d.c}" class="legend-box"></div>
+            {legendStart(d.legend)}</span
+          >
+          {#if legendEnd(d.legend) != ""}<span>{legendEnd(d.legend)}</span
+            >&nbsp;{/if}
         {/if}
       {/each}
     </p>
@@ -148,9 +161,10 @@
     display: inline-block;
     width: 1em;
     height: 1em;
-    margin-right: 4px;
-    margin-left: 4px;
     position: relative;
     top: 0.1em;
+  }
+  .legend-title-start {
+    display: inline-block;
   }
 </style>
