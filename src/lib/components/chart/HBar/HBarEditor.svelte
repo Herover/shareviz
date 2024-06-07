@@ -47,6 +47,10 @@
     }
   }
 
+  $: unusedGroups = groups[0].d[0].value
+    .map((d) => d.label)
+    .filter((k) => colorScale.colors?.byKey.findIndex((c) => c.k == k) == -1);
+
   $: automateColorKeys = () => {
     if (typeof $dbHBar.dataSet != "undefined" && typeof chartData[$dbHBar.dataSet] != "undefined") {
       const key = typeof $dbHBar.subCategories != "undefined" ? $dbHBar.subCategories : $dbHBar.categories;
@@ -250,7 +254,7 @@
             >
           </td>
           <td>
-            <input
+            <select
               value={color.k}
               on:change={(e) =>
                 chart.setColorScaleKey(
@@ -258,13 +262,15 @@
                   i,
                   e.currentTarget.value,
                 )}
-              on:keyup={(e) =>
-                chart.setColorScaleKey(
-                  colorScaleIndex,
-                  i,
-                  e.currentTarget.value,
-                )}
-            />
+            >
+              <option>{""}</option>
+              {#if color.k}
+                <option>{color.k}</option>
+              {/if}
+              {#each unusedGroups as k}
+                <option>{k}</option>
+              {/each}
+            </select>
           </td>
           <td>
             <input
@@ -347,7 +353,7 @@
     width: 100%;
     box-sizing: border-box;
   }
-  .color-control input {
+  .color-control input, .color-control select {
     width: 100%;
     box-sizing: border-box;
   }

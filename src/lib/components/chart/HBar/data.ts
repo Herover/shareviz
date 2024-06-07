@@ -1,7 +1,9 @@
 import type { HBar as hBarType } from "../../../chart";
 import { group } from "../../../utils";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// Used to place un-ordered items last
+const negativeOneToInf = (n: number) => n == -1 ? Number.POSITIVE_INFINITY : n;
+
 export const formatData = (componentSpec: hBarType, data: { [key: string]: any[]; }, order: { k: string }[]) => group(
   componentSpec.repeat,
   data[componentSpec.dataSet],
@@ -17,8 +19,11 @@ export const formatData = (componentSpec: hBarType, data: { [key: string]: any[]
             value,
           };
         });
-        let sorted = subGroups.map(d => d)
-        subGroups.forEach((item) => sorted[order.findIndex(d => d.k == item.label)] = item);
+        let sorted = subGroups
+          .map(d => d)
+          .sort((a, b) =>
+            negativeOneToInf(order.findIndex(d => d.k == a.label)) - negativeOneToInf(order.findIndex(d => d.k == b.label))
+          );
         sorted = sorted.map(d => {
           const from = componentSpec.stackSubCategories ? last : 0;
           const to = last + d.value;

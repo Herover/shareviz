@@ -92,7 +92,7 @@
   {#if showLegend}
     <p class="legend-left">
       {#each colors.byKey as d}
-        {#if d.legend}
+        {#if d.legend != "" && d.k != ""}
           <span class="legend-title-start">
             <div style="background-color:{d.c}" class="legend-box"></div>
             {legendStart(d.legend)}</span
