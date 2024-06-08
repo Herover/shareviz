@@ -277,6 +277,7 @@ export const db = function createDB() {
               dataSet: "",
               categories: "",
               subCategories: "",
+              stackSubCategories: true,
               value: "",
               labelWidth: 170,
               repeat: "",
