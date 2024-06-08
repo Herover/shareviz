@@ -2,7 +2,7 @@
   /** eslint-disable @typescript-eslint/strict-boolean-expressions */
   import type {Root } from "$lib/chart";
   import type { db } from "$lib/chartStore";
-  import { group } from "$lib/utils";
+  import { group, orDefault } from "$lib/utils";
   import type { DSVParsedArray } from "d3-dsv";
   import AxisEditor from "../AxisEditor.svelte";
   import { formatData } from "./data";
@@ -47,7 +47,7 @@
     }
   }
 
-  $: unusedGroups = groups[0].d[0].value
+  $: unusedGroups = orDefault(groups[0]?.d[0]?.value, [])
     .map((d) => d.label)
     .filter((k) => colorScale.colors?.byKey.findIndex((c) => c.k == k) == -1);
 
