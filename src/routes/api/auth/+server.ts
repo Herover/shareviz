@@ -10,7 +10,7 @@ export async function POST({ request, cookies }) {
   }
 
   const user = await db.getUser({ username });
-  if (typeof password != "string" || typeof user.password != "string" || user.password !== password) {
+  if (typeof user != "object" || typeof password != "string" || typeof user.password != "string" || user.password !== password) {
     cookies.set("x-token", "", { path: "/" });
     return json({ message: "unauthorized" }, { status: 403 });
   }
