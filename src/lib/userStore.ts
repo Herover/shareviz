@@ -91,5 +91,24 @@ export const user = function create() {
         username: "",
       });
     },
+    createUser: async (username: string, password: string) => {
+      const resp = await fetch(
+        "/api/user",
+        {
+          method: "POST",
+          body: JSON.stringify({ username, password }),
+        },
+      );
+
+      const data = await resp.json();
+
+      if (resp.status < 200 || 299 < resp.status) {
+        notifications.addError(orDefault(data.message, `Unknown error with ${resp.status} ${resp.statusText}`));
+
+        return false;
+      }
+
+      return true;
+    }
   };
 }();

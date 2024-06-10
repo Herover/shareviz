@@ -3,6 +3,7 @@
   import { user } from "$lib/userStore";
   import { db } from "$lib/chartStore";
   import { onDestroy } from "svelte";
+  import { notifications } from "$lib/notificationStore";
 
   let username = "";
   let password = "";
@@ -29,6 +30,15 @@
       }
     }
   };
+
+  const newUser = async () => {
+    const result = await user.createUser(username, password);
+    if (!result) {
+      notifications.addError("Unable to create this user");
+    } else {
+      notifications.addInfo("User created, you can log in now");
+    }
+  }
 </script>
 
 <div class="main">
@@ -46,6 +56,9 @@
           Sign in
         {/if}
       </button>
+      {#if !$user.signedIn}
+        <button on:click={() => newUser()}>Create user</button>
+      {/if}
       <br /><br />
       <button on:click={() => newGraphic()}>New graphic</button>
       {#await charts}
