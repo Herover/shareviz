@@ -8,6 +8,7 @@
       on:click={() => notifications.read(i)}
       on:keydown={() => notifications.read(i)}
       class:error={notification.type == NotificationLevel.ERROR}
+      class:info={notification.type == NotificationLevel.INFO}
       role="button"
       class="notification"
       tabindex="0"
@@ -41,5 +42,8 @@
   }
   .error {
     background-color: #ff6666;
+  }
+  .info {
+    background-color: #70ff86;
   }
 </style>

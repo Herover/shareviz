@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 
 export enum NotificationLevel {
   ERROR = "error",
+  INFO = "info",
 }
 
 export const notifications = (() => {
@@ -13,7 +14,7 @@ export const notifications = (() => {
       if (existing) {
         existing.n ++;
       } else {
-        notifications.push({ message, type: NotificationLevel.ERROR, n: 1 });
+        notifications.push({ message, type, n: 1 });
       }
 
       return notifications;
@@ -23,6 +24,7 @@ export const notifications = (() => {
   return {
     subscribe,
     addError: (message: string) => addNotification(NotificationLevel.ERROR, message),
+    addInfo: (message: string) => addNotification(NotificationLevel.INFO, message),
     read: (i: number) => update(notifications => {
       notifications.splice(i, 1);
       return notifications;
