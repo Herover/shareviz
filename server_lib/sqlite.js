@@ -1,13 +1,13 @@
 import sqlite from "sqlite3";
-import type { GetUserArguments, NewUserArguments, User } from "./user";
 
-interface Version {
-  major: number,
-}
+/**
+ * @typedef Version
+ * @prop {number} major
+ */
 
 const targetVersion = 1;
 
-const setupDB = async (db: sqlite.Database) => {
+const setupDB = async (/** @type {sqlite.Database} */ db) => {
   console.log("setup")
   db.serialize(() => {
     db.run("BEGIN TRANSACTION");
@@ -28,7 +28,7 @@ const setupDB = async (db: sqlite.Database) => {
     db.run(`INSERT INTO version (major) VALUES (${targetVersion})`);
 
     db.run("COMMIT TRANSACTION", (err) => {
-      if (err) throw err;
+      if (err != null) throw err;
     });
   });
 };
@@ -48,14 +48,14 @@ export const init = () => {
       if (typeof rows == "undefined" || rows.length == 0) {
         await setupDB(db);
       } else {
-        db.all("SELECT * FROM version", async function (err, rows) {
+        db.all("SELECT * FROM version", async function (err, /** @type {Version[] | undefined} */ rows) {
           if (err) {
             throw err;
           }
 
           if (typeof rows == "undefined" || rows.length == 0) {
             state = state_create;
-          } else if ((rows as Version[])[0]["major"] != targetVersion) {
+          } else if (rows[0]["major"] != targetVersion) {
             state = state_upgrade;
           }
 
@@ -71,33 +71,44 @@ export const init = () => {
   return cmds(db);
 };
 
-const cmds = (db: sqlite.Database) => {
+const cmds = (/** @type {sqlite.Database} */ db) => {
   return {
-    newUser: async ({ username, password }: NewUserArguments) => {
-      return new Promise<string>((resolve, reject) => {
+    /**
+     * @returns {Promise<string>} user with username or id
+     */
+    newUser: async (/** @type {{ username: string, password: string }} */{ username, password }) => {
+      return new Promise((resolve, reject) => {
         const stmt = db.prepare("INSERT INTO users (username, password) VALUES (?, ?)");
-        stmt.run([username, password], function (err) {
-          if (err) {
+        stmt.run([username, password], /** @this sqlite.RunResult */ function (/** @type {Error | null} */ err) {
+          if (err != null) {
             reject(err);
           }
           resolve("" + this.lastID);
         }).finalize();
       });
     },
-    getUser: async ({ username, id }: GetUserArguments) => {
-      return new Promise<User>((resolve, reject) => {
-        const cb = function (this: sqlite.RunResult, err: Error | null, row: any) {
-          if (err) {
+    /**
+     * @returns {Promise<import('./user.js').User>} user with username or id
+     */
+    getUser: async (/** @type {{ username?: string, id?: string }} */{ username, id }) => {
+      return new Promise((resolve, reject) => {
+        /** @this sqlite.RunResult */
+        const cb = function (/** @type {Error | null} */ err, /** @type {any} */ row) {
+          console.log("cb", "this",this,"err",err,"row",row)
+          if (err != null) {
+            console.log("ERR!", err)
             reject(err);
             return;
           }
 
+          console.log("resolve", row)
           resolve(row);
         };
 
         if (typeof username == "string") {
           const stmt = db.prepare("SELECT * FROM users WHERE username = ?");
           stmt.get([username], function (err, row) {
+            console.log(this,err,row)
             cb.call(this, err, row);
           }).finalize();
           return;
@@ -106,6 +117,7 @@ const cmds = (db: sqlite.Database) => {
         if (typeof id == "string") {
           const stmt = db.prepare("SELECT * FROM users WHERE id = ?");
           stmt.get([id], function (err, row) {
+            console.log(this,err,row)
             cb.call(this, err, row);
           }).finalize();
           return;
