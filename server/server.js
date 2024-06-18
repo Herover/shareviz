@@ -1,15 +1,11 @@
-import ShareDB from 'sharedb';
 import { WebSocketServer } from 'ws';
 import WebSocketJSONStream from '@teamwork/websocket-json-stream';
 import json1 from 'ot-json1';
 import { db } from "../server_lib/user.js";
-
-ShareDB.types.register(json1.type);
-let backend = new ShareDB({ presence: true });
+import { backend, connection } from '../server_lib/sharedb.js';
 
 // Create initial document then fire callback
 export function createDoc(callback) {
-  var connection = backend.connect();
   var doc = connection.get('examples', '1');
   doc.fetch(function (err) {
     if (err) throw err;
@@ -456,12 +452,14 @@ export function startServer(server) {
     if (ctx.req.__sharevizUserId) {
       db.getUser({ id: ctx.req.__sharevizUserId })
         .then((user) => {
+          console.log("user",user)
           ctx.agent.custom = {
             userId: user.id,
           };
           next();
         })
         .catch((e) => {
+          console.error("error",e)
           next(e);
         });
     } else {

@@ -7,12 +7,26 @@
 
   export let data;
 
-  const disconnect = db.connect();
-  db.load(data.id);
+  let chartSpec: Root | undefined;
 
-  onDestroy(() => disconnect());
+  const live = false;
 
-  $: chartSpec = $db.doc as Root | null;
+  if (live) {
+    const disconnect = db.connect();
+    db.load(data.id);
+
+    onDestroy(() => {
+      disconnect();
+    });
+  }
+
+  $: if (live && $db.doc) chartSpec = $db.doc as Root;
+  $: if (!live) {
+    fetch("/api/chart/" + data.id)
+      .then((resp) => resp.json())
+      .then((data) => chartSpec = data.chart)
+      .catch((err) => console.error(err));
+  }
 
   $: chartData =
     chartSpec == null
