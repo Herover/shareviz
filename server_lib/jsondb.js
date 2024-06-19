@@ -1,6 +1,19 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import ShareDB from 'sharedb';
 
+/**
+ * @typedef JSONDBSnapshot
+ * @prop {string} id
+ * @prop {number} v
+ * @prop {string} type
+ * @prop {any} data
+ */
+/**
+ * @typedef JSONDBData
+ * @prop {ShareDB.Op[]} ops
+ * @prop {JSONDBSnapshot} snapshot
+ */
+
 /***
  * Only allow id's and collections to include
  * a-z
@@ -76,12 +89,15 @@ JSONDB.prototype.commit = function (collection, id, op, snapshot, options, callb
       data: snapshot.data,
     };
 
+    /** @type JSONDBData */
     const document = JSON.parse(readFileSync(documentPath).toString("utf8"));
 
     if (document.ops.length == 0) {
-      document.ops.push(jsonSnapshot);
+      document.ops.push(op);
+      document.snapshot = jsonSnapshot;
     } else if (document.ops.length == jsonSnapshot.v - 1 /* && document.ops[document.ops.length - 1].v === jsonSnapshot.v */) {
-      document.ops.push(jsonSnapshot);
+      document.ops.push(op);
+      document.snapshot = jsonSnapshot;
     } else {
       callback(null, false);
       process.exit()
@@ -132,6 +148,7 @@ JSONDB.prototype.getSnapshot = function (collection, id, fields, options, callba
       return;
     }
 
+    /** @type JSONDBData */
     const document = JSON.parse(readFileSync(documentPath).toString("utf8"));
 
     if (document.ops.length == 0) {
@@ -139,7 +156,7 @@ JSONDB.prototype.getSnapshot = function (collection, id, fields, options, callba
       return;
     }
 
-    callback(null, document.ops[document.ops.length - 1]);
+    callback(null, document.snapshot);
   }
   catch (err) {
     callback(err);
@@ -181,6 +198,7 @@ JSONDB.prototype.getOps = function (collection, id, from, to, options, callback)
       return;
     }
 
+    /** @type JSONDBData */
     const document = JSON.parse(readFileSync(documentPath).toString("utf8"));
 
     return document.ops.filter((op) => from <= op.v && op.v < to).sort((a, b) => a.v - b.v);
