@@ -53,7 +53,7 @@
   let container: HTMLDivElement | undefined;
 
   let opened = 0;
-  const ev = (e: MouseEvent) => {
+  const ev = (e: MouseEvent | KeyboardEvent) => {
     if (
       // If click happens at same time as opening, it was the click that opened us.
       opened < Date.now() &&
@@ -70,6 +70,8 @@
       )
     ) {
       open = false;
+    } else if (e instanceof KeyboardEvent && e.code == "Escape") {
+      open = false;
     }
   };
 
@@ -77,18 +79,28 @@
     input?.focus();
     opened = Date.now() + 100;
     document.addEventListener("click", ev);
+    document.addEventListener("keyup", ev);
   } else {
     document.removeEventListener("click", ev);
+    document.removeEventListener("keyup", ev);
   }
 
   const dispatch = createEventDispatcher<{ change: string }>();
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.code != "Enter" && e.code != "Space") {
+      return;
+    }
+    e.preventDefault();
+    open = !open;
+  };
 </script>
 
 <div class="holder" bind:this={container}>
   <div
     style:background-color={color}
     on:click={() => (open = !open)}
-    on:keydown={() => (open = !open)}
+    on:keydown={(e) => onKeyDown(e)}
     class="color-display"
     role="button"
     tabindex="0"
