@@ -8,7 +8,6 @@ import sqlite from "sqlite3";
 const targetVersion = 1;
 
 const setupDB = async (/** @type {sqlite.Database} */ db) => {
-  console.log("setup")
   db.serialize(() => {
     db.run("BEGIN TRANSACTION");
     db.run(`
@@ -94,21 +93,17 @@ const cmds = (/** @type {sqlite.Database} */ db) => {
       return new Promise((resolve, reject) => {
         /** @this sqlite.RunResult */
         const cb = function (/** @type {Error | null} */ err, /** @type {any} */ row) {
-          console.log("cb", "this",this,"err",err,"row",row)
           if (err != null) {
-            console.log("ERR!", err)
             reject(err);
             return;
           }
 
-          console.log("resolve", row)
           resolve(row);
         };
 
         if (typeof username == "string") {
           const stmt = db.prepare("SELECT * FROM users WHERE username = ?");
           stmt.get([username], function (err, row) {
-            console.log(this,err,row)
             cb.call(this, err, row);
           }).finalize();
           return;
@@ -117,7 +112,6 @@ const cmds = (/** @type {sqlite.Database} */ db) => {
         if (typeof id == "string") {
           const stmt = db.prepare("SELECT * FROM users WHERE id = ?");
           stmt.get([id], function (err, row) {
-            console.log(this,err,row)
             cb.call(this, err, row);
           }).finalize();
           return;

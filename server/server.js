@@ -420,7 +420,6 @@ Region Nordjylland	2023	4989245`,
       }, json1.type.uri, callback);
       return;
     }
-    console.log(doc.data);
     callback();
   });
 }
@@ -452,7 +451,6 @@ export function startServer(server) {
     if (ctx.req.__sharevizUserId) {
       db.getUser({ id: ctx.req.__sharevizUserId })
         .then((user) => {
-          console.log("user",user)
           ctx.agent.custom = {
             userId: user.id,
           };
@@ -555,7 +553,6 @@ export function startServer(server) {
     } else if (typeof ctx.snapshot == "object") {
       // Only allow editing charts with write access
       const entry = ctx.snapshot?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
-      console.log(ctx.agent.custom.userId, entry)
       if (entry?.write) {
         next();
       } else {
@@ -582,6 +579,4 @@ export function startServer(server) {
     console.log('afterWrite');
     next();
   });
-
-  console.log('Listening on ws://localhost:8080');
 }
