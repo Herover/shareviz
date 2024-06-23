@@ -28,18 +28,16 @@
     </label>
   </p>
 
-  {#if !$conf.grid}
-    <p>
-      <label>
-        Label tick size:
-        <input
-          value={$conf.tickSize}
-          on:change={e => conf.setTickSize(Number.parseFloat(e.currentTarget.value))}
-          type="number"
-        />
-      </label>
-    </p>
-  {/if}
+  <p>
+    <label>
+      Label tick size:
+      <input
+        value={$conf.tickSize}
+        on:change={e => conf.setTickSize(Number.parseFloat(e.currentTarget.value))}
+        type="number"
+      />
+    </label>
+  </p>
 
   <label>
     Label tick width:

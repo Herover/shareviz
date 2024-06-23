@@ -107,9 +107,9 @@
       {#if conf.location == AxisLocation.START}
         {#each minorTicks as tick}
           <path
-            d="m {scale(tick.n)},{lineOffset} l 0,{conf.minor.grid
+            d="m {scale(tick.n)},{lineOffset - conf.minor.tickSize} L {scale(tick.n)},{conf.minor.grid
               ? height
-              : conf.minor.tickSize}"
+              : lineOffset}"
             stroke={conf.minor.color}
             stroke-width={conf.minor.tickWidth}
           />
@@ -117,9 +117,9 @@
       {:else}
         {#each minorTicks as tick}
           <path
-            d="m {scale(tick.n)},{height} l 0,{conf.minor.grid
-              ? -height
-              : -conf.minor.tickSize}"
+            d="m {scale(tick.n)},{height + conf.minor.tickSize} L {scale(tick.n)},{(conf.minor.grid
+              ? 0
+              : height)}"
             stroke={conf.minor.color}
             stroke-width={conf.minor.tickWidth}
           />
@@ -131,17 +131,17 @@
       {#each majorTicks as tick}
         {#if conf.location == AxisLocation.START}
           <path
-            d="m {scale(tick.n)},{lineOffset} l 0,{conf.major.grid
+            d="m {scale(tick.n)},{lineOffset - conf.major.tickSize} L {scale(tick.n)},{conf.major.grid
               ? height
-              : conf.major.tickSize}"
+              : lineOffset}"
             stroke={conf.major.color}
             stroke-width={conf.major.tickWidth}
           />
         {:else}
           <path
-            d="m {scale(tick.n)},{height} l 0,{conf.major.grid
-              ? -height
-              : -conf.major.tickSize}"
+            d="m {scale(tick.n)},{height + conf.major.tickSize} L {scale(tick.n)},{(conf.major.grid
+              ? -0
+              : height)}"
             stroke={conf.major.color}
             stroke-width={conf.major.tickWidth}
           />
