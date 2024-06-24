@@ -192,6 +192,18 @@
     />
   </label>
 </p>
+<p>
+  <label>
+    Height is
+    <input
+      value={$dbLine.heightRatio*100}
+      on:change={(e) => dbLine.setHeightRatio(Number.parseFloat(e.currentTarget.value)/100)}
+      type="number"
+      style:width="50px"
+    />
+    % of width
+  </label>
+</p>
 
 <p>Line style</p>
 <LineStyleEditor style={dbLine.defaultLineStyle()} {chartColors}

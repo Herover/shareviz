@@ -20,13 +20,14 @@
   export let lineSpec: Line;
   export let width: number;
 
-  const height = 300;
   const labelWidth = 80;
   const topMargin = 24;
   const bottomMargin = 24;
   const leftMargin = 24;
   const rightMargin = 0;
   const fillColor = "rgba(255, 0, 0, 0.3)";
+
+  $: height = width * lineSpec.heightRatio;
 
   $: stacked = values
     .sort((a, b) => a.value[0].y - b.value[0].y)

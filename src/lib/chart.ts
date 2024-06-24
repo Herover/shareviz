@@ -160,6 +160,7 @@ export interface Line {
   stack: boolean
   fill: boolean
   style: LineStyle
+  heightRatio: number
 }
 
 export interface X {

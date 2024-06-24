@@ -338,6 +338,7 @@ Region Nordjylland	2023	4989245`,
                 categories: "område",
                 fill: false,
                 stack: false,
+                heightRatio: 0.9,
                 style: {
                   default: {
                     k: "",

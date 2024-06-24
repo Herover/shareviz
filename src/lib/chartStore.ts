@@ -238,6 +238,7 @@ export const db = function createDB() {
             setCategoriesKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "categories", { r: 0, i: value }]),
             setFill: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "d", "fill", { r: 0, i: value }]),
             setStack: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "d", "stack", { r: 0, i: value }]),
+            setHeightRatio: (value: number) => doc.submitOp(["chart", "elements", elementIndex, "d", "heightRatio", { r: 0, i: value }]),
             xAxis: axis(hbarScope, ["x", "axis"], doc),
             yAxis: axis(hbarScope, ["y", "axis"], doc),
             defaultLineStyle: () => lineStyle(hbarScope, ["style", "default"], doc),
