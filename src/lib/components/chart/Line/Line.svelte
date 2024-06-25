@@ -25,7 +25,6 @@
   const bottomMargin = 24;
   const leftMargin = 24;
   const rightMargin = 0;
-  const fillColor = "rgba(255, 0, 0, 0.3)";
 
   $: height = width * lineSpec.heightRatio;
 
@@ -143,7 +142,7 @@
                   .reverse(),
               ),
           )}
-          fill={fillColor}
+          fill={getStyle(d.key).color}
         />
       {/each}
       {#each stacked as d}
@@ -164,7 +163,7 @@
                 { ...d.value[0], y: 0 },
               ]),
             )}
-            fill={fillColor}
+            fill={getStyle(d.key).color}
           />
         {/each}
       {/if}
