@@ -86,7 +86,7 @@
         .domain([minX, maxX]);
     }
   }
-  $: maxY = orNumber(max(stacked, (d) => max(d.value, (dd) => dd.y)), 1);
+  $: maxY = orNumber(max(stacked, (d) => max(d.value, (dd) => dd.to)), 1);
   $: yScale = scaleLinear()
     .range([height - topMargin - bottomMargin, 0])
     .domain(
