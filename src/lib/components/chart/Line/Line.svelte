@@ -28,8 +28,15 @@
 
   $: height = width * lineSpec.heightRatio;
 
+  const negativeOneToInf = (n: number) =>
+    n == -1 ? Number.POSITIVE_INFINITY : n;
+
   $: stacked = values
-    .sort((a, b) => a.value[0].y - b.value[0].y)
+    .sort(
+      (a, b) =>
+        negativeOneToInf(lineSpec.style.byKey.findIndex((e) => e.k == b.key)) -
+        negativeOneToInf(lineSpec.style.byKey.findIndex((e) => e.k == a.key)),
+    )
     .reduce(
       (acc, line, i) => {
         const lastLine =
