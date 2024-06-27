@@ -416,6 +416,7 @@ export const db = function createDB() {
               categories: "",
               fill: false,
               stack: false,
+              heightRatio: 0.9,
               style: {
                 default: {
                   k: "",
