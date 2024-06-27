@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LabelLocation, type Line, type Root } from "$lib/chart";
+  import { AxisLocation, LabelLocation, type Line, type Root } from "$lib/chart";
   import { group, orDefault, orNumber, valueKinds, valueParsers } from "$lib/utils";
   import {
     scaleLinear,
@@ -22,18 +22,34 @@
 
   const topMargin = 24;
   const bottomMargin = 24;
+  const labelOffset = 16;
   let leftMargin = 24;
   let rightMargin = 0;
+  let labelBox: DOMRect | undefined;
 
   $: height = width * lineSpec.heightRatio;
 
   const updateMargin = ({ width }: { width: number, height: number }) => {
-    if (lineSpec.y.axis.location == "start") {
-      leftMargin = width;
+    let labelWidth = 0;
+    if (labelBox) {
+      labelWidth = labelBox.width + 0;
+      if (labelBox.width != 0) {
+        // Offset between label and lines, don't add if theres no label
+        labelWidth += labelOffset;
+      }
+    }
+    if (lineSpec.y.axis.location == AxisLocation.START && lineSpec.style.default.label.location == LabelLocation.Left) {
+      leftMargin = Math.max(width, labelWidth);
       rightMargin = 0;
+    } else if (lineSpec.y.axis.location == AxisLocation.START && lineSpec.style.default.label.location == LabelLocation.Right) {
+      leftMargin = width;
+      rightMargin = labelWidth;
+    } else if (lineSpec.y.axis.location == AxisLocation.END && lineSpec.style.default.label.location == LabelLocation.Left) {
+      leftMargin = labelWidth;
+      rightMargin = width;
     } else {
       leftMargin = 0;
-      rightMargin = width;
+      rightMargin = Math.max(width, labelWidth);
     }
   }
 
@@ -193,33 +209,35 @@
       {/each}
     {/if}
 
-    {#each stacked as d}
-      {#if getStyle(d.key).label.location == LabelLocation.Right}
-        <text
-          x={xScale(d.value[d.value.length - 1].x) + 16}
-          y={yScale(d.value[d.value.length - 1].to)}
-          d={draw(d.value)}
-          fill={getStyle(d.key).label.color}
-          paint-order="stroke"
-          stroke="{chartSpec.style.bgColor}"
-          stroke-width={3}
-          dominant-baseline="middle"
-          text-anchor="start">{getStyle(d.key).label.text}</text
-        >
-      {:else if getStyle(d.key).label.location == LabelLocation.Left}
-        <text
-          x={xScale(d.value[0].x) - 16}
-          y={yScale(d.value[0].to)}
-          d={draw(d.value)}
-          fill={getStyle(d.key).label.color}
-          paint-order="stroke"
-          stroke="{chartSpec.style.bgColor}"
-          stroke-width={3}
-          dominant-baseline="middle"
-          text-anchor="end">{getStyle(d.key).label.text}</text
-        >
-      {/if}
-    {/each}
+    <g bind:contentRect={labelBox}>
+      {#each stacked as d}
+        {#if getStyle(d.key).label.location == LabelLocation.Right}
+          <text
+            x={xScale(d.value[d.value.length - 1].x) + labelOffset}
+            y={yScale(d.value[d.value.length - 1].to)}
+            d={draw(d.value)}
+            fill={getStyle(d.key).label.color}
+            paint-order="stroke"
+            stroke="{chartSpec.style.bgColor}"
+            stroke-width={3}
+            dominant-baseline="middle"
+            text-anchor="start">{getStyle(d.key).label.text}</text
+          >
+        {:else if getStyle(d.key).label.location == LabelLocation.Left}
+          <text
+            x={xScale(d.value[0].x) - labelOffset}
+            y={yScale(d.value[0].to)}
+            d={draw(d.value)}
+            fill={getStyle(d.key).label.color}
+            paint-order="stroke"
+            stroke="{chartSpec.style.bgColor}"
+            stroke-width={3}
+            dominant-baseline="middle"
+            text-anchor="end">{getStyle(d.key).label.text}</text
+          >
+        {/if}
+      {/each}
+    </g>
   </g>
 </svg>
 
