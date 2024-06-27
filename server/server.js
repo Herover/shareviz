@@ -11,6 +11,7 @@ export function createDoc(callback) {
     if (err) throw err;
     if (doc.type === null) {
       doc.create({
+        /** @type {Root} */
         meta: {
           publicRead: true,
           access: [
@@ -211,7 +212,7 @@ Region Nordjylland	2023	4989245`,
                 axis: {
                   location: "start",
                   labelSpace: 0,
-                  orientation: "vertical",
+                  orientation: "horizontal",
                   repeat: "first",
                   major: {
                     grid: true,
@@ -297,7 +298,7 @@ Region Nordjylland	2023	4989245`,
                   axis: {
                     location: "end",
                     labelSpace: 64,
-                    orientation: "horizontal",
+                    orientation: "vertical",
                     repeat: "all",
                     major: {
                       grid: true,

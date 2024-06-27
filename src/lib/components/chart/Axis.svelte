@@ -102,7 +102,7 @@
 </script>
 
 {#if scale}
-  {#if conf.orientation == AxisOrientation.VERTICAL}
+  {#if conf.orientation == AxisOrientation.HORIZONTAL}
     {#if conf.minor.enabled}
       {#if conf.location == AxisLocation.START}
         {#each minorTicks as tick}
