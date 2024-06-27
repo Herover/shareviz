@@ -3,6 +3,7 @@
   import { formatNumber } from "$lib/utils";
   import type { Axis } from "$lib/chart";
   import { AxisLocation, AxisOrientation } from "$lib/chart";
+  import { createEventDispatcher } from "svelte";
 
   export let conf: Axis;
   export let width: number;
@@ -13,6 +14,17 @@
   let size = 16;
   $: lineOffset = showLabels && conf.location == AxisLocation.START ? size : 0;
   const maxTicks = 200;
+
+  let labelBox: DOMRect | undefined;
+
+  const distpatch = createEventDispatcher<{
+    dimensions: {
+      width: number,
+      height: number,
+    },
+  }>();
+
+  $: if (labelBox) distpatch("dimensions", { width: labelBox.width + conf.labelSpace, height: labelBox.height });
 
   let autoMajorTicks: { n: number | Date; l: string }[] = [];
   $: {
@@ -176,15 +188,21 @@
             y2={0}
             stroke={conf.major.color}
           />
-          {#if showLabels}
-            {#if conf.location == AxisLocation.START && tick.l}
-              <text x={conf.labelSpace} y={-6}>{tick.l}</text>
-            {:else if conf.location == AxisLocation.END && tick.l}
-              <text x={width - conf.labelSpace} y={-6}>{tick.l}</text>
-            {/if}
-          {/if}
         </g>
       {/each}
+      <g bind:contentRect={labelBox}>
+        {#each autoMajorTicks as tick}
+          <g transform="translate(0, {scale(tick.n)})">
+            {#if showLabels}
+              {#if conf.location == AxisLocation.START && tick.l}
+                <text x={0} y={-6}>{tick.l}</text>
+              {:else if conf.location == AxisLocation.END && tick.l}
+                <text x={width} y={-6} text-anchor="end">{tick.l}</text>
+              {/if}
+            {/if}
+          </g>
+        {/each}
+      </g>
     {/if}
 
     {#if conf.minor.enabled}

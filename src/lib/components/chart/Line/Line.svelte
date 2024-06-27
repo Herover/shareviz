@@ -20,13 +20,22 @@
   export let lineSpec: Line;
   export let width: number;
 
-  const labelWidth = 80;
   const topMargin = 24;
   const bottomMargin = 24;
-  const leftMargin = 24;
-  const rightMargin = 0;
+  let leftMargin = 24;
+  let rightMargin = 0;
 
   $: height = width * lineSpec.heightRatio;
+
+  const updateMargin = ({ width }: { width: number, height: number }) => {
+    if (lineSpec.y.axis.location == "start") {
+      leftMargin = width;
+      rightMargin = 0;
+    } else {
+      leftMargin = 0;
+      rightMargin = width;
+    }
+  }
 
   const negativeOneToInf = (n: number) =>
     n == -1 ? Number.POSITIVE_INFINITY : n;
@@ -84,11 +93,11 @@
   $: {
     if (xType == valueKinds.NUMBER) {
       xScale = scaleLinear()
-        .range([leftMargin, width - labelWidth - rightMargin])
+        .range([leftMargin, width - rightMargin])
         .domain([minX, maxX]);
     } else if (xType == valueKinds.DATE) {
       xScale = scaleTime()
-        .range([leftMargin, width - labelWidth - rightMargin])
+        .range([leftMargin, width - rightMargin])
         .domain([minX, maxX]);
     }
   }
@@ -122,7 +131,7 @@
 
 <svg {width} {height}>
   <g transform="translate(0, {topMargin})">
-    <Axis {height} {width} scale={yScale} conf={lineSpec.y.axis} />
+    <Axis {height} {width} scale={yScale} conf={lineSpec.y.axis} on:dimensions={e => updateMargin(e.detail)} />
     <Axis
       height={height - topMargin - bottomMargin}
       {width}

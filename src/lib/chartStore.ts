@@ -334,7 +334,7 @@ export const db = function createDB() {
                 scale: "lineX",
                 axis: {
                   location: "end",
-                  labelSpace: 64,
+                  labelSpace: 8,
                   orientation: "horizontal",
                   repeat: "first",
                   major: {
@@ -376,7 +376,7 @@ export const db = function createDB() {
                 scale: "lineY",
                 axis: {
                   location: "end",
-                  labelSpace: 64,
+                  labelSpace: 8,
                   orientation: "vertical",
                   repeat: "first",
                   major: {
