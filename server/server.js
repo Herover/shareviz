@@ -255,8 +255,8 @@ Region Nordjylland	2023	4989245`,
                 x: {
                   axis: {
                     location: "end",
-                    labelSpace: 64,
-                    orientation: "vertical",
+                    labelSpace: 16,
+                    orientation: "horizontal",
                     repeat: "all",
                     major: {
                       grid: false,
@@ -297,7 +297,7 @@ Region Nordjylland	2023	4989245`,
                 y: {
                   axis: {
                     location: "end",
-                    labelSpace: 64,
+                    labelSpace: 16,
                     orientation: "vertical",
                     repeat: "all",
                     major: {
