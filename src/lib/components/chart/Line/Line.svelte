@@ -20,38 +20,33 @@
   export let lineSpec: Line;
   export let width: number;
 
+  let labelBox: DOMRect | undefined;
   const topMargin = 24;
   const bottomMargin = 24;
   const labelOffset = 16;
-  let leftMargin = 24;
+
+  let yAxisWidth = 0;
+  $: labelWidth = labelBox ? labelBox.width + labelOffset : 0;
+  let leftMargin = 0;
   let rightMargin = 0;
-  let labelBox: DOMRect | undefined;
-
-  $: height = width * lineSpec.heightRatio;
-
-  const updateMargin = ({ width }: { width: number, height: number }) => {
-    let labelWidth = 0;
-    if (labelBox) {
-      labelWidth = labelBox.width + 0;
-      if (labelBox.width != 0) {
-        // Offset between label and lines, don't add if theres no label
-        labelWidth += labelOffset;
-      }
-    }
+  $: {
     if (lineSpec.y.axis.location == AxisLocation.START && lineSpec.style.default.label.location == LabelLocation.Left) {
-      leftMargin = Math.max(width, labelWidth);
+      leftMargin = Math.max(yAxisWidth, labelWidth);
       rightMargin = 0;
     } else if (lineSpec.y.axis.location == AxisLocation.START && lineSpec.style.default.label.location == LabelLocation.Right) {
-      leftMargin = width;
+      leftMargin = yAxisWidth;
       rightMargin = labelWidth;
     } else if (lineSpec.y.axis.location == AxisLocation.END && lineSpec.style.default.label.location == LabelLocation.Left) {
       leftMargin = labelWidth;
-      rightMargin = width;
+      rightMargin = yAxisWidth;
     } else {
       leftMargin = 0;
-      rightMargin = Math.max(width, labelWidth);
+      rightMargin = Math.max(yAxisWidth, labelWidth);
     }
   }
+
+
+  $: height = width * lineSpec.heightRatio;
 
   const negativeOneToInf = (n: number) =>
     n == -1 ? Number.POSITIVE_INFINITY : n;
@@ -147,7 +142,7 @@
 
 <svg {width} {height}>
   <g transform="translate(0, {topMargin})">
-    <Axis {height} {width} scale={yScale} conf={lineSpec.y.axis} on:dimensions={e => updateMargin(e.detail)} />
+    <Axis {height} {width} scale={yScale} conf={lineSpec.y.axis} on:dimensions={e => yAxisWidth = e.detail.width} />
     <Axis
       height={height - topMargin - bottomMargin}
       {width}
