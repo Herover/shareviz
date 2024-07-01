@@ -29,20 +29,6 @@
 
 <p>
   <label>
-    Orientation:
-    <select
-      value={$conf.orientation}
-      on:change={(e) => conf.setOrientation(e.currentTarget.value)}
-    >
-      {#each Object.values(AxisOrientation) as orientation}
-        <option>{orientation}</option>
-      {/each}
-    </select>
-  </label>
-</p>
-
-<p>
-  <label>
     Label space:
     <input
       value={$conf.labelSpace}
