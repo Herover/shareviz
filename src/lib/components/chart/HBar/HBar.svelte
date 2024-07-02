@@ -79,22 +79,20 @@
   });
 </script>
 
-<div class="legend">
-  {#if showLegend}
-    <p class="legend-left">
-      {#each colors.byKey as d}
-        {#if d.legend != "" && d.k != ""}
-          <span class="legend-title"><div style="background-color:{d.c}" class="legend-box"></div>{d.legend}</span
-          >
-        {/if}
-      {/each}
-    </p>
-  {/if}
-
-  <p style="font-weight:bold;" class="legend-right">
-    {label}
+{#if showLegend}
+  <p>
+    {#each colors.byKey as d}
+      {#if d.legend != "" && d.k != ""}
+        <span class="legend-title"><div style="background-color:{d.c}" class="legend-box"></div>{d.legend}</span
+        >
+      {/if}
+    {/each}
   </p>
-</div>
+{/if}
+
+<p style="font-weight:bold;">
+  {label}
+</p>
 
 <svg width={valueWidth + labelWidth} {height}>
   <g transform="translate({labelWidth},{0})">
@@ -138,12 +136,6 @@
 </svg>
 
 <style>
-  .legend {
-    display: flex;
-  }
-  .legend-right {
-    margin-left: auto;
-  }
   .legend-box {
     display: inline-block;
     width: 1em;
