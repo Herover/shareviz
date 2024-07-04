@@ -200,7 +200,7 @@
               {#if conf.location == AxisLocation.START && tick.l}
                 <text x={0} y={-6}>{tick.l}</text>
               {:else if conf.location == AxisLocation.END && tick.l}
-                <text x={width} y={-6}>{tick.l}</text>
+                <text x={width} y={-6} text-anchor="end">{tick.l}</text>
               {/if}
             {/if}
           </g>
