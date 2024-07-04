@@ -178,6 +178,36 @@
       {/each}
     {/if}
   {:else}
+    <g bind:contentRect={labelBox}>
+      {#if conf.major.enabled}
+        {#each autoMajorTicks as tick}
+          <g transform="translate(0, {scale(tick.n)})">
+            {#if showLabels}
+              {#if conf.location == AxisLocation.START && tick.l}
+                <text x={0} y={-6}>{tick.l}</text>
+              {:else if conf.location == AxisLocation.END && tick.l}
+                <text x={width} y={-6} text-anchor="end">{tick.l}</text>
+              {/if}
+            {/if}
+          </g>
+        {/each}
+      {/if}
+
+      {#if conf.minor.enabled}
+        {#each autoMinorTicks as tick}
+          <g transform="translate(0, {scale(tick.n)})">
+            {#if showLabels}
+              {#if conf.location == AxisLocation.START && tick.l}
+                <text x={0} y={-6}>{tick.l}</text>
+              {:else if conf.location == AxisLocation.END && tick.l}
+                <text x={width} y={-6}>{tick.l}</text>
+              {/if}
+            {/if}
+          </g>
+        {/each}
+      {/if}
+    </g>
+
     {#if conf.major.enabled}
       {#each autoMajorTicks as tick}
         <g transform="translate(0, {scale(tick.n)})">
@@ -190,19 +220,6 @@
           />
         </g>
       {/each}
-      <g bind:contentRect={labelBox}>
-        {#each autoMajorTicks as tick}
-          <g transform="translate(0, {scale(tick.n)})">
-            {#if showLabels}
-              {#if conf.location == AxisLocation.START && tick.l}
-                <text x={0} y={-6}>{tick.l}</text>
-              {:else if conf.location == AxisLocation.END && tick.l}
-                <text x={width} y={-6} text-anchor="end">{tick.l}</text>
-              {/if}
-            {/if}
-          </g>
-        {/each}
-      </g>
     {/if}
 
     {#if conf.minor.enabled}
@@ -215,13 +232,6 @@
             y2={0}
             stroke={conf.minor.color}
           />
-          {#if showLabels}
-            {#if conf.location == AxisLocation.START && tick.l}
-              <text x={conf.labelSpace} y={-6}>{tick.l}</text>
-            {:else if conf.location == AxisLocation.END && tick.l}
-              <text x={width - conf.labelSpace} y={-6}>{tick.l}</text>
-            {/if}
-          {/if}
         </g>
       {/each}
     {/if}
