@@ -28,7 +28,7 @@
 
   let autoMajorTicks: { n: number | Date; l: string }[] = [];
   $: {
-    if (scale && conf.major.enabled) {
+    if (scale && conf.major.enabled && conf.major.auto.each != 0) {
       autoMajorTicks = [];
       const from = scale.domain()[0];
       const to = scale.domain()[1];
@@ -71,7 +71,7 @@
 
   let autoMinorTicks: { n: number | Date; l: string }[] = [];
   $: {
-    if (scale && conf.minor.enabled) {
+    if (scale && conf.minor.enabled && conf.minor.auto.each != 0) {
       autoMinorTicks = [];
       const from = scale.domain()[0];
       const to = scale.domain()[1];
