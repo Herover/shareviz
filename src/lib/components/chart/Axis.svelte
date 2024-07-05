@@ -180,7 +180,7 @@
   {:else}
     <g bind:contentRect={labelBox}>
       {#if conf.major.enabled}
-        {#each autoMajorTicks as tick}
+        {#each majorTicks as tick}
           <g transform="translate(0, {scale(tick.n)})">
             {#if showLabels}
               {#if conf.location == AxisLocation.START && tick.l}
@@ -194,7 +194,7 @@
       {/if}
 
       {#if conf.minor.enabled}
-        {#each autoMinorTicks as tick}
+        {#each minorTicks as tick}
           <g transform="translate(0, {scale(tick.n)})">
             {#if showLabels}
               {#if conf.location == AxisLocation.START && tick.l}
@@ -209,7 +209,7 @@
     </g>
 
     {#if conf.major.enabled}
-      {#each autoMajorTicks as tick}
+      {#each majorTicks as tick}
         <g transform="translate(0, {scale(tick.n)})">
           <line
             x1={0}
@@ -223,7 +223,7 @@
     {/if}
 
     {#if conf.minor.enabled}
-      {#each autoMinorTicks as tick}
+      {#each minorTicks as tick}
         <g transform="translate(0, {scale(tick.n)})">
           <line
             x1={0}
