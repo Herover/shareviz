@@ -28,7 +28,7 @@
 
   let autoMajorTicks: { n: number | Date; l: string }[] = [];
   $: {
-    if (scale) {
+    if (scale && conf.major.enabled) {
       autoMajorTicks = [];
       const from = scale.domain()[0];
       const to = scale.domain()[1];
@@ -71,7 +71,7 @@
 
   let autoMinorTicks: { n: number | Date; l: string }[] = [];
   $: {
-    if (scale) {
+    if (scale && conf.minor.enabled) {
       autoMinorTicks = [];
       const from = scale.domain()[0];
       const to = scale.domain()[1];
@@ -110,7 +110,11 @@
       }
     }
   }
-  $: minorTicks = scale ? [...conf.minor.ticks, ...autoMinorTicks] : [];
+  $: minorTicks = scale
+    ? [...conf.minor.ticks, ...autoMinorTicks].filter(
+        (d) => !majorTicks.find((dd) => dd.l != "" && dd.n == d.n),
+      )
+    : [];
 </script>
 
 {#if scale}
