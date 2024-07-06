@@ -10,6 +10,7 @@
   import { line } from "d3-shape";
   import Axis from "../Axis.svelte";
   import { max, min } from "d3-array";
+  import FloatingLabels from "./FloatingLabels.svelte";
 
   export let values: {
     label: string;
@@ -233,6 +234,11 @@
         {/if}
       {/each}
     </g>
+    <FloatingLabels
+      lines={lineSpec.style.byKey}
+      xScale={xScale}
+      yScale={yScale}
+    />
   </g>
 </svg>
 
