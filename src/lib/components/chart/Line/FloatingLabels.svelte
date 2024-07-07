@@ -17,6 +17,9 @@
       x={line.label.rx}
       y={line.label.ry - 8}
       fill={line.color}
+      paint-order="stroke"
+      stroke="#ffffff"
+      stroke-width="3"
       text-anchor="middle">{line.label.text}</text
     >
     {#if line.label.line == LabelStyleLine.Line}
