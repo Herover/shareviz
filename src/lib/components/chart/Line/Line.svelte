@@ -235,7 +235,7 @@
       {/each}
     </g>
     <FloatingLabels
-      lines={lineSpec.style.byKey}
+      lines={lineSpec.style.byKey.filter(e => e.label.location == LabelLocation.Float)}
       xScale={xScale}
       yScale={yScale}
     />
