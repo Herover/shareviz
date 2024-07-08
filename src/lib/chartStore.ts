@@ -159,8 +159,8 @@ export const db = function createDB() {
                 colors: {
                   default: "#888888",
                   byKey: [
-                    { k: "2023", c: "#aa2222", legend: "2023" },
-                    { k: "2022", c: "#ff8888", legend: "2022" },
+                    { k: "2023", c: "#aa2222", legend: "2023", x: 0, y: 0, rx: 0, ry: -32, line: "none" },
+                    { k: "2022", c: "#ff8888", legend: "2022", x: 0, y: 0, rx: 0, ry: -32, line: "none" },
                   ],
                 },
               },
@@ -248,7 +248,7 @@ export const db = function createDB() {
                 k: "",
                 color: "#000",
                 width: 1,
-                label: { text: "", location: "right", color: "#000" },
+                label: { text: "", location: "right", color: "#000", x: 0, y: 0, rx: 0, ry: -32, line: "line" },
               },
             }]),
           };
@@ -516,6 +516,8 @@ export const lineStyle = (scope: ReturnType<typeof createScope>, key: (string | 
     setColor: (value: string) => doc.submitOp([...styleScope.path.slice(1), "color", { r: 0, i: value }]),
     setLabelColor: (value: string) => doc.submitOp([...styleScope.path.slice(1), "label", "color", { r: 0, i: value }]),
     setwidth: (value: number) => doc.submitOp([...styleScope.path.slice(1), "width", { r: 0, i: value }]),
+    setLabelX: (value: number) => doc.submitOp([...styleScope.path.slice(1), "label", "x", { r: 0, i: value }]),
+    setLabelY: (value: number) => doc.submitOp([...styleScope.path.slice(1), "label", "y", { r: 0, i: value }]),
     delete: () => doc.submitOp([...styleScope.path.slice(1), { r: 0 }]),
   };
 };
