@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ScaleLinear, ScaleTime } from "d3-scale";
-  import { formatNumber } from "$lib/utils";
+  import { formatNumber, orNumber } from "$lib/utils";
   import type { Axis } from "$lib/chart";
   import { AxisLocation, AxisOrientation } from "$lib/chart";
   import { createEventDispatcher } from "svelte";
@@ -16,15 +16,24 @@
   const maxTicks = 200;
 
   let labelBox: DOMRect | undefined;
+  let leftBox: DOMRect | undefined;
+  let rightBox: DOMRect | undefined;
 
   const distpatch = createEventDispatcher<{
     dimensions: {
       width: number,
       height: number,
+      leftOverflow?: number,
+      rightOverflow?: number
     },
   }>();
 
-  $: if (labelBox) distpatch("dimensions", { width: labelBox.width + conf.labelSpace, height: labelBox.height });
+  $: if (labelBox || leftBox || rightBox) distpatch("dimensions", {
+    width: orNumber(labelBox?.width, 0) + conf.labelSpace,
+    height: orNumber(labelBox?.height, 0),
+    leftOverflow: orNumber(leftBox?.width, 0)/2,
+    rightOverflow: orNumber(rightBox?.width, 0)/2,
+  });
 
   let autoMajorTicks: { n: number | Date; l: string }[] = [];
   $: {
@@ -144,7 +153,7 @@
     {/if}
 
     {#if conf.major.enabled}
-      {#each majorTicks as tick}
+      {#each majorTicks as tick, i}
         {#if conf.location == AxisLocation.START}
           <path
             d="m {scale(tick.n)},{lineOffset - conf.major.tickSize} L {scale(tick.n)},{conf.major.grid
@@ -176,6 +185,27 @@
               y={height + size}
               font-size={size}
               x={scale(tick.n)}>{tick.l}</text
+            >
+          {/if}
+
+          <!-- Used to calculate labels overflowing outside of chart area -->
+          {#if i == 0}
+            <text
+              text-anchor="middle"
+              bind:contentRect={leftBox}
+              font-size={size}
+              x={scale(tick.n)}
+              visibility="hidden"
+              aria-hidden="true">{tick.l}</text
+            >
+          {:else if i == majorTicks.length - 1}
+            <text
+              text-anchor="middle"
+              bind:contentRect={rightBox}
+              font-size={size}
+              x={scale(tick.n)}
+              visibility="hidden"
+              aria-hidden="true">{tick.l}</text
             >
           {/if}
         {/if}
