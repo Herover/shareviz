@@ -20,7 +20,14 @@ interface ChartComponent {
       [key: string]: any[];
     },
     chartWidth: number,
-  }>,
+    editor: boolean,
+  },
+    // TODO: type events without making ChartViewer.svelte unhappy
+    // {
+    //   edit: any,
+    // }
+    any
+  >,
   /** Component for editor */
   editorComponent: SvelteComponent<any>,
 }

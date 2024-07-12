@@ -56,6 +56,30 @@
           {} as { [key: string]: DSVParsedArray<any> },
         );
   $: canEdit = chartSpec == null ? false : typeof chartSpec.meta.access.find(a => a.userId == $user.userId) != "undefined";
+
+  $: edit = (e: CustomEvent<{ k: string, v: any}>) => {
+    switch (e.detail.k) {
+      case "title":
+        db.chart().setConfigTitle(e.detail.v);
+        break;
+    
+      case "subTitle":
+        db.chart().setConfigSubTitle(e.detail.v);
+        break;
+    
+      case "sourceLeft":
+        db.chart().setSourceTextLeft(e.detail.v);
+        break;
+    
+      case "sourceRight":
+        db.chart().setSourceTextRight(e.detail.v);
+        break;
+    
+      default:
+        console.warn("attempting to edit unknown key", e.detail.k);
+        break;
+    }
+  };
 </script>
 
 <div class="main">
@@ -111,7 +135,7 @@
       </div>
       <div class="chart-view">
         <div style:scale={viewScale / 100}>
-          <ChartViewer {chartSpec} data={chartData} />
+          <ChartViewer {chartSpec} data={chartData} editor={true} on:edit={e => edit(e)} />
         </div>
       </div>
     </div>
