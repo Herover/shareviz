@@ -58,7 +58,6 @@
   $: canEdit = chartSpec == null ? false : typeof chartSpec.meta.access.find(a => a.userId == $user.userId) != "undefined";
 
   $: edit = (e: CustomEvent<{ k: string, v: any}>) => {
-    console.log(e.detail)
     switch (e.detail.k) {
       case "title":
         db.chart().setConfigTitle(e.detail.v);
