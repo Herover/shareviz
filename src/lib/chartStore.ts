@@ -518,6 +518,8 @@ export const lineStyle = (scope: ReturnType<typeof createScope>, key: (string | 
     setwidth: (value: number) => doc.submitOp([...styleScope.path.slice(1), "width", { r: 0, i: value }]),
     setLabelX: (value: number) => doc.submitOp([...styleScope.path.slice(1), "label", "x", { r: 0, i: value }]),
     setLabelY: (value: number) => doc.submitOp([...styleScope.path.slice(1), "label", "y", { r: 0, i: value }]),
+    setLabelXOffset: (value: number) => doc.submitOp([...styleScope.path.slice(1), "label", "rx", { r: 0, i: value }]),
+    setLabelYOffset: (value: number) => doc.submitOp([...styleScope.path.slice(1), "label", "ry", { r: 0, i: value }]),
     delete: () => doc.submitOp([...styleScope.path.slice(1), { r: 0 }]),
   };
 };

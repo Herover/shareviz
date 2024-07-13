@@ -58,6 +58,7 @@
   $: canEdit = chartSpec == null ? false : typeof chartSpec.meta.access.find(a => a.userId == $user.userId) != "undefined";
 
   $: edit = (e: CustomEvent<{ k: string, v: any}>) => {
+    console.log(e.detail)
     switch (e.detail.k) {
       case "title":
         db.chart().setConfigTitle(e.detail.v);
@@ -74,6 +75,18 @@
       case "sourceRight":
         db.chart().setSourceTextRight(e.detail.v);
         break;
+      
+      case "line": {
+        const [i, a] = e.detail.v;
+        if (a == "style") {
+          const [_1, _2, styleI, styleA, styleV] = e.detail.v;
+          if (styleA == "labelRelativePos") {
+            db.chart().line(i).lineStyle(styleI).setLabelXOffset(styleV[0]);
+            db.chart().line(i).lineStyle(styleI).setLabelYOffset(styleV[1]);
+          }
+        }
+        break;
+      }
     
       default:
         console.warn("attempting to edit unknown key", e.detail.k);

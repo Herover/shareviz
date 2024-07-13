@@ -26,6 +26,11 @@
     });
   };
 
+  const editElement = (i: number, d: any) => {
+    const type = chartSpec.chart.elements[i].type;
+    dispatch("edit",{ k: type, v: [i, ...d] });
+  }
+
   $: chartWidth = orNumber(width, chartSpec.chart.width);
 </script>
 
@@ -67,7 +72,7 @@
       {line}
     {/each}
   </p>
-  {#each chartSpec.chart.elements as element}
+  {#each chartSpec.chart.elements as element, i}
     <svelte:component
       this={getComponent(element.type)}
       componentSpec={element.d}
@@ -75,7 +80,7 @@
       {data}
       {chartWidth}
       {editor}
-      on:edit={(e) => console.log(e.detail)}
+      on:edit={(e) => editElement(i, e.detail)}
     />
   {/each}
   <div class="source">

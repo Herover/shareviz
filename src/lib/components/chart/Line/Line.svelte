@@ -11,6 +11,7 @@
   import Axis from "../Axis.svelte";
   import { max, min } from "d3-array";
   import FloatingLabels from "./FloatingLabels.svelte";
+  import { createEventDispatcher } from "svelte";
 
   export let values: {
     label: string;
@@ -20,6 +21,11 @@
   export let chartSpec: Root;
   export let lineSpec: Line;
   export let width: number;
+  export let editor = false;
+
+  const dispatch = createEventDispatcher<{
+    edit: any[];
+  }>();
 
   let labelBox: DOMRect | undefined;
   const topMargin = 24;
@@ -240,6 +246,8 @@
       lines={lineSpec.style.byKey.filter(e => e.label.location == LabelLocation.Float)}
       xScale={xScale}
       yScale={yScale}
+      {editor}
+      on:edit={e => dispatch("edit", ["style", ...e.detail])}
     />
   </g>
 </svg>
