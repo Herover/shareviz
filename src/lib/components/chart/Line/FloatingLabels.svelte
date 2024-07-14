@@ -17,6 +17,7 @@
   }>();
 
   let lastMovePos = [0, 0];
+  let relativeMove = [0, 0];
   let moving = -1;
   const startMove = (
     i: number,
@@ -29,15 +30,8 @@
       addEventListener("mouseup", stopMove);
     }
   };
-  const stopMove = () => {
+  const stopMove = (e: MouseEvent) => {
     if (editor) {
-      moving = -1;
-      removeEventListener("mousemove", move);
-      removeEventListener("mouseup", stopMove);
-    }
-  };
-  const move = (e: MouseEvent) => {
-    if (editor && moving !== -1) {
       dispatch("edit", [
         moving,
         "labelRelativePos",
@@ -47,6 +41,15 @@
         ],
       ]);
       lastMovePos = [e.clientX, e.clientY];
+      relativeMove = [0, 0];
+      moving = -1;
+      removeEventListener("mousemove", move);
+      removeEventListener("mouseup", stopMove);
+    }
+  };
+  const move = (e: MouseEvent) => {
+    if (editor && moving !== -1) {
+      relativeMove = [e.clientX - lastMovePos[0], e.clientY - lastMovePos[1]];
     }
   };
 
@@ -60,8 +63,8 @@
     on:mousedown={(e) => startMove(i, e)}
   >
     <text
-      x={line.label.rx}
-      y={line.label.ry - 8}
+      x={line.label.rx + (moving == i ? relativeMove[0] : 0)}
+      y={line.label.ry - 8 + (moving == i ? relativeMove[1] : 0)}
       fill={line.color}
       bind:contentRect={boxes[i]}
       cursor={moving == i ? "grabbing" : "grab"}
@@ -79,10 +82,10 @@
           stroke-width={2}
           stroke-linecap="round"
         />
-      {:else if line.label.ry > 24}
+      {:else if line.label.ry > boxes[i]?.height}
         <line
           x2={line.label.rx}
-          y2={line.label.ry - 24}
+          y2={line.label.ry - boxes[i]?.height - 8}
           stroke="#000000"
           stroke-width={2}
           stroke-linecap="round"
