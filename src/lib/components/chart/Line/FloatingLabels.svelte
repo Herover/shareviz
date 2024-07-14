@@ -64,6 +64,7 @@
       y={line.label.ry - 8}
       fill={line.color}
       bind:contentRect={boxes[i]}
+      cursor={moving == i ? "grabbing" : "grab"}
       paint-order="stroke"
       stroke="#ffffff"
       stroke-width="3"
