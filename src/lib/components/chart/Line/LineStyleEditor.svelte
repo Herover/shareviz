@@ -2,10 +2,12 @@
   import { LabelLocation } from "$lib/chart";
   import { lineStyle } from "$lib/chartStore";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
+  import { formatData } from "./data";
 
   export let style: ReturnType<typeof lineStyle>;
   export let unspecifiecKeys: null | string[] = null;
   export let chartColors: string[];
+  export let values: ReturnType<typeof formatData>;
 
   $: updateColor = (color: string) => {
     if ($style.label.color == $style.color) {
@@ -15,6 +17,16 @@
   };
   $: updateLabelColor = (color: string) => {
     style.setLabelColor(color);
+  };
+  $: setLabelX = (value: number) => {
+    const proposedY = values
+      .find((e) => e.key == $style.k)
+      ?.value.find((d) => d.x == value);
+    console.log("y", proposedY);
+    if (typeof proposedY != "undefined") {
+      style.setLabelY(proposedY.y);
+    }
+    style.setLabelX(value);
   };
 </script>
 
@@ -45,6 +57,16 @@
       <option>{orientation}</option>
     {/each}
   </select>
+
+  {#if unspecifiecKeys != null && $style.label.location == LabelLocation.Float}
+    <input
+      value={$style.label.x}
+      on:change={(e) => setLabelX(Number.parseInt(e.currentTarget.value))}
+      on:keyup={(e) => setLabelX(Number.parseInt(e.currentTarget.value))}
+      type="number"
+      style="width: 80px;"
+    />
+  {/if}
 
   <ColorPicker
     color={$style.color}

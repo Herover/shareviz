@@ -10,6 +10,7 @@
     [key: string]: any[];
   };
   export let chartWidth: number;
+  export let editor = false;
 </script>
 
 <Line
@@ -17,4 +18,6 @@
   lineSpec={componentSpec}
   values={formatData(componentSpec, data)}
   width={chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight}
+  {editor}
+  on:edit
 />

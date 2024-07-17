@@ -132,12 +132,27 @@ export interface HBar {
 export enum LabelLocation {
   Left = "left",
   Right = "right",
+  Float = "float",
+}
+
+export enum LabelStyleLine {
+  None = "none",
+  Line = "line"
 }
 
 export interface LabelStyle {
   location: LabelLocation
   text: string
   color: string
+  /** x value when location is float */
+  x: number
+  /** y value when location is float */
+  y: number
+  /** Label relative position to calculated when location is float */
+  rx: number
+  /** Label relative position to calculated when location is float */
+  ry: number
+  line: LabelStyleLine
 }
 
 export interface LineStyleKey {
