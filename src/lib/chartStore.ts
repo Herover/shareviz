@@ -26,6 +26,47 @@ export const db = function createDB() {
 
   let connected = false;
 
+  const getLocalDoc = (collection: string, id: string) => {
+    const initial = localStorage.getItem(collection + "-" + id);
+    let onOp: any;
+    const doc = {
+      data: initial == null ? initial : JSON.parse(initial),
+    } as {
+      data: any,
+      create: (data: any, type: any, cb: (error: Error | undefined) => any) => any,
+      submitOp: (op: any) => any,
+      on: (ev: string, listener: (a: any) => any) => any,
+      subscribe: (listener: (d: any) => any) => any,
+    };
+    doc.create = (data: any, type: any, cb: (error?: Error) => any) => {
+      doc.data = json1.type.create(data);
+      localStorage.setItem(collection + "-" + id, JSON.stringify(doc.data));
+      cb();
+    };
+    doc.submitOp = (op: any) => {
+      try {
+        doc.data = json1.type.apply(doc.data, op);
+        localStorage.setItem(collection + "-" + id, doc.data);
+        onOp();
+      } catch (error) {
+        onOp(error);
+      }
+    };
+    doc.on = (ev: string, listener: (a?: any) => any) => {
+      switch (ev) {
+        case "op":
+          onOp = listener;
+          break;
+      
+        default:
+          break;
+      }
+    };
+    doc.subscribe = (listener: (e?: Error) => any) => listener();
+
+    return doc;
+  };
+
   //let myColor = `hsl(${Math.random() * 360} 100% 50%)`;
 
   const { subscribe, set, update } = writable<{
