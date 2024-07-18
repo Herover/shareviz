@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { db } from "$lib/chartStore";
+  import { db, localPrefix } from "$lib/chartStore";
   import type { Root } from "$lib/chart.d.ts";
   import { dsvFormat, type DSVParsedArray } from "d3-dsv";
   import ChartEditor from "$lib/components/chart/ChartEditor.svelte";
@@ -16,14 +16,13 @@
   let viewScale = 100;
 
   const disconnect = db.connect();
-  db.load(data.id);
+  db.load(data.id, !data.id.includes(localPrefix));
 
   onDestroy(() => {
     disconnect();
   });
 
   $: chartSpec = $db.doc as Root;
-  // $: console.log(chartSpec, JSON.stringify(chartSpec));
 
   $: chartData =
     chartSpec == null
@@ -55,7 +54,7 @@
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           {} as { [key: string]: DSVParsedArray<any> },
         );
-  $: canEdit = chartSpec == null ? false : typeof chartSpec.meta.access.find(a => a.userId == $user.userId) != "undefined";
+  $: canEdit = chartSpec == null ? false : $db.mode == "local" || typeof chartSpec.meta.access.find(a => a.userId == $user.userId) != "undefined";
 
   $: edit = (e: CustomEvent<{ k: string, v: any}>) => {
     switch (e.detail.k) {

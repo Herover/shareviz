@@ -12,6 +12,8 @@ import { notifications } from './notificationStore';
 // import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
 
+export const localPrefix = "local-";
+
 interface PresenceData {
   selected: string
   color: string
@@ -37,6 +39,7 @@ export const db = function createDB() {
       submitOp: (op: any) => any,
       on: (ev: string, listener: (a: any) => any) => any,
       subscribe: (listener: (d: any) => any) => any,
+      kind: "local" | "synced"
     };
     doc.create = (data: any, type: any, cb: (error?: Error) => any) => {
       doc.data = json1.type.create(data);
@@ -46,7 +49,7 @@ export const db = function createDB() {
     doc.submitOp = (op: any) => {
       try {
         doc.data = json1.type.apply(doc.data, op);
-        localStorage.setItem(collection + "-" + id, doc.data);
+        localStorage.setItem(collection + "-" + id, JSON.stringify(doc.data));
         onOp();
       } catch (error) {
         onOp(error);
@@ -63,6 +66,7 @@ export const db = function createDB() {
       }
     };
     doc.subscribe = (listener: (e?: Error) => any) => listener();
+    doc.kind = "local";
 
     return doc;
   };
@@ -76,7 +80,8 @@ export const db = function createDB() {
     missing: boolean,
     presences: unknown,
     presenceTargets: unknown,
-  }>({ connected, doc: null, missing: false, presences: {}, presenceTargets: {} });
+    mode: "local" | "synced",
+  }>({ connected, doc: null, missing: false, presences: {}, presenceTargets: {}, mode: "local" });
 
   return {
     subscribe, set, update,
@@ -106,9 +111,8 @@ export const db = function createDB() {
 
       return () => socket.close();
     },
-    load: (docId: string) => {
-      // Create local Doc instance mapped to 'examples' collection document with id 'counter'
-      doc = connection.get('examples', docId);
+    load: (docId: string, synced: boolean) => {
+      doc = synced ? connection.get('examples', docId) : getLocalDoc("examples", docId);
       doc.on("error", (e: Error) => notifications.addError(e.message))
 
       
@@ -152,6 +156,7 @@ export const db = function createDB() {
           connected,
           presences,
           presenceTargets,
+          mode: doc.mode === "synced" ? "synced" : "local",
         });
       }
       // window.localPresence = localPresence
@@ -163,11 +168,11 @@ export const db = function createDB() {
       // update the number on the page
       doc.on('op', onData);
     },
-    create: () => {
+    create: (synced: boolean) => {
       return new Promise<string>((resolve, reject) => {
         // TODO: id collision detection
-        const docId = ("" + Math.random()).split(".")[1];
-        doc = connection.get('examples', docId);
+        const docId = (synced ? "" : localPrefix) + ("" + Math.random()).split(".")[1];
+        doc = synced  ? connection.get('examples', docId) : getLocalDoc('examples', docId);
         doc.on("error", (e: Error) => console.warn("doc error", e));
         doc.create({
           meta: {

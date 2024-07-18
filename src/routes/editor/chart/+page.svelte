@@ -15,8 +15,8 @@
 
   const charts = db.getRecent();
 
-  const newGraphic = async () => {
-    const docId = await db.create();
+  const newGraphic = async (synced: boolean) => {
+    const docId = await db.create(synced);
     goto("/editor/chart/" + docId);
   };
   const authenticate = async () => {
@@ -60,7 +60,8 @@
         <button on:click={() => newUser()}>Create user</button>
       {/if}
       <br /><br />
-      <button on:click={() => newGraphic()}>New graphic</button>
+      <button on:click={() => newGraphic(true)}>New graphic</button>
+      <button on:click={() => newGraphic(false)}>New local graphic</button>
       {#await charts}
         ...
       {:then chartList}
