@@ -60,7 +60,9 @@
         <button on:click={() => newUser()}>Create user</button>
       {/if}
       <br /><br />
-      <button on:click={() => newGraphic(true)}>New graphic</button>
+      {#if $user.signedIn}
+        <button on:click={() => newGraphic(true)}>New graphic</button>
+      {/if}
       <button on:click={() => newGraphic(false)}>New local graphic</button>
       {#await charts}
         ...

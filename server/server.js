@@ -479,7 +479,7 @@ export function startServer(server) {
       //   console.log("unauthorized")
       //   return next("unauthorized");
       // }
-    } else if (ctx.data.a == "op" && ctx.data.c == "examples" && typeof ctx.data.create != "undefined") {
+    } else if (ctx.data.a == "op" && ctx.data.c == "examples" && typeof ctx.data.create != "undefined" && ctx.agent.custom.userId) {
       // When creating a new chart, always add current user to access list
       ctx.data.create.data.meta = {
         publicRead: false,
