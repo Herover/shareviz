@@ -57,7 +57,7 @@
 
 {#if chartSpec && chartData}
   <div class="main" bind:clientWidth={width}>
-    <ChartViewer {chartSpec} data={chartData} {width} />
+    <ChartViewer {chartSpec} data={chartData} {width} editor={false} />
   </div>
 {/if}
 

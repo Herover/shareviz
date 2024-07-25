@@ -7,7 +7,7 @@
   export let chartSpec: Root;
   export let data: { [key: string]: any[] };
   export let width: number | undefined = undefined;
-  export let editor = true;
+  export let editor: boolean;
 
   const dispatch = createEventDispatcher<{
     edit: {
