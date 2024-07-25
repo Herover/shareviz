@@ -28,8 +28,8 @@
 
   const editElement = (i: number, d: any) => {
     const type = chartSpec.chart.elements[i].type;
-    dispatch("edit",{ k: type, v: [i, ...d] });
-  }
+    dispatch("edit", { k: type, v: [i, ...d] });
+  };
 
   $: chartWidth = orNumber(width, chartSpec.chart.width);
 </script>
@@ -49,28 +49,34 @@
     style:font-size="{chartSpec.style.titleSize}em"
     style:font-weight={chartSpec.style.titleBold ? "bold" : "normal"}
     class="title"
-    contenteditable={editor ? "true" : "false"}
-    on:keyup={(e) => editText("title", e)}
   >
-    {#each chartSpec.chart.title.split("\n") as line, i}
-      {#if i != 0}
-        <br />
-      {/if}
-      {line}
-    {/each}
+    {#if editor}
+      <span
+        bind:innerText={chartSpec.chart.title}
+        contenteditable="true"
+        on:keyup={(e) => editText("title", e)}
+        role="textbox"
+        tabindex="0"
+      ></span>
+    {:else}
+      {chartSpec.chart.title}
+    {/if}
   </p>
   <p
     style:font-size="{chartSpec.style.subTitleSize}em"
     style:font-weight={chartSpec.style.subTitleBold ? "bold" : "normal"}
-    contenteditable={editor ? "true" : "false"}
-    on:keyup={(e) => editText("subTitle", e)}
   >
-    {#each chartSpec.chart.subTitle.split("\n") as line, i}
-      {#if i != 0}
-        <br />
-      {/if}
-      {line}
-    {/each}
+    {#if editor}
+      <span
+        bind:innerText={chartSpec.chart.subTitle}
+        contenteditable="true"
+        on:keyup={(e) => editText("subTitle", e)}
+        role="textbox"
+        tabindex="0"
+      ></span>
+    {:else}
+      {chartSpec.chart.subTitle}
+    {/if}
   </p>
   {#each chartSpec.chart.elements as element, i}
     <svelte:component
@@ -85,21 +91,42 @@
   {/each}
   <div class="source">
     <p class="source-left">
-      <a
-        href={editor ? null : chartSpec.chart.sourceTextLeftLink}
-        style="color:#888888"
-        contenteditable={editor ? "true" : "false"}
-        on:keyup={(e) => editText("sourceLeft", e)}>{chartSpec.chart.sourceTextLeft}</a
-      >
+      {#if editor}
+        <a
+          href={editor ? null : chartSpec.chart.sourceTextLeftLink}
+          bind:innerText={chartSpec.chart.sourceTextLeft}
+          contenteditable="true"
+          on:keyup={(e) => editText("sourceLeft", e)}
+          style="color:#888888"
+        >
+        </a>
+      {:else}
+        <a
+          href={editor ? null : chartSpec.chart.sourceTextLeftLink}
+          style="color:#888888"
+          on:keyup={(e) => editText("sourceLeft", e)}
+          >{chartSpec.chart.sourceTextLeft}</a
+        >
+      {/if}
     </p>
     <p class="source-right">
-      <a
-        href={editor ? null : chartSpec.chart.sourceTextRightLink}
-        style="color:#888888"
-        contenteditable={editor ? "true" : "false"}
-        on:keyup={(e) => editText("sourceRight", e)}
-        >{chartSpec.chart.sourceTextRight}</a
-      >
+      {#if editor}
+        <a
+          href={editor ? null : chartSpec.chart.sourceTextRightLink}
+          bind:innerText={chartSpec.chart.sourceTextRight}
+          contenteditable="true"
+          on:keyup={(e) => editText("sourceRight", e)}
+          style="color:#888888"
+        >
+        </a>
+      {:else}
+        <a
+          href={editor ? null : chartSpec.chart.sourceTextRightLink}
+          style="color:#888888"
+          on:keyup={(e) => editText("sourceRight", e)}
+          >{chartSpec.chart.sourceTextRight}</a
+        >
+      {/if}
     </p>
   </div>
 </div>
