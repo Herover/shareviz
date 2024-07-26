@@ -71,6 +71,11 @@ export const db = function createDB() {
     return doc;
   };
 
+  const getLocalDocs = () => {
+    return Object.keys(localStorage)
+      .map(id => ({ id: id.substring("examples-".length), data: JSON.parse(localStorage[id]) }));
+  };
+
   //let myColor = `hsl(${Math.random() * 360} 100% 50%)`;
 
   const { subscribe, set, update } = writable<{
@@ -246,10 +251,12 @@ export const db = function createDB() {
     },
 
     getRecent: (): Promise<any> => {
+      const local = getLocalDocs();
       return new Promise((resolve, reject) => {
         connection.createFetchQuery("examples", { $limit: 5 }, {}, (err: Error | undefined, results: any) => {
           if (err) reject(err);
-          resolve(results);
+          if (typeof results != "undefined") resolve([...results, ...local]);
+          else resolve(local);
         });
       });
     },

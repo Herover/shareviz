@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, } from "fs";
 import ShareDB from 'sharedb';
 
 /**
@@ -207,3 +207,37 @@ JSONDB.prototype.getOps = function (collection, id, from, to, options, callback)
     callback(err);
   }
 };
+
+JSONDB.prototype.query = function (collection, inputQuery, fields, options, callback) {
+  try {
+    if (collection.length > pathPartMaxLength) {
+      throw new Error("collection name is longer than " + pathPartMaxLength + " bytes");
+    }
+
+    const collectionPathPart = collection.match(pathAllowExpr);
+    if (collectionPathPart.length != 1 && collectionPathPart[0].length != 0) {
+      throw new Error("collection name contains illegal characters or is invalid");
+    }
+
+    const collectionPath = `${this.documentDir}/${collectionPathPart}`;
+
+    const files = readdirSync(collectionPath);
+
+    const results = [];
+
+    files.forEach(file => {
+      results.push(new Promise((resolve, reject) => {
+        this.getSnapshot(collection, file.split(".")[0], null, null, (err, snap) => {
+          if (err) reject(err);
+          resolve(snap);
+        });
+      }))
+    });
+
+    Promise.all(results)
+      .then(docs => callback(null, docs))
+      .catch(err => callback(err));
+  } catch (err) {
+    callback(err);
+  }
+}
