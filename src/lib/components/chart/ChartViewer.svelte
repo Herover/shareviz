@@ -49,6 +49,7 @@
     style:font-size="{chartSpec.style.titleSize}em"
     style:font-weight={chartSpec.style.titleBold ? "bold" : "normal"}
     class="title"
+    dir="auto"
   >
     {#if editor}
       <span
@@ -65,6 +66,7 @@
   <p
     style:font-size="{chartSpec.style.subTitleSize}em"
     style:font-weight={chartSpec.style.subTitleBold ? "bold" : "normal"}
+    dir="auto"
   >
     {#if editor}
       <span
@@ -90,7 +92,7 @@
     />
   {/each}
   <div class="source">
-    <p class="source-left">
+    <p class="source-left" dir="auto">
       {#if editor}
         <a
           href={editor ? null : chartSpec.chart.sourceTextLeftLink}
@@ -109,7 +111,7 @@
         >
       {/if}
     </p>
-    <p class="source-right">
+    <p class="source-right" dir="auto">
       {#if editor}
         <a
           href={editor ? null : chartSpec.chart.sourceTextRightLink}
@@ -145,6 +147,10 @@
   }
   .source-right {
     margin-left: auto;
+    text-align: right;
+  }
+  .source-left {
+    text-align: left;
   }
   p.title {
     margin-top: 0px;
