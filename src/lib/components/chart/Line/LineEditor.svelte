@@ -16,13 +16,18 @@
     [key: string]: DSVParsedArray<any>;
   };
 
+  $: dataSet = spec.data.sets.find((set) => set.id == $dbLine.dataSet);
+
   $: values = formatData($dbLine, chartData);
+  $: columns = [
+    ...orDefault(dataSet?.rows, []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.type })), []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.type })), []),
+  ];
 
   $: unspecifiecKeys = values
     .filter((v) => !$dbLine.style.byKey.find((s) => s.k == v.key))
     .map((v) => v.key);
-
-  $: dataSet = spec.data.sets.find((set) => set.id == $dbLine.dataSet);
 
   $: xScaleIndex = spec.chart.scales.findIndex(
     (s) => s.name == $dbLine.x.scale,
@@ -69,7 +74,7 @@
         on:change={(e) => dbLine.setXKey(e.currentTarget.value)}
       >
         <option>{""}</option>
-        {#each dataSet.rows as row}
+        {#each columns as row}
           <option>{row.key}</option>
         {/each}
       </select>
@@ -83,7 +88,7 @@
         on:change={(e) => dbLine.setYKey(e.currentTarget.value)}
       >
         <option>{""}</option>
-        {#each dataSet.rows as row}
+        {#each columns as row}
           <option>{row.key}</option>
         {/each}
       </select>
@@ -97,7 +102,7 @@
         on:change={(e) => dbLine.setCategoriesKey(e.currentTarget.value)}
       >
         <option>{""}</option>
-        {#each dataSet.rows as row}
+        {#each columns as row}
           <option>{row.key}</option>
         {/each}
       </select>

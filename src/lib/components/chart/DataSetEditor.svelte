@@ -71,6 +71,58 @@ value3\tvalue4
     </select>
   </label>
 </p>
+
+<p>Columns to rows (transpose)</p>
+<ul>
+  {#each $dataStore.transpose as transpose, i}
+    <il>
+      From
+      <ul>
+        {#each transpose.from as from, ii}
+          <li>
+            <select
+              value={from}
+              on:change={(e) => dataStore.setTransposeFrom(i, ii, e.currentTarget.value)}
+            >
+              {#each $dataStore.rows as col}
+                <option>{col.key}</option>
+              {/each}
+            </select>
+            <button on:click={dataStore.removeTransposeFrom(i, ii)}>Delete</button>
+          </li>
+        {/each}
+        <br>
+        <button on:click={dataStore.addTransposeFrom(i, transpose.from.length)}>+</button>
+      </ul>
+      <br>
+      Keys:
+      <input
+        value={transpose.toKey}
+        on:change={(e) => dataStore.setTransposeToKey(i, e.currentTarget.value)}
+        on:keyup={(e) => dataStore.setTransposeToKey(i, e.currentTarget.value)}
+      /><br>
+      Values:
+      <input
+        value={transpose.toValue}
+        on:change={(e) => dataStore.setTransposeToValue(i, e.currentTarget.value)}
+        on:keyup={(e) => dataStore.setTransposeToValue(i, e.currentTarget.value)}
+      /><br>
+      type:
+      <select
+        value={transpose.type}
+        on:change={(e) => dataStore.setTransposeType(i, e.currentTarget.value)}
+      >
+        {#each Object.keys(valueParsers) as type}
+          <option>{type}</option>
+        {/each}
+      </select>
+    </il>
+  {/each}
+</ul>
+<button
+  on:click={dataStore.addTranspose($dataStore.transpose.length)}
+>Add transpose</button>
+
 <p>Columns:</p>
 <ul>
   {#each $dataStore.rows as column, i}

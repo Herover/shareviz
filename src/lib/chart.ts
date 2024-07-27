@@ -26,6 +26,18 @@ export interface Set {
   raw: string
   name: string
   rows: Row[]
+  transpose: TransposedColumn[]
+}
+
+export interface TransposedColumn {
+  /** Columns to turn into rows */
+  from: string[]
+  /** New column for keys/old column names */
+  toKey: string
+  /** New column for values */
+  toValue: string
+  /** Data type for values in toValue */
+  type: string
 }
 
 export interface Row {

@@ -30,7 +30,7 @@
       : chartSpec.data.sets.reduce(
           (acc, data) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            acc[data.id] = dsvFormat("\t").parse<any, string>(
+            let set = dsvFormat("\t").parse<any, string>(
               data.raw,
               (row) => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,11 +48,33 @@
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 }, {} as any);
               },
-            );
+            ) as any[];
+
+            data.transpose.forEach((transpose) => {
+              const set2: any[] = [];
+
+              const parser = valueParsers[transpose.type];
+                if (typeof parser != "undefined") { // TODO
+                  transpose.from.forEach((key) => {
+                    set.forEach((row) => {
+                      const row2 = {
+                        ...row,
+                        [transpose.toValue]: parser.fn(row[key]),
+                        [transpose.toKey]: key,
+                      };
+                      set2.push(row2);
+                    });
+                  });
+                  set = set2;
+                }
+            });
+
+            acc[data.id] = set;
+
             return acc;
           },
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          {} as { [key: string]: DSVParsedArray<any> },
+          {} as { [key: string]: any[] },
         );
   $: canEdit = chartSpec == null ? false : $db.mode == "local" || typeof chartSpec.meta.access.find(a => a.userId == $user.userId) != "undefined";
 

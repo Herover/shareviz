@@ -26,6 +26,12 @@
 
   $: dataSet = spec.data.sets.find((set) => set.id == $dbHBar.dataSet);
 
+  $: columns = [
+    ...orDefault(dataSet?.rows, []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.type })), []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.type })), []),
+  ];
+
   $: scaleIndex = spec.chart.scales.findIndex((s) => s.name == $dbHBar.scale);
   $: scale = typeof spec.chart.scales[scaleIndex] == "undefined" ? { dataRange: [0, 1] } : spec.chart.scales[scaleIndex];
   $: colorScaleIndex = spec.chart.scales.findIndex(
@@ -131,8 +137,8 @@
         on:change={(e) => dbHBar.setCategories(e.currentTarget.value)}
       >
         <option>{""}</option>
-        {#each dataSet.rows as row}
-          <option>{row.key}</option>
+        {#each columns as column}
+          <option>{column.key}</option>
         {/each}
       </select>
     </label>
@@ -145,8 +151,8 @@
         on:change={(e) => dbHBar.setSubCategories(e.currentTarget.value)}
       >
         <option>{""}</option>
-        {#each dataSet.rows as row}
-          <option>{row.key}</option>
+        {#each columns as column}
+          <option>{column.key}</option>
         {/each}
       </select>
     </label>
@@ -169,7 +175,7 @@
         on:change={(e) => dbHBar.setValue(e.currentTarget.value)}
       >
         <option>{""}</option>
-        {#each dataSet.rows.filter((r) => r.type == "number") as row}
+        {#each columns.filter((r) => r.type == "number") as row}
           <option>{row.key}</option>
         {/each}
       </select>

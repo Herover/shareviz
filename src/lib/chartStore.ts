@@ -512,12 +512,22 @@ export const db = function createDB() {
         setRaw: (value: string) => doc.submitOp(["data", "sets", index, "raw", { r: 0, i: value }]),
         setType: (value: string) => doc.submitOp(["data", "sets", index, "type", { r: 0, i: value }]),
         setName: (value: string) => doc.submitOp(["data", "sets", index, "name", { r: 0, i: value }]),
+
         setColumnType: (colIndex: number, value: string) => doc.submitOp(["data", "sets", index, "rows", colIndex, "type", { r: 0, i: value }]),
         addColumn: (colIndex: number, key: string, type: string) => doc.submitOp(["data", "sets", index, "rows", colIndex, { i: { key, type }}]),
         removeColumn: (colIndex: number) => doc.submitOp(["data", "sets", index, "rows", colIndex, { r: true }]),
+
+        addTranspose: (transposeIndex: number) => doc.submitOp(["data", "sets", index, "transpose", transposeIndex, { i: { from: [], toKey: "", toValue: "", type: "text" } }]),
+        removeTranspose: (transposeIndex: number) => doc.submitOp(["data", "sets", index, "transpose", transposeIndex, { r: true }]),
+        setTransposeToKey: (transposeIndex: number, value: string) => doc.submitOp(["data", "sets", index, "transpose", transposeIndex, "toKey", { r: 0, i: value }]),
+        setTransposeToValue: (transposeIndex: number, value: string) => doc.submitOp(["data", "sets", index, "transpose", transposeIndex, "toValue", { r: 0, i: value }]),
+        setTransposeType: (transposeIndex: number, value: string) => doc.submitOp(["data", "sets", index, "transpose", transposeIndex, "type", { r: 0, i: value }]),
+        addTransposeFrom: (transposeIndex: number, fromIndex: number) => doc.submitOp(["data", "sets", index, "transpose", transposeIndex, "from", fromIndex, { i: "" }]),
+        removeTransposeFrom: (transposeIndex: number, fromIndex: number) => doc.submitOp(["data", "sets", index, "transpose", transposeIndex, "from", fromIndex, { r: true }]),
+        setTransposeFrom: (transposeIndex: number, fromIndex: number, value: string) => doc.submitOp(["data", "sets", index, "transpose", transposeIndex, "from", fromIndex, { r: 0, i: value }]),
       };
     },
-    addDataSet: (index: number) => doc.submitOp(["data", "sets", index, { i: { id: "" + Date.now(), type: "tsv", name:  `Data set ${index+1}`, raw: "", rows: [] } }]),
+    addDataSet: (index: number) => doc.submitOp(["data", "sets", index, { i: { id: "" + Date.now(), type: "tsv", name:  `Data set ${index+1}`, raw: "", rows: [], transpose: [] } }]),
   };
 }();
 

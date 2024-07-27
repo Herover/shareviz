@@ -32,6 +32,8 @@
   const bottomMargin = 24;
   const labelOffset = 16;
 
+  $: dataSet = chartSpec.data.sets.find((set) => set.id == lineSpec.dataSet);
+
   let xAxisOverflow: { leftOverflow?: number, rightOverflow?: number } = { leftOverflow: 0, rightOverflow: 0 };
   let yAxisWidth = 0;
   $: labelWidth = labelBox ? labelBox.width + labelOffset : 0;
@@ -95,16 +97,17 @@
       }[],
     );
 
+  $: columns = [
+    ...orDefault(dataSet?.rows, []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.type })), []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.type })), []),
+  ];
+
   $: minX = orNumber(min(values, (d) => min(d.value, (dd) => dd.x)));
   $: maxX = orNumber(max(values, (d) => max(d.value, (dd) => dd.x)), 1);
-  $: xScaleSpec = chartSpec.chart.scales.find(
-    (s) => s.name == lineSpec.x.scale,
-  );
   $: xType =
     orDefault(valueParsers[
-      orDefault(chartSpec.data.sets
-        .find((set) => set.id == lineSpec.dataSet)
-        ?.rows.find((r) => r.key == xScaleSpec?.dataKey)?.type, "")
+      orDefault(columns.find((r) => r.key == lineSpec.x.key)?.type, "")
     ]?.type, "" as valueKinds);
   let xScale:
     | ScaleLinear<number, number, never>
