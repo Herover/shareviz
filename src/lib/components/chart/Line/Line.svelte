@@ -102,16 +102,31 @@
           }, [[]] as { x: number; y: number; to: number; from: number }[][]);
 
         values.filter(d => d.length != 0)
-          .forEach(value => acc.push({
-            label: line.label,
-            key: line.key,
-            value,
-          }));
+          .forEach((value, i, arr) => {
+            acc.push({
+              label: line.label,
+              key: line.key,
+              type: "line",
+              value,
+            });
+            if (i != arr.length - 1) {
+              acc.push({
+                label: line.label,
+                key: line.key,
+                type: "missing",
+                value: [
+                  { ...value[value.length - 1] },
+                  { ...arr[i + 1][0] },
+                ],
+              });
+            }
+          });
         return acc;
       },
       [] as {
         label: string;
         key: string;
+        type: "missing" | "line";
         value: { x: number; y: number; to: number; from: number }[];
       }[],
     );
@@ -230,6 +245,7 @@
           stroke={getStyle(d.key).color}
           stroke-width={getStyle(d.key).width}
           fill="none"
+          stroke-dasharray={d.type == "line" ? null : "3"}
         />
       {/each}
     {/if}
@@ -241,7 +257,6 @@
             <text
               x={xScale(d.value[d.value.length - 1].x) + labelOffset}
               y={yScale(d.value[d.value.length - 1].to)}
-              d={draw(d.value)}
               fill={getStyle(d.key).label.color}
               paint-order="stroke"
               stroke="{chartSpec.style.bgColor}"
@@ -255,7 +270,6 @@
             <text
               x={xScale(d.value[0].x) - labelOffset}
               y={yScale(d.value[0].to)}
-              d={draw(d.value)}
               fill={getStyle(d.key).label.color}
               paint-order="stroke"
               stroke="{chartSpec.style.bgColor}"
