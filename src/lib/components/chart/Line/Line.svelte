@@ -61,6 +61,8 @@
   const negativeOneToInf = (n: number) =>
     n == -1 ? Number.POSITIVE_INFINITY : n;
 
+  // I'd prefer that each element in stacked is a array of line segments for a
+  // country. However, this is easier to compute and handle in template.
   $: stacked = values
     .sort(
       (a, b) =>
@@ -73,10 +75,9 @@
           lineSpec.stack && i != 0
             ? acc[i - 1].value.map((d) => d.to)
             : line.value.map(() => 0);
-        acc.push({
-          label: line.label,
-          key: line.key,
-          value: group("x", line.value, (k, d) => ({ k, d })).map((d, i) => {
+
+        const values = group("x", line.value, (k, d) => ({ k, d }))
+          .map((d, i) => {
             // Sum values if this line has multiple of the same X value, ex.
             // same year multiple times.
             const summed = d.d.reduce((acc, dd) => acc + dd.y, 0);
@@ -86,8 +87,26 @@
               to: summed + lastLine[i],
               from: lastLine[i],
             };
-          }),
-        });
+          })
+          // Split line parts into multiple if there's a NaN value
+          .reduce((acc, value, i, arr) => {
+            if (Number.isNaN(value.y)) {
+              if (i != arr.length - 1 && !Number.isNaN(arr[i + 1].y)) {
+                acc.push([]);
+              }
+            } else {
+              acc[acc.length - 1].push(value);
+            }
+
+            return acc;
+          }, [[]] as { x: number; y: number; to: number; from: number }[][]);
+
+        values.filter(d => d.length != 0)
+          .forEach(value => acc.push({
+            label: line.label,
+            key: line.key,
+            value,
+          }));
         return acc;
       },
       [] as {
@@ -96,7 +115,6 @@
         value: { x: number; y: number; to: number; from: number }[];
       }[],
     );
-
   $: columns = [
     ...orDefault(dataSet?.rows, []),
     ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.type })), []),
@@ -217,31 +235,35 @@
     {/if}
 
     <g bind:contentRect={labelBox}>
-      {#each stacked as d}
+      {#each stacked as d, i}
         {#if getStyle(d.key).label.location == LabelLocation.Right}
-          <text
-            x={xScale(d.value[d.value.length - 1].x) + labelOffset}
-            y={yScale(d.value[d.value.length - 1].to)}
-            d={draw(d.value)}
-            fill={getStyle(d.key).label.color}
-            paint-order="stroke"
-            stroke="{chartSpec.style.bgColor}"
-            stroke-width={3}
-            dominant-baseline="middle"
-            text-anchor="start">{getStyle(d.key).label.text}</text
-          >
+          {#if stacked.length == i + 1 || stacked[i + 1].key !== d.key}
+            <text
+              x={xScale(d.value[d.value.length - 1].x) + labelOffset}
+              y={yScale(d.value[d.value.length - 1].to)}
+              d={draw(d.value)}
+              fill={getStyle(d.key).label.color}
+              paint-order="stroke"
+              stroke="{chartSpec.style.bgColor}"
+              stroke-width={3}
+              dominant-baseline="middle"
+              text-anchor="start">{getStyle(d.key).label.text}</text
+            >
+          {/if}
         {:else if getStyle(d.key).label.location == LabelLocation.Left}
-          <text
-            x={xScale(d.value[0].x) - labelOffset}
-            y={yScale(d.value[0].to)}
-            d={draw(d.value)}
-            fill={getStyle(d.key).label.color}
-            paint-order="stroke"
-            stroke="{chartSpec.style.bgColor}"
-            stroke-width={3}
-            dominant-baseline="middle"
-            text-anchor="end">{getStyle(d.key).label.text}</text
-          >
+          {#if i == 0 || stacked[i - 1].key !== d.key}
+            <text
+              x={xScale(d.value[0].x) - labelOffset}
+              y={yScale(d.value[0].to)}
+              d={draw(d.value)}
+              fill={getStyle(d.key).label.color}
+              paint-order="stroke"
+              stroke="{chartSpec.style.bgColor}"
+              stroke-width={3}
+              dominant-baseline="middle"
+              text-anchor="end">{getStyle(d.key).label.text}</text
+            >
+          {/if}
         {/if}
       {/each}
     </g>
