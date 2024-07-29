@@ -21,8 +21,8 @@
   $: values = formatData($dbLine, chartData);
   $: columns = [
     ...orDefault(dataSet?.rows, []),
-    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.type })), []),
-    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.type })), []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.valueType })), []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.valueType })), []),
   ];
 
   $: unspecifiecKeys = values

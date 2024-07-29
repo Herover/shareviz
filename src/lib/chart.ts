@@ -37,7 +37,9 @@ export interface TransposedColumn {
   /** New column for values */
   toValue: string
   /** Data type for values in toValue */
-  type: string
+  valueType: string
+  /** Data type for keys in from */
+  keyType: string
 }
 
 export interface Row {

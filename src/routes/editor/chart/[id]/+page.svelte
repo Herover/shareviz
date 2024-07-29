@@ -53,20 +53,21 @@
             data.transpose.forEach((transpose) => {
               const set2: any[] = [];
 
-              const parser = valueParsers[transpose.type];
-                if (typeof parser != "undefined") { // TODO
-                  transpose.from.forEach((key) => {
-                    set.forEach((row) => {
-                      const row2 = {
-                        ...row,
-                        [transpose.toValue]: parser.fn(row[key]),
-                        [transpose.toKey]: key,
-                      };
-                      set2.push(row2);
-                    });
+              const valueParser = valueParsers[transpose.valueType];
+              const keyParser = valueParsers[transpose.keyType];
+              if (typeof valueParser != "undefined" && typeof keyParser != "undefined") { // TODO
+                transpose.from.forEach((key) => {
+                  set.forEach((row) => {
+                    const row2 = {
+                      ...row,
+                      [transpose.toValue]: valueParser.fn(row[key]),
+                      [transpose.toKey]: keyParser.fn(key),
+                    };
+                    set2.push(row2);
                   });
-                  set = set2;
-                }
+                });
+                set = set2;
+              }
             });
 
             acc[data.id] = set;

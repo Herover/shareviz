@@ -28,8 +28,8 @@
 
   $: columns = [
     ...orDefault(dataSet?.rows, []),
-    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.type })), []),
-    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.type })), []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.valueType })), []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.valueType })), []),
   ];
 
   $: scaleIndex = spec.chart.scales.findIndex((s) => s.name == $dbHBar.scale);

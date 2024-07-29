@@ -132,8 +132,8 @@
     );
   $: columns = [
     ...orDefault(dataSet?.rows, []),
-    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.type })), []),
-    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.type })), []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.valueType })), []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.valueType })), []),
   ];
 
   $: minX = orNumber(min(values, (d) => min(d.value, (dd) => dd.x)));
