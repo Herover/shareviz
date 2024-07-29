@@ -516,6 +516,7 @@ export const db = function createDB() {
         setColumnType: (colIndex: number, value: string) => doc.submitOp(["data", "sets", index, "rows", colIndex, "type", { r: 0, i: value }]),
         addColumn: (colIndex: number, key: string, type: string) => doc.submitOp(["data", "sets", index, "rows", colIndex, { i: { key, type }}]),
         removeColumn: (colIndex: number) => doc.submitOp(["data", "sets", index, "rows", colIndex, { r: true }]),
+        setColumns: (value: { key: string, type: string }[]) => doc.submitOp(["data", "sets", index, "rows",{ r: 0, i: value }]),
 
         addTranspose: (transposeIndex: number) => doc.submitOp(["data", "sets", index, "transpose", transposeIndex, { i: { from: [], toKey: "", toValue: "", valueType: "text", keyType: "text" } }]),
         removeTranspose: (transposeIndex: number) => doc.submitOp(["data", "sets", index, "transpose", transposeIndex, { r: true }]),
