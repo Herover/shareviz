@@ -20,9 +20,9 @@
 
   $: values = formatData($dbLine, chartData);
   $: columns = [
-    ...orDefault(dataSet?.rows, []),
-    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.valueType })), []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.keyType })), []),
     ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.valueType })), []),
+    ...orDefault(dataSet?.rows, []),
   ];
 
   $: unspecifiecKeys = values

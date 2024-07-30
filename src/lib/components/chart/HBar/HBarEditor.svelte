@@ -27,9 +27,9 @@
   $: dataSet = spec.data.sets.find((set) => set.id == $dbHBar.dataSet);
 
   $: columns = [
-    ...orDefault(dataSet?.rows, []),
-    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.valueType })), []),
+    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.keyType })), []),
     ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.valueType })), []),
+    ...orDefault(dataSet?.rows, []),
   ];
 
   $: scaleIndex = spec.chart.scales.findIndex((s) => s.name == $dbHBar.scale);
