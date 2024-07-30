@@ -343,7 +343,7 @@
         on:change={(e) => dbHBar.setRepeat(e.currentTarget.value)}
       >
         <option>{""}</option>
-        {#each dataSet.rows as row}
+        {#each columns as row}
           <option>{row.key}</option>
         {/each}
       </select>
