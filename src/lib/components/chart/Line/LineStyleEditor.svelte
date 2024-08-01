@@ -3,12 +3,15 @@
   import { lineStyle } from "$lib/chartStore";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import { formatData } from "./data";
+  import { db } from "$lib/chartStore";
 
   export let style: ReturnType<typeof lineStyle>;
   export let unspecifiecKeys: null | string[] = null;
   export let chartColors: string[];
   export let values: ReturnType<typeof formatData>;
+  export let lineSpec: ReturnType<ReturnType<typeof db.chart>["line"]>;
 
+  $: type = typeof values[0]?.value[0]?.x == "number" ? "number" : "date";
   $: updateColor = (color: string) => {
     if ($style.label.color == $style.color) {
       style.setLabelColor(color);
@@ -18,15 +21,19 @@
   $: updateLabelColor = (color: string) => {
     style.setLabelColor(color);
   };
-  $: setLabelX = (value: number) => {
+  $: setLabelX = (value: string) => {
+    const parsed = type == "number" ? Number.parseInt(value) : new Date(value).getTime();
+    const proposed = values
+      .find((e) => e.key == $style.k)
+      ?.value.map(d => ({ d: Math.abs(parsed - d.x), x: d.x, y: d.y}))
+      .sort((a, b) => a.d - b.d)[0] || { x: 0, y: 0 }
     const proposedY = values
       .find((e) => e.key == $style.k)
-      ?.value.find((d) => d.x == value);
-    console.log("y", proposedY);
+      ?.value.find((d) => d.x == proposed.x);
     if (typeof proposedY != "undefined") {
-      style.setLabelY(proposedY.y);
+      style.setLabelY(proposed.y);
     }
-    style.setLabelX(value);
+    style.setLabelX(proposed.x instanceof Date ? proposed.x.getTime() : proposed.x);
   };
 </script>
 
@@ -60,11 +67,11 @@
 
   {#if unspecifiecKeys != null && $style.label.location == LabelLocation.Float}
     <input
-      value={$style.label.x}
-      on:change={(e) => setLabelX(Number.parseInt(e.currentTarget.value))}
-      on:keyup={(e) => setLabelX(Number.parseInt(e.currentTarget.value))}
-      type="number"
-      style="width: 80px;"
+      value={type == "number" ? $style.label.x : new Date($style.label.x).toISOString().split("T")[0]}
+      on:change={(e) => setLabelX(e.currentTarget.value)}
+      on:keyup={(e) => setLabelX(e.currentTarget.value)}
+      type={type}
+      style="width: 104px;"
     />
   {/if}
 

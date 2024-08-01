@@ -211,10 +211,19 @@
 </p>
 
 <p>Line style</p>
-<LineStyleEditor style={dbLine.defaultLineStyle()} {chartColors} {values}
+<LineStyleEditor
+  style={dbLine.defaultLineStyle()}
+  {chartColors}
+  {values}
+  lineSpec={dbLine}
 ></LineStyleEditor>
 {#each $dbLine.style.byKey as _style, i}
-  <LineStyleEditor style={dbLine.lineStyle(i)} {chartColors} {unspecifiecKeys} {values}
+  <LineStyleEditor
+    style={dbLine.lineStyle(i)}
+    {chartColors}
+    {unspecifiecKeys}
+    {values}
+    lineSpec={dbLine}
   ></LineStyleEditor>
 {/each}
 <button on:click={() => dbLine.addLineStyle($dbLine.style.byKey.length)}

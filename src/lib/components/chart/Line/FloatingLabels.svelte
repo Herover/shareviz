@@ -60,7 +60,9 @@
   {#if line.label.location == LabelLocation.Float}
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <g
-      transform="translate({xScale(line.label.x)}, {yScale(line.label.y)})"
+      transform="translate({xScale(
+        typeof line.label.x == 'string' ? new Date(line.label.x) : line.label.x,
+      )}, {yScale(line.label.y)})"
       on:mousedown={(e) => startMove(i, e)}
     >
       <text
@@ -72,8 +74,7 @@
         paint-order="stroke"
         stroke="#ffffff"
         stroke-width="3"
-        text-anchor="middle"
-        >{line.label.text}</text
+        text-anchor="middle">{line.label.text}</text
       >
       {#if line.label.line == LabelStyleLine.Line}
         {#if line.label.ry < 0}

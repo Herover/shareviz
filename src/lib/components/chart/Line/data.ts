@@ -9,8 +9,8 @@ export const formatData = (componentSpec: Line, data: { [key: string]: any[] }) 
       label: k,
       key: k,
       value: g.map((d) => ({
-        x: d[componentSpec.x.key],
-        y: d[componentSpec.y.key],
+        x: d[componentSpec.x.key] as number | Date,
+        y: d[componentSpec.y.key] as number,
       })),
     }),
   );
