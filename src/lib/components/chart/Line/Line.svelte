@@ -153,7 +153,8 @@
     } else if (xType == valueKinds.DATE) {
       xScale = scaleTime()
         .range([leftMargin, width - rightMargin])
-        .domain([minX, maxX]);
+        .domain([minX, maxX])
+        .nice();
     }
   }
   $: maxY = orNumber(max(stacked, (d) => max(d.value, (dd) => dd.to)), 1);
