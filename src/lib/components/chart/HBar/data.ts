@@ -17,8 +17,11 @@ export const formatData = (componentSpec: hBarType, data: { [key: string]: any[]
           return {
             label: kk,
             value,
+            from: 0,
+            to: 0,
           };
         });
+        const sum = componentSpec.portionSubCategories ? subGroups.reduce((acc, dd) => acc + dd.value, 0) : 1;
         let sorted = subGroups
           .map(d => d)
           .sort((a, b) =>
@@ -26,7 +29,7 @@ export const formatData = (componentSpec: hBarType, data: { [key: string]: any[]
           );
         sorted = sorted.map(d => {
           const from = componentSpec.stackSubCategories ? last : 0;
-          const to = last + d.value;
+          const to = last + d.value / sum;
           last = componentSpec.stackSubCategories ? to : 0;
           return {
             label: d.label,

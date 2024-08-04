@@ -137,6 +137,8 @@ export interface HBar {
   categories: string
   subCategories: string
   stackSubCategories: boolean
+  /** Show how much of 100% value represents, eg. is a stacked 100% area chart */
+  portionSubCategories: boolean
   value: string
   labelWidth: number
   repeat: string
