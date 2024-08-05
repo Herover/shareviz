@@ -1,15 +1,14 @@
 <script lang="ts">
   import { db, localPrefix } from "$lib/chartStore";
   import type { Root } from "$lib/chart.d.ts";
-  import { dsvFormat, type DSVParsedArray } from "d3-dsv";
   import ChartEditor from "$lib/components/chart/ChartEditor.svelte";
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
   import DataSetEditor from "$lib/components/chart/DataSetsEditor.svelte";
   import EditorCollapsible from "$lib/components/chart/EditorCollapsible.svelte";
   import { onDestroy } from "svelte";
-  import { valueParsers } from "$lib/utils.js";
   import { user } from "$lib/userStore";
   import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
+  import { computeData } from "$lib/data.js";
 
   export let data;
 
@@ -24,59 +23,8 @@
 
   $: chartSpec = $db.doc as Root;
 
-  $: chartData =
-    chartSpec == null
-      ? {}
-      : chartSpec.data.sets.reduce(
-          (acc, data) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            let set = dsvFormat("\t").parse<any, string>(
-              data.raw,
-              (row) => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                return data.rows.reduce((acc: any, rowInfo) => {
-                  const parser = valueParsers[rowInfo.type];
-                  if (typeof parser == "undefined") {
-                    // TODO: better warning?
-                    console.warn("could not find parser", rowInfo.key);
-                    acc[rowInfo.key] = row[rowInfo.key];
-                    return acc;
-                  }
-                  acc[rowInfo.key] = parser.fn(row[rowInfo.key]);
-
-                  return acc;
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                }, {} as any);
-              },
-            ) as any[];
-
-            data.transpose.forEach((transpose) => {
-              const set2: any[] = [];
-
-              const valueParser = valueParsers[transpose.valueType];
-              const keyParser = valueParsers[transpose.keyType];
-              if (typeof valueParser != "undefined" && typeof keyParser != "undefined") { // TODO
-                transpose.from.forEach((key) => {
-                  set.forEach((row) => {
-                    const row2 = {
-                      ...row,
-                      [transpose.toValue]: valueParser.fn(row[key]),
-                      [transpose.toKey]: keyParser.fn(key),
-                    };
-                    set2.push(row2);
-                  });
-                });
-                set = set2;
-              }
-            });
-
-            acc[data.id] = set;
-
-            return acc;
-          },
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          {} as { [key: string]: any[] },
-        );
+  $: chartData = computeData(chartSpec);
+    
   $: canEdit = chartSpec == null ? false : $db.mode == "local" || typeof chartSpec.meta.access.find(a => a.userId == $user.userId) != "undefined";
 
   $: edit = (e: CustomEvent<{ k: string, v: any}>) => {
