@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LabelLocation } from "$lib/chart";
+  import { LabelLocation, LabelStyleLine } from "$lib/chart";
   import { lineStyle } from "$lib/chartStore";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import { formatData } from "./data";
@@ -72,6 +72,11 @@
       on:keyup={(e) => setLabelX(e.currentTarget.value)}
       type={type}
       style="width: 104px;"
+    />
+    <input
+      checked={$style.label.line == LabelStyleLine.Line}
+      on:change={(e) => style.setLabelLine(e.currentTarget.checked ? LabelStyleLine.Line : LabelStyleLine.None)}
+      type="checkbox"
     />
   {/if}
 
