@@ -9,6 +9,7 @@ const targetVersion = 1;
 
 const setupDB = async (/** @type {sqlite.Database} */ db) => {
   db.serialize(() => {
+    console.log("Creating db...");
     db.run("BEGIN TRANSACTION");
     db.run(`
       CREATE TABLE users (
@@ -18,6 +19,44 @@ const setupDB = async (/** @type {sqlite.Database} */ db) => {
       )
     `);
     db.run(`INSERT INTO users (username, password) VALUES ('test', 'test')`);
+    db.run(`INSERT INTO users (username, password) VALUES ('SHOULD NOT BE VISIBLE user', 'test')`);
+
+    db.run(`
+      CREATE TABLE teams (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE,
+        organization_id INTEGER
+      )
+    `);
+    db.run(`INSERT INTO teams (id, name, organization_id) VALUES (1, 'Test team', 1)`);
+    db.run(`INSERT INTO teams (id, name, organization_id) VALUES (2, 'SHOULD NOT BE VISIBLE team', 1)`);
+
+    db.run(`
+      CREATE TABLE teams_users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        team_id INTEGER
+      )
+    `);
+    db.run(`INSERT INTO teams_users (user_id, team_id) VALUES (1, 1)`);
+
+    db.run(`
+      CREATE TABLE teams_charts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        team_id INTEGER,
+        chart_id TEXT
+      )
+    `);
+    db.run(`INSERT INTO teams_charts (chart_id, team_id) VALUES ("1", 1)`);
+
+    db.run(`
+      CREATE TABLE organizations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT
+      )
+    `);
+    db.run(`INSERT INTO organizations (name) VALUES ("Test organization")`);
+    db.run(`INSERT INTO organizations (name) VALUES ("SHOULD NOT BE VISIBLE organization")`);
 
     db.run(`
       CREATE TABLE version (
@@ -28,6 +67,7 @@ const setupDB = async (/** @type {sqlite.Database} */ db) => {
 
     db.run("COMMIT TRANSACTION", (err) => {
       if (err != null) throw err;
+      console.log("Done creating db...");
     });
   });
 };
@@ -86,6 +126,7 @@ const cmds = (/** @type {sqlite.Database} */ db) => {
         }).finalize();
       });
     },
+
     /**
      * @returns {Promise<import('./user.js').User>} user with username or id
      */
@@ -118,6 +159,51 @@ const cmds = (/** @type {sqlite.Database} */ db) => {
         }
 
         reject("no user identifier")
+      });
+    },
+
+    /**
+     * @returns {Promise<import('./user.js').Team[]>} teams by userId connected to them
+     */
+    getUserTeams: async (/** @type {string} */ userId) => {
+      return new Promise((resolve, reject) => {
+
+        const stmt = db.prepare(`
+          SELECT
+            teams.id, teams.name
+          FROM
+            teams_users
+            INNER JOIN teams ON teams_users.team_id = teams.id
+          WHERE
+            (teams_users.user_id = ?)
+        `);
+        stmt.all([userId], function (err, rows) {
+          if (err) reject(err);
+          resolve(rows);
+        }).finalize();
+      });
+    },
+
+    /**
+     * @returns {Promise<import('./user.js').TeamChart[]>} charts a user can see
+     */
+    getUserCharts: async (/** @type {string} */ userId) => {
+      return new Promise((resolve, reject) => {
+
+        const stmt = db.prepare(`
+          SELECT
+            teams_charts.id, teams_charts.chart_id
+          FROM
+            teams_users
+            INNER JOIN teams ON teams_users.team_id = teams.id
+            INNER JOIN teams_charts ON teams_charts.team_id = teams.id
+          WHERE
+            (teams_users.user_id = ?)
+        `);
+        stmt.all([userId], function (err, rows) {
+          if (err) reject(err);
+          resolve(rows);
+        }).finalize();
       });
     },
   }
