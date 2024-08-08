@@ -12,9 +12,12 @@ import * as sqlite from "./sqlite.js";
  * @prop {string} name
  */
 /**
- * @typedef TeamChart
+ * @typedef ChartInfo
  * @prop {string} id
- * @prop {string} chart_id
+ * @prop {string} name
+ * @prop {string} chartId
+ * @prop {string | null} teamId
+ * @prop {number | null} relationType
  */
 
 export const db = sqlite.init();

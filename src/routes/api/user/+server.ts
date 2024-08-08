@@ -21,6 +21,7 @@ export async function GET({ cookies }) {
   }
 
   const user = await db.getUser({ id });
+  const teams = await db.getUserTeams(id);
 
-  return json({ userId: user.id, username: user.username }, { status: 200 });
+  return json({ userId: user.id, username: user.username, teams }, { status: 200 });
 }

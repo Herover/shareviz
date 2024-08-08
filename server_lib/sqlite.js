@@ -41,13 +41,32 @@ const setupDB = async (/** @type {sqlite.Database} */ db) => {
     db.run(`INSERT INTO teams_users (user_id, team_id) VALUES (1, 1)`);
 
     db.run(`
+      CREATE TABLE charts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        chart_ref TEXT
+      )
+    `);
+    db.run(`INSERT INTO charts (name, chart_ref) VALUES ("Demo chart", "1")`);
+
+    db.run(`
+      CREATE TABLE users_charts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        relation_type INTEGER,
+        chart_id INTEGER
+      )
+    `);
+    db.run(`INSERT INTO users_charts (chart_id, user_id, relation_type) VALUES (1, 1, 1)`);
+
+    db.run(`
       CREATE TABLE teams_charts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         team_id INTEGER,
-        chart_id TEXT
+        chart_id INTEGER
       )
     `);
-    db.run(`INSERT INTO teams_charts (chart_id, team_id) VALUES ("1", 1)`);
+    db.run(`INSERT INTO teams_charts (chart_id, team_id) VALUES (1, 1)`);
 
     db.run(`
       CREATE TABLE organizations (
@@ -179,30 +198,52 @@ const cmds = (/** @type {sqlite.Database} */ db) => {
         `);
         stmt.all([userId], function (err, rows) {
           if (err) reject(err);
-          resolve(rows);
+          resolve(rows.map(((row) => ({ ...row, id: "" + row.id }))));
         }).finalize();
       });
     },
 
     /**
-     * @returns {Promise<import('./user.js').TeamChart[]>} charts a user can see
+     * @returns {Promise<import('./user.js').ChartInfo[]>} charts a user can see
      */
     getUserCharts: async (/** @type {string} */ userId) => {
       return new Promise((resolve, reject) => {
 
         const stmt = db.prepare(`
           SELECT
-            teams_charts.id, teams_charts.chart_id
+            teams_charts.chart_id AS chartId,
+            teams_users.team_id AS teamId,
+            charts.chart_ref AS chartRef,
+            NULL AS relationType
           FROM
             teams_users
             INNER JOIN teams ON teams_users.team_id = teams.id
             INNER JOIN teams_charts ON teams_charts.team_id = teams.id
+            INNER JOIN charts ON charts.id = teams_charts.chart_id
           WHERE
             (teams_users.user_id = ?)
+          UNION
+          SELECT
+            users_charts.chart_id AS chartId,
+            NULL AS teamId,
+            charts.chart_ref AS chartRef,
+            users_charts.relation_type AS relationType
+          FROM
+            users_charts
+            INNER JOIN charts ON charts.id = users_charts.chart_id
+          WHERE
+            users_charts.user_id = ?
         `);
-        stmt.all([userId], function (err, rows) {
+        
+        stmt.all([userId, userId], function (err, rows) {
           if (err) reject(err);
-          resolve(rows);
+          resolve(rows.map((row) => ({
+            id: "" + row.id,
+            name: row.name,
+            teamId: row.teamId == null ? null : "" + row.teamId,
+            relationType: row.relationType == null ? null : row.relationType,
+            chartId: row.chartId,
+          })));
         }).finalize();
       });
     },

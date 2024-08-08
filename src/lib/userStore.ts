@@ -8,7 +8,8 @@ export const user = function create() {
     signedIn: boolean,
     username: string,
     userId: string,
-  }>({ signedIn: false, username: "", userId: "" });
+    teams: { id: string, name: string }[],
+  }>({ signedIn: false, username: "", userId: "", teams: [] });
 
   const fetchLoggedIn = async () => {
     const resp = await fetch(
@@ -33,6 +34,7 @@ export const user = function create() {
       signedIn: true,
       userId: data.userId,
       username: data.username,
+      teams: data.teams,
     });
   };
   fetchLoggedIn();
@@ -66,6 +68,7 @@ export const user = function create() {
         signedIn: true,
         userId: data.userId,
         username: data.username,
+        teams: data.teams,
       });
       return true;
     },
@@ -89,6 +92,7 @@ export const user = function create() {
         signedIn: false,
         userId: "",
         username: "",
+        teams: [],
       });
     },
     createUser: async (username: string, password: string) => {
