@@ -2,18 +2,33 @@
   import { goto } from "$app/navigation";
   import { user } from "$lib/userStore";
   import { db } from "$lib/chartStore";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { notifications } from "$lib/notificationStore";
+  import type { ChartInfo } from "./../../../../server_lib/user";
+  import { group, orDefault } from "$lib/utils";
 
   let username = "";
   let password = "";
+
+  let charts: ChartInfo[] | null = null;
+  $: chartsByTeam =
+    charts == null
+      ? []
+      : group(
+          "teamId",
+          charts.filter((d) => d.teamId != null),
+          (k, g) => ({ k, g }),
+        );
+  $: userCharts = charts == null ? [] : charts.filter((d) => d.teamId == null);
 
   const disconnect = db.connect();
   onDestroy(() => {
     disconnect();
   });
-
-  const charts = db.getRecent();
+  onMount(async () => {
+    const req = await fetch("/api/chart");
+    charts = (await req.json()).charts;
+  });
 
   const newGraphic = async (synced: boolean) => {
     const docId = await db.create(synced);
@@ -38,7 +53,7 @@
     } else {
       notifications.addInfo("User created, you can log in now");
     }
-  }
+  };
 </script>
 
 <div class="main">
@@ -64,13 +79,29 @@
         <button on:click={() => newGraphic(true)}>New graphic</button>
       {/if}
       <button on:click={() => newGraphic(false)}>New local graphic</button>
-      {#await charts}
+      {#if charts == null}
         ...
-      {:then chartList}
-        {#each chartList as chart}
-          <p dir="auto"><a href="/editor/chart/{chart.id}">{chart.data.chart.title}</a></p>
+      {:else}
+        <h2>Your charts</h2>
+        {#each userCharts as chart}
+          <p dir="auto">
+            <a href="/editor/chart/{chart.chartRef}">{chart.name}</a>
+          </p>
         {/each}
-      {/await}
+        {#each chartsByTeam as byTeam}
+          <h2>
+            {orDefault(
+              $user.teams.find((d) => d.id == byTeam.k)?.name,
+              "Your charts",
+            )}
+          </h2>
+          {#each byTeam.g as chart}
+            <p dir="auto">
+              <a href="/editor/chart/{chart.chartRef}">{chart.name}</a>
+            </p>
+          {/each}
+        {/each}
+      {/if}
     </div>
   </div>
 </div>

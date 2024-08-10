@@ -211,7 +211,8 @@ const cmds = (/** @type {sqlite.Database} */ db) => {
 
         const stmt = db.prepare(`
           SELECT
-            teams_charts.chart_id AS chartId,
+            charts.id AS id,
+            charts.name AS name,
             teams_users.team_id AS teamId,
             charts.chart_ref AS chartRef,
             NULL AS relationType
@@ -224,7 +225,8 @@ const cmds = (/** @type {sqlite.Database} */ db) => {
             (teams_users.user_id = ?)
           UNION
           SELECT
-            users_charts.chart_id AS chartId,
+            charts.id AS id,
+            charts.name AS name,
             NULL AS teamId,
             charts.chart_ref AS chartRef,
             users_charts.relation_type AS relationType
@@ -243,6 +245,7 @@ const cmds = (/** @type {sqlite.Database} */ db) => {
             teamId: row.teamId == null ? null : "" + row.teamId,
             relationType: row.relationType == null ? null : row.relationType,
             chartId: row.chartId,
+            chartRef: row.chartRef,
           })));
         }).finalize();
       });
