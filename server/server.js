@@ -481,6 +481,7 @@ export function startServer(server) {
       //   console.log("unauthorized")
       //   return next("unauthorized");
       // }
+      next();
     } else if (ctx.data.a == "op" && ctx.data.c == "examples" && typeof ctx.data.create != "undefined" && ctx.agent.custom.userId) {
       // When creating a new chart, always add current user to access list
       ctx.data.create.data.meta = {
@@ -489,30 +490,46 @@ export function startServer(server) {
           { userId: ctx.agent.custom.userId, read: true, write: true },
         ],
       };
+
+      db.addChart(ctx.data.d, "Chart name")
+        .then((id) => db.addUserChart(ctx.agent.custom.userId, id, 1))
+        .then(() => next())
+        .catch((e) => next(e));
+    } else {
+      next();
     }
-    next();
   });
   backend.use('reply', function (ctx, next) {
     console.log('reply', /* JSON.stringify(ctx.reply) */);
     if (ctx.reply.a == "qf" && ctx.reply?.data?.length) {
       // When querying db, remove items user doesn't have access to
-      ctx.reply.data = ctx.reply?.data?.filter(
-        e => e.data?.meta?.publicRead || e.data?.meta?.access.find(e => e.userId == ctx.agent.custom.userId && e.read)
-      );
-      next();
+      // ctx.reply.data = ctx.reply?.data?.filter(
+      //   e => e.data?.meta?.publicRead || e.data?.meta?.access.find(e => e.userId == ctx.agent.custom.userId && e.read)
+      // );
+      next("no queries");
     } else if (ctx.reply.a == "s" && ctx.reply.c == "examples") {
       // When accessing chart, check if user is allowed to read
-      if (ctx.reply?.data?.data?.meta?.publicRead) {
-        next();
-      } else {
-        const entry = ctx.reply?.data?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
-        if (entry?.read) {
-          next();
-        } else {
-          console.log(`unauthorized reply on ${ctx.request.c} ${ctx.request.d}`);
-          next("unauthorized");
-        }
-      }
+      db.getUserCharts(ctx.agent.custom.userId, ctx.request.d)
+        .then((charts) => {
+          if (charts.length != 0) {
+            next();
+          } else {
+            console.log(`unauthorized reply on ${ctx.request.c} ${ctx.request.d}`);
+            next("unauthorized");
+          }
+        })
+        .catch((e) => next(e));
+      // if (ctx.reply?.data?.data?.meta?.publicRead) {
+      //   next();
+      // } else {
+      //   const entry = ctx.reply?.data?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
+      //   if (entry?.read) {
+      //     next();
+      //   } else {
+      //     console.log(`unauthorized reply on ${ctx.request.c} ${ctx.request.d}`);
+      //     next("unauthorized");
+      //   }
+      // }
     } else {
       next();
     }

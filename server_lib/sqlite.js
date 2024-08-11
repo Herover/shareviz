@@ -206,9 +206,8 @@ const cmds = (/** @type {sqlite.Database} */ db) => {
     /**
      * @returns {Promise<import('./user.js').ChartInfo[]>} charts a user can see
      */
-    getUserCharts: async (/** @type {string} */ userId) => {
+    getUserCharts: async (/** @type {string} */ userId, /** @type {string | undefined} */ chartRef) => {
       return new Promise((resolve, reject) => {
-
         const stmt = db.prepare(`
           SELECT
             charts.id AS id,
@@ -222,7 +221,7 @@ const cmds = (/** @type {sqlite.Database} */ db) => {
             INNER JOIN teams_charts ON teams_charts.team_id = teams.id
             INNER JOIN charts ON charts.id = teams_charts.chart_id
           WHERE
-            (teams_users.user_id = ?)
+            teams_users.user_id = ? ${typeof chartRef == "undefined" ? "" : " AND charts.chart_ref = ?"}
           UNION
           SELECT
             charts.id AS id,
@@ -234,10 +233,10 @@ const cmds = (/** @type {sqlite.Database} */ db) => {
             users_charts
             INNER JOIN charts ON charts.id = users_charts.chart_id
           WHERE
-            users_charts.user_id = ?
+            users_charts.user_id = ? ${typeof chartRef == "undefined" ? "" : " AND charts.chart_ref = ?"}
         `);
         
-        stmt.all([userId, userId], function (err, rows) {
+        stmt.all(typeof chartRef == "undefined" ? [userId, userId] : [userId, chartRef, userId, chartRef], function (err, rows) {
           if (err) reject(err);
           resolve(rows.map((row) => ({
             id: "" + row.id,
@@ -247,6 +246,36 @@ const cmds = (/** @type {sqlite.Database} */ db) => {
             chartId: row.chartId,
             chartRef: row.chartRef,
           })));
+        }).finalize();
+      });
+    },
+
+    /**
+     * @returns {Promise<string>} add a new user-chart relation
+     */
+    addChart: async (/** @type {string} */ ref, /** @type {string} */ name) => {
+      return new Promise((resolve, reject) => {
+        const stmt = db.prepare("INSERT INTO charts (name, chart_ref) VALUES (?, ?)");
+        stmt.run([name, ref], /** @this sqlite.RunResult */ function (/** @type {Error | null} */ err) {
+          if (err != null) {
+            reject(err);
+          }
+          resolve("" + this.lastID);
+        }).finalize();
+      });
+    },
+
+    /**
+     * @returns {Promise<string>} add a new user-chart relation
+     */
+    addUserChart: async (/** @type {string} */ userId, /** @type {string} */ chartId, /** @type {number} */ typeId) => {
+      return new Promise((resolve, reject) => {
+        const stmt = db.prepare("INSERT INTO users_charts (chart_id, user_id, relation_type) VALUES (?, ?, ?)");
+        stmt.run([chartId, userId, typeId], /** @this sqlite.RunResult */ function (/** @type {Error | null} */ err) {
+          if (err != null) {
+            reject(err);
+          }
+          resolve("" + this.lastID);
         }).finalize();
       });
     },

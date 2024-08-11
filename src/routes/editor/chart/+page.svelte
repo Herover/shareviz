@@ -2,7 +2,7 @@
   import { goto } from "$app/navigation";
   import { user } from "$lib/userStore";
   import { db } from "$lib/chartStore";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import { notifications } from "$lib/notificationStore";
   import type { ChartInfo } from "./../../../../server_lib/user";
   import { group, orDefault } from "$lib/utils";
@@ -21,14 +21,22 @@
         );
   $: userCharts = charts == null ? [] : charts.filter((d) => d.teamId == null);
 
-  const disconnect = db.connect();
+  let disconnect = () => {};
   onDestroy(() => {
     disconnect();
   });
-  onMount(async () => {
-    const req = await fetch("/api/chart");
-    charts = (await req.json()).charts;
-  });
+  $: {
+    if ($user.signedIn) {
+      disconnect = db.connect();
+      fetch("/api/chart")
+        .then(req => req.json())
+        .then(data => charts = data.charts)
+        .catch(e => notifications.addError(e.message));
+    } else {
+      disconnect = () => {};
+      charts = null;
+    }
+  }
 
   const newGraphic = async (synced: boolean) => {
     const docId = await db.create(synced);
