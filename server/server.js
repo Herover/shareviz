@@ -45,6 +45,7 @@ Verden udenfor Danmark	Region Sjælland	754574	2023
 Verden udenfor Danmark	Region Syddanmark	4169743	2023
 Verden udenfor Danmark	Region Midtjylland	1423986	2023
 Verden udenfor Danmark	Region Nordjylland	1427582	2023`,
+              transpose: [],
               rows: [
                 {
                   key: "gæstens nationalitet",
@@ -139,6 +140,7 @@ Region Nordjylland	2020	4035544
 Region Nordjylland	2021	4514346
 Region Nordjylland	2022	5336107
 Region Nordjylland	2023	4989245`,
+              transpose: [],
               rows: [
                 {
                   key: "område",
