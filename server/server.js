@@ -561,16 +561,27 @@ export function startServer(server) {
       next();
       return;
     }
-    const entry = ctx.snapshot?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
-    if (entry?.write) {
-      next();
-    } else {
-      console.log(`unauthorized submit on ${ctx.collection} ${ctx.id}`);
-      next("unauthorized");
-    }
+    db.getUserCharts(ctx.agent.custom.userId, ctx.id)
+      .then((charts) => {
+        // TODO: get rid of hard coded constant
+        if (charts.length != 0 && charts[0].relationType === 1) {
+          next();
+        } else {
+          console.log(`unauthorized submit on ${ctx.collection} ${ctx.id}`);
+          next("unauthorized");
+        }
+      })
+      .catch((e) => next(e));
+    // const entry = ctx.snapshot?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
+    // if (entry?.write) {
+    //   next();
+    // } else {
+    //   console.log(`unauthorized submit on ${ctx.collection} ${ctx.id}`);
+    //   next("unauthorized");
+    // }
   });
   backend.use('apply', function (ctx, next) {
-    console.log('apply', /* ctx.agent.custom.userId, ctx.snapshot?.data?.chart?.title */);
+    console.log('apply', /* ctx.agent.custom.userId, ctx */);
     ctx.extra.oldMeta = ctx.snapshot?.data?.meta;
 
     if (typeof ctx.op.create == "object" && typeof ctx.snapshot?.data != "object") {
@@ -578,13 +589,24 @@ export function startServer(server) {
       next();
     } else if (typeof ctx.snapshot == "object") {
       // Only allow editing charts with write access
-      const entry = ctx.snapshot?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
-      if (entry?.write) {
-        next();
-      } else {
-        console.log(`unauthorized apply on ${ctx.collection} ${ctx.id}`);
-        next("unauthorized");
-      }
+      db.getUserCharts(ctx.agent.custom.userId, ctx.id)
+        .then((charts) => {
+          // TODO: get rid of hard coded constant
+          if (charts.length != 0 && charts[0].relationType === 1) {
+            next();
+          } else {
+            console.log(`unauthorized apply on ${ctx.collection} ${ctx.id}`);
+            next("unauthorized");
+          }
+        })
+        .catch((e) => next(e));
+      // const entry = ctx.snapshot?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
+      // if (entry?.write) {
+      //   next();
+      // } else {
+      //   console.log(`unauthorized apply on ${ctx.collection} ${ctx.id}`);
+      //   next("unauthorized");
+      // }
     } else {
       console.log(`unknown apply on ${ctx.collection} ${ctx.id}`);
       next("unauthorized");
