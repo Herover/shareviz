@@ -3,6 +3,7 @@ import WebSocketJSONStream from '@teamwork/websocket-json-stream';
 import json1 from 'ot-json1';
 import { db } from "../server_lib/user.js";
 import { backend, connection } from '../server_lib/sharedb.js';
+import sharedb from 'sharedb';
 
 // Create initial document then fire callback
 export function createDoc(callback) {
@@ -474,15 +475,20 @@ export function startServer(server) {
     }
   });
   backend.use('receive', function (ctx, next) {
-    console.log('receive', /* JSON.stringify(ctx.data) */)
-    if (ctx.data.a == "s" && ctx.data.c == "examples") {
+    console.log(
+      'receive',
+      ctx.data.a,
+      Object.keys(sharedb.MESSAGE_ACTIONS).find(k => sharedb.MESSAGE_ACTIONS[k] == ctx.data.a),
+      /* JSON.stringify(ctx.data), */
+    );
+    if (ctx.data.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.data.c == "examples") {
       // TODO: add authentication using `ctx.agent.custom.userId`
       // if (false) {
       //   console.log("unauthorized")
       //   return next("unauthorized");
       // }
       next();
-    } else if (ctx.data.a == "op" && ctx.data.c == "examples" && typeof ctx.data.create != "undefined" && ctx.agent.custom.userId) {
+    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.op && ctx.data.c == "examples" && typeof ctx.data.create != "undefined" && ctx.agent.custom.userId) {
       // When creating a new chart, always add current user to access list
       ctx.data.create.data.meta = {
         publicRead: false,
@@ -495,19 +501,25 @@ export function startServer(server) {
         .then((id) => db.addUserChart(ctx.agent.custom.userId, id, 1))
         .then(() => next())
         .catch((e) => next(e));
-    } else {
+    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.handshake) {
       next();
+    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.presenceSubscribe) {
+      // TODO: only for allowed charts
+      next();
+    } else {
+      console.log(`unauthorized receive on ${JSON.stringify(ctx.data)}`);
+      next("unauthorized");
     }
   });
   backend.use('reply', function (ctx, next) {
     console.log('reply', /* JSON.stringify(ctx.reply) */);
-    if (ctx.reply.a == "qf" && ctx.reply?.data?.length) {
+    if (ctx.reply.a == sharedb.MESSAGE_ACTIONS.queryFetch && ctx.reply?.data?.length) {
       // When querying db, remove items user doesn't have access to
       // ctx.reply.data = ctx.reply?.data?.filter(
       //   e => e.data?.meta?.publicRead || e.data?.meta?.access.find(e => e.userId == ctx.agent.custom.userId && e.read)
       // );
       next("no queries");
-    } else if (ctx.reply.a == "s" && ctx.reply.c == "examples") {
+    } else if (ctx.reply.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.reply.c == "examples") {
       // When accessing chart, check if user is allowed to read
       db.getUserCharts(ctx.agent.custom.userId, ctx.request.d)
         .then((charts) => {
