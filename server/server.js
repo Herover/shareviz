@@ -481,41 +481,31 @@ export function startServer(server) {
       Object.keys(sharedb.MESSAGE_ACTIONS).find(k => sharedb.MESSAGE_ACTIONS[k] == ctx.data.a),
       /* JSON.stringify(ctx.data), */
     );
-    setTimeout(() => {
-      if (ctx.data.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.data.c == "examples") {
-        // TODO: add authentication using `ctx.agent.custom.userId`
-        // if (false) {
-        //   console.log("unauthorized")
-        //   return next("unauthorized");
-        // }
-        next();
-      } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.op && ctx.agent.custom.userId) {
-        if (ctx.data.c == "examples" && typeof ctx.data.create != "undefined") {
-          // When creating a new chart, always add current user to access list
-          ctx.data.create.data.meta = {
-            publicRead: false,
-            access: [
-              { userId: ctx.agent.custom.userId, read: true, write: true },
-            ],
-          };
-        }
 
-        db.addChart(ctx.data.d, "Chart name")
-          .then((id) => db.addUserChart(ctx.agent.custom.userId, id, 1))
-          .then(() => next())
-          .catch((e) => next(e));
-      } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.handshake) {
-        next();
-      } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.presenceSubscribe) {
-        // TODO: only for allowed charts
-        next();
-      } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.fetch) {
+    if (ctx.data.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.data.c == "examples") {
+      // TODO: add authentication using `ctx.agent.custom.userId`
+      // if (false) {
+      //   console.log("unauthorized")
+      //   return next("unauthorized");
+      // }
+      next();
+    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.op && ctx.agent.custom.userId) {
+      if (ctx.data.c == "examples" && typeof ctx.data.create != "undefined") {
         next();
       } else {
-        console.log(`unauthorized receive on ${JSON.stringify(ctx.data)}`);
-        next("unauthorized");
+        next();
       }
-    }, 1000)
+    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.handshake) {
+      next();
+    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.presenceSubscribe) {
+      // TODO: only for allowed charts
+      next();
+    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.fetch) {
+      next();
+    } else {
+      console.log(`unauthorized receive on ${JSON.stringify(ctx.data)}`);
+      next("unauthorized");
+    }
   });
   backend.use('reply', function (ctx, next) {
     console.log('reply', /* JSON.stringify(ctx.reply) */);
@@ -603,8 +593,18 @@ export function startServer(server) {
     ctx.extra.oldMeta = ctx.snapshot?.data?.meta;
 
     if (typeof ctx.op.create == "object" && typeof ctx.snapshot?.data != "object") {
-      // Allow creating new charts
-      next();
+      // When creating a new chart, always add current user to access list
+      ctx.op.create.data.meta = {
+        publicRead: false,
+        access: [
+          { userId: ctx.agent.custom.userId, read: true, write: true },
+        ],
+      };
+
+      db.addChart(ctx.id, "Chart name")
+        .then((id) => db.addUserChart(ctx.agent.custom.userId, id, 1))
+        .then(() => next())
+        .catch((e) => next(e));
     } else if (typeof ctx.snapshot == "object") {
       // Only allow editing charts with write access
       db.getUserCharts(ctx.agent.custom.userId, ctx.id)
