@@ -582,7 +582,7 @@ export function startServer(server) {
     db.getUserCharts(ctx.agent.custom.userId, ctx.id)
       .then((charts) => {
         // TODO: get rid of hard coded constant
-        if (charts.length != 0 && charts[0].relationType === 1) {
+        if (charts.length != 0 && (charts[0].relationType === 1 || charts[0].teamId !== null)) {
           next();
         } else {
           console.log(`unauthorized submit on ${ctx.collection} ${ctx.id}`);
@@ -610,7 +610,7 @@ export function startServer(server) {
       db.getUserCharts(ctx.agent.custom.userId, ctx.id)
         .then((charts) => {
           // TODO: get rid of hard coded constant
-          if (charts.length != 0 && charts[0].relationType === 1) {
+          if (charts.length != 0 && (charts[0].relationType === 1 || charts[0].teamId !== null)) {
             next();
           } else {
             console.log(`unauthorized apply on ${ctx.collection} ${ctx.id}`);
