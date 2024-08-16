@@ -1,10 +1,8 @@
 import { writable } from 'svelte/store';
 
 import ReconnectingWebSocket from 'reconnecting-websocket';
-// @ts-expect-error missing types
-import {json1} from 'sharedb-client-browser/dist/ot-json1-umd.cjs';
- // @ts-expect-error missing types
-import sharedb from 'sharedb-client-browser/dist/sharedb-client-umd.cjs';
+import * as json1 from 'ot-json1';
+import ShareDB from 'sharedb/lib/client';
 import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
 import type { HBar, Line, Root, Set, Chart, Axis, AxisGrid, Style, LineStyleKey } from './chart';
@@ -110,8 +108,8 @@ export const db = function createDB() {
       }));
         
 
-      sharedb.types.register(json1.type);
-      connection = new sharedb.Connection(socket);
+      ShareDB.types.register(json1.type);
+      connection = new ShareDB.Connection(socket as any);
     
 
       return () => socket.close();
@@ -306,7 +304,7 @@ export const db = function createDB() {
             }]),
           };
         },
-        setConfigTitle: (value: string) => doc.submitOp(["chart", "title", { r: 0, i: value }]),
+        setConfigTitle: (value: string) => setTimeout(() => doc.submitOp(["chart", "title", { r: 0, i: value }]), 1000),
         setConfigSubTitle: (value: string) => doc.submitOp(["chart", "subTitle", { r: 0, i: value }]),
         setConfigHeight: (value: number) => doc.submitOp(["chart", "height", { r: 0, i: value }]),
         setConfigWidth: (value: number) => doc.submitOp(["chart", "width", { r: 0, i: value }]),
