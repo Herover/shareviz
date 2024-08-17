@@ -103,3 +103,6 @@ export const orDefault = <T>(n: T | undefined, def: T): T => {
    return n;
 };
 export const orNumber = (n: number | undefined, def = 0) => orDefault(n, def);
+
+// Used to place un-ordered items last
+export const negativeOneToInf = (n: number) => n == -1 ? Number.POSITIVE_INFINITY : n;

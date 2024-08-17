@@ -1,8 +1,5 @@
 import type { HBar as hBarType } from "../../../chart";
-import { group } from "../../../utils";
-
-// Used to place un-ordered items last
-const negativeOneToInf = (n: number) => n == -1 ? Number.POSITIVE_INFINITY : n;
+import { group, negativeOneToInf } from "../../../utils";
 
 export const formatData = (componentSpec: hBarType, data: { [key: string]: any[]; }, order: { k: string }[]) => group(
   componentSpec.repeat,
