@@ -92,21 +92,37 @@
       return;
     }
     e.preventDefault();
-    open = !open;
+    toggleOpen();
   };
+
+  const toggleOpen = () => {
+    open = !open;
+    if (typeof previewElement != "undefined") {
+      // TODO: should also update on scroll
+      const boundingBox = previewElement.getBoundingClientRect();
+      x = boundingBox.left;
+      y = boundingBox.top;
+    }
+  }
+
+  let previewElement: HTMLDivElement | undefined;
+  let x = 0;
+  let y = 0;
+  $: console.log(x,y)
 </script>
 
 <div class="holder" bind:this={container}>
   <div
     style:background-color={color}
-    on:click={() => (open = !open)}
+    on:click={() => toggleOpen()}
     on:keydown={(e) => onKeyDown(e)}
+    bind:this={previewElement}
     class="color-display"
     role="button"
     tabindex="0"
   ></div>
   {#if open}
-    <div class="popout">
+    <div style:top="{y + 16}px" style:left="{x - 60}px" class="popout">
       <input
         value={color}
         bind:this={input}
@@ -212,15 +228,17 @@
     width: 100%;
   }
   .popout {
-    position: absolute;
+    position: fixed;
+    display: block;
     top: 100%;
     left: calc(-50px + 50% - 16px);
-    width: 100px;
+    width: 120px;
     border: 2px solid black;
     background-color: #ffffff;
     margin: 8px;
     padding: 8px;
-    z-index: 1;
+    z-index: 10;
+    box-sizing: border-box;
     /* border-radius: 8px; */
   }
   .popout input {
