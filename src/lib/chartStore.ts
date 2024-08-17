@@ -7,6 +7,7 @@ import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
 import type { HBar, Line, Root, Set, Chart, Axis, AxisGrid, Style, LineStyleKey } from './chart';
 import { notifications } from './notificationStore';
+import { orDefault } from './utils';
 // import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
 
@@ -294,12 +295,12 @@ export const db = function createDB() {
             yAxis: axis(hbarScope, ["y", "axis"], doc),
             defaultLineStyle: () => lineStyle(hbarScope, ["style", "default"], doc),
             lineStyle: (i: number) => lineStyle(hbarScope, ["style", "byKey", i], doc),
-            addLineStyle: (i: number) => doc.submitOp(["chart", "elements", elementIndex, "d", "style", "byKey", i, {
+            addLineStyle: (i: number, d: { key?: string, color?: string, labelText?: string } = {}) => doc.submitOp(["chart", "elements", elementIndex, "d", "style", "byKey", i, {
               i: {
-                k: "",
-                color: "#000",
+                k: orDefault(d.key, ""),
+                color: orDefault(d.color, "#000000"),
                 width: 1,
-                label: { text: "", location: "right", color: "#000", x: 0, y: 0, rx: 0, ry: -32, line: "line" },
+                label: { text: orDefault(d.labelText, ""), location: "right", color: "#000", x: 0, y: 0, rx: 0, ry: -32, line: "line" },
               },
             }]),
           };

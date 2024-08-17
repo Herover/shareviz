@@ -7,6 +7,7 @@
   import AxisEditor from "../AxisEditor.svelte";
   import { formatData } from "./data";
   import { orDefault } from "$lib/utils";
+  import LinesEditor from "./LinesEditor.svelte";
 
   export let spec: Root;
   export let chart: ReturnType<typeof db.chart>;
@@ -211,6 +212,11 @@
 </p>
 
 <p>Line style</p>
+<LinesEditor
+  {chartColors}
+  {values}
+  lineSpec={dbLine}
+/>
 <LineStyleEditor
   style={dbLine.defaultLineStyle()}
   {chartColors}
