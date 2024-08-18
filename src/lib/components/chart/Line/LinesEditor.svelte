@@ -15,6 +15,9 @@
       i: $lineSpec.style.byKey.findIndex((e) => e.k === k),
       k,
     }));
+  $: canEdit =
+    selectedIndexes.length == 0 ||
+    selectedIndexes.findIndex((e) => e.i == -1) != -1;
 
   const toggleSelect = (
     key: string,
@@ -47,8 +50,9 @@
   $: filteredValues = values
     .filter(
       (e) =>
-        e.key.toLowerCase().includes(searchString.toLowerCase()) ||
-        e.label.toLowerCase().includes(searchString.toLowerCase()),
+        Object.keys(e.d[0]).findIndex((k) =>
+          ("" + e.d[0]?.[k]).toLowerCase().includes(searchString.toLowerCase()),
+        ) != -1,
     )
     .sort(
       (a, b) =>
@@ -86,7 +90,7 @@
       if (last === 0) {
         return next.color;
       }
-      if (last === next.color || last === 0) {
+      if (last === next.color) {
         return last;
       } else {
         return 1;
@@ -94,7 +98,53 @@
     },
     0 as string | number,
   );
+  $: selectedTextColor = selectedIndexes.reduce(
+    (last, nextI) => {
+      const next = $lineSpec.style.byKey[nextI.i];
+      if (typeof next == "undefined") {
+        return "";
+      }
+      if (last === 0) {
+        return next.label.color;
+      }
+      if (last === next.label.color) {
+        return last;
+      } else {
+        return 1;
+      }
+    },
+    0 as string | number,
+  );
+  $: selectedWidth = selectedIndexes.reduce(
+    (last, nextI) => {
+      const next = $lineSpec.style.byKey[nextI.i];
+      if (typeof next == "undefined") {
+        return "";
+      }
+      if (last === "") {
+        return next.width;
+      }
+      if (last === next.width) {
+        return last;
+      } else {
+        return "";
+      }
+    },
+    "" as string | number,
+  );
 
+  $: setLabelToKey = () => {
+    selectedIndexes.forEach((d) => {
+      if (d.i == -1) {
+        lineSpec.addLineStyle($lineSpec.style.byKey.length, {
+          key: d.k,
+          labelText: d.k,
+        });
+      } else {
+        lineSpec.lineStyle(d.i).setLabelText(d.k);
+      }
+    });
+  };
   $: setLineLabel = (label: string) => {
     selectedIndexes.forEach((d) => {
       if (d.i == -1) {
@@ -109,15 +159,24 @@
   };
   $: setLineColor = (color: string) => {
     selectedIndexes.forEach((d) => {
-      if (d.i == -1) {
-        lineSpec.addLineStyle($lineSpec.style.byKey.length, {
-          key: d.k,
-          labelText: d.k,
-          color,
-        });
-      } else {
-        lineSpec.lineStyle(d.i).setColor(color);
+      const style = lineSpec.lineStyle(d.i);
+      if (
+        $lineSpec.style.byKey[d.i].label.color ==
+        $lineSpec.style.byKey[d.i].color
+      ) {
+        style.setLabelColor(color);
       }
+      style.setColor(color);
+    });
+  };
+  $: setTextColor = (color: string) => {
+    selectedIndexes.forEach((d) => {
+      lineSpec.lineStyle(d.i).setLabelColor(color);
+    });
+  };
+  $: setWidth = (width: number) => {
+    selectedIndexes.forEach((d) => {
+      lineSpec.lineStyle(d.i).setwidth(width);
     });
   };
 </script>
@@ -145,7 +204,7 @@
           <ColorPicker
             color={orDefault(line.style?.color, "#00000000")}
             {chartColors}
-            on:change={e => lineSpec.lineStyle(i).setColor(e.detail)}
+            on:change={(e) => lineSpec.lineStyle(i).setColor(e.detail)}
           />
           &nbsp;
           <span
@@ -171,6 +230,7 @@
         on:change={(e) => setLineLabel(e.currentTarget.value)}
       />
     </label>
+    <button on:click={() => setLabelToKey()}>Auto</button>
   </p>
   <p>
     <span>
@@ -180,9 +240,27 @@
           ? selectedColor
           : "#ffffff"}
         {chartColors}
+        disabled={selectedIndexes.length == 0 || canEdit}
         on:change={(e) => setLineColor(e.detail)}
       />
+      text color
+      <ColorPicker
+        color={typeof selectedTextColor == "string" && selectedTextColor != ""
+          ? selectedTextColor
+          : "#ffffff"}
+        {chartColors}
+        disabled={selectedIndexes.length == 0 || canEdit}
+        on:change={(e) => setTextColor(e.detail)}
+      />
     </span>
+  </p>
+  <p>
+    Width
+    <input
+      value={selectedWidth}
+      disabled={canEdit}
+      on:change={(e) => setWidth(Number.parseInt(e.currentTarget.value))}
+    />
   </p>
 </div>
 

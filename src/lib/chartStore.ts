@@ -295,12 +295,21 @@ export const db = function createDB() {
             yAxis: axis(hbarScope, ["y", "axis"], doc),
             defaultLineStyle: () => lineStyle(hbarScope, ["style", "default"], doc),
             lineStyle: (i: number) => lineStyle(hbarScope, ["style", "byKey", i], doc),
-            addLineStyle: (i: number, d: { key?: string, color?: string, labelText?: string } = {}) => doc.submitOp(["chart", "elements", elementIndex, "d", "style", "byKey", i, {
+            addLineStyle: (i: number, d: { key?: string, color?: string, labelColor?: string, labelText?: string } = {}) => doc.submitOp(["chart", "elements", elementIndex, "d", "style", "byKey", i, {
               i: {
                 k: orDefault(d.key, ""),
                 color: orDefault(d.color, "#000000"),
                 width: 1,
-                label: { text: orDefault(d.labelText, ""), location: "right", color: "#000", x: 0, y: 0, rx: 0, ry: -32, line: "line" },
+                label: {
+                  text: orDefault(d.labelText, ""),
+                  location: "right",
+                  color: orDefault(d.labelColor, "#000000"),
+                  x: 0,
+                  y: 0,
+                  rx: 0,
+                  ry: -32,
+                  line: "line",
+                },
               },
             }]),
           };
