@@ -23,6 +23,8 @@
 
   export let chartColors: string[] = [];
 
+  export let disabled = false;
+
   let cc = [0, 0, 0];
 
   $: try {
@@ -96,6 +98,9 @@
   };
 
   const toggleOpen = () => {
+    if (disabled) {
+      return;
+    }
     open = !open;
     if (typeof previewElement != "undefined") {
       // TODO: should also update on scroll
@@ -103,23 +108,28 @@
       x = boundingBox.left;
       y = boundingBox.top;
     }
-  }
+  };
 
   let previewElement: HTMLDivElement | undefined;
   let x = 0;
   let y = 0;
-  $: console.log(x,y)
+  $: console.log(x, y);
 </script>
 
-<div class="holder" bind:this={container}>
+<div
+  style:border-color={disabled ? "#cccccc" : "#000000"}
+  style:cursor={disabled ? "initial" : "pointer"}
+  bind:this={container}
+  class="holder"
+>
   <div
     style:background-color={color}
     on:click={() => toggleOpen()}
     on:keydown={(e) => onKeyDown(e)}
     bind:this={previewElement}
+    tabindex={disabled ? null : 0}
     class="color-display"
     role="button"
-    tabindex="0"
   ></div>
   {#if open}
     <div style:top="{y + 16}px" style:left="{x - 60}px" class="popout">
@@ -250,9 +260,8 @@
     width: 1em;
     height: 1em;
     display: inline-block;
-    cursor: pointer;
     box-sizing: border-box;
-    border: 1px solid black;
+    border: 1px solid;
   }
   .color-display {
     width: 100%;
