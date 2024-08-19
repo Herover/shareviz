@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { LabelLocation, LabelStyleLine } from "$lib/chart";
   import type { db } from "$lib/chartStore";
   import { negativeOneToInf, orDefault } from "$lib/utils";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
@@ -132,6 +133,57 @@
     },
     "" as string | number,
   );
+  $: selectedLabelLocation = selectedIndexes.reduce(
+    (last, nextI) => {
+      const next = $lineSpec.style.byKey[nextI.i];
+      if (typeof next == "undefined") {
+        return "";
+      }
+      if (last === "") {
+        return next.label.location;
+      }
+      if (last === next.label.location) {
+        return last;
+      } else {
+        return "";
+      }
+    },
+    "" as string | number,
+  );
+  $: selectedLabelX = selectedIndexes.reduce(
+    (last, nextI) => {
+      const next = $lineSpec.style.byKey[nextI.i];
+      if (typeof next == "undefined") {
+        return "";
+      }
+      if (last === "") {
+        return next.label.x;
+      }
+      if (last === next.label.x) {
+        return last;
+      } else {
+        return "";
+      }
+    },
+    "" as string | number,
+  );
+  $: selectedLabelLine = selectedIndexes.reduce(
+    (last, nextI) => {
+      const next = $lineSpec.style.byKey[nextI.i];
+      if (typeof next == "undefined") {
+        return null;
+      }
+      if (last === null) {
+        return next.label.line;
+      }
+      if (last === next.label.line) {
+        return last;
+      } else {
+        return null;
+      }
+    },
+    null as LabelStyleLine | null,
+  );
 
   $: setLabelToKey = () => {
     selectedIndexes.forEach((d) => {
@@ -177,6 +229,41 @@
   $: setWidth = (width: number) => {
     selectedIndexes.forEach((d) => {
       lineSpec.lineStyle(d.i).setwidth(width);
+    });
+  };
+  $: setLabelLocation = (location: string) => {
+    selectedIndexes.forEach((d) => {
+      lineSpec.lineStyle(d.i).setLabelLocation(location);
+    });
+  };
+  $: type = typeof values[0]?.value[0]?.x == "number" ? "number" : "date";
+  $: setLabelX = (value: string) => {
+    selectedIndexes.forEach((d) => {
+      const style = lineSpec.lineStyle(d.i);
+      const parsed =
+        type == "number" ? Number.parseInt(value) : new Date(value).getTime();
+      const proposed = values
+        .find((e) => e.key == d.k)
+        ?.value.map((d) => ({
+          d: Math.abs(parsed - (d.x as any)),
+          x: d.x,
+          y: d.y,
+        }))
+        .sort((a, b) => a.d - b.d)[0] || { x: 0, y: 0 };
+      const proposedY = values
+        .find((e) => e.key == d.k)
+        ?.value.find((d) => d.x == proposed.x);
+      if (typeof proposedY != "undefined") {
+        style.setLabelY(proposed.y);
+      }
+      style.setLabelX(
+        proposed.x instanceof Date ? proposed.x.getTime() : proposed.x,
+      );
+    });
+  };
+  $: setLabelLineStyle = (value: LabelStyleLine) => {
+    selectedIndexes.forEach((d) => {
+      lineSpec.lineStyle(d.i).setLabelLine(value);
     });
   };
 </script>
@@ -255,12 +342,52 @@
     </span>
   </p>
   <p>
-    Width
-    <input
-      value={selectedWidth}
-      disabled={canEdit}
-      on:change={(e) => setWidth(Number.parseInt(e.currentTarget.value))}
-    />
+    <label>
+      Width
+      <input
+        value={selectedWidth}
+        disabled={canEdit}
+        on:change={(e) => setWidth(Number.parseInt(e.currentTarget.value))}
+        type="number"
+        style="width: 80px"
+      />
+    </label>
+  </p>
+  <p>
+    <label>
+      Location
+      <select
+        value={selectedLabelLocation}
+        disabled={canEdit}
+        on:change={(e) => setLabelLocation(e.currentTarget.value)}
+      >
+        {#each Object.values(LabelLocation) as location}
+          <option>{location}</option>
+        {/each}
+      </select>
+    </label>
+    <label>
+      X value
+      <input
+        value={selectedLabelX}
+        disabled={canEdit}
+        on:change={(e) => setLabelX(e.currentTarget.value)}
+        type="number"
+        style="width: 80px;"
+      />
+    </label>
+    <label>
+      Line
+      <input
+        checked={selectedLabelLine == LabelStyleLine.Line}
+        on:change={(e) =>
+          setLabelLineStyle(
+            e.currentTarget.checked ? LabelStyleLine.Line : LabelStyleLine.None,
+          )}
+        disabled={canEdit}
+        type="checkbox"
+      />
+    </label>
   </p>
 </div>
 
