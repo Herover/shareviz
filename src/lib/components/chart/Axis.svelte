@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ScaleLinear, ScaleTime } from "d3-scale";
-  import { formatNumber, orNumber } from "$lib/utils";
+  import { formatNumber, orDefault, orNumber } from "$lib/utils";
   import type { Axis } from "$lib/chart";
   import { AxisLocation, AxisOrientation } from "$lib/chart";
   import { createEventDispatcher } from "svelte";
@@ -31,7 +31,15 @@
   $: if (labelBox || leftBox || rightBox) distpatch("dimensions", {
     width: orNumber(labelBox?.width, 0) + conf.labelSpace,
     height: orNumber(labelBox?.height, 0),
-    leftOverflow: orNumber(leftBox?.width, 0)/2,
+    leftOverflow: Math.max(
+      orNumber(leftBox?.width, 0) / 2 -
+        (scale
+          ? Math.floor(
+              (scale(orDefault(majorTicks[0]?.n, 0)) - scale.range()[0]) / 10,
+            ) * 10
+          : 0),
+      0,
+    ),
     rightOverflow: orNumber(rightBox?.width, 0)/2,
   });
 
@@ -42,14 +50,15 @@
       const from = scale.domain()[0];
       const to = scale.domain()[1];
       if (typeof to == "number" && typeof from == "number") {
+        const customFrom = Math.max(Math.min(conf.major.auto.from, to), from);
         const expectedTicks =
-          1 + (to - from) / conf.major.auto.each;
+          1 + (to - customFrom) / conf.major.auto.each;
         if (expectedTicks > maxTicks) {
           autoMajorTicks = [
             { n: from, l: `Too many ticks (${expectedTicks})` },
           ];
         } else {
-          for (let i = from; i <= to; i += conf.major.auto.each) {
+          for (let i = customFrom; i <= to; i += conf.major.auto.each) {
             autoMajorTicks.push({
               n: i,
               l: conf.major.auto.labels ? formatNumber(
@@ -86,13 +95,13 @@
       const to = scale.domain()[1];
       if (typeof to == "number" && typeof from == "number") {
         const expectedTicks =
-          1 + (to - from) / conf.minor.auto.each;
+          1 + (to - conf.minor.auto.from) / conf.minor.auto.each;
         if (expectedTicks > maxTicks) {
           autoMinorTicks = [
             { n: from, l: `Too many ticks (${expectedTicks})` },
           ];
         } else {
-          for (let i = from; i <= to; i += conf.minor.auto.each) {
+          for (let i = conf.minor.auto.from; i <= to; i += conf.minor.auto.each) {
             autoMinorTicks.push({
               n: i,
               l: conf.minor.auto.labels ? formatNumber(
