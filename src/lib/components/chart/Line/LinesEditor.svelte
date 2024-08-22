@@ -1,44 +1,33 @@
 <script lang="ts">
   import { LabelLocation, LabelStyleLine } from "$lib/chart";
   import type { db } from "$lib/chartStore";
-  import { negativeOneToInf, orDefault } from "$lib/utils";
+  import { negativeOneToInf } from "$lib/utils";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import type { formatData } from "./data";
+  import LinesEditorLine from "./LinesEditorLine.svelte";
 
   export let chartColors: string[];
   export let values: ReturnType<typeof formatData>;
   export let lineSpec: ReturnType<ReturnType<typeof db.chart>["line"]>;
 
   let selected: { [key: string]: boolean } = {};
+  let defaultSelected = false;
+  let defaultStyle = lineSpec.defaultLineStyle();
   $: selectedIndexes = Object.keys(selected)
-    .filter((k) => selected[k])
-    .map((k) => ({
-      i: $lineSpec.style.byKey.findIndex((e) => e.k === k),
-      k,
-    }));
+    .filter((k) => selected[k] !== false)
+    .map((k) => {
+      const i = $lineSpec.style.byKey.findIndex((e) => e.k === k);
+      return {
+        style: lineSpec.lineStyle(i),
+        i,
+        k,
+      };
+    });
   $: canEdit =
     selectedIndexes.length == 0 ||
     selectedIndexes.findIndex((e) => e.i == -1) != -1;
 
-  const toggleSelect = (
-    key: string,
-    me: MouseEvent | null,
-    ke?: KeyboardEvent,
-  ) => {
-    let replace = true;
-    if (ke) {
-      if (ke.code != "Enter" && ke.code != "Space") {
-        return;
-      }
-      ke.preventDefault();
-      if (ke.ctrlKey) {
-        replace = false;
-      }
-    } else if (me) {
-      if (me.ctrlKey) {
-        replace = false;
-      }
-    }
+  const toggleSelect = (key: string, select: boolean, replace: boolean) => {
     if (replace) {
       if (typeof selected[key] == "undefined") selected[key] = true;
       Object.keys(selected).forEach((k) => (selected[k] = k == key));
@@ -60,11 +49,17 @@
         negativeOneToInf($lineSpec.style.byKey.findIndex((e) => e.k == a.key)) -
         negativeOneToInf($lineSpec.style.byKey.findIndex((e) => e.k == b.key)),
     )
-    .map((d) => ({
-      d,
-      style: $lineSpec.style.byKey.find((e) => e.k == d.key),
-    }));
+    .map((d) => {
+      const i = $lineSpec.style.byKey.findIndex((e) => e.k == d.key);
+      return {
+        d,
+        style: i == -1 ? undefined : lineSpec.lineStyle(i),
+        selected: selected[d.key] === true,
+        // style: $lineSpec.style.byKey.find((e) => e.k == d.key),
+      };
+    });
 
+  // TODO: These variables and functions needs to be unified somehow
   $: selectedLabel = selectedIndexes.reduce(
     (last, nextI) => {
       const next = $lineSpec.style.byKey[nextI.i];
@@ -193,7 +188,7 @@
           labelText: d.k,
         });
       } else {
-        lineSpec.lineStyle(d.i).setLabelText(d.k);
+        d.style.setLabelText(d.k);
       }
     });
   };
@@ -205,13 +200,13 @@
           labelText: label,
         });
       } else {
-        lineSpec.lineStyle(d.i).setLabelText(label);
+        d.style.setLabelText(label);
       }
     });
   };
   $: setLineColor = (color: string) => {
     selectedIndexes.forEach((d) => {
-      const style = lineSpec.lineStyle(d.i);
+      const style = d.style;
       if (
         $lineSpec.style.byKey[d.i].label.color ==
         $lineSpec.style.byKey[d.i].color
@@ -223,23 +218,23 @@
   };
   $: setTextColor = (color: string) => {
     selectedIndexes.forEach((d) => {
-      lineSpec.lineStyle(d.i).setLabelColor(color);
+      d.style.setLabelColor(color);
     });
   };
   $: setWidth = (width: number) => {
     selectedIndexes.forEach((d) => {
-      lineSpec.lineStyle(d.i).setwidth(width);
+      d.style.setwidth(width);
     });
   };
   $: setLabelLocation = (location: string) => {
     selectedIndexes.forEach((d) => {
-      lineSpec.lineStyle(d.i).setLabelLocation(location);
+      d.style.setLabelLocation(location);
     });
   };
   $: type = typeof values[0]?.value[0]?.x == "number" ? "number" : "date";
   $: setLabelX = (value: string) => {
     selectedIndexes.forEach((d) => {
-      const style = lineSpec.lineStyle(d.i);
+      const style = d.style;
       const parsed =
         type == "number" ? Number.parseInt(value) : new Date(value).getTime();
       const proposed = values
@@ -263,7 +258,7 @@
   };
   $: setLabelLineStyle = (value: LabelStyleLine) => {
     selectedIndexes.forEach((d) => {
-      lineSpec.lineStyle(d.i).setLabelLine(value);
+      d.style.setLabelLine(value);
     });
   };
 </script>
@@ -273,38 +268,22 @@
     Search
     <input bind:value={searchString} class="line-search" />
   </label>
-  {#each filteredValues as line, i}
-    <div
-      on:click={(e) => toggleSelect(line.d.key, e)}
-      on:keydown={(e) => toggleSelect(line.d.key, null, e)}
-      class:line-selected={selected[line.d.key] === true}
-      class="line-item"
-      role="button"
-      tabindex="0"
-    >
-      <div class="line-text">
-        {line.d.key}
-      </div>
-      <div class="line-buttons">
-        {#if line.style}
-          &#x25B2; &#x25BC; &nbsp;
-          <ColorPicker
-            color={orDefault(line.style?.color, "#00000000")}
-            {chartColors}
-            on:change={(e) => lineSpec.lineStyle(i).setColor(e.detail)}
-          />
-          &nbsp;
-          <span
-            on:click={() => lineSpec.lineStyle(i).delete()}
-            on:keydown={(e) =>
-              e.code == "Space" ? lineSpec.lineStyle(i).delete() : ""}
-            role="button"
-            tabindex="0"
-            title="delete">❌</span
-          >
-        {/if}
-      </div>
-    </div>
+  <LinesEditorLine
+    style={defaultStyle}
+    selected={defaultSelected}
+    {chartColors}
+  />
+  {#each filteredValues as line}
+    {#if line}
+      <LinesEditorLine
+        style={line.style}
+        key={line.d.key}
+        selected={line.selected}
+        {chartColors}
+        on:onSelect={(e) =>
+          toggleSelect(line.d.key, e.detail.selected, e.detail.replace)}
+      />
+    {/if}
   {/each}
 </div>
 
@@ -399,26 +378,7 @@
     border: 1px solid black;
     box-sizing: border-box;
   }
-  .line-item {
-    width: 100%;
-    padding: 0.3em;
-    display: flex;
-    box-sizing: border-box;
-    align-items: center;
-  }
-  .line-selected {
-    background-color: #dddddd;
-  }
   .line-search {
     width: 100%;
-  }
-  .line-text {
-    cursor: pointer;
-  }
-  .line-buttons {
-    margin-left: auto;
-    height: 16px;
-    display: flex;
-    align-items: center;
   }
 </style>
