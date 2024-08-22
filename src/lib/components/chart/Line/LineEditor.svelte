@@ -1,6 +1,4 @@
 <script lang="ts">
-  import LineStyleEditor from "./LineStyleEditor.svelte";
-
   import { type Root } from "$lib/chart";
   import { db } from "$lib/chartStore";
   import type { DSVParsedArray } from "d3-dsv";
@@ -25,10 +23,6 @@
     ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.valueType })), []),
     ...orDefault(dataSet?.rows, []),
   ];
-
-  $: unspecifiecKeys = values
-    .filter((v) => !$dbLine.style.byKey.find((s) => s.k == v.key))
-    .map((v) => v.key);
 
   $: xScaleIndex = spec.chart.scales.findIndex(
     (s) => s.name == $dbLine.x.scale,
@@ -217,24 +211,6 @@
   {values}
   lineSpec={dbLine}
 />
-<LineStyleEditor
-  style={dbLine.defaultLineStyle()}
-  {chartColors}
-  {values}
-  lineSpec={dbLine}
-></LineStyleEditor>
-{#each $dbLine.style.byKey as _style, i}
-  <LineStyleEditor
-    style={dbLine.lineStyle(i)}
-    {chartColors}
-    {unspecifiecKeys}
-    {values}
-    lineSpec={dbLine}
-  ></LineStyleEditor>
-{/each}
-<button on:click={() => dbLine.addLineStyle($dbLine.style.byKey.length)}
-  >+</button
->
 <br />
 
 <b>X axis</b>
