@@ -19,6 +19,7 @@
       const i = $lineSpec.style.byKey.findIndex((e) => e.k === k);
       return {
         style: lineSpec.lineStyle(i),
+        $style: $lineSpec.style.byKey[i],
         i,
         k,
       };
@@ -26,6 +27,39 @@
   $: canEdit =
     selectedIndexes.length == 0 ||
     selectedIndexes.findIndex((e) => e.i == -1) != -1;
+  const chooseSelectedStyle = <T>(merged: T, next: T): T | undefined => typeof merged == "undefined"
+            ? next
+            : merged == next
+              ? merged
+              : undefined;
+  $: mergedStyle = selectedIndexes
+    .map((e) => e.$style)
+    .reduce(
+      (merged, next) => {
+        if (typeof next == "undefined") return merged;
+
+        merged.color = chooseSelectedStyle(merged.color, next.color);
+        merged.width = chooseSelectedStyle(merged.width, next.width);
+        merged.label.color = chooseSelectedStyle(merged.label.color, next.label.color);
+        merged.label.location = chooseSelectedStyle(merged.label.location, next.label.location);
+        merged.label.line = chooseSelectedStyle(merged.label.line, next.label.line);
+        merged.label.text = chooseSelectedStyle(merged.label.text, next.label.text);
+        merged.label.x = chooseSelectedStyle(merged.label.x, next.label.x);
+
+        return merged;
+      },
+      { label: {} } as {
+        color: string | undefined;
+        width: number | undefined;
+        label: {
+          color: string | undefined;
+          location: string | undefined;
+          line: string | undefined;
+          text: string | undefined;
+          x: number | undefined;
+        };
+      },
+    );
 
   const toggleSelect = (key: string, select: boolean, replace: boolean) => {
     if (replace) {
@@ -58,127 +92,6 @@
         // style: $lineSpec.style.byKey.find((e) => e.k == d.key),
       };
     });
-
-  // TODO: These variables and functions needs to be unified somehow
-  $: selectedLabel = selectedIndexes.reduce(
-    (last, nextI) => {
-      const next = $lineSpec.style.byKey[nextI.i];
-      if (typeof next == "undefined") {
-        return "";
-      }
-      if (last === 0) {
-        return next.label.text;
-      }
-      if (last === next.label.text) {
-        return last;
-      } else {
-        return 1;
-      }
-    },
-    0 as string | number,
-  );
-  $: selectedColor = selectedIndexes.reduce(
-    (last, nextI) => {
-      const next = $lineSpec.style.byKey[nextI.i];
-      if (typeof next == "undefined") {
-        return "";
-      }
-      if (last === 0) {
-        return next.color;
-      }
-      if (last === next.color) {
-        return last;
-      } else {
-        return 1;
-      }
-    },
-    0 as string | number,
-  );
-  $: selectedTextColor = selectedIndexes.reduce(
-    (last, nextI) => {
-      const next = $lineSpec.style.byKey[nextI.i];
-      if (typeof next == "undefined") {
-        return "";
-      }
-      if (last === 0) {
-        return next.label.color;
-      }
-      if (last === next.label.color) {
-        return last;
-      } else {
-        return 1;
-      }
-    },
-    0 as string | number,
-  );
-  $: selectedWidth = selectedIndexes.reduce(
-    (last, nextI) => {
-      const next = $lineSpec.style.byKey[nextI.i];
-      if (typeof next == "undefined") {
-        return "";
-      }
-      if (last === "") {
-        return next.width;
-      }
-      if (last === next.width) {
-        return last;
-      } else {
-        return "";
-      }
-    },
-    "" as string | number,
-  );
-  $: selectedLabelLocation = selectedIndexes.reduce(
-    (last, nextI) => {
-      const next = $lineSpec.style.byKey[nextI.i];
-      if (typeof next == "undefined") {
-        return "";
-      }
-      if (last === "") {
-        return next.label.location;
-      }
-      if (last === next.label.location) {
-        return last;
-      } else {
-        return "";
-      }
-    },
-    "" as string | number,
-  );
-  $: selectedLabelX = selectedIndexes.reduce(
-    (last, nextI) => {
-      const next = $lineSpec.style.byKey[nextI.i];
-      if (typeof next == "undefined") {
-        return "";
-      }
-      if (last === "") {
-        return next.label.x;
-      }
-      if (last === next.label.x) {
-        return last;
-      } else {
-        return "";
-      }
-    },
-    "" as string | number,
-  );
-  $: selectedLabelLine = selectedIndexes.reduce(
-    (last, nextI) => {
-      const next = $lineSpec.style.byKey[nextI.i];
-      if (typeof next == "undefined") {
-        return null;
-      }
-      if (last === null) {
-        return next.label.line;
-      }
-      if (last === next.label.line) {
-        return last;
-      } else {
-        return null;
-      }
-    },
-    null as LabelStyleLine | null,
-  );
 
   $: setLabelToKey = () => {
     selectedIndexes.forEach((d) => {
@@ -272,6 +185,7 @@
     style={defaultStyle}
     selected={defaultSelected}
     {chartColors}
+    on:onSelect={(e) => (defaultSelected = e.detail.selected)}
   />
   {#each filteredValues as line}
     {#if line}
@@ -292,7 +206,9 @@
     <label>
       Label
       <input
-        value={typeof selectedLabel == "string" ? selectedLabel : ""}
+        value={typeof mergedStyle.label.text == "undefined"
+          ? ""
+          : mergedStyle.label.text}
         on:change={(e) => setLineLabel(e.currentTarget.value)}
       />
     </label>
@@ -302,18 +218,18 @@
     <span>
       Line color
       <ColorPicker
-        color={typeof selectedColor == "string" && selectedColor != ""
-          ? selectedColor
-          : "#ffffff"}
+        color={typeof mergedStyle.color == "undefined"
+          ? "#ffffff"
+          : mergedStyle.color}
         {chartColors}
         disabled={selectedIndexes.length == 0 || canEdit}
         on:change={(e) => setLineColor(e.detail)}
       />
       text color
       <ColorPicker
-        color={typeof selectedTextColor == "string" && selectedTextColor != ""
-          ? selectedTextColor
-          : "#ffffff"}
+        color={typeof mergedStyle.label.color == "undefined"
+          ? "#ffffff"
+          : mergedStyle.label.color}
         {chartColors}
         disabled={selectedIndexes.length == 0 || canEdit}
         on:change={(e) => setTextColor(e.detail)}
@@ -324,7 +240,7 @@
     <label>
       Width
       <input
-        value={selectedWidth}
+        value={typeof mergedStyle.width == "undefined" ? "" : mergedStyle.width}
         disabled={canEdit}
         on:change={(e) => setWidth(Number.parseInt(e.currentTarget.value))}
         type="number"
@@ -336,7 +252,9 @@
     <label>
       Location
       <select
-        value={selectedLabelLocation}
+        value={typeof mergedStyle.label.location == "undefined"
+          ? ""
+          : mergedStyle.label.location}
         disabled={canEdit}
         on:change={(e) => setLabelLocation(e.currentTarget.value)}
       >
@@ -348,7 +266,9 @@
     <label>
       X value
       <input
-        value={selectedLabelX}
+        value={typeof mergedStyle.label.x == "undefined"
+          ? ""
+          : mergedStyle.label.x}
         disabled={canEdit}
         on:change={(e) => setLabelX(e.currentTarget.value)}
         type="number"
@@ -358,7 +278,9 @@
     <label>
       Line
       <input
-        checked={selectedLabelLine == LabelStyleLine.Line}
+        checked={typeof mergedStyle.label.line == "undefined"
+          ? false
+          : mergedStyle.label.line == LabelStyleLine.Line}
         on:change={(e) =>
           setLabelLineStyle(
             e.currentTarget.checked ? LabelStyleLine.Line : LabelStyleLine.None,
