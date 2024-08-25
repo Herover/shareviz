@@ -24,14 +24,12 @@
         k,
       };
     });
-  $: canEdit =
-    selectedIndexes.length == 0 ||
-    selectedIndexes.findIndex((e) => e.i == -1) != -1;
-  const chooseSelectedStyle = <T>(merged: T, next: T): T | undefined => typeof merged == "undefined"
-            ? next
-            : merged == next
-              ? merged
-              : undefined;
+  $: nonEditable =
+    !defaultSelected &&
+    (selectedIndexes.length == 0 ||
+      selectedIndexes.findIndex((e) => e.i == -1) != -1);
+  const chooseSelectedStyle = <T,>(merged: T, next: T): T | undefined =>
+    typeof merged == "undefined" ? next : merged == next ? merged : undefined;
   $: mergedStyle = selectedIndexes
     .map((e) => e.$style)
     .reduce(
@@ -40,33 +38,60 @@
 
         merged.color = chooseSelectedStyle(merged.color, next.color);
         merged.width = chooseSelectedStyle(merged.width, next.width);
-        merged.label.color = chooseSelectedStyle(merged.label.color, next.label.color);
-        merged.label.location = chooseSelectedStyle(merged.label.location, next.label.location);
-        merged.label.line = chooseSelectedStyle(merged.label.line, next.label.line);
-        merged.label.text = chooseSelectedStyle(merged.label.text, next.label.text);
+        merged.label.color = chooseSelectedStyle(
+          merged.label.color,
+          next.label.color,
+        );
+        merged.label.location = chooseSelectedStyle(
+          merged.label.location,
+          next.label.location,
+        );
+        merged.label.line = chooseSelectedStyle(
+          merged.label.line,
+          next.label.line,
+        );
+        merged.label.text = chooseSelectedStyle(
+          merged.label.text,
+          next.label.text,
+        );
         merged.label.x = chooseSelectedStyle(merged.label.x, next.label.x);
 
         return merged;
       },
-      { label: {} } as {
-        color: string | undefined;
-        width: number | undefined;
-        label: {
-          color: string | undefined;
-          location: string | undefined;
-          line: string | undefined;
-          text: string | undefined;
-          x: number | undefined;
-        };
-      },
+      defaultSelected
+        ? $lineSpec.style.default
+        : ({ label: {} } as {
+            color: string | undefined;
+            width: number | undefined;
+            label: {
+              color: string | undefined;
+              location: string | undefined;
+              line: string | undefined;
+              text: string | undefined;
+              x: number | undefined;
+            };
+          }),
     );
 
-  const toggleSelect = (key: string, select: boolean, replace: boolean) => {
+  const toggleSelect = (
+    key: string | null,
+    select: boolean,
+    replace: boolean,
+  ) => {
     if (replace) {
-      if (typeof selected[key] == "undefined") selected[key] = true;
+      if (key == null) {
+        defaultSelected = true;
+      } else {
+        if (typeof selected[key] == "undefined") selected[key] = true;
+        defaultSelected = false;
+      }
       Object.keys(selected).forEach((k) => (selected[k] = k == key));
     } else {
-      selected[key] = !selected[key];
+      if (key == null) {
+        defaultSelected = !defaultSelected;
+      } else {
+        selected[key] = !selected[key];
+      }
     }
   };
 
@@ -104,6 +129,10 @@
         d.style.setLabelText(d.k);
       }
     });
+
+    if (defaultSelected) {
+      lineSpec.defaultLineStyle().setLabelText("auto");
+    }
   };
   $: setLineLabel = (label: string) => {
     selectedIndexes.forEach((d) => {
@@ -116,6 +145,10 @@
         d.style.setLabelText(label);
       }
     });
+
+    if (defaultSelected) {
+      lineSpec.defaultLineStyle().setLabelText(label);
+    }
   };
   $: setLineColor = (color: string) => {
     selectedIndexes.forEach((d) => {
@@ -128,21 +161,43 @@
       }
       style.setColor(color);
     });
+
+    if (defaultSelected) {
+      const style = lineSpec.defaultLineStyle();
+      if (
+        $lineSpec.style.default.label.color == $lineSpec.style.default.color
+      ) {
+        style.setLabelColor(color);
+      }
+      style.setColor(color);
+    }
   };
   $: setTextColor = (color: string) => {
     selectedIndexes.forEach((d) => {
       d.style.setLabelColor(color);
     });
+
+    if (defaultSelected) {
+      lineSpec.defaultLineStyle().setLabelColor(color);
+    }
   };
   $: setWidth = (width: number) => {
     selectedIndexes.forEach((d) => {
       d.style.setwidth(width);
     });
+
+    if (defaultSelected) {
+      lineSpec.defaultLineStyle().setwidth(width);
+    }
   };
   $: setLabelLocation = (location: string) => {
     selectedIndexes.forEach((d) => {
       d.style.setLabelLocation(location);
     });
+
+    if (defaultSelected) {
+      lineSpec.defaultLineStyle().setLabelLocation(location);
+    }
   };
   $: type = typeof values[0]?.value[0]?.x == "number" ? "number" : "date";
   $: setLabelX = (value: string) => {
@@ -185,7 +240,7 @@
     style={defaultStyle}
     selected={defaultSelected}
     {chartColors}
-    on:onSelect={(e) => (defaultSelected = e.detail.selected)}
+    on:onSelect={(e) => toggleSelect(null, e.detail.selected, e.detail.replace)}
   />
   {#each filteredValues as line}
     {#if line}
@@ -214,6 +269,7 @@
     </label>
     <button on:click={() => setLabelToKey()}>Auto</button>
   </p>
+  {nonEditable}
   <p>
     <span>
       Line color
@@ -222,7 +278,7 @@
           ? "#ffffff"
           : mergedStyle.color}
         {chartColors}
-        disabled={selectedIndexes.length == 0 || canEdit}
+        disabled={nonEditable}
         on:change={(e) => setLineColor(e.detail)}
       />
       text color
@@ -231,7 +287,7 @@
           ? "#ffffff"
           : mergedStyle.label.color}
         {chartColors}
-        disabled={selectedIndexes.length == 0 || canEdit}
+        disabled={nonEditable}
         on:change={(e) => setTextColor(e.detail)}
       />
     </span>
@@ -241,7 +297,7 @@
       Width
       <input
         value={typeof mergedStyle.width == "undefined" ? "" : mergedStyle.width}
-        disabled={canEdit}
+        disabled={nonEditable}
         on:change={(e) => setWidth(Number.parseInt(e.currentTarget.value))}
         type="number"
         style="width: 80px"
@@ -255,7 +311,7 @@
         value={typeof mergedStyle.label.location == "undefined"
           ? ""
           : mergedStyle.label.location}
-        disabled={canEdit}
+        disabled={nonEditable}
         on:change={(e) => setLabelLocation(e.currentTarget.value)}
       >
         {#each Object.values(LabelLocation) as location}
@@ -269,7 +325,7 @@
         value={typeof mergedStyle.label.x == "undefined"
           ? ""
           : mergedStyle.label.x}
-        disabled={canEdit}
+        disabled={nonEditable || defaultSelected}
         on:change={(e) => setLabelX(e.currentTarget.value)}
         type="number"
         style="width: 80px;"
@@ -285,7 +341,7 @@
           setLabelLineStyle(
             e.currentTarget.checked ? LabelStyleLine.Line : LabelStyleLine.None,
           )}
-        disabled={canEdit}
+        disabled={nonEditable || defaultSelected}
         type="checkbox"
       />
     </label>
