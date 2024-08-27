@@ -264,12 +264,13 @@
         value={typeof mergedStyle.label.text == "undefined"
           ? ""
           : mergedStyle.label.text}
+        disabled={nonEditable}
         on:change={(e) => setLineLabel(e.currentTarget.value)}
       />
     </label>
-    <button on:click={() => setLabelToKey()}>Auto</button>
+    <button disabled={nonEditable} on:click={() => setLabelToKey()}>Auto</button
+    >
   </p>
-  {nonEditable}
   <p>
     <span>
       Line color
