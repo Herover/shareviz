@@ -8,6 +8,7 @@ export const formatData = (componentSpec: Line, data: { [key: string]: any[] }) 
     (k, g) => ({
       label: k,
       key: k,
+      d: g,
       value: g.map((d) => ({
         x: d[componentSpec.x.key] as number | Date,
         y: d[componentSpec.y.key] as number,
