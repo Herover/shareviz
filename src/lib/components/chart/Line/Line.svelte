@@ -10,7 +10,7 @@
   import { line } from "d3-shape";
   import Axis from "../Axis.svelte";
   import { max, min } from "d3-array";
-  import FloatingLabels from "./FloatingLabels.svelte";
+  import FloatingLabels from "./FloatingLabels/FloatingLabels.svelte";
   import { createEventDispatcher } from "svelte";
 
   export let values: {
