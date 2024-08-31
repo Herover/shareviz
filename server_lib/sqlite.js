@@ -279,5 +279,51 @@ const cmds = (/** @type {sqlite.Database} */ db) => {
         }).finalize();
       });
     },
+
+    /**
+     * @returns {Promise<void>} update a charts info
+     */
+    updateChart: async (/** @type {string} */ chartRef, /** @type {string} */ name) => {
+      return new Promise((resolve, reject) => {
+        const stmt = db.prepare(`
+          UPDATE charts
+          SET name = ?
+          WHERE chart_ref = ?
+        `);
+        stmt.run([name, chartRef], /** @this sqlite.RunResult */ function (/** @type {Error | null} */ err) {
+          if (err != null) {
+            reject(err);
+          }
+          resolve();
+        }).finalize();
+      });
+    },
+
+    /**
+     * @returns {Promise<{ id: string, name: string, chartRef: string }>} update a charts info
+     */
+    getChart: async (/** @type {string} */ chartRef) => {
+      return new Promise((resolve, reject) => {
+        const stmt = db.prepare(`
+          SELECT
+            charts.id AS id,
+            charts.name AS name,
+            charts.chart_ref AS chartRef
+          FROM
+            charts
+          WHERE
+            charts.chart_ref = ?
+        `);
+
+        stmt.get([chartRef], function (err, row) {
+          if (err != null) {
+            reject(err);
+            return;
+          }
+
+          resolve(row);
+        }).finalize();
+      });
+    },
   }
 };

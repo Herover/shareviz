@@ -22,7 +22,7 @@
 
   $: if (live && $db.doc) chartSpec = $db.doc as Root;
   $: if (!live) {
-    fetch("/api/chart/" + data.id)
+    fetch("/api/chart/" + data.id + "/data")
       .then((resp) => resp.json())
       .then((data) => chartSpec = data.chart)
       .catch((err) => console.error(err));

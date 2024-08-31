@@ -5,7 +5,7 @@
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
   import DataSetEditor from "$lib/components/chart/DataSetsEditor.svelte";
   import EditorCollapsible from "$lib/components/chart/EditorCollapsible.svelte";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { user } from "$lib/userStore";
   import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
   import { computeData } from "$lib/data.js";
@@ -14,11 +14,15 @@
 
   let viewScale = 100;
 
-  const disconnect = db.connect();
-  db.load(data.id, !data.id.includes(localPrefix));
+  let disconnect: undefined | (() => void);
+
+  onMount(() => {
+    disconnect = db.connect();
+    db.load(data.id, !data.id.includes(localPrefix));
+  });
 
   onDestroy(() => {
-    disconnect();
+    if (disconnect) disconnect();
   });
 
   $: chartSpec = $db.doc as Root;
@@ -68,6 +72,11 @@
   {#if chartSpec != null}
     <div class="chart-controls-pane">
       <div class="chart-controls-primary chart-controls">
+        <input
+          value={$db?.chartInfo?.name}
+          on:change={e => db.updateInfo({ name: e.currentTarget.value })}
+          disabled={!canEdit || $db.chartInfo == null}
+        />
         {#if canEdit}
         <EditorCollapsible
           group="controls"

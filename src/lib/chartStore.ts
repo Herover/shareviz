@@ -21,6 +21,7 @@ interface PresenceData {
 export const db = function createDB() {
   let doc: any; // Doc;
   let connection: any;
+  let id: undefined | string;
   
   let presence: any; // Presence<PresenceData>;
   //let localPresence: any; // LocalPresence<PresenceData>;
@@ -85,7 +86,8 @@ export const db = function createDB() {
     presences: unknown,
     presenceTargets: unknown,
     mode: "local" | "synced",
-  }>({ connected, doc: null, missing: false, presences: {}, presenceTargets: {}, mode: "local" });
+    chartInfo: null | any,
+  }>({ connected, doc: null, missing: false, presences: {}, presenceTargets: {}, mode: "local", chartInfo: null });
 
   return {
     subscribe, set, update,
@@ -116,6 +118,7 @@ export const db = function createDB() {
       return () => socket.close();
     },
     load: (docId: string, synced: boolean) => {
+      id = docId;
       doc = synced ? connection.get('examples', docId) : getLocalDoc("examples", docId);
       doc.on("error", (e: Error) => notifications.addError(e.message))
 
@@ -154,14 +157,15 @@ export const db = function createDB() {
       const onData = (e?: Error) => {
         if (e && typeof e.message == "string") notifications.addError(e.message);
         console.log("doc", doc, doc.data)
-        set({
+        update(d => ({
           doc: doc.data,
           missing: typeof doc.data === "undefined",
           connected,
           presences,
           presenceTargets,
           mode: doc.mode === "synced" ? "synced" : "local",
-        });
+          chartInfo: d.chartInfo,
+        }));
       }
       // window.localPresence = localPresence
       // window.presence = presence
@@ -171,6 +175,15 @@ export const db = function createDB() {
       // When document changes (by this client or any other, or the server),
       // update the number on the page
       doc.on('op', onData);
+
+      if (synced) {
+        fetch("/api/chart/" + docId)
+          .then(res => res.json())
+          .then(data => update(d => ({
+            ...d,
+            chartInfo: data.chart,
+          })));
+      }
     },
     create: (synced: boolean) => {
       return new Promise<string>((resolve, reject) => {
@@ -258,6 +271,29 @@ export const db = function createDB() {
           else resolve(local);
         });
       });
+    },
+
+    updateInfo: async (info: { name: string }) => {
+      const res = await fetch(
+        "/api/chart/" + id,
+        {
+          method: "PUT",
+          body: JSON.stringify({ name: info.name })
+        },
+      );
+
+      if (res.status != 200) {
+        notifications.addError("Unable to update");
+        return;
+      }
+
+      update((d) => ({
+        ...d,
+        chartInfo: {
+          ...d.chartInfo,
+          name: info.name,
+        },
+      }));
     },
 
     chart: () => {
