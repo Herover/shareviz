@@ -28,18 +28,7 @@
   let cc = [0, 0, 0];
 
   $: try {
-    if (color.startsWith("lch")) {
-      const parts = color.match(/(\d+\.?\d*)/g);
-      if (parts && parts.length == 3) {
-        cc = [
-          Math.max(Math.min(Number.parseFloat(parts[0]), 100), 0),
-          Math.max(Math.min(Number.parseFloat(parts[1]), 100), 0),
-          Number.parseFloat(parts[2]) % 360,
-        ];
-      }
-    } else {
-      cc = chroma(color).lch();
-    }
+    cc = chroma(color).lch();
   } catch (e) {
     console.warn(e);
     cc = [0, 0, 0];
