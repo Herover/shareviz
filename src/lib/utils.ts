@@ -4,7 +4,7 @@ enum Divide {
   Millions = 1000000,
 }
 
-export const formatNumber = (val: number, divide = Divide.None, thousandsDelim = ",", fractionDelim = ".") => {
+export const formatNumber = (val: number, divide = Divide.None, thousandsDelim = ",", fractionDelim = ".", decimals = 1) => {
   const str = "" + val / divide;
 
   let res = "";
@@ -16,8 +16,8 @@ export const formatNumber = (val: number, divide = Divide.None, thousandsDelim =
     res = wholes[i] + res;
   }
 
-  if (typeof fraction != "undefined" && fraction.length > 0) {
-    res += fractionDelim + fraction;
+  if (typeof fraction != "undefined" && fraction.length > 0 && decimals > 0) {
+    res += fractionDelim + fraction.slice(0, decimals);
   }
 
   /* if (fraction) {

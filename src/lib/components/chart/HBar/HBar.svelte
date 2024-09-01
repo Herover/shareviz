@@ -4,6 +4,7 @@
   import type { Root, HBar } from "$lib/chart";
   import { AxisLocation } from "$lib/chart";
   import Axis from "../Axis.svelte";
+  import HBarRect from "./HBarRect.svelte";
 
   export let labelWidth: number;
   export let valueWidth: number;
@@ -19,7 +20,7 @@
 
   const dispatch = createEventDispatcher();
 
-  const valueHeight = 20;
+  const valueHeight = 26;
   const barMargin = 0;
   const blockMargin = 16;
   let legendHeight = 0;
@@ -122,15 +123,17 @@
         >
 
         {#each d.value as dd, ii}
-          <rect
+          <HBarRect
             x={labelWidth + valueScale(dd.from)}
             y={(hBarSpec.stackSubCategories ? 0 : ii) * valueHeight + barMargin}
             height={barHeight}
             width={valueScale(dd.to - dd.from)}
             fill={color(dd.label != "" ? dd : d)}
-          >
-            <title>{dd.label}: {dd.value}</title>
-          </rect>
+            label={dd.label}
+            value={dd.value}
+            {barHeight}
+            axis={hBarSpec.axis}
+          />
         {/each}
       </g>
     {/each}
