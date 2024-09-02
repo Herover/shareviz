@@ -336,6 +336,16 @@
     <button on:click={removeExtraColorKeys}>Remove extra data keys</button>
   {/if}
   <p>
+    <label>
+      Rectangle labels:
+      <input
+        checked={$dbHBar.rectLabels}
+        on:change={(e) => dbHBar.setRectLabels(e.currentTarget.checked)}
+        type="checkbox"
+      />
+    </label>
+  </p>
+  <p>
     <label
       >Repeat for each:
       <select

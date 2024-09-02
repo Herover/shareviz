@@ -143,6 +143,7 @@ export interface HBar {
   labelWidth: number
   repeat: string
   scale: string
+  rectLabels: boolean
 }
 
 export enum LabelLocation {

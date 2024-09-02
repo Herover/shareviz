@@ -312,6 +312,7 @@ export const db = function createDB() {
             setValue: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "value", { r: 0, i: value }]),
             setRepeat: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "repeat", { r: 0, i: value }]),
             setDataSet: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "dataSet", { r: 0, i: value }]),
+            setRectLabels: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "d", "rectLabels", { r: 0, i: value }]),
             axis: () => axis(hbarScope, ["axis"], doc),
           };
         },
@@ -380,6 +381,7 @@ export const db = function createDB() {
               labelWidth: 170,
               repeat: "",
               scale: "x", // FIXME
+              rectLabels: false,
               axis: {
                 location: "start",
                 labelSpace: 0,

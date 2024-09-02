@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Axis } from "$lib/chart";
+  import type { Axis, HBar } from "$lib/chart";
   import { formatNumber } from "$lib/utils";
   import chroma from "chroma-js";
 
@@ -12,6 +12,7 @@
   export let label: string;
   export let value: number;
   export let axis: Axis;
+  export let conf: HBar
 
   let textBox: DOMRect | undefined;
   $: offset = (textBox ? barHeight - textBox.height : 0);
@@ -36,15 +37,17 @@
 <rect {x} {y} {height} {width} {fill}>
   <title>{label}: {value}</title>
 </rect>
-<text
-  bind:contentRect={textBox}
-  x={x + width - offset}
-  y={y + barHeight / 2}
-  opacity={display ? null : 0}
-  aria-hidden={display ? null : true}
-  fill={textColor}
-  text-anchor="end"
-  dominant-baseline="middle"
->
-  {formatNumber(value, axis.major.labelDivide, axis.major.labelThousands)}
-</text>
+{#if conf.rectLabels}
+  <text
+    bind:contentRect={textBox}
+    x={x + width - offset}
+    y={y + barHeight / 2}
+    opacity={display ? null : 0}
+    aria-hidden={display ? null : true}
+    fill={textColor}
+    text-anchor="end"
+    dominant-baseline="middle"
+  >
+    {formatNumber(value, axis.major.labelDivide, axis.major.labelThousands)}
+  </text>
+{/if}
