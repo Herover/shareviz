@@ -44,6 +44,10 @@
   });
 
   let autoMajorTicks: { n: number | Date; l: string }[] = [];
+  let manualMajorTicks: {
+    n: number;
+    l: string;
+  }[] = [];
   $: {
     if (scale && conf.major.enabled && conf.major.auto.each != 0) {
       autoMajorTicks = [];
@@ -69,6 +73,7 @@
             });
           }
         }
+        manualMajorTicks = conf.major.ticks.filter(d => d.n <= to && from <= d.n);
       } else if (to instanceof Date && from instanceof Date) {
         let d = new Date(from);
         d.setDate(1);
@@ -85,9 +90,13 @@
       }
     }
   }
-  $: majorTicks = scale ? [...conf.major.ticks, ...autoMajorTicks] : [];
-
+  $: majorTicks = scale ? [...manualMajorTicks, ...autoMajorTicks] : [];
+$:console.log(manualMajorTicks,conf.major.ticks)
   let autoMinorTicks: { n: number | Date; l: string }[] = [];
+  let manualMinorTicks: {
+    n: number;
+    l: string;
+  }[] = [];
   $: {
     if (scale && conf.minor.enabled && conf.minor.auto.each != 0) {
       autoMinorTicks = [];
@@ -112,6 +121,7 @@
             });
           }
         }
+        manualMinorTicks = conf.minor.ticks.filter(d => d.n <= to && from <= d.n);
       } else if (to instanceof Date && from instanceof Date) {
         let d = new Date(from);
         d.setDate(1);
@@ -129,7 +139,7 @@
     }
   }
   $: minorTicks = scale
-    ? [...conf.minor.ticks, ...autoMinorTicks].filter(
+    ? [...manualMinorTicks, ...autoMinorTicks].filter(
         (d) => !majorTicks.find((dd) => dd.l != "" && dd.n == d.n),
       )
     : [];
