@@ -12,6 +12,7 @@
     label: string;
     value: { label: string; value: number; from: number; to: number }[];
   }[];
+  // eslint-disable-next-line svelte/valid-compile
   export let chartSpec: Root;
   export let hBarSpec: HBar;
   export let label: string;
@@ -40,20 +41,15 @@
     .domain(
       hBarSpec.portionSubCategories
         ? [0, 1]
-        : chartSpec.chart.scales.find((s) => s.name == hBarSpec.scale)
-            ?.dataRange || [0, 1],
+        : hBarSpec.scale.dataRange || [0, 1],
     );
   // "#ff8888", "#aa2222"
-  $: colors = chartSpec.chart.scales.find((s) => s.name == "color")?.colors || {
-    default: "#888",
-    byKey: [],
-  };
   $: color = (d: { label: string }) => {
-    const c = colors.byKey.find((e) => e.k == d.label);
+    const c = hBarSpec.colors.byKey.find((e) => e.k == d.label);
     if (c) {
       return c.c;
     }
-    return colors.default;
+    return hBarSpec.colors.default;
   };
 
   $: height =
@@ -84,7 +80,7 @@
 
 {#if showLegend}
   <p>
-    {#each colors.byKey as d}
+    {#each hBarSpec.colors.byKey as d}
       {#if d.legend != "" && d.k != ""}
         <span class="legend-title"><div style="background-color:{d.c}" class="legend-box"></div>{d.legend}</span
         >

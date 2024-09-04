@@ -1,7 +1,7 @@
 <script lang="ts">
   /** eslint-disable @typescript-eslint/strict-boolean-expressions */
   import type {Root } from "$lib/chart";
-  import type { db } from "$lib/chartStore";
+  import { colors, db } from "$lib/chartStore";
   import { group, orDefault } from "$lib/utils";
   import type { DSVParsedArray } from "d3-dsv";
   import AxisEditor from "../AxisEditor.svelte";
@@ -10,18 +10,12 @@
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
 
   export let spec: Root;
+  // eslint-disable-next-line svelte/valid-compile
   export let chart: ReturnType<typeof db.chart>;
   export let dbHBar: ReturnType<ReturnType<typeof db.chart>["hBar"]>;
   export let chartData: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: DSVParsedArray<any>;
-  };
-
-  const deleteColor = (i: number, ci: number) => {
-    chart.removeColorScaleColor(i, ci);
-  };
-  const addColor = (i: number, ci: number) => {
-    chart.addColorScaleColor(i, ci);
   };
 
   $: dataSet = spec.data.sets.find((set) => set.id == $dbHBar.dataSet);
@@ -32,14 +26,22 @@
     ...orDefault(dataSet?.rows, []),
   ];
 
-  $: scaleIndex = spec.chart.scales.findIndex((s) => s.name == $dbHBar.scale);
-  $: scale = typeof spec.chart.scales[scaleIndex] == "undefined" ? { dataRange: [0, 1] } : spec.chart.scales[scaleIndex];
-  $: colorScaleIndex = spec.chart.scales.findIndex(
-    (s) => s.type == "categoriesColor",
-  );
-  $: colorScale = spec.chart.scales[colorScaleIndex];
+  $: scale = dbHBar.scale();
+  $: colorScale = null as unknown as ReturnType<typeof colors>;
+  $: {
+    console.log($dbHBar, dbHBar)
+    colorScale = dbHBar.colors()
+  }
 
-  $: groups = formatData($dbHBar, chartData, colorScale.colors?.byKey || []);
+  const deleteColor = (ci: number) => {
+    colorScale.removeColorScaleColor(ci);
+  };
+  const addColor = (ci: number) => {
+    colorScale.addColorScaleColor(ci);
+  };
+
+  $: groups = formatData($dbHBar, chartData, []/* $colorScale.byKey */);
+  $: console.log(groups,)
   $: {
     const computed = max(groups, (d) =>
       max(d.d, (dd) => max(dd.value, (ddd) => ddd.to)),
@@ -47,16 +49,16 @@
     if (
       typeof computed == "number" &&
       !Number.isNaN(computed) &&
-      computed != scale.dataRange?.[1]
+      computed != $dbHBar.scale.dataRange?.[1]
     ) {
-      chart.setScaleTo(scaleIndex, computed);
+      dbHBar.scale().setScaleTo(computed);
     }
   }
 
   $: unusedGroups = orDefault(groups[0]?.d[0]?.value, [])
     .map((d) => d.label)
-    .filter((k) => colorScale.colors?.byKey.findIndex((c) => c.k == k) == -1);
-
+    .filter((k) => $colorScale.byKey.findIndex((c) => c.k == k) == -1);
+$: console.log(groups,unusedGroups)
   $: automateColorKeys = () => {
     if (typeof $dbHBar.dataSet != "undefined" && typeof chartData[$dbHBar.dataSet] != "undefined") {
       const key = typeof $dbHBar.subCategories != "undefined" ? $dbHBar.subCategories : $dbHBar.categories;
@@ -64,14 +66,14 @@
       const groups = group(key, dataSet, (k) => k);
       groups.forEach((k) => {
         if (
-          !spec.chart.scales[colorScaleIndex].colors?.byKey.find(
+          !$colorScale.byKey.find(
             (d) => d.k == k,
           )
         ) {
-          const n = spec.chart.scales[colorScaleIndex].colors?.byKey.length;
+          const n = $colorScale.byKey.length;
           const keyIndex =
             typeof n != "undefined" ? n : 0;
-          chart.addColorScaleColor(colorScaleIndex, keyIndex, k, "#FF0000", k);
+            colorScale.addColorScaleColor(keyIndex, k, "#FF0000", k);
         }
       });
     }
@@ -83,10 +85,10 @@
       const dataSet = chartData[$dbHBar.dataSet];
       const groups = group(key, dataSet, (k) => k);
       let removed = 0;
-      spec.chart.scales[colorScaleIndex].colors?.byKey.forEach(
+      $colorScale.byKey.forEach(
         (c, keyIndex) => {
           if (typeof groups.find((k) => c.k == k) != "undefined") {
-            chart.removeColorScaleColor(colorScaleIndex, keyIndex - removed);
+            colorScale.removeColorScaleColor(keyIndex - removed);
             removed++;
           }
         },
@@ -95,10 +97,10 @@
   };
 
   $: moveColorKeyUp = (i: number) => {
-    chart.moveColorUp(colorScaleIndex, i);
+    colorScale.moveColorUp(i);
   };
   $: moveColorKeyDown = (i: number) => {
-    chart.moveColorDown(colorScaleIndex, i);
+    colorScale.moveColorDown(i);
   };
 </script>
 
@@ -185,15 +187,13 @@
     <label
       >Scale from:
       <input
-        value={scale.dataRange[0]}
+        value={$scale.dataRange?.[0] ?? 0}
         on:keyup={(e) =>
-          chart.setScaleFrom(
-            scaleIndex,
+          scale.setScaleFrom(
             Number.parseInt(e.currentTarget.value),
           )}
         on:change={(e) =>
-          chart.setScaleFrom(
-            scaleIndex,
+          scale.setScaleFrom(
             Number.parseInt(e.currentTarget.value),
           )}
         type="number"
@@ -203,18 +203,18 @@
     <label>
       to
       <input
-        value={scale.dataRange[1]}
+        value={$scale.dataRange?.[1] ?? 1}
         on:keyup={(e) =>
-          chart.setScaleTo(scaleIndex, Number.parseInt(e.currentTarget.value))}
+          scale.setScaleTo(Number.parseInt(e.currentTarget.value))}
         on:change={(e) =>
-          chart.setScaleTo(scaleIndex, Number.parseInt(e.currentTarget.value))}
+          scale.setScaleTo(Number.parseInt(e.currentTarget.value))}
         type="number"
         style="width: 90px"
       />
     </label>
   </p>
   <p>Colors</p>
-  {#if colorScale.colors}
+  {#if colorScale}
     <table class="color-control">
       <tr><th></th><th>Key</th><th>Color</th><th></th><th>Label</th></tr>
       <tr>
@@ -222,30 +222,28 @@
         <td><input value={"default"} disabled /> </td>
         <td>
           <input
-            value={colorScale.colors.default}
+            value={$colorScale.default}
             on:change={(e) =>
-              chart.setColorScaleDefaultColor(
-                colorScaleIndex,
+              colorScale.setColorScaleDefaultColor(
                 e.currentTarget.value,
               )}
             on:keyup={(e) =>
-              chart.setColorScaleDefaultColor(
-                colorScaleIndex,
+              colorScale.setColorScaleDefaultColor(
                 e.currentTarget.value,
               )}
           />
         </td>
         <td>
           <ColorPicker
-            color={colorScale.colors.default}
+            color={$colorScale.default}
             on:change={(e) =>
-              chart.setColorScaleDefaultColor(colorScaleIndex, e.detail)}
+              colorScale.setColorScaleDefaultColor(e.detail)}
           />
         </td>
         <td> </td>
         <td> </td>
       </tr>
-      {#each colorScale.colors.byKey as color, i}
+      {#each $colorScale.byKey as color, i}
         <tr>
           <td style="width:38px;">
             <button
@@ -254,7 +252,7 @@
               class="color-control-arrow">&#x25B2;</button
             >
             <button
-              disabled={i == colorScale.colors.byKey.length - 1}
+              disabled={i == $colorScale.byKey.length - 1}
               on:click={() => moveColorKeyDown(i)}
               class="color-control-arrow">&#x25BC;</button
             >
@@ -263,8 +261,7 @@
             <select
               value={color.k}
               on:change={(e) =>
-                chart.setColorScaleKey(
-                  colorScaleIndex,
+                colorScale.setColorScaleKey(
                   i,
                   e.currentTarget.value,
                 )}
@@ -282,14 +279,12 @@
             <input
               value={color.c}
               on:change={(e) =>
-                chart.setColorScaleColor(
-                  colorScaleIndex,
+                colorScale.setColorScaleColor(
                   i,
                   e.currentTarget.value,
                 )}
               on:keyup={(e) =>
-                chart.setColorScaleColor(
-                  colorScaleIndex,
+                colorScale.setColorScaleColor(
                   i,
                   e.currentTarget.value,
                 )}
@@ -298,30 +293,28 @@
           <td>
             <ColorPicker
               color={color.c}
-              chartColors={colorScale.colors.byKey.map(c => c.c)}
+              chartColors={$colorScale.byKey.map(c => c.c)}
               on:change={(e) =>
-                chart.setColorScaleColor(colorScaleIndex, i, e.detail)}
+                colorScale.setColorScaleColor(i, e.detail)}
             />
           </td>
           <td
             ><input
               value={color.legend}
               on:change={(e) =>
-                chart.setColorScaleLegend(
-                  colorScaleIndex,
+                colorScale.setColorScaleLegend(
                   i,
                   e.currentTarget.value,
                 )}
               on:keyup={(e) =>
-                chart.setColorScaleLegend(
-                  colorScaleIndex,
+                colorScale.setColorScaleLegend(
                   i,
                   e.currentTarget.value,
                 )}
             />
           </td>
           <td>
-            <button on:click={() => deleteColor(colorScaleIndex, i)}>
+            <button on:click={() => deleteColor(i)}>
               Delete
             </button>
           </td>
@@ -329,8 +322,8 @@
       {/each}
     </table>
     <button
-      on:click={() => addColor(colorScaleIndex, colorScale.colors.byKey.length)}
-      >Add new</button
+      on:click={() => addColor($colorScale.byKey.length)}
+      >Add new {$colorScale.byKey.length}</button
     >
     <button on:click={automateColorKeys}>Add missing data keys</button>
     <button on:click={removeExtraColorKeys}>Remove extra data keys</button>
