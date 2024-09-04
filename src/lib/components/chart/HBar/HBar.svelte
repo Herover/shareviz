@@ -4,7 +4,7 @@
   import type { Root, HBar } from "$lib/chart";
   import { AxisLocation } from "$lib/chart";
   import Axis from "../Axis.svelte";
-  import HBarRect from "./HBarRect.svelte";
+  import HBarLine from "./HBarLine.svelte";
 
   export let labelWidth: number;
   export let valueWidth: number;
@@ -110,28 +110,19 @@
       : 0})"
   >
     {#each values as d, i}
-      <g transform="translate({0},{i * (blockHeight + blockMargin)})">
-        <text
-          x={0}
-          y={blockHeight / 2}
-          dominant-baseline="middle"
-          text-anchor="start">{d.label}</text
-        >
-
-        {#each d.value as dd, ii}
-          <HBarRect
-            x={labelWidth + valueScale(dd.from)}
-            y={(hBarSpec.stackSubCategories ? 0 : ii) * valueHeight + barMargin}
-            height={barHeight}
-            width={valueScale(dd.to - dd.from)}
-            fill={color(dd.label != "" ? dd : d)}
-            label={dd.label}
-            value={dd.value}
-            {barHeight}
-            axis={hBarSpec.axis}
-          />
-        {/each}
-      </g>
+      <HBarLine
+        conf={hBarSpec}
+        {i}
+        {d}
+        {blockHeight}
+        {blockMargin}
+        {barMargin}
+        {barHeight}
+        {labelWidth}
+        {valueHeight}
+        {valueScale}
+        {color}
+      />
     {/each}
   </g>
 </svg>

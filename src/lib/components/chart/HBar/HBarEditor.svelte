@@ -1,6 +1,6 @@
 <script lang="ts">
   /** eslint-disable @typescript-eslint/strict-boolean-expressions */
-  import type {Root } from "$lib/chart";
+  import {HBarTotalLabelStyle, type Root } from "$lib/chart";
   import { colors, db } from "$lib/chartStore";
   import { group, orDefault } from "$lib/utils";
   import type { DSVParsedArray } from "d3-dsv";
@@ -336,6 +336,19 @@ $: console.log(groups,unusedGroups)
         on:change={(e) => dbHBar.setRectLabels(e.currentTarget.checked)}
         type="checkbox"
       />
+    </label>
+  </p>
+  <p>
+    <label>
+      Total labels:
+      <select
+        value={$dbHBar.totalLabels}
+        on:change={(e) => dbHBar.setTotalLabels(e.currentTarget.value)}
+      >
+        {#each Object.values(HBarTotalLabelStyle) as location}
+          <option>{location}</option>
+        {/each}
+      </select>
     </label>
   </p>
   <p>
