@@ -225,6 +225,7 @@ Region Nordjylland	2023	4989245`,
                   ],
                 },
                 rectLabels: false,
+                totalLabels: "none",
                 axis: {
                   location: "start",
                   labelSpace: 0,
@@ -480,7 +481,7 @@ export function startServer(server) {
           next();
         })
         .catch((e) => {
-          console.error("error",e)
+          console.error("error", e)
           next(e);
         });
     } else {

@@ -145,6 +145,13 @@ export interface HBar {
   scale: Scale
   colors: Colors
   rectLabels: boolean
+  totalLabels: HBarTotalLabelStyle
+}
+
+export enum HBarTotalLabelStyle {
+  NONE = "none",
+  INSIDE = "inside",
+  OUTSIDE = "outside",
 }
 
 export enum LabelLocation {
