@@ -12,12 +12,9 @@
     [key: string]: any[];
   };
   export let chartWidth: number;
+  export let editor = false;
 
-  $: colorScaleIndex = chartSpec.chart.scales.findIndex(
-    (s) => s.type == "categoriesColor",
-  );
-  $: colorScale = chartSpec.chart.scales[colorScaleIndex];
-  $: groups = formatData(componentSpec, data, colorScale.colors?.byKey || []);
+  $: groups = formatData(componentSpec, data, componentSpec.colors.byKey);
 
   $: showAxis = (type: AxisRepeatMode, i: number) => {
     if (type == AxisRepeatMode.ALL) return true;
