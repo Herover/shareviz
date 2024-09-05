@@ -29,7 +29,6 @@
   $: scale = dbHBar.scale();
   $: colorScale = null as unknown as ReturnType<typeof colors>;
   $: {
-    console.log($dbHBar, dbHBar)
     colorScale = dbHBar.colors()
   }
 
@@ -41,7 +40,6 @@
   };
 
   $: groups = formatData($dbHBar, chartData, []/* $colorScale.byKey */);
-  $: console.log(groups,)
   $: {
     const computed = max(groups, (d) =>
       max(d.d, (dd) => max(dd.value, (ddd) => ddd.to)),
@@ -58,7 +56,6 @@
   $: unusedGroups = orDefault(groups[0]?.d[0]?.value, [])
     .map((d) => d.label)
     .filter((k) => $colorScale.byKey.findIndex((c) => c.k == k) == -1);
-$: console.log(groups,unusedGroups)
   $: automateColorKeys = () => {
     if (typeof $dbHBar.dataSet != "undefined" && typeof chartData[$dbHBar.dataSet] != "undefined") {
       const key = typeof $dbHBar.subCategories != "undefined" ? $dbHBar.subCategories : $dbHBar.categories;
@@ -323,7 +320,7 @@ $: console.log(groups,unusedGroups)
     </table>
     <button
       on:click={() => addColor($colorScale.byKey.length)}
-      >Add new {$colorScale.byKey.length}</button
+      >Add new</button
     >
     <button on:click={automateColorKeys}>Add missing data keys</button>
     <button on:click={removeExtraColorKeys}>Remove extra data keys</button>

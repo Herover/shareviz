@@ -91,7 +91,7 @@
     }
   }
   $: majorTicks = scale ? [...manualMajorTicks, ...autoMajorTicks] : [];
-$:console.log(manualMajorTicks,conf.major.ticks)
+
   let autoMinorTicks: { n: number | Date; l: string }[] = [];
   let manualMinorTicks: {
     n: number;
