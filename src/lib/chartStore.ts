@@ -5,7 +5,7 @@ import * as json1 from 'ot-json1';
 import ShareDB from 'sharedb/lib/client';
 import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
-import type { HBar, Line, Root, Set, Chart, Axis, AxisGrid, Style, LineStyleKey, Scale, Colors } from './chart';
+import { type HBar, type Line, type Root, type Set, type Chart, type Axis, type AxisGrid, type Style, type LineStyleKey, type Scale, type Colors, AxisLocation, AxisOrientation, HBarTotalLabelStyle, LabelLocation, AxisRepeatMode, LabelStyleLine } from './chart';
 import { notifications } from './notificationStore';
 import { orDefault } from './utils';
 // import { type Doc } from "sharedb";
@@ -342,13 +342,13 @@ export const db = function createDB() {
                 width: 1,
                 label: {
                   text: orDefault(d.labelText, ""),
-                  location: "right",
+                  location: LabelLocation.Right,
                   color: orDefault(d.labelColor, "#000000"),
                   x: 0,
                   y: 0,
                   rx: 0,
                   ry: -32,
-                  line: "line",
+                  line: LabelStyleLine.Line,
                 },
               },
             }]),
@@ -395,12 +395,12 @@ export const db = function createDB() {
                 ],
               },
               rectLabels: false,
-              totalLabels: "none",
+              totalLabels: HBarTotalLabelStyle.NONE,
               axis: {
-                location: "start",
+                location: AxisLocation.START,
                 labelSpace: 0,
-                orientation: "horizontal",
-                repeat: "first",
+                orientation: AxisOrientation.HORIZONTAL,
+                repeat: AxisRepeatMode.FIRST,
                 major: {
                   grid: true,
                   enabled: true,
@@ -446,10 +446,10 @@ export const db = function createDB() {
                 key: "",
                 scale: "lineX",
                 axis: {
-                  location: "end",
+                  location: AxisLocation.END,
                   labelSpace: 8,
-                  orientation: "horizontal",
-                  repeat: "first",
+                  orientation: AxisOrientation.HORIZONTAL,
+                  repeat: AxisRepeatMode.FIRST,
                   major: {
                     grid: false,
                     enabled: true,
@@ -488,10 +488,10 @@ export const db = function createDB() {
                 key: "",
                 scale: "lineY",
                 axis: {
-                  location: "end",
+                  location: AxisLocation.END,
                   labelSpace: 8,
-                  orientation: "vertical",
-                  repeat: "first",
+                  orientation: AxisOrientation.VERTICAL,
+                  repeat: AxisRepeatMode.FIRST,
                   major: {
                     grid: true,
                     enabled: true,
@@ -535,7 +535,7 @@ export const db = function createDB() {
                   k: "",
                   color: "#000",
                   width: 1,
-                  label: { text: "", location: "right", color: "#000" },
+                  label: { text: "", location: LabelLocation.Right, color: "#000" },
                 },
                 byKey: []
               },
