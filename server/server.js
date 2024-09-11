@@ -220,8 +220,11 @@ Region Nordjylland	2023	4989245`,
                 colors: {
                   default: "#888888",
                   byKey: [
-                    { k: "2023", c: "#aa2222", legend: "2023", x: 0, y: 0, rx: 0, ry: -32, line: "none" },
-                    { k: "2022", c: "#ff8888", legend: "2022", x: 0, y: 0, rx: 0, ry: -32, line: "none" },
+                    { k: "Region Hovedstaden", legend: "Region Hovedstaden", c: "lch(38.24079414130722% 60 219.99901061253297)" },
+                    { k: "Region Nordjylland", legend: "Region Nordjylland", c: "lch(68.24079414130722% 65 39.99901061253297)" },
+                    { k: "Region Midtjylland", legend: "Region Midtjylland", c: "lch(78.24079414130722% 65 57.99901061253297)" },
+                    { k: "Region Syddanmark", legend: "Region Syddanmark", c: "lch(88.24079414130722% 60 93.99901061253297)" },
+                    { k: "Region Sjælland", legend: "Region Sjælland", c: "lch(68.24079414130722% 40 165.99901061253297)" },
                   ],
                 },
                 rectLabels: false,
