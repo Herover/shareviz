@@ -11,8 +11,8 @@ export function createDoc(callback) {
   doc.fetch(function (err) {
     if (err) throw err;
     if (doc.type === null) {
-      doc.create({
-        /** @type {Root} */
+      /** @type {import('./../src/lib/chart').Root} */
+      const defaultChart = {
         meta: {
           publicRead: true,
           access: [
@@ -441,7 +441,8 @@ Region Nordjylland	2023	4989245`,
           }
         ] */
 
-      }, json1.type.uri, callback);
+      }
+      doc.create(defaultChart, json1.type.uri, callback);
       return;
     }
     callback();
