@@ -32,6 +32,10 @@
   };
 
   $: chartWidth = orNumber(width, chartSpec.chart.width);
+
+  const mkEditElement = (i: number) => {
+    return (e: CustomEvent<any>) => editElement(i, e.detail)
+  }
 </script>
 
 <div
@@ -88,7 +92,7 @@
       {data}
       {chartWidth}
       {editor}
-      on:edit={(e) => editElement(i, e.detail)}
+      on:edit={mkEditElement(i)}
     />
   {/each}
   <div class="source">

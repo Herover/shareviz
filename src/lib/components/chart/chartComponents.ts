@@ -46,7 +46,7 @@ export const registerComponent = (component: ChartComponent) => {
 registerComponent(Line as unknown as ChartComponent)
 registerComponent(HBar as unknown as ChartComponent)
 
-export const getComponent = (key: string) => {
+export const getComponent = (key: string): any => {
   if (key in components) {
     return components[key].component;
   }
