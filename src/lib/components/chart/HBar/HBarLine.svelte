@@ -1,6 +1,8 @@
 <script lang="ts">
   import { HBarTotalLabelStyle, type HBar } from "$lib/chart";
+  import { createEventDispatcher } from "svelte";
   import HBarRect from "./HBarRect.svelte";
+  import { formatNumber } from "$lib/utils";
 
   export let conf: HBar;
   export let i: number;
@@ -21,6 +23,22 @@
   export let valueHeight: number;
   export let valueScale: (d: any) => number;
   export let color: (d: any) => string;
+
+  const spacing = 2;
+
+  const dispatch = createEventDispatcher<{
+    labelOverflow: number;
+  }>();
+
+  let outsideLabelBox: DOMRect | undefined;
+  $: if (
+    conf.totalLabels == HBarTotalLabelStyle.OUTSIDE &&
+    typeof outsideLabelBox != "undefined"
+  ) {
+    dispatch("labelOverflow", outsideLabelBox.width + spacing);
+  } else {
+    dispatch("labelOverflow", 0);
+  }
 </script>
 
 <g transform="translate({0},{i * (blockHeight + blockMargin)})">
@@ -41,13 +59,20 @@
       {barHeight}
       axis={conf.axis}
     />
-    {#if conf.totalLabels == HBarTotalLabelStyle.OUTSIDE && ii== d.value.length - 1}
+    {#if conf.totalLabels == HBarTotalLabelStyle.OUTSIDE && ii == d.value.length - 1}
       <text
-        x={labelWidth + valueScale(dd.to) + 2}
-        y={(conf.stackSubCategories ? 0 : ii) * valueHeight + barMargin + barHeight/2}
+        bind:contentRect={outsideLabelBox}
+        x={labelWidth + valueScale(dd.to) + spacing}
+        y={(conf.stackSubCategories ? 0 : ii) * valueHeight +
+          barMargin +
+          barHeight / 2}
         dominant-baseline="middle"
       >
-        {d.value[d.value.length - 1].to}
+        {formatNumber(
+          d.value[d.value.length - 1].to,
+          conf.axis.major.labelDivide,
+          conf.axis.major.labelThousands,
+        )}
       </text>
     {/if}
   {/each}

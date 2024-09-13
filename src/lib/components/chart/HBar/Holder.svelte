@@ -16,6 +16,12 @@
 
   $: groups = formatData(componentSpec, data, componentSpec.colors.byKey);
 
+  let labelOverflows: number[] = [];
+  $: labelOverflows = labelOverflows.slice(0, groups.length);
+  $: labelOverflow = labelOverflows.reduce((acc, n) => Math.max(acc, n), 0);
+  $: width =
+    chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight;
+
   $: showAxis = (type: AxisRepeatMode, i: number) => {
     if (type == AxisRepeatMode.ALL) return true;
     else if (type == AxisRepeatMode.FIRST && i == 0) return true;
@@ -29,13 +35,12 @@
     {chartSpec}
     hBarSpec={componentSpec}
     labelWidth={componentSpec.labelWidth}
-    valueWidth={chartWidth -
-      chartSpec.style.marginLeft -
-      chartSpec.style.marginRight -
-      componentSpec.labelWidth}
+    valueWidth={width - componentSpec.labelWidth - labelOverflow}
+    {width}
     values={d}
     label={k}
     showLegend={i == 0}
     showAxisLabels={showAxis(componentSpec.axis.repeat, i)}
+    on:labelOverflow={(e) => (labelOverflows[i] = e.detail)}
   />
 {/each}

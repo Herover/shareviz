@@ -18,13 +18,26 @@
   export let label: string;
   export let showLegend: boolean;
   export let showAxisLabels: boolean;
+  export let width: number;
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{
+    size: {
+      height: number;
+    };
+    labelOverflow: number;
+  }>();
 
   const valueHeight = 26;
   const barMargin = 0;
   const blockMargin = 16;
   let legendHeight = 0;
+
+  let labelOverflows: number[] = [];
+  $: labelOverflows = labelOverflows.slice(0, values.length);
+  $: dispatch(
+    "labelOverflow",
+    labelOverflows.reduce((acc, n) => Math.max(acc, n), 0),
+  );
 
   $: scaleHeight =
     !showAxisLabels || hBarSpec.axis.location == AxisLocation.NONE ? 0 : 16;
@@ -82,7 +95,9 @@
   <p>
     {#each hBarSpec.colors.byKey as d}
       {#if d.legend != "" && d.k != ""}
-        <span class="legend-title"><div style="background-color:{d.c}" class="legend-box"></div>{d.legend}</span
+        <span class="legend-title"
+          ><div style="background-color:{d.c}" class="legend-box"></div>
+          {d.legend}</span
         >
       {/if}
     {/each}
@@ -93,7 +108,7 @@
   {label}
 </p>
 
-<svg width={valueWidth + labelWidth} {height}>
+<svg {width} {height}>
   <g transform="translate({labelWidth},{0})">
     <Axis
       width={valueWidth}
@@ -122,6 +137,7 @@
         {valueHeight}
         {valueScale}
         {color}
+        on:labelOverflow={(e) => (labelOverflows[i] = e.detail)}
       />
     {/each}
   </g>
