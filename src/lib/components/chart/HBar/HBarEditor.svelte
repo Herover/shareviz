@@ -70,7 +70,13 @@
           const n = $colorScale.byKey.length;
           const keyIndex =
             typeof n != "undefined" ? n : 0;
-            colorScale.addColorScaleColor(keyIndex, k, "#FF0000", k);
+            colorScale.addColorScaleColor(
+              keyIndex,
+              k,
+              // TODO: only use known "good" color schemes
+              `lch(${25 + Math.random() * 50}% ${80 + Math.random() * 20} ${Math.random() * 360})`,
+              k,
+            );
         }
       });
     }
