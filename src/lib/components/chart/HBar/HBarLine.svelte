@@ -59,7 +59,7 @@
       {barHeight}
       axis={conf.axis}
     />
-    {#if conf.totalLabels == HBarTotalLabelStyle.OUTSIDE && ii == d.value.length - 1}
+    {#if conf.totalLabels == HBarTotalLabelStyle.OUTSIDE && (!conf.stackSubCategories || ii == d.value.length - 1)}
       <text
         bind:contentRect={outsideLabelBox}
         x={labelWidth + valueScale(dd.to) + spacing}
@@ -69,7 +69,7 @@
         dominant-baseline="middle"
       >
         {formatNumber(
-          d.value[d.value.length - 1].to,
+          conf.stackSubCategories ? d.value[d.value.length - 1].to : dd.value,
           conf.axis.major.labelDivide,
           conf.axis.major.labelThousands,
         )}
