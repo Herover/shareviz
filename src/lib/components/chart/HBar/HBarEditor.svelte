@@ -165,6 +165,16 @@
         type="checkbox"
       >
     </label>
+    {#if $dbHBar.stackSubCategories}
+      <label>
+        Total:
+        <input
+          checked={$dbHBar.portionSubCategories}
+          on:change={(e) => dbHBar.setPortionSubCategories(e.currentTarget.checked)}
+          type="checkbox"
+        >
+      </label>
+    {/if}
   </p>
   <p>
     <label>
