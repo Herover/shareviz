@@ -44,10 +44,13 @@
     y={y + barHeight / 2}
     opacity={display ? null : 0}
     aria-hidden={display ? null : true}
+    cursor={display ? null : "default"}
     fill={textColor}
     text-anchor="end"
     dominant-baseline="middle"
   >
     {formatNumber(value, axis.major.labelDivide, axis.major.labelThousands)}
+    <!-- Consider using invisible rectancle on top instead of this -->
+    <title>{label}: {value}</title>
   </text>
 {/if}
