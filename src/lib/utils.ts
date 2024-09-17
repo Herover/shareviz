@@ -17,7 +17,9 @@ export const formatNumber = (val: number, divide = Divide.None, thousandsDelim =
   }
 
   if (typeof fraction != "undefined" && fraction.length > 0 && decimals > 0) {
-    res += fractionDelim + fraction.slice(0, decimals);
+    const fractionNum = Number.parseFloat("0." + fraction);
+    const d = Math.pow(10, decimals);
+    res += fractionDelim + (("" + (Math.round(fractionNum * d)) / d).split(".")[1] ?? "").padEnd(decimals, "0");
   }
 
   /* if (fraction) {
