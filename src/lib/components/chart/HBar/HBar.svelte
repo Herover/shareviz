@@ -53,7 +53,7 @@
     .range([0, valueWidth])
     .domain(
       hBarSpec.portionSubCategories
-        ? [0, 1]
+        ? [0, 100]
         : hBarSpec.scale.dataRange || [0, 1],
     );
   // "#ff8888", "#aa2222"
