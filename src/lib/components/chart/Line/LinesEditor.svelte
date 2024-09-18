@@ -264,11 +264,14 @@
         value={typeof mergedStyle.label.text == "undefined"
           ? ""
           : mergedStyle.label.text}
-        disabled={nonEditable}
+        disabled={nonEditable && selectedIndexes.length != 1}
         on:change={(e) => setLineLabel(e.currentTarget.value)}
+        on:keyup={(e) => setLineLabel(e.currentTarget.value)}
       />
     </label>
-    <button disabled={nonEditable} on:click={() => setLabelToKey()}>Auto</button
+    <button
+      disabled={selectedIndexes.length == 0}
+      on:click={() => setLabelToKey()}>Auto</button
     >
   </p>
   <p>
