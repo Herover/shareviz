@@ -7,7 +7,10 @@
   export let l: number;
   export let title: string;
 
-  $: lch = `lch(${Math.max(Math.min(orNumber(l), 100), 0)}% ${Math.max(Math.min(orNumber(c), 100), 0)} ${(orNumber(h) + 360) % 360})`;
+  $: l2 = Math.floor(Math.max(Math.min(orNumber(l), 100), 0));
+  $: c2 = Math.floor(Math.max(Math.min(orNumber(c), 100), 0));
+  $: h2 = Math.floor((orNumber(h) + 360) % 360);
+  $: lch = `lch(${l2}% ${c2} ${h2})`;
 
   const dispatch = createEventDispatcher<{ click: string }>();
   const onKey = (e: KeyboardEvent) => {
