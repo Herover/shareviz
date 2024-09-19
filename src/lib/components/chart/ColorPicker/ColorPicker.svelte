@@ -25,15 +25,30 @@
 
   export let disabled = false;
 
-  let cc = [0, 0, 0];
+  let l = 0;
+  let c = 0;
+  let h = 0;
 
   $: try {
-    cc = chroma(color).lch();
+    if (color.startsWith("lch")) {
+      // TODO: This allows colors that cannot be rendered, is that OK?
+      const parts = color.match(/lch\((\d+\.?\d*)[, %]+(\d+\.?\d*)[, ]+(\d+\.?\d*)(?:deg)?\)/);
+      console.log("parts",parts,color)
+      if (parts != null && parts.length == 4) {
+        l = Number.parseFloat(parts[1]);
+        c = Number.parseFloat(parts[2]);
+        h = Number.parseFloat(parts[3]);
+      }
+    } else {
+      [l, c, h] = chroma(color).lch();
+    }
   } catch (e) {
     console.warn(e);
-    cc = [0, 0, 0];
+    l = 0;
+    c = 0;
+    h = 0;
   }
-  $: [l, c, h] = cc;
+  $:console.log(color, l,c,h)
 
   const hueStep = 18;
   const chromaStep = 5;
