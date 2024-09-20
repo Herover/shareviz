@@ -30,17 +30,18 @@
   let h = 0;
 
   $: try {
-    if (color.startsWith("lch")) {
-      // TODO: This allows colors that cannot be rendered, is that OK?
-      const parts = color.match(/lch\((\d+\.?\d*)[, %]+(\d+\.?\d*)[, ]+(\d+\.?\d*)(?:deg)?\)/);
-      console.log("parts",parts,color)
-      if (parts != null && parts.length == 4) {
-        l = Number.parseFloat(parts[1]);
-        c = Number.parseFloat(parts[2]);
-        h = Number.parseFloat(parts[3]);
-      }
+    // TODO: This allows colors that cannot be rendered, is that OK?
+    const parts = color.match(
+      /oklch\((\d+\.?\d*)[, %]+(\d+\.?\d*)%[, ]+(\d+\.?\d*)(?:deg)?\)/,
+    );
+    if (parts != null && parts.length == 4) {
+      l = Number.parseFloat(parts[1]);
+      c = Number.parseFloat(parts[2]);
+      h = Number.parseFloat(parts[3]);
     } else {
-      [l, c, h] = chroma(color).lch();
+      [l, c, h] = chroma(color).oklch();
+      l = l * 100;
+      c = c * (1 / 0.4) * 100;
     }
   } catch (e) {
     console.warn(e);
@@ -48,7 +49,6 @@
     c = 0;
     h = 0;
   }
-  $:console.log(color, l,c,h)
 
   const hueStep = 18;
   const chromaStep = 5;

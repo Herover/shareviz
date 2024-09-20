@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { orNumber } from "$lib/utils";
+  import chroma from "chroma-js";
 
   export let h: number;
   export let c: number;
@@ -10,7 +11,7 @@
   $: l2 = Math.floor(Math.max(Math.min(orNumber(l), 100), 0));
   $: c2 = Math.floor(Math.max(Math.min(orNumber(c), 100), 0));
   $: h2 = Math.floor((orNumber(h) + 360) % 360);
-  $: lch = `lch(${l2}% ${c2} ${h2})`;
+  $: lch = `oklch(${l2}% ${c2}% ${h2}deg)`;
 
   const dispatch = createEventDispatcher<{ click: string }>();
   const onKey = (e: KeyboardEvent) => {
@@ -22,7 +23,7 @@
 </script>
 
 <div
-  style:background-color={`${lch}`}
+  style:background-color={`${chroma(lch).hex()}`}
   on:click={() => dispatch("click", lch)}
   on:keydown={onKey}
   {title}
