@@ -9,6 +9,7 @@
   export let chartColors: string[];
   export let values: ReturnType<typeof formatData>;
   export let lineSpec: ReturnType<ReturnType<typeof db.chart>["line"]>;
+  export let index: number;
 
   let selected: { [key: string]: boolean } = {};
   let defaultSelected = false;
@@ -249,6 +250,7 @@
         key={line.d.key}
         selected={line.selected}
         {chartColors}
+        {index}
         on:onSelect={(e) =>
           toggleSelect(line.d.key, e.detail.selected, e.detail.replace)}
       />

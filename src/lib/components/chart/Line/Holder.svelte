@@ -11,6 +11,7 @@
   };
   export let chartWidth: number;
   export let editor = false;
+  export let index: number;
 </script>
 
 <Line
@@ -19,5 +20,6 @@
   values={formatData(componentSpec, data)}
   width={chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight}
   {editor}
+  {index}
   on:edit
 />

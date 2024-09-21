@@ -92,6 +92,7 @@
       {data}
       {chartWidth}
       {editor}
+      index={i}
       on:edit={mkEditElement(i)}
     />
   {/each}

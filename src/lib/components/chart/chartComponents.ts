@@ -21,6 +21,7 @@ interface ChartComponent {
     },
     chartWidth: number,
     editor: boolean,
+    index: number,
   },
     // TODO: type events without making ChartViewer.svelte unhappy
     // {

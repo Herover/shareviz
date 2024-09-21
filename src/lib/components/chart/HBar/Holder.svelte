@@ -13,6 +13,7 @@
   };
   export let chartWidth: number;
   export let editor = false;
+  export let index: number;
 
   $: groups = formatData(componentSpec, data, componentSpec.colors.byKey);
 

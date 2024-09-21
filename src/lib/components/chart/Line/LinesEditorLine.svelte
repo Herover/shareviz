@@ -3,9 +3,11 @@
   import { orDefault } from "$lib/utils";
   import { createEventDispatcher } from "svelte";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
+  import { chartToEditor } from "../../../chartToEditorStore";
 
   export let style: ReturnType<typeof lineStyle> | undefined = undefined;
   export let key: string | undefined = undefined;
+  export let index: number = -1;
   export let chartColors: string[] = [];
   export let selected: boolean;
 
@@ -30,11 +32,22 @@
     }
     dispatch("onSelect", { replace, selected: !selected });
   };
+
+const toggleHover = (me: Event | null) => {
+  if (me == null) {
+    chartToEditor.setHighlight([]);
+  } else {
+    chartToEditor.setHighlight(["elements", index, key]);
+  }
+};
 </script>
 
 <div
   on:click={(e) => toggleSelect(e, null)}
   on:keydown={(e) => toggleSelect(null, e)}
+  on:mouseover={(e) => toggleHover(e)}
+  on:focus={(e) => toggleHover(e)}
+  on:blur={() => toggleHover(null)}
   class:line-selected={selected}
   class:line-unselected={!selected}
   class="line-item"

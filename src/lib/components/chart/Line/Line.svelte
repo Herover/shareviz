@@ -12,6 +12,7 @@
   import { max, min } from "d3-array";
   import FloatingLabels from "./FloatingLabels/FloatingLabels.svelte";
   import { createEventDispatcher } from "svelte";
+  import { chartToEditor } from "$lib/chartToEditorStore";
 
   export let values: {
     label: string;
@@ -22,6 +23,7 @@
   export let lineSpec: Line;
   export let width: number;
   export let editor = false;
+  export let index: number;
 
   const dispatch = createEventDispatcher<{
     edit: any[];
@@ -183,6 +185,11 @@
       return def;
     }
   };
+
+  $: higlight = $chartToEditor.highlight[0] == "elements"
+    && $chartToEditor.highlight[1] == index
+    ? $chartToEditor.highlight[2] as string
+    : null;
 </script>
 
 <svg {width} {height}>
@@ -244,7 +251,7 @@
         <path
           d={draw(d.value)}
           stroke={getStyle(d.key).color}
-          stroke-width={getStyle(d.key).width}
+          stroke-width={higlight === d.key ? getStyle(d.key).width + 2 : getStyle(d.key).width}
           fill="none"
           stroke-dasharray={d.type == "line" ? null : "3"}
         />

@@ -149,6 +149,7 @@
         dbLine={chartScope.line(i)}
         chart={chartScope}
         {chartData}
+        index={i}
       />
       <div slot="actions">
         <button on:click={() => removeElement(i)}>Delete</button>

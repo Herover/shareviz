@@ -14,6 +14,7 @@
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: DSVParsedArray<any>;
   };
+  export let index: number;
 
   $: dataSet = spec.data.sets.find((set) => set.id == $dbLine.dataSet);
 
@@ -210,6 +211,7 @@
   {chartColors}
   {values}
   lineSpec={dbLine}
+  {index}
 />
 <br />
 
