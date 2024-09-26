@@ -119,6 +119,10 @@ export const db = function createDB() {
     },
     load: (docId: string, synced: boolean) => {
       id = docId;
+      update((d) => ({
+        ...d,
+        doc: null,
+      }));
       doc = synced ? connection.get('examples', docId) : getLocalDoc("examples", docId);
       doc.on("error", (e: Error) => notifications.addError(e.message))
 
