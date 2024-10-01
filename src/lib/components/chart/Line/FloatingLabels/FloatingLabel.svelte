@@ -32,7 +32,6 @@
   const stopMove = (e: MouseEvent) => {
     if (editor) {
       dispatch("edit", [
-        moving,
         "labelRelativePos",
         [
           line.label.rx + e.clientX - lastMovePos[0],
