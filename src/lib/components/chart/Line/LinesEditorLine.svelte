@@ -46,6 +46,7 @@ const toggleHover = (me: Event | null) => {
   on:click={(e) => toggleSelect(e, null)}
   on:keydown={(e) => toggleSelect(null, e)}
   on:mouseover={(e) => toggleHover(e)}
+  on:mouseout={() => toggleHover(null)}
   on:focus={(e) => toggleHover(e)}
   on:blur={() => toggleHover(null)}
   class:line-selected={selected}
