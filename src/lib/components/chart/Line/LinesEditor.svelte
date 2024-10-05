@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LabelLocation, LabelStyleLine } from "$lib/chart";
+  import { LabelLocation, LabelStyleLine, LineSymbol } from "$lib/chart";
   import type { db } from "$lib/chartStore";
   import { negativeOneToInf } from "$lib/utils";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
@@ -56,6 +56,7 @@
           next.label.text,
         );
         merged.label.x = chooseSelectedStyle(merged.label.x, next.label.x);
+        merged.symbols = chooseSelectedStyle(merged.symbols, next.symbols);
 
         return merged;
       },
@@ -71,6 +72,7 @@
               text: string | undefined;
               x: number | undefined;
             };
+            symbols: string | undefined;
           }),
     );
 
@@ -230,6 +232,15 @@
       d.style.setLabelLine(value);
     });
   };
+  $: setSymbols = (symbols: string) => {
+    selectedIndexes.forEach((d) => {
+      d.style.setSymbols(symbols);
+    });
+
+    if (defaultSelected) {
+      lineSpec.defaultLineStyle().setSymbols(symbols);
+    }
+  };
 </script>
 
 <div class="line-list">
@@ -350,6 +361,22 @@
         disabled={nonEditable || defaultSelected}
         type="checkbox"
       />
+    </label>
+  </p>
+  <p>
+    <label>
+      Symbols
+      <select
+        value={typeof mergedStyle.label.location == "undefined"
+          ? ""
+          : mergedStyle.symbols}
+        disabled={nonEditable}
+        on:change={(e) => setSymbols(e.currentTarget.value)}
+      >
+        {#each Object.values(LineSymbol) as symbol}
+          <option>{symbol}</option>
+        {/each}
+      </select>
     </label>
   </p>
 </div>

@@ -355,7 +355,8 @@ export const db = function createDB() {
                   ry: -32,
                   line: LabelStyleLine.Line,
                 },
-              },
+                symbols: LineSymbol.NONE
+              } as LineStyleKey,
             }]),
           };
         },
@@ -541,7 +542,8 @@ export const db = function createDB() {
                   k: "",
                   color: "#000",
                   width: 1,
-                  label: { text: "", location: LabelLocation.Right, color: "#000" },
+                  label: { text: "", location: LabelLocation.Right, color: "#000", x: 0, y: 0, rx: 0, ry: 0, line: LabelStyleLine.None },
+                  symbols: LineSymbol.NONE,
                 },
                 byKey: []
               },
@@ -648,6 +650,7 @@ export const lineStyle = (scope: ReturnType<typeof createScope>, key: (string | 
     setColor: (value: string) => doc.submitOp([...styleScope.path.slice(1), "color", { r: 0, i: value }]),
     setLabelColor: (value: string) => doc.submitOp([...styleScope.path.slice(1), "label", "color", { r: 0, i: value }]),
     setwidth: (value: number) => doc.submitOp([...styleScope.path.slice(1), "width", { r: 0, i: value }]),
+    setSymbols: (value: string) => doc.submitOp([...styleScope.path.slice(1), "symbols", { r: 0, i: value }]),
     setLabelX: (value: number) => doc.submitOp([...styleScope.path.slice(1), "label", "x", { r: 0, i: value }]),
     setLabelY: (value: number) => doc.submitOp([...styleScope.path.slice(1), "label", "y", { r: 0, i: value }]),
     setLabelXOffset: (value: number) => doc.submitOp([...styleScope.path.slice(1), "label", "rx", { r: 0, i: value }]),

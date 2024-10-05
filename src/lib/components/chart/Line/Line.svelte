@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AxisLocation, LabelLocation, type Line, type Root } from "$lib/chart";
+  import { AxisLocation, LabelLocation, LineSymbol, type Line, type Root } from "$lib/chart";
   import { group, orDefault, orNumber, valueKinds, valueParsers } from "$lib/utils";
   import {
     scaleLinear,
@@ -289,6 +289,18 @@
         {/if}
       {/each}
     </g>
+    {#each stacked as d, i}
+      {#if getStyle(d.key).symbols == LineSymbol.CIRCLE}
+        {#each d.value as value}
+          <circle
+            cx={xScale(value.x)}
+            cy={yScale(value.y)}
+            fill={getStyle(d.key).label.color}
+            r={getStyle(d.key).width * 2}
+          />
+        {/each}
+      {/if}
+    {/each}
     <FloatingLabels
       lines={lineSpec.style.byKey}
       xScale={xScale}

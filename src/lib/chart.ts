@@ -180,11 +180,17 @@ export interface LabelStyle {
   line: LabelStyleLine
 }
 
+export enum LineSymbol {
+  NONE = "none",
+  CIRCLE = "circle",
+}
+
 export interface LineStyleKey {
   k: string
   color: string
   width: number
   label: LabelStyle
+  symbols: LineSymbol
 }
 
 export interface LineStyle {
