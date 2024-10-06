@@ -5,7 +5,7 @@ import * as json1 from 'ot-json1';
 import ShareDB from 'sharedb/lib/client';
 import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
-import { type HBar, type Line, type Root, type Set, type Chart, type Axis, type AxisGrid, type Style, type LineStyleKey, type Scale, type Colors, AxisLocation, AxisOrientation, HBarTotalLabelStyle, LabelLocation, AxisRepeatMode, LabelStyleLine, type StyledText, LineSymbol } from './chart';
+import { type HBar, type Line, type Root, type Set, type Chart, type Axis, type AxisGrid, type Style, type LineStyleKey, type Scale, type Colors, AxisLocation, AxisOrientation, HBarTotalLabelStyle, LabelLocation, AxisRepeatMode, LabelStyleLine, type StyledText, LineSymbol, LineMissingStyle } from './chart';
 import { notifications } from './notificationStore';
 import { orDefault } from './utils';
 // import { type Doc } from "sharedb";
@@ -544,6 +544,7 @@ export const db = function createDB() {
                   width: 1,
                   label: { text: "", location: LabelLocation.Right, color: "#000", x: 0, y: 0, rx: 0, ry: 0, line: LabelStyleLine.None },
                   symbols: LineSymbol.NONE,
+                  missingStyle: LineMissingStyle.DASHED,
                 },
                 byKey: []
               },
@@ -656,6 +657,7 @@ export const lineStyle = (scope: ReturnType<typeof createScope>, key: (string | 
     setLabelXOffset: (value: number) => doc.submitOp([...styleScope.path.slice(1), "label", "rx", { r: 0, i: value }]),
     setLabelYOffset: (value: number) => doc.submitOp([...styleScope.path.slice(1), "label", "ry", { r: 0, i: value }]),
     setLabelLine: (value: string) => doc.submitOp([...styleScope.path.slice(1), "label", "line", { r: 0, i: value }]),
+    setMissingStyle: (value: string) => doc.submitOp([...styleScope.path.slice(1), "missingStyle", { r: 0, i: value }]),
     delete: () => doc.submitOp([...styleScope.path.slice(1), { r: 0 }]),
   };
 };

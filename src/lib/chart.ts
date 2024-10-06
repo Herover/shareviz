@@ -185,12 +185,19 @@ export enum LineSymbol {
   CIRCLE = "circle",
 }
 
+export enum LineMissingStyle {
+  NONE = "none",
+  LINE = "line",
+  DASHED = "dashed",
+}
+
 export interface LineStyleKey {
   k: string
   color: string
   width: number
   label: LabelStyle
   symbols: LineSymbol
+  missingStyle: LineMissingStyle
 }
 
 export interface LineStyle {
