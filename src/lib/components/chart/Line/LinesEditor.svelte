@@ -1,7 +1,13 @@
 <script lang="ts">
-  import { LabelLocation, LabelStyleLine, LineMissingStyle, LineSymbol } from "$lib/chart";
+  import {
+    LabelLocation,
+    LabelStyleLine,
+    LineMissingStyle,
+    LineSymbol,
+  } from "$lib/chart";
   import type { db } from "$lib/chartStore";
   import { negativeOneToInf } from "$lib/utils";
+  import { onDestroy, onMount } from "svelte";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import type { formatData } from "./data";
   import LinesEditorLine from "./LinesEditorLine.svelte";
@@ -57,7 +63,10 @@
         );
         merged.label.x = chooseSelectedStyle(merged.label.x, next.label.x);
         merged.symbols = chooseSelectedStyle(merged.symbols, next.symbols);
-        merged.missingStyle = chooseSelectedStyle(merged.missingStyle, next.missingStyle);
+        merged.missingStyle = chooseSelectedStyle(
+          merged.missingStyle,
+          next.missingStyle,
+        );
 
         return merged;
       },
@@ -78,27 +87,26 @@
           }),
     );
 
-  const toggleSelect = (
-    key: string | null,
-    select: boolean,
-    replace: boolean,
-  ) => {
-    if (replace) {
-      if (key == null) {
-        defaultSelected = true;
-      } else {
-        if (typeof selected[key] == "undefined") selected[key] = true;
-        defaultSelected = false;
-      }
-      Object.keys(selected).forEach((k) => (selected[k] = k == key));
-    } else {
-      if (key == null) {
-        defaultSelected = !defaultSelected;
-      } else {
-        selected[key] = !selected[key];
-      }
+  let rangedSelect = false;
+  let lastSelected: number | null = -1;
+  const keyDown = (e: KeyboardEvent) => {
+    if (e.key == "Shift") {
+      rangedSelect = true;
     }
   };
+  const keyUp = (e: KeyboardEvent) => {
+    if (e.key == "Shift") {
+      rangedSelect = false;
+    }
+  };
+  onMount(() => {
+    window.addEventListener("keydown", keyDown);
+    window.addEventListener("keyup", keyUp);
+  });
+  onDestroy(() => {
+    window.removeEventListener("keydown", keyDown);
+    window.removeEventListener("keyup", keyUp);
+  });
 
   let searchString = "";
   $: filteredValues = values
@@ -118,10 +126,53 @@
       return {
         d,
         style: i == -1 ? undefined : lineSpec.lineStyle(i),
-        selected: selected[d.key] === true,
         // style: $lineSpec.style.byKey.find((e) => e.k == d.key),
       };
     });
+
+  $: toggleSelect = (
+    key: string | null,
+    select: boolean,
+    replace: boolean,
+    lineIndex: number | null,
+  ) => {
+    if (rangedSelect) {
+      if (lineIndex == null) {
+        defaultSelected = true;
+        lineIndex = 0;
+      }
+      if (lastSelected == null) {
+        defaultSelected = true;
+        lastSelected = 0;
+      }
+      for (
+        let i = Math.min(lineIndex, lastSelected);
+        i <= Math.max(lineIndex, lastSelected);
+        i++
+      ) {
+        if (i < 0 || filteredValues.length <= i) continue;
+        const element = filteredValues[i];
+        selected[element.d.key] = true;
+      }
+      document.getSelection()?.removeAllRanges();
+    } else if (replace) {
+      if (key == null) {
+        defaultSelected = true;
+      } else {
+        if (typeof selected[key] == "undefined") selected[key] = true;
+        defaultSelected = false;
+      }
+      Object.keys(selected).forEach((k) => (selected[k] = k == key));
+    } else {
+      if (key == null) {
+        defaultSelected = !defaultSelected;
+      } else {
+        selected[key] = !selected[key];
+      }
+    }
+
+    lastSelected = lineIndex;
+  };
 
   $: setLabelToKey = () => {
     selectedIndexes.forEach((d) => {
@@ -263,18 +314,19 @@
     style={defaultStyle}
     selected={defaultSelected}
     {chartColors}
-    on:onSelect={(e) => toggleSelect(null, e.detail.selected, e.detail.replace)}
+    on:onSelect={(e) =>
+      toggleSelect(null, e.detail.selected, e.detail.replace, null)}
   />
-  {#each filteredValues as line}
+  {#each filteredValues as line, i}
     {#if line}
       <LinesEditorLine
         style={line.style}
         key={line.d.key}
-        selected={line.selected}
+        selected={selected[line.d.key]}
         {chartColors}
         {index}
         on:onSelect={(e) =>
-          toggleSelect(line.d.key, e.detail.selected, e.detail.replace)}
+          toggleSelect(line.d.key, e.detail.selected, e.detail.replace, i)}
       />
     {/if}
   {/each}
