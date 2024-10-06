@@ -5,7 +5,7 @@ import * as json1 from 'ot-json1';
 import ShareDB from 'sharedb/lib/client';
 import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
-import { type HBar, type Line, type Root, type Set, type Chart, type Axis, type AxisGrid, type Style, type LineStyleKey, type Scale, type Colors, AxisLocation, AxisOrientation, HBarTotalLabelStyle, LabelLocation, AxisRepeatMode, LabelStyleLine } from './chart';
+import { type HBar, type Line, type Root, type Set, type Chart, type Axis, type AxisGrid, type Style, type LineStyleKey, type Scale, type Colors, AxisLocation, AxisOrientation, HBarTotalLabelStyle, LabelLocation, AxisRepeatMode, LabelStyleLine, type StyledText, LineSymbol } from './chart';
 import { notifications } from './notificationStore';
 import { orDefault } from './utils';
 // import { type Doc } from "sharedb";
