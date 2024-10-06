@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AxisLocation, LabelLocation, LineSymbol, type Line, type Root } from "$lib/chart";
+  import { AxisLocation, LabelLocation, LineMissingStyle, LineSymbol, type Line, type Root } from "$lib/chart";
   import { group, orDefault, orNumber, valueKinds, valueParsers } from "$lib/utils";
   import {
     scaleLinear,
@@ -250,10 +250,10 @@
       {#each stacked as d}
         <path
           d={draw(d.value)}
-          stroke={getStyle(d.key).color}
+          stroke={d.type == "missing" && getStyle(d.key).missingStyle == LineMissingStyle.NONE ? "none" : getStyle(d.key).color}
           stroke-width={higlight === d.key ? getStyle(d.key).width + 2 : getStyle(d.key).width}
           fill="none"
-          stroke-dasharray={d.type == "line" ? null : "3"}
+          stroke-dasharray={d.type == "line" || getStyle(d.key).missingStyle == LineMissingStyle.LINE ? null : "3"}
         />
       {/each}
     {/if}

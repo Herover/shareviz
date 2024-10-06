@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LabelLocation, LabelStyleLine, LineSymbol } from "$lib/chart";
+  import { LabelLocation, LabelStyleLine, LineMissingStyle, LineSymbol } from "$lib/chart";
   import type { db } from "$lib/chartStore";
   import { negativeOneToInf } from "$lib/utils";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
@@ -57,6 +57,7 @@
         );
         merged.label.x = chooseSelectedStyle(merged.label.x, next.label.x);
         merged.symbols = chooseSelectedStyle(merged.symbols, next.symbols);
+        merged.missingStyle = chooseSelectedStyle(merged.missingStyle, next.missingStyle);
 
         return merged;
       },
@@ -73,6 +74,7 @@
               x: number | undefined;
             };
             symbols: string | undefined;
+            missingStyle: string | undefined;
           }),
     );
 
@@ -241,6 +243,15 @@
       lineSpec.defaultLineStyle().setSymbols(symbols);
     }
   };
+  $: setMissingStyle = (style: string) => {
+    selectedIndexes.forEach((d) => {
+      d.style.setMissingStyle(style);
+    });
+
+    if (defaultSelected) {
+      lineSpec.defaultLineStyle().setMissingStyle(style);
+    }
+  };
 </script>
 
 <div class="line-list">
@@ -367,7 +378,7 @@
     <label>
       Symbols
       <select
-        value={typeof mergedStyle.label.location == "undefined"
+        value={typeof mergedStyle.symbols == "undefined"
           ? ""
           : mergedStyle.symbols}
         disabled={nonEditable}
@@ -375,6 +386,21 @@
       >
         {#each Object.values(LineSymbol) as symbol}
           <option>{symbol}</option>
+        {/each}
+      </select>
+    </label>
+
+    <label>
+      Missing data
+      <select
+        value={typeof mergedStyle.missingStyle == "undefined"
+          ? ""
+          : mergedStyle.missingStyle}
+        disabled={nonEditable}
+        on:change={(e) => setMissingStyle(e.currentTarget.value)}
+      >
+        {#each Object.values(LineMissingStyle) as style}
+          <option>{style}</option>
         {/each}
       </select>
     </label>
