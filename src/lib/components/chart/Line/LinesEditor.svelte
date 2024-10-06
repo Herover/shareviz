@@ -71,7 +71,20 @@
         return merged;
       },
       defaultSelected
-        ? $lineSpec.style.default
+        ? // Manual deep copy, `{ ...$defaultStyle }` copies some reactivity-stuff we do not want to copy!
+          {
+            color: $defaultStyle.color,
+            width: $defaultStyle.width,
+            label: {
+              color: $defaultStyle.label.color,
+              location: $defaultStyle.label.location,
+              line: $defaultStyle.label.line,
+              text: $defaultStyle.label.text,
+              x: $defaultStyle.label.x,
+            },
+            symbols: $defaultStyle.symbols,
+            missingStyle: $defaultStyle.missingStyle,
+          }
         : ({ label: {} } as {
             color: string | undefined;
             width: number | undefined;
