@@ -1,9 +1,8 @@
-import Holder from "./Holder.svelte";
 import LineEditor from "./LineEditor.svelte";
 
 export default {
   name: "Line",
   key: "line",
-  component: Holder,
+  component: () => import("./Holder.svelte").then(mod => mod.default),
   editorComponent: LineEditor,
 };

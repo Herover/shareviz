@@ -85,16 +85,18 @@
     {/if}
   </p>
   {#each chartSpec.chart.elements as element, i}
-    <svelte:component
-      this={getComponent(element.type)}
-      componentSpec={element.d}
-      {chartSpec}
-      {data}
-      {chartWidth}
-      {editor}
-      index={i}
-      on:edit={mkEditElement(i)}
-    />
+    {#await getComponent(element.type) then component}
+      <svelte:component
+        this={component}
+        componentSpec={element.d}
+        {chartSpec}
+        {data}
+        {chartWidth}
+        {editor}
+        index={i}
+        on:edit={mkEditElement(i)}
+      />
+    {/await}
   {/each}
   <div class="source">
     <p class="source-left" dir="auto">

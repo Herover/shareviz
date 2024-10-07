@@ -13,7 +13,7 @@ interface ChartComponent {
   key: string,
   /** Actual component displayed in chart */
   // FIXME: types are not correct
-  component: typeof SvelteComponent<{
+  component: () => Promise<typeof SvelteComponent<{
     chartSpec: Root,
     componentSpec: any,
     data: {
@@ -28,7 +28,7 @@ interface ChartComponent {
     //   edit: any,
     // }
     any
-  >,
+  >>,
   /** Component for editor */
   editorComponent: SvelteComponent<any>,
 }
@@ -47,9 +47,9 @@ export const registerComponent = (component: ChartComponent) => {
 registerComponent(Line as unknown as ChartComponent)
 registerComponent(HBar as unknown as ChartComponent)
 
-export const getComponent = (key: string): any => {
+export const getComponent = async (key: string): Promise<any> => {
   if (key in components) {
-    return components[key].component;
+    return components[key].component();
   }
   return ErrorText;
 }
