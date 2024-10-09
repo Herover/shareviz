@@ -355,6 +355,7 @@ export const db = function createDB() {
                   ry: -32,
                   line: LabelStyleLine.Line,
                 },
+                missingStyle: LineMissingStyle.DASHED,
                 symbols: LineSymbol.NONE
               } as LineStyleKey,
             }]),
