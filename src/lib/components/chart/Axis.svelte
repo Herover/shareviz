@@ -50,7 +50,10 @@
   }[] = [];
   $: {
     if (scale && conf.major.enabled && conf.major.auto.each != 0) {
+      // Note: we are not allowed to assign these two variables to new values after this, or we
+      // get a weird reactive loop when we access it in the reactive block that dispatch stuff.
       autoMajorTicks = [];
+      manualMajorTicks = [];
       const from = scale.domain()[0];
       const to = scale.domain()[1];
       if (typeof to == "number" && typeof from == "number") {
@@ -73,7 +76,7 @@
             });
           }
         }
-        manualMajorTicks = conf.major.ticks.filter(d => d.n <= to && from <= d.n);
+        manualMajorTicks.concat(conf.major.ticks.filter(d => d.n <= to && customFrom <= d.n));
       } else if (to instanceof Date && from instanceof Date) {
         let d = new Date(from);
         d.setDate(1);
