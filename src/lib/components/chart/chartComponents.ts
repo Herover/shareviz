@@ -34,6 +34,7 @@ interface ChartComponent {
 }
 
 const components: { [key: string]: ChartComponent } = {};
+const componentCache: { [key: string]: typeof SvelteComponent<any, any> } = {};
 
 export const registerComponent = (component: ChartComponent) => {
   if (component.key in components) {
@@ -48,8 +49,12 @@ registerComponent(Line as unknown as ChartComponent)
 registerComponent(HBar as unknown as ChartComponent)
 
 export const getComponent = async (key: string): Promise<any> => {
+  if (key in componentCache) {
+    return componentCache[key];
+  }
   if (key in components) {
-    return components[key].component();
+    componentCache[key] = await components[key].component();
+    return componentCache[key];
   }
   return ErrorText;
 }
