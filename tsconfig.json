@@ -9,7 +9,7 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"moduleResolution": "Node",
+		"moduleResolution": "Bundler",
 	},
   "include": ["src/**/*", "src/node_modules/**/*", "drizze.config.ts"],
   "exclude": ["node_modules/*", "__sapper__/*", "static/*"]
