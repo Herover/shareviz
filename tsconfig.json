@@ -11,7 +11,7 @@
 		"strict": true,
 		"moduleResolution": "Node",
 	},
-  "include": ["src/**/*", "src/node_modules/**/*"],
+  "include": ["src/**/*", "src/node_modules/**/*", "drizze.config.ts"],
   "exclude": ["node_modules/*", "__sapper__/*", "static/*"]
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//

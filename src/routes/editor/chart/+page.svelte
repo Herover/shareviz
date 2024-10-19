@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { SignIn, SignOut } from "@auth/sveltekit/components";
+  import { page } from "$app/stores";
   import { goto } from "$app/navigation";
   import { user } from "$lib/userStore";
   import { db } from "$lib/chartStore";
@@ -81,7 +83,10 @@
       </button>
       {#if !$user.signedIn}
         <button on:click={() => newUser()}>Create user</button>
+        <SignIn provider="github" signInPage="signin" />
       {/if}
+      <SignOut signOutPage="signout" />
+      {$page.data.session?.expires}
       <br /><br />
       {#if $user.signedIn}
         <button on:click={() => newGraphic(true)}>New graphic</button>
