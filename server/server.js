@@ -4,6 +4,9 @@ import json1 from 'ot-json1';
 import { db } from "../server_lib/user.js";
 import { backend, connection } from '../server_lib/sharedb.js';
 import sharedb from 'sharedb';
+import { db as drizzledb, sessions, users } from "../server_lib/drizzle/schema.js"
+import { eq, gt } from 'drizzle-orm';
+
 
 // Create initial document then fire callback
 export function createDoc(callback) {
@@ -475,6 +478,7 @@ export function startServer(server) {
       return acc;
     }, {}) : {};
     req.__sharevizUserId = cookies["x-token"];
+    req.__sharevizAuthJSToken = cookies["authjs.session-token"];
 
     backend.listen(stream, req);
   });
@@ -482,11 +486,30 @@ export function startServer(server) {
   backend.use('connect', function (ctx, next) {
     console.log('connect');
     if (ctx.req.__sharevizUserId) {
-      db.getUser({ id: ctx.req.__sharevizUserId })
+      drizzledb.select()
+        .from(sessions)
+        .where(
+          eq(sessions.sessionToken, ctx.req.__sharevizAuthJSToken),
+          gt(sessions.expires, new Date().toISOString()),
+        )
+        .leftJoin(
+          users,
+          eq(sessions.userId, users.id),
+        )
+        .then((result) => {
+          if (typeof result != "undefined" && result.length == 1) {
+            ctx.agent.custom.user = result[0].user;
+            ctx.agent.custom.session = result[0].session;
+            // TODO: respect session.expires and close user connection after this timestamp.
+            return result[0];
+          }
+          throw new Error("session not found");
+        })
+        .then((_result) => {
+          return db.getUser({ id: ctx.req.__sharevizUserId });
+        })
         .then((user) => {
-          ctx.agent.custom = {
-            userId: user.id,
-          };
+          ctx.agent.custom.userId = user.id;
           next();
         })
         .catch((e) => {
