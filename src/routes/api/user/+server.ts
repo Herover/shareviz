@@ -1,27 +1,15 @@
 import { json } from '@sveltejs/kit';
 import { db } from "../../../../server_lib/user.js";
 
-export async function POST({ request }) {
-  const { username, password } = await request.json();
+export async function GET({ locals }) {
+  const session = await locals.auth();
 
-  if (typeof password != "string" || typeof password != "string") {
-    return json({ message: "invalid parameter" }, { status: 400 });
-  }
-
-  const userId = await db.newUser({ username, password });
-
-  return json({ userId }, { status: 200 });
-}
-
-export async function GET({ cookies }) {
-  const id = cookies.get("x-token"); // TODO
-
-  if (typeof id != "string") {
+  const user = session?.user;
+  if (session == null || typeof user == "undefined" || typeof user.id != "string") {
     return json({ message: "invalid token" }, { status: 400 });
   }
-
-  const user = await db.getUser({ id });
-  const teams = await db.getUserTeams(id);
-
-  return json({ userId: user.id, username: user.username, teams }, { status: 200 });
+  console.log("get it")
+  const teams = await db.getUserTeams(user.id);
+  console.log("OK")
+  return json({ userId: user.id, username: user.name, teams }, { status: 200 });
 }

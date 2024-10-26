@@ -9,9 +9,6 @@
   import type { ChartInfo } from "./../../../../server_lib/user";
   import { group, orDefault } from "$lib/utils";
 
-  let username = "";
-  let password = "";
-
   let charts: ChartInfo[] | null = null;
   $: chartsByTeam =
     charts == null
@@ -28,7 +25,7 @@
     disconnect();
   });
   $: {
-    if ($user.signedIn) {
+    if ($page.data.session?.user) {
       disconnect = db.connect();
       fetch("/api/chart")
         .then(req => req.json())
@@ -44,51 +41,19 @@
     const docId = await db.create(synced);
     goto("/editor/chart/" + docId);
   };
-  const authenticate = async () => {
-    if ($user.signedIn) {
-      await user.signOut();
-    } else {
-      const res = await user.signIn(username, password);
-      if (res) {
-        username = "";
-        password = "";
-      }
-    }
-  };
-
-  const newUser = async () => {
-    const result = await user.createUser(username, password);
-    if (!result) {
-      notifications.addError("Unable to create this user");
-    } else {
-      notifications.addInfo("User created, you can log in now");
-    }
-  };
 </script>
 
 <div class="main">
   <div class="holder">
     <div class="container">
-      <h1>Welcome {$user.username}</h1>
-      {#if !$user.signedIn}
-        <input bind:value={username} placeholder="username" />
-        <input bind:value={password} placeholder="password" type="password" />
-      {/if}
-      <button on:click={() => authenticate()}>
-        {#if $user.signedIn}
-          Sign out
-        {:else}
-          Sign in
-        {/if}
-      </button>
-      {#if !$user.signedIn}
-        <button on:click={() => newUser()}>Create user</button>
+      <h1>Welcome {$page.data.session?.user?.name}</h1>
+      {#if !$page.data.session?.user}
         <SignIn provider="github" signInPage="signin" />
+      {:else}
+        <SignOut signOutPage="signout" />
       {/if}
-      <SignOut signOutPage="signout" />
-      {$page.data.session?.expires}
       <br /><br />
-      {#if $user.signedIn}
+      {#if $page.data.session?.user}
         <button on:click={() => newGraphic(true)}>New graphic</button>
       {/if}
       <button on:click={() => newGraphic(false)}>New local graphic</button>
@@ -137,8 +102,5 @@
   h1 {
     margin-top: 0em;
     margin-bottom: 0.5em;
-  }
-  input {
-    width: 30%;
   }
 </style>

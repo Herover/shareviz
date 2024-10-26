@@ -477,7 +477,6 @@ export function startServer(server) {
       acc[key] = value;
       return acc;
     }, {}) : {};
-    req.__sharevizUserId = cookies["x-token"];
     req.__sharevizAuthJSToken = cookies["authjs.session-token"];
 
     backend.listen(stream, req);
@@ -485,7 +484,7 @@ export function startServer(server) {
 
   backend.use('connect', function (ctx, next) {
     console.log('connect');
-    if (ctx.req.__sharevizUserId) {
+    if (ctx.req.__sharevizAuthJSToken) {
       drizzledb.select()
         .from(sessions)
         .where(
@@ -505,11 +504,7 @@ export function startServer(server) {
           }
           throw new Error("session not found");
         })
-        .then((_result) => {
-          return db.getUser({ id: ctx.req.__sharevizUserId });
-        })
-        .then((user) => {
-          ctx.agent.custom.userId = user.id;
+        .then(() => {
           next();
         })
         .catch((e) => {
@@ -535,7 +530,7 @@ export function startServer(server) {
       //   return next("unauthorized");
       // }
       next();
-    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.op && ctx.agent.custom.userId) {
+    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.op && ctx.agent.custom.user) {
       if (ctx.data.c == "examples" && typeof ctx.data.create != "undefined") {
         next();
       } else {
@@ -563,7 +558,7 @@ export function startServer(server) {
       next("no queries");
     } else if (ctx.reply.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.reply.c == "examples") {
       // When accessing chart, check if user is allowed to read
-      db.getUserCharts(ctx.agent.custom.userId, ctx.request.d)
+      db.getUserCharts(ctx.agent.custom.user.id, ctx.request.d)
         .then((charts) => {
           if (charts.length != 0) {
             next();
@@ -615,7 +610,7 @@ export function startServer(server) {
       next();
       return;
     }
-    db.getUserCharts(ctx.agent.custom.userId, ctx.id)
+    db.getUserCharts(ctx.agent.custom.user.id, ctx.id)
       .then((charts) => {
         // TODO: get rid of hard coded constant
         if (charts.length != 0 && (charts[0].relationType === 1 || charts[0].teamId !== null)) {
@@ -643,20 +638,20 @@ export function startServer(server) {
       ctx.op.create.data.meta = {
         publicRead: false,
         access: [
-          { userId: ctx.agent.custom.userId, read: true, write: true },
+          { userId: ctx.agent.custom.user.id, read: true, write: true },
         ],
       };
 
       db.addChart(ctx.id, "Chart name")
-        .then((id) => db.addUserChart(ctx.agent.custom.userId, id, 1))
+        .then((id) => db.addUserChart(ctx.agent.custom.user.id, id, 1))
         .then(() => next())
         .catch((e) => next(e));
     } else if (typeof ctx.snapshot == "object") {
       // Only allow editing charts with write access
-      db.getUserCharts(ctx.agent.custom.userId, ctx.id)
+      db.getUserCharts(ctx.agent.custom.user.id, ctx.id)
         .then((charts) => {
           // TODO: get rid of hard coded constant
-          if (charts.length != 0 && (charts[0].relationType === 1 || charts[0].teamId !== null)) {
+          if (charts.length != 0 /* && (charts[0].relationType === 1 || charts[0].teamId !== null) */) {
             next();
           } else {
             console.log(`unauthorized apply on ${ctx.collection} ${ctx.id}`);

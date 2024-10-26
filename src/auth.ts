@@ -12,5 +12,9 @@ export const { handle, signIn, signOut } = SvelteKitAuth({
       // return "/editor/chart?error=No invitation found";
       return true;
     },
+    session({ session, user }) {
+      session.user = user;
+      return session;
+    },
   },
 });
