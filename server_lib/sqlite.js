@@ -1,5 +1,5 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
-import { charts, db as drizzledb, organizationInvites, organizations, teams, teamsCharts, userCharts, users, usersOrganizations, usersTeams } from "./drizzle/schema";
+import { charts, db as drizzledb, organizationInvites, organizations, teams, teamsCharts, userCharts, users, usersOrganizations, usersTeams } from "./drizzle/schema.js";
 import { union } from "drizzle-orm/sqlite-core";
 
 export const db = {
