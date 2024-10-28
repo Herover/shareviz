@@ -46,4 +46,12 @@
   .info {
     background-color: #70ff86;
   }
+
+  :root {
+    --main-bg-color: #ffffff;
+    --accent-bg-color: #eeeeee;
+    --detail-color: #aaaaaa;
+    --text-secondary: #666666;
+    --width-wide: 1200px;
+  }
 </style>
