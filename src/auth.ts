@@ -7,7 +7,7 @@ export const { handle, signIn, signOut } = SvelteKitAuth({
   adapter: DrizzleAdapter(db),
   providers: [GitHub],
   callbacks: {
-    signIn: async ({ profile }) => {
+    signIn: async () => {
       // See if we have a shareviz user with profile?.email, if not then this person wasn't invited
       // return "/editor/chart?error=No invitation found";
       return true;
