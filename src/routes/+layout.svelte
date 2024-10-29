@@ -1,5 +1,11 @@
 <script lang="ts">
+  import { page } from "$app/stores";
   import { NotificationLevel, notifications } from "$lib/notificationStore";
+  import { user } from "$lib/userStore";
+
+  $: if ($page.data.session?.user?.id != null) {
+    user.update();
+  }
 </script>
 
 <div class="notifications">
