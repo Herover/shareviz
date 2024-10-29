@@ -40,34 +40,17 @@ export const db = {
   },
 
   getUserCharts: async (/** @type {string} */ userId, /** @type {string | undefined} */ chartRef) => {
-    return union(
-      drizzledb.select({
-        id: charts.id,
-        name: charts.name,
-        teamId: usersTeams.teamId,
-        chartRef: charts.chartRef,
-      })
-        .from(usersTeams)
-        .innerJoin(teams, eq(usersTeams.teamId, teams.id))
-        .innerJoin(teamsCharts, eq(teamsCharts.teamId, teams.id))
-        .innerJoin(charts, eq(charts.id, teamsCharts.chartId))
-        .where(and(
-          eq(usersTeams.userId, userId),
-          chartRef ? eq(charts.chartRef, chartRef) : undefined,
-        )),
-      drizzledb.select({
-        id: charts.id,
-        name: charts.name,
-        teamId: sql`NULL`.as("teamId"),
-        chartRef: charts.chartRef,
-      })
-        .from(userCharts)
-        .innerJoin(charts, eq(charts.id, userCharts.chartId))
-        .where(and(
-          eq(userCharts.userId, userId),
-          chartRef ? eq(charts.chartRef, chartRef) : undefined,
-        ))
-    );
+    return drizzledb.select({
+      id: charts.id,
+      name: charts.name,
+      chartRef: charts.chartRef,
+    })
+      .from(userCharts)
+      .innerJoin(charts, eq(charts.id, userCharts.chartId))
+      .where(and(
+        eq(userCharts.userId, userId),
+        chartRef ? eq(charts.chartRef, chartRef) : undefined,
+      ));
     // return new Promise((resolve, reject) => {
     //   const stmt = db.prepare(`
     //     SELECT
@@ -259,6 +242,23 @@ export const db = {
       })
       .returning({ id: organizations.id });
     return res[0].id;
+  },
+
+  getTeamCharts: async(/** @type {string} */ id) => {
+    const res = await drizzledb.select({
+      id: charts.id,
+      name: charts.name,
+      chartRef: charts.chartRef,
+    })
+      .from(usersTeams)
+      .innerJoin(teams, eq(usersTeams.teamId, teams.id))
+      .innerJoin(teamsCharts, eq(teamsCharts.teamId, teams.id))
+      .innerJoin(charts, eq(charts.id, teamsCharts.chartId))
+      .where(and(
+        eq(usersTeams.teamId, id),
+      ));
+
+    return res;
   },
 
   getOrganizationInvite: async (/** @type {string} */ code) => {
