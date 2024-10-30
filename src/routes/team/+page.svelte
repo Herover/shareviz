@@ -10,6 +10,7 @@
   const selectTeam = async (tId: string | null) => {
     teamId = tId;
   };
+  const addTeam = async () => {};
 </script>
 
 <div class="holder">
@@ -19,7 +20,7 @@
     <div class="options">
       <div
         on:click={() => selectTeam(null)}
-        on:keypress={(e) => e.key == "Enter" || selectTeam(null)}
+        on:keypress={(e) => e.key == "Enter" && selectTeam(null)}
         tabindex="0"
         role="button"
         class="option"
@@ -29,7 +30,7 @@
       {#each $user.teams as team}
         <div
           on:click={() => selectTeam(team.id)}
-          on:keypress={(e) => e.key == "Enter" || selectTeam(team.id)}
+          on:keypress={(e) => e.key == "Enter" && selectTeam(team.id)}
           tabindex="0"
           role="button"
           class="option"
@@ -37,7 +38,13 @@
           {team.name}
         </div>
       {/each}
-      <div class="option">
+      <div
+        on:click={() => addTeam()}
+        on:keypress={(e) => e.key == "Enter" && addTeam()}
+        tabindex="0"
+        role="button"
+        class="option"
+      >
         <div class="add-option">+ New team</div>
       </div>
     </div>
@@ -71,7 +78,7 @@
   }
 
   .options {
-    width: 400px;
+    width: 240px;
     box-sizing: border-box;
     border: 1px solid var(--detail-color);
     background-color: var(--accent-bg-color);
