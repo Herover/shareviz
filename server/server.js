@@ -642,8 +642,7 @@ export function startServer(server) {
         ],
       };
 
-      db.addChart(ctx.id, "Chart name")
-        .then((id) => db.addUserChart(ctx.agent.custom.user.id, id, 1))
+      db.addChart(ctx.id, "Chart name", ctx.agent.custom.user.id)
         .then(() => next())
         .catch((e) => next(e));
     } else if (typeof ctx.snapshot == "object") {

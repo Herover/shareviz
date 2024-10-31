@@ -1,5 +1,10 @@
 <script lang="ts">
+  import { onDestroy } from "svelte";
+  import { goto } from "$app/navigation";
+  import { page } from "$app/stores";
+  import { notifications } from "$lib/notificationStore";
   import { user } from "$lib/userStore";
+  import { db as chartStore } from "$lib/chartStore";
 
 
   let teamId: null | string = null;
@@ -11,6 +16,27 @@
     teamId = tId;
   };
   const addTeam = async () => {};
+
+  let disconnect = () => {};
+  onDestroy(() => {
+    disconnect();
+  });
+  $: {
+    if ($page.data.session?.user) {
+      disconnect = chartStore.connect();
+      fetch("/api/chart")
+        .then(req => req.json())
+        .then(data => charts = data.charts)
+        .catch(e => notifications.addError(e.message));
+    } else {
+      disconnect = () => {};
+    }
+  }
+
+  const newGraphic = async (synced: boolean) => {
+    const docId = await chartStore.create(synced);
+    goto("/editor/chart/" + docId);
+  };
 </script>
 
 <div class="holder">
@@ -51,11 +77,11 @@
   </div>
 
   <div class="side">
-    <h3>Charts</h3>
+    <h3>Charts <button on:click={() => newGraphic(true)}>Create new</button></h3>
     <ul>
       {#await charts then c}
         {#each c as chart}
-          <li>{chart.name}</li>
+          <li><a href="/editor/chart/{chart.chartRef}">{chart.name}</a></li>
         {/each}
       {/await}
     </ul>

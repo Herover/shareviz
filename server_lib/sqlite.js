@@ -97,24 +97,36 @@ export const db = {
   /**
    * @returns {Promise<string>} add a new user-chart relation
    */
-  addChart: async (/** @type {string} */ ref, /** @type {string} */ name) => {
-    const res = await drizzledb.insert(charts)
-      .values({
-        name,
-        chartRef: ref,
-      })
-      .returning({ id: charts.id });
-    return res[0].id;
-    // return new Promise((resolve, reject) => {
-    //   resolve("");
-      // const stmt = db.prepare("INSERT INTO charts (name, chart_ref) VALUES (?, ?)");
-      // stmt.run([name, ref], /** @this sqlite.RunResult */ function (/** @type {Error | null} */ err) {
-      //   if (err != null) {
-      //     reject(err);
-      //   }
-      //   resolve("" + this.lastID);
-      // }).finalize();
-    // });
+  addChart: async (
+    /** @type {string} */ ref,
+    /** @type {string} */ name,
+    /** @type {string} */ userId,
+    /** @type {string | undefined} */ teamId,
+  ) => {
+    return drizzledb.transaction(async tx => {
+      const chartRef = await tx.insert(charts)
+        .values({
+          name,
+          chartRef: ref,
+        })
+        .returning({ id: charts.id });
+      console.log(chartRef)
+      await tx.insert(userCharts)
+        .values({
+          chartId: chartRef[0].id,
+          userId,
+        });
+
+      if (typeof teamId != "undefined") {
+        await tx.insert(teamsCharts)
+          .values({
+            chartId: chartRef[0].id,
+            teamId
+          });
+      }
+
+      return chartRef[0].id;
+    });
   },
 
   /**
