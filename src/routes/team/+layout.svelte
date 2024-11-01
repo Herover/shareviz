@@ -30,9 +30,12 @@
     border-bottom: solid 1px var(--detail-color);
   }
   header .content {
+    box-sizing: border-box;
     width: 100%;
     max-width: var(--width-wide);
     margin: auto;
+    padding-left: 1em;
+    padding-right: 1em;
     height: 3em;
     display: flex;
     justify-content: start;
@@ -49,13 +52,19 @@
     font-weight: bold;
     color: var(--text-secondary);
   }
+  .nav-item:last-child {
+    padding-right: 0;
+  }
   header nav {
     display: flex;
     justify-content: space-between;
     margin-left: auto;
   }
   main {
-    width: var(--width-wide);
+    box-sizing: border-box;
+    max-width: var(--width-wide);
     margin: auto;
+    padding-left: 1em;
+    padding-right: 1em;
   }
 </style>
