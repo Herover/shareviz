@@ -1,5 +1,4 @@
 <script lang="ts">
-
 </script>
 
 <header>
@@ -17,9 +16,7 @@
   <slot />
 </main>
 
-<footer>
-
-</footer>
+<footer></footer>
 
 <style>
   :global(body) {

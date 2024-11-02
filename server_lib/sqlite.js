@@ -1,6 +1,5 @@
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { charts, db as drizzledb, organizationInvites, organizations, teams, teamsCharts, userCharts, users, usersOrganizations, usersTeams } from "./drizzle/schema.js";
-import { union } from "drizzle-orm/sqlite-core";
 
 export const db = {
   getUser: async (/** @type {{ username?: string, id?: string }} */{ username, id }) => {
@@ -271,6 +270,21 @@ export const db = {
       ));
 
     return res;
+  },
+
+  getTeamMembers: async (/** @type {string} */ id) => {
+    return drizzledb.select()
+      .from(usersTeams)
+      .innerJoin(users, eq(usersTeams.userId, users.id))
+      .where(eq(usersTeams.teamId, id));
+  },
+
+  addUserTeamsRelation: async (/** @type {string} */ teamId, /** @type {string} */ userId) => {
+    await drizzledb.insert(usersTeams)
+      .values({
+        teamId,
+        userId,
+      });
   },
 
   getOrganizationInvite: async (/** @type {string} */ code) => {
