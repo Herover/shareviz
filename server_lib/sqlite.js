@@ -1,6 +1,15 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { charts, db as drizzledb, organizationInvites, organizations, teams, teamsCharts, userCharts, users, usersOrganizations, usersTeams } from "./drizzle/schema.js";
 
+const TEAM_ROLES = {
+  MEMBER: 1,
+  ADMIN: 2,
+};
+const ORGANIZATION_ROLES = {
+  MEMBER: 1,
+  ADMIN: 2,
+};
+
 export const db = {
   getUser: async (/** @type {{ username?: string, id?: string }} */{ username, id }) => {
     return drizzledb.select()
@@ -240,6 +249,7 @@ export const db = {
       .values({
         expires: expireVal,
         organizationId: resOrg[0].id,
+        role: ORGANIZATION_ROLES.ADMIN,
       })
       .returning({ code: organizationInvites.code });
     return { id: resOrg[0].id, code: resInvite[0].code };
@@ -253,6 +263,13 @@ export const db = {
       })
       .returning({ id: organizations.id });
     return res[0].id;
+  },
+
+  getTeam: async (/** @type {string} */ teamId) => {
+    const res = await drizzledb.select()
+      .from(teams)
+      .where(eq(teams.id, teamId));
+    return res[0];
   },
 
   getTeamCharts: async(/** @type {string} */ id) => {
@@ -279,11 +296,12 @@ export const db = {
       .where(eq(usersTeams.teamId, id));
   },
 
-  addUserTeamsRelation: async (/** @type {string} */ teamId, /** @type {string} */ userId) => {
+  addUserTeamsRelation: async (/** @type {string} */ teamId, /** @type {string} */ userId, /** @type {number} */ role) => {
     await drizzledb.insert(usersTeams)
       .values({
         teamId,
         userId,
+        role,
       });
   },
 
@@ -324,10 +342,13 @@ export const db = {
         .values({
           organizationId: invite[0].organizationId,
           userId,
+          role: invite[0].role,
         });
       return res.changes == 1;
     });
-  }
+  },
+  TEAM_ROLES,
+  ORGANIZATION_ROLES,
 };
 
 const init = async () => {

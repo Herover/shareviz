@@ -33,19 +33,23 @@ export const user = function create() {
   return {
     subscribe,
     update: fetchLoggedIn,
-    getTeamCharts: async (teamId: string): Promise<{ charts: { id: string, name: string, chartRef: string }[], members: { id: string, name: string }[]}> => {
+    getTeamCharts: async (teamId: string): Promise<{
+      charts: { id: string, name: string, chartRef: string }[],
+      members: { role: number, user: { id: string, name: string } }[],
+      name: string,
+    }> => {
       const resp = await fetch(
         `/api/team/${teamId}`,
         {
           method: "GET",
         },
       );
-  
+
       const data = await resp.json();
-  
+
       if (resp.status != 200) {
         notifications.addError(orDefault(data.message, "Unknown error " + resp.statusText));
-        return { charts: [], members: [] };
+        return { charts: [], members: [], name: "" };
       }
 
       return data;
@@ -57,9 +61,9 @@ export const user = function create() {
           method: "GET",
         },
       );
-  
+
       const data = await resp.json();
-  
+
       if (resp.status != 200) {
         notifications.addError(orDefault(data.message, "Unknown error " + resp.statusText));
         return [];

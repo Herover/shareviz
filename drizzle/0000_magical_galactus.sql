@@ -39,7 +39,8 @@ CREATE TABLE `organizationInvites` (
 	`code` text PRIMARY KEY NOT NULL,
 	`organizationId` text NOT NULL,
 	`used` text,
-	`expires` text
+	`expires` text,
+	`role` integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `organizations` (
@@ -89,6 +90,7 @@ CREATE UNIQUE INDEX `user_email_unique` ON `user` (`email`);--> statement-breakp
 CREATE TABLE `usersOrganizations` (
 	`userId` text NOT NULL,
 	`organizationId` text NOT NULL,
+	`role` integer NOT NULL,
 	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`organizationId`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE cascade
 );
@@ -97,6 +99,7 @@ CREATE UNIQUE INDEX `usersOrganizationsUnique` ON `usersOrganizations` (`userId`
 CREATE TABLE `usersTeams` (
 	`userId` text NOT NULL,
 	`teamId` text NOT NULL,
+	`role` integer NOT NULL,
 	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`teamId`) REFERENCES `teams`(`id`) ON UPDATE no action ON DELETE cascade
 );

@@ -17,7 +17,7 @@ export async function POST({ request, locals }) {
   // TODO: check if user has access to organization
 
   const teamId = await db.addTeam(name, organizationId);
-  await db.addUserTeamsRelation(teamId, user.id);
+  await db.addUserTeamsRelation(teamId, user.id, db.TEAM_ROLES.ADMIN);
 
   return json({ teamId });
 }

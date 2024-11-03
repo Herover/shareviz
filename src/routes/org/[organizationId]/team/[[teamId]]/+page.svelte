@@ -9,14 +9,23 @@
   $: teamId = $page.params.teamId;
   $: console.log(teamId);
   let charts: { chartRef: string; id: string; name: string }[] = [];
+  let team:
+    | Awaited<ReturnType<typeof user.getTeamCharts>>
+    | undefined;
   $: typeof teamId == "undefined"
     ? user
         .geUserCharts()
-        .then((c) => (charts = c))
+        .then((c) => {
+          charts = c;
+          team = undefined;
+        })
         .catch((e) => notifications.addError(e.message))
     : user
         .getTeamCharts(teamId)
-        .then((c) => (charts = c.charts))
+        .then((c) => {
+          charts = c.charts;
+          team = c;
+        })
         .catch((e) => notifications.addError(e.message));
   $: console.log(typeof teamId == "undefined", teamId);
   const addTeam = async () => {
@@ -79,6 +88,23 @@
         <div class="add-option">+ New team</div>
       </div>
     </div>
+
+    {#if team}
+      <p>Team <b>{team.name}</b> members:</p>
+      <ul>
+        {#each team.members as member}
+          <li>
+            {member.user.name}
+            {#if member.role == 2}
+              (administrator)
+            {/if}
+            {#if member.user.id == $page.data.session?.user?.id}
+              (you)
+            {/if}
+          </li>
+        {/each}
+      </ul>
+    {/if}
   </div>
 
   <div class="side">

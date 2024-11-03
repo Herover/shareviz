@@ -120,6 +120,8 @@ export const usersTeams = sqliteTable(
     teamId: text("teamId")
       .notNull()
       .references(() => teams.id, { onDelete: "cascade" }),
+    role: integer("role")
+      .notNull(),
   },
   (t) => ({
     unq: unique("userTeamsUnique").on(t.userId, t.teamId),
@@ -135,6 +137,8 @@ export const usersOrganizations = sqliteTable(
     organizationId: text("organizationId")
       .notNull()
       .references(() => organizations.id, { onDelete: "cascade" }),
+    role: integer("role")
+      .notNull(),
   },
   (t) => ({
     unq: unique("usersOrganizationsUnique").on(t.userId, t.organizationId),
@@ -197,5 +201,7 @@ export const organizationInvites = sqliteTable(
     // Date this invite code was used
     used: text("used"),
     expires: text("expires"),
+    role: integer("role")
+      .notNull(),
   },
 );
