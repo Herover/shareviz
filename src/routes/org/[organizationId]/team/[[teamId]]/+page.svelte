@@ -4,14 +4,13 @@
   import { notifications } from "$lib/notificationStore";
   import { user } from "$lib/userStore";
   import { db as chartStore } from "$lib/chartStore";
+  import { onDestroy, onMount } from "svelte";
 
   let teamId: string | undefined;
   $: teamId = $page.params.teamId;
   $: console.log(teamId);
   let charts: { chartRef: string; id: string; name: string }[] = [];
-  let team:
-    | Awaited<ReturnType<typeof user.getTeamCharts>>
-    | undefined;
+  let team: Awaited<ReturnType<typeof user.getTeamCharts>> | undefined;
   $: typeof teamId == "undefined"
     ? user
         .geUserCharts()
@@ -40,10 +39,13 @@
     goto(`/org/${$page.params.organizationId}/team/${data.teamId}`);
   };
 
-  // let disconnect = () => {};
-  // onDestroy(() => {
-  //   disconnect();
-  // });
+  let disconnect = () => {};
+  onDestroy(() => {
+    disconnect();
+  });
+  onMount(() => {
+    disconnect = chartStore.connect();
+  });
   // $: {
   //   if ($page.data.session?.user) {
   //     disconnect = chartStore.connect();
@@ -58,7 +60,19 @@
 
   const newGraphic = async (synced: boolean) => {
     const docId = await chartStore.create(synced);
-    goto("/editor/chart/" + docId);
+    const res = await fetch("/api/chart", {
+      method: "POST",
+      body: JSON.stringify({
+        ref: docId,
+        teamId,
+      }),
+    });
+    if (res.status != 200) {
+      const data = await res.json();
+      notifications.addError(data.message);
+    } else {
+      goto("/editor/chart/" + docId);
+    }
   };
 </script>
 

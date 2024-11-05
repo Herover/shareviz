@@ -192,7 +192,7 @@ export const db = function createDB() {
     create: (synced: boolean) => {
       return new Promise<string>((resolve, reject) => {
         // TODO: id collision detection
-        const docId = (synced ? "" : localPrefix) + ("" + Math.random()).split(".")[1];
+        const docId = (synced ? "" : localPrefix) + crypto.randomUUID();
         doc = synced  ? connection.get('examples', docId) : getLocalDoc('examples', docId);
         doc.on("error", (e: Error) => console.warn("doc error", e));
         doc.create({

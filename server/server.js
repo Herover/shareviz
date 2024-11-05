@@ -642,9 +642,10 @@ export function startServer(server) {
         ],
       };
 
-      db.addChart(ctx.id, "Chart name", ctx.agent.custom.user.id)
-        .then(() => next())
-        .catch((e) => next(e));
+      // db.addChart(ctx.id, "Chart name", ctx.agent.custom.user.id)
+      //   .then(() => next())
+      //   .catch((e) => next(e));
+      next();
     } else if (typeof ctx.snapshot == "object") {
       // Only allow editing charts with write access
       db.getUserCharts(ctx.agent.custom.user.id, ctx.id)
