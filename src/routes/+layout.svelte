@@ -57,7 +57,13 @@
     --main-bg-color: #ffffff;
     --accent-bg-color: #eeeeee;
     --detail-color: #aaaaaa;
+    --text-primary: #000000;
     --text-secondary: #666666;
     --width-wide: 1200px;
+  }
+
+  :global(body) {
+    background-color: var(--main-bg-color);
+    color: var(--text-primary);
   }
 </style>

@@ -19,9 +19,6 @@
 <footer></footer>
 
 <style>
-  :global(body) {
-    background-color: var(--main-bg-color);
-  }
   header {
     width: 100%;
     border-bottom: solid 1px var(--detail-color);
