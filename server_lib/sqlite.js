@@ -1,11 +1,12 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { charts, db as drizzledb, organizationInvites, organizations, teams, teamsCharts, userCharts, users, usersOrganizations, usersTeams } from "./drizzle/schema.js";
 
-const TEAM_ROLES = {
+// FIXME: These values must match values in src/lib/consts.ts
+export const TEAM_ROLES = {
   MEMBER: 1,
   ADMIN: 2,
 };
-const ORGANIZATION_ROLES = {
+export const ORGANIZATION_ROLES = {
   MEMBER: 1,
   ADMIN: 2,
 };
@@ -317,6 +318,23 @@ export const db = {
       return res[0];
     }
   },
+  getOrganizationUsers: async (/** @type {string} */ id) => {
+    return await drizzledb.select()
+      .from(usersOrganizations)
+      .innerJoin(users, eq(usersOrganizations.userId, users.id))
+      .where(eq(usersOrganizations.organizationId, id));
+  },
+  addOrganizationInvite: async (/** @type {string} */ organizationId) => {
+    const code = crypto.randomUUID();
+    await drizzledb.insert(organizationInvites)
+      .values({
+        organizationId,
+        code,
+        role: ORGANIZATION_ROLES.MEMBER,
+        expires: new Date().toISOString(),
+      });
+    return code;
+  },
 
   addUserOrganizationRelation: async (/** @type {string} */ code, /** @type {string} */ userId) => {
     return drizzledb.transaction(async (tx) => {
@@ -338,7 +356,7 @@ export const db = {
       await tx.update(organizationInvites)
         .set({ used: new Date().toISOString() })
         .where(eq(organizationInvites.code, code));
-      const res = await drizzledb.insert(usersOrganizations)
+      const res = await tx.insert(usersOrganizations)
         .values({
           organizationId: invite[0].organizationId,
           userId,
@@ -347,8 +365,6 @@ export const db = {
       return res.changes == 1;
     });
   },
-  TEAM_ROLES,
-  ORGANIZATION_ROLES,
 };
 
 const init = async () => {
