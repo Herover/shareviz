@@ -1,13 +1,16 @@
 <script lang="ts">
+  import { page } from "$app/stores";
 </script>
 
 <header>
   <div class="content">
     <div class="icon">ShareViz</div>
     <nav>
-      <div class="nav-item">Overview</div>
-      <div class="nav-item">Organization</div>
-      <div class="nav-item">User</div>
+      {#if $page.params.organizationId}
+        <div class="nav-item"><a href="/org/{$page.params.organizationId}/team">Overview</a></div>
+        <div class="nav-item"><a href="/org/{$page.params.organizationId}">Organization</a></div>
+      {/if}
+      <div class="nav-item"><a href="/org/user">User</a></div>
     </nav>
   </div>
 </header>
@@ -45,6 +48,10 @@
     padding-right: 1em;
     font-weight: bold;
     color: var(--text-secondary);
+  }
+  .nav-item > a {
+    color: var(--text-secondary);
+    text-decoration: none;
   }
   .nav-item:last-child {
     padding-right: 0;
