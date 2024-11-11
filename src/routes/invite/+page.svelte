@@ -9,7 +9,7 @@
 
   $: join = async () => {
     const r = await fetch("/api/invite", {
-      method: "POST",
+      method: "PUT",
       body: JSON.stringify({ code: $page.data.code }),
     });
     if (r.status != 200) {

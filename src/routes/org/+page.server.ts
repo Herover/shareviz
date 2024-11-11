@@ -1,4 +1,4 @@
-import { json } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { db } from '../../../server_lib/sqlite.js';
 
 export async function load({ locals }) {
@@ -6,7 +6,7 @@ export async function load({ locals }) {
 
   const user = session?.user;
   if (session == null || typeof user == "undefined" || typeof user.id != "string") {
-    return json({ message: "invalid token" }, { status: 400 });
+    redirect(302, "/");
   }
 
   const orgs = await db.getUserOrganizations(user.id);

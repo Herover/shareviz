@@ -2,10 +2,84 @@
   import { page } from "$app/stores";
   import { ORGANIZATION_ROLES } from "$lib/consts";
 
-  $: console.log($page.data.orgUsers)
+  let inviteCode = "";
+  $: createInvite = async () => {
+    const res = await fetch(`/api/org/${$page.params.organizationId}/invite`, {
+      method: "POST",
+    });
+    const data = await res.json();
+    inviteCode = data.code;
+  };
+
+  let invites: { code: string; expires: Date | null; used: boolean }[] = [];
+  $: {
+    invites = (
+      $page.data.invites as {
+        code: string;
+        expires: Date | null;
+        used: boolean;
+      }[]
+    )
+      .map((invite: any) => ({
+        code: invite.code,
+        used: invite.used,
+        expires: invite.expires == null ? null : new Date(invite.expires),
+      }))
+      .sort(
+        (a, b) =>
+          (a.expires?.getTime() ?? Infinity) -
+          (b.expires?.getTime() ?? Infinity),
+      );
+  }
+  $: deleteInvite = async (code: string) => {
+    const res = await fetch(`/api/org/${$page.params.organizationId}/invite`, {
+      method: "DELETE",
+      body: JSON.stringify({ code }),
+    });
+    if (res.status == 200) {
+      invites = invites.filter((e) => e.code != code);
+    }
+  };
 </script>
 
 <h1>Organization Settings</h1>
+
+<p>
+  <button on:click={() => createInvite()}>New invite</button>
+  {#if inviteCode != ""}
+    <input value={inviteCode} />
+  {/if}
+</p>
+
+<table>
+  <tr>
+    <th>Code</th>
+    <th>Expires</th>
+    <th></th>
+  </tr>
+  {#each invites as invite}
+    <tr>
+      <td>{invite.code}</td>
+      <td>
+        {#if invite.expires}
+          {(invite.expires.getDay() + "").padStart(2, "0")}
+          -
+          {(invite.expires.getMonth() + 1 + "").padStart(2, "0")}
+          -
+          {invite.expires.getFullYear()}
+        {:else}
+          never
+        {/if}
+      </td>
+      <td
+        ><button
+          disabled={invite.used}
+          on:click={() => deleteInvite(invite.code)}>Delete</button
+        ></td
+      >
+    </tr>
+  {/each}
+</table>
 
 <table>
   <tr>
@@ -14,8 +88,9 @@
   </tr>
   {#each $page.data.orgUsers as user}
     <tr>
-      <td>{user.usersOrganizations.role == ORGANIZATION_ROLES.ADMIN ? "Administrator" : "user"}</td>
-      <td>{user.user.name}</td>
+      <td>{user.role == ORGANIZATION_ROLES.ADMIN ? "Administrator" : "user"}</td
+      >
+      <td>{user.name}</td>
     </tr>
   {/each}
 </table>
