@@ -96,6 +96,16 @@ export const valueParsers: { [name: string]: { fn: (s: string) => any, type: val
     },
     type: valueKinds.DATE,
   },
+  yyyyKk: {
+    fn: (d: string) => {
+      const parts = d.match(/(\d{4})K(\d{1})/);
+      if (parts && parts.length == 3) {
+        return new Date(`${parts[1]}-${("" + Number.parseInt(parts[2])*3).padStart(2, "0")}-01T00:00:00+00:00`);
+      }
+      return null;
+    },
+    type: valueKinds.DATE,
+  },
 };
 
 export const orDefault = <T>(n: T | undefined, def: T): T => {
