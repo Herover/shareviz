@@ -81,6 +81,9 @@
       });
     }
   };
+  // $: if ($dbHBar.categories != "" && $dbHBar.subCategories != "") {
+  //   automateColorKeys();
+  // }
 
   $: removeExtraColorKeys = () => {
     if (typeof $dbHBar.dataSet != "undefined" && typeof chartData[$dbHBar.dataSet] != "undefined") {
