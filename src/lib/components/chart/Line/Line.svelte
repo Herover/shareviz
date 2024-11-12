@@ -11,7 +11,7 @@
   import Axis from "../Axis.svelte";
   import { max, min } from "d3-array";
   import FloatingLabels from "./FloatingLabels/FloatingLabels.svelte";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import { chartToEditor } from "$lib/chartToEditorStore";
 
   export let values: {
@@ -33,6 +33,9 @@
   const topMargin = 24;
   const bottomMargin = 24;
   const labelOffset = 16;
+
+  let t1 = Date.now()
+  onMount(() => console.log("mounted!", Date.now() - t1))
 
   $: dataSet = chartSpec.data.sets.find((set) => set.id == lineSpec.dataSet);
 
@@ -91,16 +94,16 @@
             };
           })
           // Split line parts into multiple if there's a NaN value
-          .reduce((acc, value, i, arr) => {
+          .reduce((acc2, value, i, arr) => {
             if (Number.isNaN(value.y)) {
               if (i != arr.length - 1 && !Number.isNaN(arr[i + 1].y)) {
-                acc.push([]);
+                acc2.push([]);
               }
             } else {
-              acc[acc.length - 1].push(value);
+              acc2[acc2.length - 1].push(value);
             }
 
-            return acc;
+            return acc2;
           }, [[]] as { x: number; y: number; to: number; from: number }[][]);
 
         values.filter(d => d.length != 0)
