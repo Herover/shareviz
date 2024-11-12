@@ -326,14 +326,29 @@ export const db = {
   },
   addOrganizationInvite: async (/** @type {string} */ organizationId) => {
     const code = crypto.randomUUID();
+    const expires = new Date();
+    expires.setMonth(expires.getMonth() + 1);
     await drizzledb.insert(organizationInvites)
       .values({
         organizationId,
         code,
         role: ORGANIZATION_ROLES.MEMBER,
-        expires: new Date().toISOString(),
+        expires: expires.toISOString(),
       });
     return code;
+  },
+  getOrganizationInvites: async (/** @type {string} */ id) => {
+    return await drizzledb.select()
+      .from(organizationInvites)
+      .where(eq(organizationInvites.organizationId, id));
+  },
+  deleteInvite: async (/** @type {string} */ id, /** @type {string} */ code) => {
+    return await drizzledb.delete(organizationInvites)
+      .where(and(
+        eq(organizationInvites.code, code),
+        eq(organizationInvites.organizationId, id),
+        isNull(organizationInvites.used),
+      ));
   },
 
   addUserOrganizationRelation: async (/** @type {string} */ code, /** @type {string} */ userId) => {
