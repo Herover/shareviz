@@ -1,38 +1,29 @@
-# create-svelte
+Website for creating simple data visualizations, that can be shared as images or embedded into websites!
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+The goal is to allow non-technical users to collaborate on creating simple but effective data visualizations, while allowing programmers to extend the functionality. It is also simple to host on your own infrastructure, and comes with SSO.
 
-## Creating a project
+Not ready for production.
 
-If you're seeing this, you've probably already done this step. Congrats!
+# Comparison with other tools
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+"Is it like INSERT-DATAVIZ-TOOL-HERE, but for free?" Probably! But, more like a free/discount version of it. This tools isn't made to compete with some of the amazing commercial tools that already exists, but to fill out a niche for organizations where the requirements to host your own data, free access to source code, or price isn't met elsewhere. It is also limited how much a tiny open-source project can do compared to the commercial counterparts.
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+There's currently no hosted version, but there might be in the future.
 
-## Developing
+# Development
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+* First install everything `npm install`.
 
-```bash
-npm run dev
+* Then run any new database migrations `npx drizzle-kit migrate --config drizze.config.ts`.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+* Run the dev server `npm run dev`, or `npm run dev -- --host` if you want to test with a external device.
 
-## Building
+# Production
 
-To create a production version of your app:
+* Install everything `npm install`.
 
-```bash
-npm run build
-```
+* Build the server `npm run build`.
 
-You can preview the production build with `npm run preview`.
+* Then run any new database migrations `npx drizzle-kit migrate --config drizze.config.ts`.
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+* Run the server `node server/prod.js`.
