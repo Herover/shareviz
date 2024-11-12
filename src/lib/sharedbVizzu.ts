@@ -3,9 +3,9 @@ import { readable, writable } from 'svelte/store';
 
 import ReconnectingWebSocket from 'reconnecting-websocket';
  // @ts-ignore
-import {json1} from 'sharedb-client-browser/dist/ot-json1-umd.cjs';
+import * as json1 from 'ot-json1';
  // @ts-ignore
-import sharedb from 'sharedb-client-browser/dist/sharedb-client-umd.cjs';
+import ShareDB from 'sharedb/lib/client';
 import { WebSocket } from 'ws';
 import { createScope } from './dataScope';
 import { Config } from 'vizzu';
@@ -57,8 +57,8 @@ export const db = function createDB() {
       }));
         
 
-      sharedb.types.register(json1.type);
-      const connection: /* Connection */ any = new sharedb.Connection(socket);
+      ShareDB.types.register(json1.type);
+      const connection: /* Connection */ any = new ShareDB.Connection(socket);
     
       // Create local Doc instance mapped to 'examples' collection document with id 'counter'
       doc = connection.get('examples', id);
