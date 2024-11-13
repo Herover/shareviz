@@ -4,14 +4,23 @@
   import FloatingLabel from "./FloatingLabel.svelte";
   import { createEventDispatcher } from "svelte";
 
-  export let lines: LineStyleKey[];
-  export let xScale:
+  interface Props {
+    lines: LineStyleKey[];
+    xScale: 
     | ScaleLinear<number, number, never>
     | ScaleTime<number, number, never>;
-  export let yScale:
+    yScale: 
     | ScaleLinear<number, number, never>
     | ScaleTime<number, number, never>;
-  export let editor = false;
+    editor?: boolean;
+  }
+
+  let {
+    lines,
+    xScale,
+    yScale,
+    editor = false
+  }: Props = $props();
 
   const dispatch = createEventDispatcher<{
     edit: any[];

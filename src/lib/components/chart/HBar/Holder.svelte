@@ -1,34 +1,49 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import type { Root, HBar as hBarType } from "$lib/chart";
   import { AxisRepeatMode } from "$lib/chart";
   import { group } from "$lib/utils";
   import HBar from "./HBar.svelte";
   import { formatData } from "./data";
 
-  export let chartSpec: Root;
-  export let componentSpec: hBarType;
-  export let data: {
+  interface Props {
+    chartSpec: Root;
+    componentSpec: hBarType;
+    data: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any[];
   };
-  export let chartWidth: number;
-  export let editor = false;
-  export let index: number;
+    chartWidth: number;
+    editor?: boolean;
+    index: number;
+  }
 
-  $: groups = formatData(componentSpec, data, componentSpec.colors.byKey);
+  let {
+    chartSpec,
+    componentSpec,
+    data,
+    chartWidth,
+    editor = false,
+    index
+  }: Props = $props();
 
-  let labelOverflows: number[] = [];
-  $: labelOverflows = labelOverflows.slice(0, groups.length);
-  $: labelOverflow = labelOverflows.reduce((acc, n) => Math.max(acc, n), 0);
-  $: width =
-    chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight;
+  let groups = $derived(formatData(componentSpec, data, componentSpec.colors.byKey));
 
-  $: showAxis = (type: AxisRepeatMode, i: number) => {
+  let labelOverflows: number[] = $state([]);
+  run(() => {
+    labelOverflows = labelOverflows.slice(0, groups.length);
+  });
+  let labelOverflow = $derived(labelOverflows.reduce((acc, n) => Math.max(acc, n), 0));
+  let width =
+    $derived(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight);
+
+  let showAxis = $derived((type: AxisRepeatMode, i: number) => {
     if (type == AxisRepeatMode.ALL) return true;
     else if (type == AxisRepeatMode.FIRST && i == 0) return true;
     else if (type == AxisRepeatMode.LAST && i == group.length - 1) return true;
     return false;
-  };
+  });
 </script>
 
 {#each groups as { k, d }, i}

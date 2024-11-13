@@ -3,8 +3,12 @@
   import type { db } from "$lib/chartStore";
   import DataSetEditor from "./DataSetEditor.svelte";
 
-  export let chartData: Data;
-  export let store: typeof db;
+  interface Props {
+    chartData: Data;
+    store: typeof db;
+  }
+
+  let { chartData, store }: Props = $props();
 
   const addDataSet = () => {
     store.addDataSet(chartData.sets.length);
@@ -18,4 +22,4 @@
   <DataSetEditor dataStore={store.dataSet(i)} />
 {/each}
 
-<button on:click={() => addDataSet()}>+ Data set</button>
+<button onclick={() => addDataSet()}>+ Data set</button>

@@ -7,13 +7,17 @@
   import Channel from "./Channel.svelte";
   import TextInput from "../TextInput.svelte";
 
-  export let configChart: ReturnType<typeof createScope<Config.Chart>>;
-  export let configData: TableByRecords | undefined;
-  export let index: number;
+  interface Props {
+    configChart: ReturnType<typeof createScope<Config.Chart>>;
+    configData: TableByRecords | undefined;
+    index: number;
+  }
+
+  let { configChart, configData, index }: Props = $props();
 </script>
 
 <div class="holder">
-  <!-- svelte-ignore a11y-label-has-associated-control -->
+  <!-- svelte-ignore a11y_label_has_associated_control -->
   <p><label>Title <TextInput value={$configChart?.title} onChange={(val) => db.setConfigTitle(index, val)}/></label></p>
 
 <!--   <p>
@@ -61,7 +65,7 @@
 
   <p>
     Geometry
-    <select value={$configChart?.geometry} on:change={e => db.setConfigGeometry(index, e.currentTarget.value)}>
+    <select value={$configChart?.geometry} onchange={e => db.setConfigGeometry(index, e.currentTarget.value)}>
       {#each ['rectangle', 'circle', 'area', 'line'] as geom}
         <option value={geom}>{geom}</option>
       {/each}
@@ -70,7 +74,7 @@
 
   <p>
     Coordinate system
-    <select value={$configChart?.coordSystem} on:change={e => db.setConfigCoordSystem(index, e.currentTarget.value)}>
+    <select value={$configChart?.coordSystem} onchange={e => db.setConfigCoordSystem(index, e.currentTarget.value)}>
       {#each ['cartesian', 'polar'] as coord}
         <option value={coord}>{coord}</option>
       {/each}

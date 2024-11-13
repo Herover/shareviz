@@ -2,8 +2,12 @@
   import type { axisGrid } from "$lib/chartStore";
   import ColorPicker from "./ColorPicker/ColorPicker.svelte";
 
-  export let conf: ReturnType<typeof axisGrid>;
-  export let isMinor = false;
+  interface Props {
+    conf: ReturnType<typeof axisGrid>;
+    isMinor?: boolean;
+  }
+
+  let { conf, isMinor = false }: Props = $props();
 </script>
 
 <p>
@@ -11,7 +15,7 @@
     Enabled:
     <input
       checked={$conf.enabled}
-      on:change={e => conf.setEnabled(e.currentTarget.checked)}
+      onchange={e => conf.setEnabled(e.currentTarget.checked)}
       type="checkbox"
     />
   </label>
@@ -22,7 +26,7 @@
       Grid:
       <input
         checked={$conf.grid}
-        on:change={e => conf.setGrid(e.currentTarget.checked)}
+        onchange={e => conf.setGrid(e.currentTarget.checked)}
         type="checkbox"
       />
     </label>
@@ -33,7 +37,7 @@
       Label tick size:
       <input
         value={$conf.tickSize}
-        on:change={e => conf.setTickSize(Number.parseFloat(e.currentTarget.value))}
+        onchange={e => conf.setTickSize(Number.parseFloat(e.currentTarget.value))}
         type="number"
       />
     </label>
@@ -43,7 +47,7 @@
     Label tick width:
     <input
       value={$conf.tickWidth}
-      on:change={e => conf.setTickWidth(Number.parseFloat(e.currentTarget.value))}
+      onchange={e => conf.setTickWidth(Number.parseFloat(e.currentTarget.value))}
       type="number"
     />
   </label>
@@ -61,7 +65,7 @@
       Auto ticks from
       <input
         value={$conf.auto.from}
-        on:change={e => conf.setAutoFrom(Number.parseFloat(e.currentTarget.value))}
+        onchange={e => conf.setAutoFrom(Number.parseFloat(e.currentTarget.value))}
         type="number"
         style="width: 80px;"
       />
@@ -70,7 +74,7 @@
       every
       <input
         value={$conf.auto.each}
-        on:change={e => conf.setAutoEach(Number.parseFloat(e.currentTarget.value))}
+        onchange={e => conf.setAutoEach(Number.parseFloat(e.currentTarget.value))}
         type="number"
         style="width: 80px;"
       />
@@ -83,7 +87,7 @@
         Auto label
         <input
           checked={$conf.auto.labels}
-          on:change={e => conf.setAutoLabels(e.currentTarget.checked)}
+          onchange={e => conf.setAutoLabels(e.currentTarget.checked)}
           type="checkbox"
         />
       </label>
@@ -91,7 +95,7 @@
       <label>
         <select
           value={$conf.labelDivide}
-          on:change={(e) => conf.setLabelDivide(Number.parseFloat(e.currentTarget.value))}
+          onchange={(e) => conf.setLabelDivide(Number.parseFloat(e.currentTarget.value))}
           style="width: 80px;"
         >
           {#each [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000] as n}
@@ -104,7 +108,7 @@
         after
         <input
           value={$conf.afterLabel}
-          on:change={e => conf.setAfterLabel(e.currentTarget.value)}
+          onchange={e => conf.setAfterLabel(e.currentTarget.value)}
           style="width: 80px;"
         />
       </label>
@@ -114,12 +118,12 @@
       Manual marks
       <br>
       {#each $conf.ticks as kv, i}
-        <label>Value <input value={kv.n} on:change={(e) => conf.setTickValue(i, Number.parseInt(e.currentTarget.value))} type="number" style="width: 80px;" /></label>
-        <label>Text <input value={kv.l} on:change={(e) => conf.setTickLabel(i, e.currentTarget.value)} type="text" style="width: 80px;" /></label>
-        <button on:click={() => conf.removeTick(i)}>delete</button>
+        <label>Value <input value={kv.n} onchange={(e) => conf.setTickValue(i, Number.parseInt(e.currentTarget.value))} type="number" style="width: 80px;" /></label>
+        <label>Text <input value={kv.l} onchange={(e) => conf.setTickLabel(i, e.currentTarget.value)} type="text" style="width: 80px;" /></label>
+        <button onclick={() => conf.removeTick(i)}>delete</button>
         <br>
       {/each}
-      <button on:click={() => conf.addTick($conf.ticks.length)}>+ add</button>
+      <button onclick={() => conf.addTick($conf.ticks.length)}>+ add</button>
     </p>
   {/if}
 {/if}

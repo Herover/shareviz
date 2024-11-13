@@ -1,12 +1,25 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import chroma from "chroma-js";
   import { createEventDispatcher } from "svelte";
   import ColorComponent from "./ColorComponent.svelte";
 
-  export let color: string;
 
-  // From https://github.com/d3/d3-scale-chromatic/blob/main/src/categorical/Paired.js
-  export let scheme = [
+  
+
+
+  interface Props {
+    color: string;
+    // From https://github.com/d3/d3-scale-chromatic/blob/main/src/categorical/Paired.js
+    scheme?: any;
+    chartColors?: string[];
+    disabled?: boolean;
+  }
+
+  let {
+    color,
+    scheme = [
     "#a6cee3",
     "#1f78b4",
     "#b2df8a",
@@ -19,46 +32,47 @@
     "#6a3d9a",
     "#ffff99",
     "#b15928",
-  ];
+  ],
+    chartColors = [],
+    disabled = false
+  }: Props = $props();
 
-  export let chartColors: string[] = [];
+  let l = $state(0);
+  let c = $state(0);
+  let h = $state(0);
 
-  export let disabled = false;
-
-  let l = 0;
-  let c = 0;
-  let h = 0;
-
-  $: try {
-    // TODO: This allows colors that cannot be rendered, is that OK?
-    const parts = color.match(
-      /oklch\((\d+\.?\d*)[, %]+(\d+\.?\d*)%[, ]+(\d+\.?\d*)(?:deg)?\)/,
-    );
-    if (parts != null && parts.length == 4) {
-      l = Number.parseFloat(parts[1]);
-      c = Number.parseFloat(parts[2]);
-      h = Number.parseFloat(parts[3]);
-    } else {
-      [l, c, h] = chroma(color).oklch();
-      l = l * 100;
-      c = c * (1 / 0.4) * 100;
+  run(() => {
+    try {
+      // TODO: This allows colors that cannot be rendered, is that OK?
+      const parts = color.match(
+        /oklch\((\d+\.?\d*)[, %]+(\d+\.?\d*)%[, ]+(\d+\.?\d*)(?:deg)?\)/,
+      );
+      if (parts != null && parts.length == 4) {
+        l = Number.parseFloat(parts[1]);
+        c = Number.parseFloat(parts[2]);
+        h = Number.parseFloat(parts[3]);
+      } else {
+        [l, c, h] = chroma(color).oklch();
+        l = l * 100;
+        c = c * (1 / 0.4) * 100;
+      }
+    } catch (e) {
+      console.warn(e);
+      l = 0;
+      c = 0;
+      h = 0;
     }
-  } catch (e) {
-    console.warn(e);
-    l = 0;
-    c = 0;
-    h = 0;
-  }
+  });
 
   const hueStep = 18;
   const chromaStep = 5;
   const lightnessStep = 5;
 
-  let open = false;
-  let input: HTMLInputElement | undefined;
-  let container: HTMLDivElement | undefined;
+  let open = $state(false);
+  let input: HTMLInputElement | undefined = $state();
+  let container: HTMLDivElement | undefined = $state();
 
-  let opened = 0;
+  let opened = $state(0);
   const ev = (e: MouseEvent | KeyboardEvent) => {
     if (
       // If click happens at same time as opening, it was the click that opened us.
@@ -81,15 +95,17 @@
     }
   };
 
-  $: if (open) {
-    input?.focus();
-    opened = Date.now() + 100;
-    document.addEventListener("click", ev);
-    document.addEventListener("keyup", ev);
-  } else {
-    document.removeEventListener("click", ev);
-    document.removeEventListener("keyup", ev);
-  }
+  run(() => {
+    if (open) {
+      input?.focus();
+      opened = Date.now() + 100;
+      document.addEventListener("click", ev);
+      document.addEventListener("keyup", ev);
+    } else {
+      document.removeEventListener("click", ev);
+      document.removeEventListener("keyup", ev);
+    }
+  });
 
   const dispatch = createEventDispatcher<{ change: string }>();
 
@@ -114,9 +130,9 @@
     }
   };
 
-  let previewElement: HTMLDivElement | undefined;
-  let x = 0;
-  let y = 0;
+  let previewElement: HTMLDivElement | undefined = $state();
+  let x = $state(0);
+  let y = $state(0);
 </script>
 
 <div
@@ -127,8 +143,8 @@
 >
   <div
     style:background-color={color}
-    on:click={() => toggleOpen()}
-    on:keydown={(e) => onKeyDown(e)}
+    onclick={() => toggleOpen()}
+    onkeydown={(e) => onKeyDown(e)}
     bind:this={previewElement}
     tabindex={disabled ? null : 0}
     class="color-display"
@@ -139,8 +155,8 @@
       <input
         value={color}
         bind:this={input}
-        on:change={(e) => dispatch("change", e.currentTarget.value)}
-        on:keyup={(e) => dispatch("change", e.currentTarget.value)}
+        onchange={(e) => dispatch("change", e.currentTarget.value)}
+        onkeyup={(e) => dispatch("change", e.currentTarget.value)}
       />
 
       <div class="component-row">
@@ -211,8 +227,8 @@
         <div class="holder">
           <div
             style:background-color={c}
-            on:click={() => dispatch("change", c)}
-            on:keyup={(e) => e.key === " " && dispatch("change", c)}
+            onclick={() => dispatch("change", c)}
+            onkeyup={(e) => e.key === " " && dispatch("change", c)}
             class="color-display"
             role="button"
             tabindex="0"
@@ -224,8 +240,8 @@
         <div class="holder">
           <div
             style:background-color={c}
-            on:click={() => dispatch("change", c)}
-            on:keyup={(e) => e.key === " " && dispatch("change", c)}
+            onclick={() => dispatch("change", c)}
+            onkeyup={(e) => e.key === " " && dispatch("change", c)}
             class="color-display"
             role="button"
             tabindex="0"

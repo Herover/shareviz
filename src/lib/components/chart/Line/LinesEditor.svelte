@@ -12,15 +12,24 @@
   import type { formatData } from "./data";
   import LinesEditorLine from "./LinesEditorLine.svelte";
 
-  export let chartColors: string[];
-  export let values: ReturnType<typeof formatData>;
-  export let lineSpec: ReturnType<ReturnType<typeof db.chart>["line"]>;
-  export let index: number;
+  interface Props {
+    chartColors: string[];
+    values: ReturnType<typeof formatData>;
+    lineSpec: ReturnType<ReturnType<typeof db.chart>["line"]>;
+    index: number;
+  }
 
-  let selected: { [key: string]: boolean } = {};
-  let defaultSelected = false;
+  let {
+    chartColors,
+    values,
+    lineSpec,
+    index
+  }: Props = $props();
+
+  let selected: { [key: string]: boolean } = $state({});
+  let defaultSelected = $state(false);
   let defaultStyle = lineSpec.defaultLineStyle();
-  $: selectedIndexes = Object.keys(selected)
+  let selectedIndexes = $derived(Object.keys(selected)
     .filter((k) => selected[k] !== false)
     .map((k) => {
       const i = $lineSpec.style.byKey.findIndex((e) => e.k === k);
@@ -30,14 +39,14 @@
         i,
         k,
       };
-    });
-  $: nonEditable =
-    !defaultSelected &&
+    }));
+  let nonEditable =
+    $derived(!defaultSelected &&
     (selectedIndexes.length == 0 ||
-      selectedIndexes.findIndex((e) => e.i == -1) != -1);
+      selectedIndexes.findIndex((e) => e.i == -1) != -1));
   const chooseSelectedStyle = <T,>(merged: T, next: T): T | undefined =>
     typeof merged == "undefined" ? next : merged == next ? merged : undefined;
-  $: mergedStyle = selectedIndexes
+  let mergedStyle = $derived(selectedIndexes
     .map((e) => e.$style)
     .reduce(
       (merged, next) => {
@@ -98,10 +107,10 @@
             symbols: string | undefined;
             missingStyle: string | undefined;
           }),
-    );
+    ));
 
-  let rangedSelect = false;
-  let lastSelected: number | null = -1;
+  let rangedSelect = $state(false);
+  let lastSelected: number | null = $state(-1);
   const keyDown = (e: KeyboardEvent) => {
     if (e.key == "Shift") {
       rangedSelect = true;
@@ -121,8 +130,8 @@
     window.removeEventListener("keyup", keyUp);
   });
 
-  let searchString = "";
-  $: filteredValues = values
+  let searchString = $state("");
+  let filteredValues = $derived(values
     .filter(
       (e) =>
         Object.keys(e.d[0]).findIndex((k) =>
@@ -141,9 +150,9 @@
         style: i == -1 ? undefined : lineSpec.lineStyle(i),
         // style: $lineSpec.style.byKey.find((e) => e.k == d.key),
       };
-    });
+    }));
 
-  $: toggleSelect = (
+  let toggleSelect = $derived((
     key: string | null,
     select: boolean,
     replace: boolean,
@@ -185,9 +194,9 @@
     }
 
     lastSelected = lineIndex;
-  };
+  });
 
-  $: setLabelToKey = () => {
+  let setLabelToKey = $derived(() => {
     selectedIndexes.forEach((d) => {
       if (d.i == -1) {
         lineSpec.addLineStyle($lineSpec.style.byKey.length, {
@@ -202,8 +211,8 @@
     if (defaultSelected) {
       lineSpec.defaultLineStyle().setLabelText("auto");
     }
-  };
-  $: setLineLabel = (label: string) => {
+  });
+  let setLineLabel = $derived((label: string) => {
     selectedIndexes.forEach((d) => {
       if (d.i == -1) {
         lineSpec.addLineStyle($lineSpec.style.byKey.length, {
@@ -218,8 +227,8 @@
     if (defaultSelected) {
       lineSpec.defaultLineStyle().setLabelText(label);
     }
-  };
-  $: setLineColor = (color: string) => {
+  });
+  let setLineColor = $derived((color: string) => {
     selectedIndexes.forEach((d) => {
       const style = d.style;
       if (
@@ -240,8 +249,8 @@
       }
       style.setColor(color);
     }
-  };
-  $: setTextColor = (color: string) => {
+  });
+  let setTextColor = $derived((color: string) => {
     selectedIndexes.forEach((d) => {
       d.style.setLabelColor(color);
     });
@@ -249,8 +258,8 @@
     if (defaultSelected) {
       lineSpec.defaultLineStyle().setLabelColor(color);
     }
-  };
-  $: setWidth = (width: number) => {
+  });
+  let setWidth = $derived((width: number) => {
     selectedIndexes.forEach((d) => {
       d.style.setwidth(width);
     });
@@ -258,8 +267,8 @@
     if (defaultSelected) {
       lineSpec.defaultLineStyle().setwidth(width);
     }
-  };
-  $: setLabelLocation = (location: string) => {
+  });
+  let setLabelLocation = $derived((location: string) => {
     selectedIndexes.forEach((d) => {
       d.style.setLabelLocation(location);
     });
@@ -267,9 +276,9 @@
     if (defaultSelected) {
       lineSpec.defaultLineStyle().setLabelLocation(location);
     }
-  };
-  $: type = typeof values[0]?.value[0]?.x == "number" ? "number" : "date";
-  $: setLabelX = (value: string) => {
+  });
+  let type = $derived(typeof values[0]?.value[0]?.x == "number" ? "number" : "date");
+  let setLabelX = $derived((value: string) => {
     selectedIndexes.forEach((d) => {
       const style = d.style;
       const parsed =
@@ -292,13 +301,13 @@
         proposed.x instanceof Date ? proposed.x.getTime() : proposed.x,
       );
     });
-  };
-  $: setLabelLineStyle = (value: LabelStyleLine) => {
+  });
+  let setLabelLineStyle = $derived((value: LabelStyleLine) => {
     selectedIndexes.forEach((d) => {
       d.style.setLabelLine(value);
     });
-  };
-  $: setSymbols = (symbols: string) => {
+  });
+  let setSymbols = $derived((symbols: string) => {
     selectedIndexes.forEach((d) => {
       d.style.setSymbols(symbols);
     });
@@ -306,8 +315,8 @@
     if (defaultSelected) {
       lineSpec.defaultLineStyle().setSymbols(symbols);
     }
-  };
-  $: setMissingStyle = (style: string) => {
+  });
+  let setMissingStyle = $derived((style: string) => {
     selectedIndexes.forEach((d) => {
       d.style.setMissingStyle(style);
     });
@@ -315,7 +324,7 @@
     if (defaultSelected) {
       lineSpec.defaultLineStyle().setMissingStyle(style);
     }
-  };
+  });
 </script>
 
 <div class="line-list">
@@ -354,13 +363,13 @@
           ? ""
           : mergedStyle.label.text}
         disabled={nonEditable && selectedIndexes.length != 1}
-        on:change={(e) => setLineLabel(e.currentTarget.value)}
-        on:keyup={(e) => setLineLabel(e.currentTarget.value)}
+        onchange={(e) => setLineLabel(e.currentTarget.value)}
+        onkeyup={(e) => setLineLabel(e.currentTarget.value)}
       />
     </label>
     <button
       disabled={selectedIndexes.length == 0}
-      on:click={() => setLabelToKey()}>Auto</button
+      onclick={() => setLabelToKey()}>Auto</button
     >
   </p>
   <p>
@@ -391,7 +400,7 @@
       <input
         value={typeof mergedStyle.width == "undefined" ? "" : mergedStyle.width}
         disabled={nonEditable}
-        on:change={(e) => setWidth(Number.parseInt(e.currentTarget.value))}
+        onchange={(e) => setWidth(Number.parseInt(e.currentTarget.value))}
         type="number"
         style="width: 80px"
       />
@@ -405,7 +414,7 @@
           ? ""
           : mergedStyle.label.location}
         disabled={nonEditable}
-        on:change={(e) => setLabelLocation(e.currentTarget.value)}
+        onchange={(e) => setLabelLocation(e.currentTarget.value)}
       >
         {#each Object.values(LabelLocation) as location}
           <option>{location}</option>
@@ -419,7 +428,7 @@
           ? ""
           : mergedStyle.label.x}
         disabled={nonEditable || defaultSelected}
-        on:change={(e) => setLabelX(e.currentTarget.value)}
+        onchange={(e) => setLabelX(e.currentTarget.value)}
         type="number"
         style="width: 80px;"
       />
@@ -430,7 +439,7 @@
         checked={typeof mergedStyle.label.line == "undefined"
           ? false
           : mergedStyle.label.line == LabelStyleLine.Line}
-        on:change={(e) =>
+        onchange={(e) =>
           setLabelLineStyle(
             e.currentTarget.checked ? LabelStyleLine.Line : LabelStyleLine.None,
           )}
@@ -447,7 +456,7 @@
           ? ""
           : mergedStyle.symbols}
         disabled={nonEditable}
-        on:change={(e) => setSymbols(e.currentTarget.value)}
+        onchange={(e) => setSymbols(e.currentTarget.value)}
       >
         {#each Object.values(LineSymbol) as symbol}
           <option>{symbol}</option>
@@ -462,7 +471,7 @@
           ? ""
           : mergedStyle.missingStyle}
         disabled={nonEditable}
-        on:change={(e) => setMissingStyle(e.currentTarget.value)}
+        onchange={(e) => setMissingStyle(e.currentTarget.value)}
       >
         {#each Object.values(LineMissingStyle) as style}
           <option>{style}</option>

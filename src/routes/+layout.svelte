@@ -1,18 +1,27 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { page } from "$app/stores";
   import { NotificationLevel, notifications } from "$lib/notificationStore";
   import { user } from "$lib/userStore";
-
-  $: if ($page.data.session?.user?.id != null) {
-    user.update();
+  interface Props {
+    children?: import('svelte').Snippet;
   }
+
+  let { children }: Props = $props();
+
+  run(() => {
+    if ($page.data.session?.user?.id != null) {
+      user.update();
+    }
+  });
 </script>
 
 <div class="notifications">
   {#each $notifications as notification, i}
     <div
-      on:click={() => notifications.read(i)}
-      on:keydown={() => notifications.read(i)}
+      onclick={() => notifications.read(i)}
+      onkeydown={() => notifications.read(i)}
       class:error={notification.type == NotificationLevel.ERROR}
       class:info={notification.type == NotificationLevel.INFO}
       role="button"
@@ -27,7 +36,7 @@
   {/each}
 </div>
 
-<slot />
+{@render children?.()}
 
 <style>
   .notifications {

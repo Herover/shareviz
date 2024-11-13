@@ -1,18 +1,20 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { page } from "$app/stores";
   import { ORGANIZATION_ROLES } from "$lib/consts";
 
-  let inviteCode = "";
-  $: createInvite = async () => {
+  let inviteCode = $state("");
+  let createInvite = $derived(async () => {
     const res = await fetch(`/api/org/${$page.params.organizationId}/invite`, {
       method: "POST",
     });
     const data = await res.json();
     inviteCode = data.code;
-  };
+  });
 
-  let invites: { code: string; expires: Date | null; used: boolean }[] = [];
-  $: {
+  let invites: { code: string; expires: Date | null; used: boolean }[] = $state([]);
+  run(() => {
     invites = (
       $page.data.invites as {
         code: string;
@@ -30,8 +32,8 @@
           (a.expires?.getTime() ?? Infinity) -
           (b.expires?.getTime() ?? Infinity),
       );
-  }
-  $: deleteInvite = async (code: string) => {
+  });
+  let deleteInvite = $derived(async (code: string) => {
     const res = await fetch(`/api/org/${$page.params.organizationId}/invite`, {
       method: "DELETE",
       body: JSON.stringify({ code }),
@@ -39,58 +41,66 @@
     if (res.status == 200) {
       invites = invites.filter((e) => e.code != code);
     }
-  };
+  });
 </script>
 
 <h1>Organization Settings</h1>
 
 <p>
-  <button on:click={() => createInvite()}>New invite</button>
+  <button onclick={() => createInvite()}>New invite</button>
   {#if inviteCode != ""}
     <input value={inviteCode} />
   {/if}
 </p>
 
 <table>
-  <tr>
-    <th>Code</th>
-    <th>Expires</th>
-    <th></th>
-  </tr>
-  {#each invites as invite}
+  <thead>
     <tr>
-      <td>{invite.code}</td>
-      <td>
-        {#if invite.expires}
-          {(invite.expires.getDay() + "").padStart(2, "0")}
-          -
-          {(invite.expires.getMonth() + 1 + "").padStart(2, "0")}
-          -
-          {invite.expires.getFullYear()}
-        {:else}
-          never
-        {/if}
-      </td>
-      <td
-        ><button
-          disabled={invite.used}
-          on:click={() => deleteInvite(invite.code)}>Delete</button
-        ></td
-      >
+      <th>Code</th>
+      <th>Expires</th>
+      <th></th>
     </tr>
-  {/each}
+  </thead>
+  <tbody>
+    {#each invites as invite}
+      <tr>
+        <td>{invite.code}</td>
+        <td>
+          {#if invite.expires}
+            {(invite.expires.getDay() + "").padStart(2, "0")}
+            -
+            {(invite.expires.getMonth() + 1 + "").padStart(2, "0")}
+            -
+            {invite.expires.getFullYear()}
+          {:else}
+            never
+          {/if}
+        </td>
+        <td
+          ><button
+            disabled={invite.used}
+            onclick={() => deleteInvite(invite.code)}>Delete</button
+          ></td
+        >
+      </tr>
+    {/each}
+  </tbody>
 </table>
 
 <table>
-  <tr>
-    <th>Role</th>
-    <th>Name</th>
-  </tr>
-  {#each $page.data.orgUsers as user}
+  <thead>
     <tr>
-      <td>{user.role == ORGANIZATION_ROLES.ADMIN ? "Administrator" : "user"}</td
-      >
-      <td>{user.name}</td>
+      <th>Role</th>
+      <th>Name</th>
     </tr>
-  {/each}
+  </thead>
+  <tbody>
+    {#each $page.data.orgUsers as user}
+      <tr>
+        <td>{user.role == ORGANIZATION_ROLES.ADMIN ? "Administrator" : "user"}</td
+        >
+        <td>{user.name}</td>
+      </tr>
+    {/each}
+  </tbody>
 </table>

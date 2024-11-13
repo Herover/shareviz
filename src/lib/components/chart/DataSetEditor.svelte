@@ -4,7 +4,11 @@
   import { orDefault, valueParsers } from "$lib/utils";
   import DataSetTransposeEditor from "./DataSetTransposeEditor.svelte";
 
-  export let dataStore: ReturnType<typeof db.dataSet>;
+  interface Props {
+    dataStore: ReturnType<typeof db.dataSet>;
+  }
+
+  let { dataStore }: Props = $props();
 
   const updateColumns = (newRaw: string) => {
     dataStore.setRaw(newRaw);
@@ -30,13 +34,13 @@
   <label
     >Raw data <textarea
       value={$dataStore.raw}
-      on:change={(e) => updateColumns(e.currentTarget.value)}
+      onchange={(e) => updateColumns(e.currentTarget.value)}
       rows="4"
       placeholder={$dataStore.type == "tsv" ? `column1\tcolumn2
 value1\tvalue2
 value3\tvalue4
 ...` : ""}
-    /></label
+></textarea></label
   >
 </p>
 <p>
@@ -44,8 +48,8 @@ value3\tvalue4
     >Name
     <input
       value={$dataStore.name}
-      on:change={(e) => dataStore.setName(e.currentTarget.value)}
-      on:keyup={(e) => dataStore.setName(e.currentTarget.value)}
+      onchange={(e) => dataStore.setName(e.currentTarget.value)}
+      onkeyup={(e) => dataStore.setName(e.currentTarget.value)}
     />
   </label>
 </p>
@@ -54,7 +58,7 @@ value3\tvalue4
     >Format
     <select
       value={$dataStore.type}
-      on:change={(e) => dataStore.setType(e.currentTarget.value)}
+      onchange={(e) => dataStore.setType(e.currentTarget.value)}
     >
       {#each ["tsv"] as row}
         <option>{row}</option>
@@ -71,7 +75,7 @@ value3\tvalue4
 </ul>
 
 <button
-on:click={dataStore.addTranspose($dataStore.transpose.length)}
+onclick={dataStore.addTranspose($dataStore.transpose.length)}
 >Add transpose</button>
 
 <p>Columns:</p>
@@ -81,7 +85,7 @@ on:click={dataStore.addTranspose($dataStore.transpose.length)}
       "{column.key}"
       <select
         value={column.type}
-        on:change={(e) => dataStore.setColumnType(i, e.currentTarget.value)}
+        onchange={(e) => dataStore.setColumnType(i, e.currentTarget.value)}
       >
         {#each Object.keys(valueParsers) as type}
           <option>{type}</option>

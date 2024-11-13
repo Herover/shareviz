@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let radioGroups = 0;
 </script>
@@ -11,35 +11,44 @@
   import RadioInput from "../RadioInput.svelte";
   import { orNumber } from "$lib/utils";
 
-  export let configChannel: Config.Channel = {};
-  export let configData: TableByRecords | undefined;
-  export let title = "";
-  export let configScope: ReturnType<typeof db.channelScope>;
+  interface Props {
+    configChannel?: Config.Channel;
+    configData: TableByRecords | undefined;
+    title?: string;
+    configScope: ReturnType<typeof db.channelScope>;
+  }
 
-  let showMore = false;
+  let {
+    configChannel = {},
+    configData,
+    title = "",
+    configScope
+  }: Props = $props();
 
-  $: axis = configChannel?.axis;
-  $: labels = configChannel?.labels;
-  $: ticks = configChannel?.ticks;
-  $: interlacing = configChannel?.interlacing;
-  $: guides = configChannel?.guides;
-  $: markerGuides = configChannel?.markerGuides;
+  let showMore = $state(false);
+
+  let axis = $derived(configChannel?.axis);
+  let labels = $derived(configChannel?.labels);
+  let ticks = $derived(configChannel?.ticks);
+  let interlacing = $derived(configChannel?.interlacing);
+  let guides = $derived(configChannel?.guides);
+  let markerGuides = $derived(configChannel?.markerGuides);
 </script>
 
 <div class="holder">
   <p>
     {title}
     {#each configChannel?.set || [] as channel, i}
-      <select value={channel} on:change={e => configScope.set(i, e.currentTarget.value)}>
+      <select value={channel} onchange={e => configScope.set(i, e.currentTarget.value)}>
         <option value={null}></option>
         {#each configData?.series || [] as series}
           <option value={series.name}>{series.name}</option>
         {/each}
       </select>
-    {/each}<button on:click={() => configScope.add(orNumber(configChannel?.set?.length), (configData?.series || [])[0].name)}>+</button>
+    {/each}<button onclick={() => configScope.add(orNumber(configChannel?.set?.length), (configData?.series || [])[0].name)}>+</button>
   </p>
 
-  <button class="show-more" on:click={() => showMore = !showMore}>
+  <button class="show-more" onclick={() => showMore = !showMore}>
     {#if showMore}
       Show less
     {:else}
@@ -49,54 +58,54 @@
 
   {#if showMore}
     <div class="advanced">
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label>Title <TextInput value={configChannel?.title} onChange={(val) => configScope.setTitle(val)}/></label>
       <p>Axis</p>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.setAxis(val)} value={axis} group={title + "axis"} setValue={"auto"}/>Auto</label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.setAxis(val)} value={axis} group={title + "axis"} setValue={true}/>Yes</label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.setAxis(val)} value={axis} group={title + "axis"} setValue={false}/>No</label>
 
       <p>Labels</p>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.setLabels(val)} value={labels} group={title + "labels"} setValue={"auto"}/>Auto</label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.setLabels(val)} value={labels} group={title + "labels"} setValue="{true}"/>Yes</label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.setLabels(val)} value={labels} group={title + "labels"} setValue="{false}"/>No</label>
 
       <p>Ticks</p>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.  setTicks(val)} value={ticks} group={title + "ticks"} setValue={"auto"}/>Auto</label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.  setTicks(val)} value={ticks} group={title + "ticks"} setValue="{true}"/>Yes</label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.  setTicks(val)} value={ticks} group={title + "ticks"} setValue="{false}"/>No</label>
 
       <p>Interlacing</p>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.  setInterlacing(val)} value={interlacing} group={title + "interlacing"} setValue={"auto"}/>Auto</label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.  setInterlacing(val)} value={interlacing} group={title + "interlacing"} setValue="{true}"/>Yes</label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.  setInterlacing(val)} value={interlacing} group={title + "interlacing"} setValue="{false}"/>No</label>
 
       <p>Guides</p>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.  setGuides(val)} value={guides} group={title + "guides"} setValue={"auto"}/>Auto</label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.  setGuides(val)} value={guides} group={title + "guides"} setValue="{true}"/>Yes</label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.  setGuides(val)} value={guides} group={title + "guides"} setValue="{false}"/>No</label>
 
       <p>Marker Guides</p>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.  setMarkerGuides(val)} value={markerGuides} group={title + "markerGuides"} setValue={"auto"}/>Auto</label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.  setMarkerGuides(val)} value={markerGuides} group={title + "markerGuides"} setValue="{true}"/>Yes</label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label><RadioInput onChange={val => configScope.  setMarkerGuides(val)} value={markerGuides} group={title + "markerGuides"} setValue="{false}"/>No</label>
     </div>
   {/if}

@@ -3,8 +3,12 @@
   import type { axis } from "$lib/chartStore";
   import AxisGridEditor from "./AxisGridEditor.svelte";
 
-  export let conf: ReturnType<typeof axis>;
-  export let showRepeatControl = false;
+  interface Props {
+    conf: ReturnType<typeof axis>;
+    showRepeatControl?: boolean;
+  }
+
+  let { conf, showRepeatControl = false }: Props = $props();
 
   const repeatSettings = [
     { l: "Always show", k: AxisRepeatMode.ALL },
@@ -18,7 +22,7 @@
     Location:
     <select
       value={$conf.location}
-      on:change={(e) => conf.setLocation(e.currentTarget.value)}
+      onchange={(e) => conf.setLocation(e.currentTarget.value)}
     >
       {#each Object.values(AxisLocation) as location}
         <option>{location}</option>
@@ -32,7 +36,7 @@
     Label space:
     <input
       value={$conf.labelSpace}
-      on:change={(e) => conf.setLabelSpace(Number.parseInt(e.currentTarget.value))}
+      onchange={(e) => conf.setLabelSpace(Number.parseInt(e.currentTarget.value))}
     />
 </p>
 
@@ -41,7 +45,7 @@
     Repeat labels:
     <select
       value={$conf.repeat}
-      on:change={(e) => conf.setRepeat(e.currentTarget.value)}
+      onchange={(e) => conf.setRepeat(e.currentTarget.value)}
       disabled={!showRepeatControl}
     >
       {#each repeatSettings as repeat}

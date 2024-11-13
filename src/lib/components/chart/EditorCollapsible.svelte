@@ -1,20 +1,36 @@
 <script lang="ts">
-  // eslint-disable-next-line svelte/valid-compile
-  export let group: string | number;
-  // eslint-disable-next-line svelte/valid-compile
-  export let key: string | number;
-  export let label: string;
-  export let startOpen: boolean = false;
-  export let lvl = 1;
+  
+  
+  interface Props {
+    // eslint-disable-next-line svelte/valid-compile
+    group: string | number;
+    // eslint-disable-next-line svelte/valid-compile
+    key: string | number;
+    label: string;
+    startOpen?: boolean;
+    lvl?: number;
+    actions?: import('svelte').Snippet;
+    children?: import('svelte').Snippet;
+  }
 
-  let open = startOpen || false;
+  let {
+    group,
+    key,
+    label,
+    startOpen = false,
+    lvl = 1,
+    actions,
+    children
+  }: Props = $props();
+
+  let open = $state(startOpen || false);
 </script>
 
 <div class="container">
   <div class="header-content">
     <button
       class:header-open={open}
-      on:click={() => (open = !open)}
+      onclick={() => (open = !open)}
       class="header"
     >
       <!-- h3 is technically not allowed inside a button, but appears like the most accessible solution if we want a
@@ -25,11 +41,11 @@
         <h4>{open ? "-" : "+"} {label}</h4>
       {/if}
     </button>
-    <slot name="actions" />
+    {@render actions?.()}
   </div>
   <div class="content">
     {#if open}
-      <slot />
+      {@render children?.()}
     {/if}
   </div>
 </div>

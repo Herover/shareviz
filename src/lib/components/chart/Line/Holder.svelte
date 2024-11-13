@@ -3,15 +3,26 @@
   import Line from "./Line.svelte";
   import { formatData } from "./data";
 
-  export let chartSpec: Root;
-  export let componentSpec: lineType;
-  export let data: {
+  interface Props {
+    chartSpec: Root;
+    componentSpec: lineType;
+    data: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any[];
   };
-  export let chartWidth: number;
-  export let editor = false;
-  export let index: number;
+    chartWidth: number;
+    editor?: boolean;
+    index: number;
+  }
+
+  let {
+    chartSpec,
+    componentSpec,
+    data,
+    chartWidth,
+    editor = false,
+    index
+  }: Props = $props();
 </script>
 
 <Line

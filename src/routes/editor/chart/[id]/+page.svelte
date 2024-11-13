@@ -10,9 +10,9 @@
   import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
   import { computeData } from "$lib/data.js";
 
-  export let data;
+  let { data } = $props();
 
-  let viewScale = 100;
+  let viewScale = $state(100);
 
   let disconnect: undefined | (() => void);
 
@@ -25,13 +25,13 @@
     if (disconnect) disconnect();
   });
 
-  $: chartSpec = $db.doc as Root;
+  let chartSpec = $derived($db.doc as Root);
 
-  $: chartData = computeData(chartSpec);
+  let chartData = $derived(computeData(chartSpec));
     
-  $: canEdit = chartSpec == null ? false : $db.mode == "local" || typeof chartSpec.meta.access.find(a => a.userId == $user.userId) != "undefined";
+  let canEdit = $derived(chartSpec == null ? false : $db.mode == "local" || typeof chartSpec.meta.access.find(a => a.userId == $user.userId) != "undefined");
 
-  $: edit = (e: CustomEvent<{ k: string, v: any}>) => {
+  let edit = $derived((e: CustomEvent<{ k: string, v: any}>) => {
     switch (e.detail.k) {
       case "title":
         db.chart().setConfigTitle(e.detail.v);
@@ -65,7 +65,7 @@
         console.warn("attempting to edit unknown key", e.detail.k);
         break;
     }
-  };
+  });
 </script>
 
 <div class="main">
@@ -74,7 +74,7 @@
       <div class="chart-controls-primary chart-controls">
         <input
           value={$db?.chartInfo?.name}
-          on:change={e => db.updateInfo({ name: e.currentTarget.value })}
+          onchange={e => db.updateInfo({ name: e.currentTarget.value })}
           disabled={!canEdit || $db.chartInfo == null}
         />
         {#if canEdit}
@@ -120,9 +120,9 @@
     <div class="chart-viewer">
       <div class="view-controls">
         <div>Zoom</div>
-        <div><button on:click={() => (viewScale -= 10)}>-</button></div>
+        <div><button onclick={() => (viewScale -= 10)}>-</button></div>
         <div><input value={viewScale} size="2" /></div>
-        <div><button on:click={() => (viewScale += 10)}>+</button></div>
+        <div><button onclick={() => (viewScale += 10)}>+</button></div>
       </div>
       <div class="chart-view">
         <div style:scale={viewScale / 100}>

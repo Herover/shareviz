@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { AxisLocation, LabelLocation, LineMissingStyle, LineSymbol, type Line, type Root } from "$lib/chart";
   import { group, orDefault, orNumber, valueKinds, valueParsers } from "$lib/utils";
   import {
@@ -14,22 +16,33 @@
   import { createEventDispatcher, onMount } from "svelte";
   import { chartToEditor } from "$lib/chartToEditorStore";
 
-  export let values: {
+  interface Props {
+    values: {
     label: string;
     key: string;
     value: { x: number; y: number }[];
   }[];
-  export let chartSpec: Root;
-  export let lineSpec: Line;
-  export let width: number;
-  export let editor = false;
-  export let index: number;
+    chartSpec: Root;
+    lineSpec: Line;
+    width: number;
+    editor?: boolean;
+    index: number;
+  }
+
+  let {
+    values,
+    chartSpec,
+    lineSpec,
+    width,
+    editor = false,
+    index
+  }: Props = $props();
 
   const dispatch = createEventDispatcher<{
     edit: any[];
   }>();
 
-  let labelBox: DOMRect | undefined;
+  let labelBox: DOMRect | undefined = $state();
   const topMargin = 24;
   const bottomMargin = 24;
   const labelOffset = 16;
@@ -37,14 +50,14 @@
   let t1 = Date.now()
   onMount(() => console.log("mounted!", Date.now() - t1))
 
-  $: dataSet = chartSpec.data.sets.find((set) => set.id == lineSpec.dataSet);
+  let dataSet = $derived(chartSpec.data.sets.find((set) => set.id == lineSpec.dataSet));
 
-  let xAxisOverflow: { leftOverflow?: number, rightOverflow?: number } = { leftOverflow: 0, rightOverflow: 0 };
-  let yAxisWidth = 0;
-  $: labelWidth = labelBox ? labelBox.width + labelOffset : 0;
-  let leftMargin = 0;
-  let rightMargin = 0;
-  $: {
+  let xAxisOverflow: { leftOverflow?: number, rightOverflow?: number } = $state({ leftOverflow: 0, rightOverflow: 0 });
+  let yAxisWidth = $state(0);
+  let labelWidth = $derived(labelBox ? labelBox.width + labelOffset : 0);
+  let leftMargin = $state(0);
+  let rightMargin = $state(0);
+  run(() => {
     if (lineSpec.y.axis.location == AxisLocation.START && lineSpec.style.default.label.location == LabelLocation.Left) {
       leftMargin = Math.max(Math.max(yAxisWidth, labelWidth), orNumber(xAxisOverflow.leftOverflow, 0));
       rightMargin = orDefault(xAxisOverflow.rightOverflow, 0);
@@ -58,17 +71,17 @@
       leftMargin = orNumber(xAxisOverflow.leftOverflow, 0);
       rightMargin = Math.max(Math.max(yAxisWidth, labelWidth), orDefault(xAxisOverflow.rightOverflow, 0));
     }
-  }
+  });
 
 
-  $: height = width * lineSpec.heightRatio;
+  let height = $derived(width * lineSpec.heightRatio);
 
   const negativeOneToInf = (n: number) =>
     n == -1 ? Number.POSITIVE_INFINITY : n;
 
   // I'd prefer that each element in stacked is a array of line segments for a
   // country. However, this is easier to compute and handle in template.
-  $: stacked = values
+  let stacked = $derived(values
     .sort(
       (a, b) =>
         negativeOneToInf(lineSpec.style.byKey.findIndex((e) => e.k == b.key)) -
@@ -134,23 +147,23 @@
         type: "missing" | "line";
         value: { x: number; y: number; to: number; from: number }[];
       }[],
-    );
-  $: columns = [
+    ));
+  let columns = $derived([
     ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.keyType })), []),
     ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.valueType })), []),
     ...orDefault(dataSet?.rows, []),
-  ];
+  ]);
 
-  $: minX = orNumber(min(values, (d) => min(d.value, (dd) => dd.x)));
-  $: maxX = orNumber(max(values, (d) => max(d.value, (dd) => dd.x)), 1);
-  $: xType =
-    orDefault(valueParsers[
+  let minX = $derived(orNumber(min(values, (d) => min(d.value, (dd) => dd.x))));
+  let maxX = $derived(orNumber(max(values, (d) => max(d.value, (dd) => dd.x)), 1));
+  let xType =
+    $derived(orDefault(valueParsers[
       orDefault(columns.find((r) => r.key == lineSpec.x.key)?.type, "")
-    ]?.type, "" as valueKinds);
+    ]?.type, "" as valueKinds));
   let xScale:
     | ScaleLinear<number, number, never>
-    | ScaleTime<number, number, never> = scaleLinear();
-  $: {
+    | ScaleTime<number, number, never> = $state(scaleLinear());
+  run(() => {
     if (xType == valueKinds.NUMBER) {
       xScale = scaleLinear()
         .range([leftMargin, width - rightMargin])
@@ -161,22 +174,22 @@
         .domain([minX, maxX])
         .nice();
     }
-  }
-  $: maxY = orNumber(max(stacked, (d) => max(d.value, (dd) => dd.to)), 1);
-  $: yScale = scaleLinear()
+  });
+  let maxY = $derived(orNumber(max(stacked, (d) => max(d.value, (dd) => dd.to)), 1));
+  let yScale = $derived(scaleLinear()
     .range([height - topMargin - bottomMargin, 0])
     .domain(
       [0, maxY],
       // chartSpec.chart.scales.find((s) => s.name == lineSpec.y.scale)
       //   ?.dataRange || [0, 1],
     )
-    .nice();
+    .nice());
 
-  $: draw = line<{ x: number; y: number }>()
+  let draw = $derived(line<{ x: number; y: number }>()
     .x((d) => xScale(d.x))
-    .y((d) => yScale(d.y));
+    .y((d) => yScale(d.y)));
 
-  $: getStyle = (k: string) => {
+  let getStyle = $derived((k: string) => {
     const style = lineSpec.style.byKey.find((s) => s.k == k);
     if (style) return style;
     else {
@@ -187,12 +200,12 @@
 
       return def;
     }
-  };
+  });
 
-  $: higlight = $chartToEditor.highlight[0] == "elements"
+  let higlight = $derived($chartToEditor.highlight[0] == "elements"
     && $chartToEditor.highlight[1] == index
     ? $chartToEditor.highlight[2] as string
-    : null;
+    : null);
 </script>
 
 <svg {width} {height}>

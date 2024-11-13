@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { SignIn, SignOut } from "@auth/sveltekit/components";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
@@ -9,22 +11,22 @@
   import type { ChartInfo } from "./../../../../server_lib/user";
   import { group, orDefault } from "$lib/utils";
 
-  let charts: ChartInfo[] | null = null;
-  $: chartsByTeam =
-    charts == null
+  let charts: ChartInfo[] | null = $state(null);
+  let chartsByTeam =
+    $derived(charts == null
       ? []
       : group(
           "teamId",
           charts.filter((d) => d.teamId != null),
           (k, g) => ({ k, g }),
-        );
-  $: userCharts = charts == null ? [] : charts.filter((d) => d.teamId == null);
+        ));
+  let userCharts = $derived(charts == null ? [] : charts.filter((d) => d.teamId == null));
 
-  let disconnect = () => {};
+  let disconnect = $state(() => {});
   onDestroy(() => {
     disconnect();
   });
-  $: {
+  run(() => {
     if ($page.data.session?.user) {
       disconnect = db.connect();
       fetch("/api/chart")
@@ -35,7 +37,7 @@
       disconnect = () => {};
       charts = null;
     }
-  }
+  });
 
   const newGraphic = async (synced: boolean) => {
     const docId = await db.create(synced);
@@ -54,9 +56,9 @@
       {/if}
       <br /><br />
       {#if $page.data.session?.user}
-        <button on:click={() => newGraphic(true)}>New graphic</button>
+        <button onclick={() => newGraphic(true)}>New graphic</button>
       {/if}
-      <button on:click={() => newGraphic(false)}>New local graphic</button>
+      <button onclick={() => newGraphic(false)}>New local graphic</button>
       {#if charts == null}
         ...
       {:else}

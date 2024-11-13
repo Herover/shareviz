@@ -1,23 +1,34 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import type { ScaleLinear, ScaleTime } from "d3-scale";
   import { formatNumber, orDefault, orNumber } from "$lib/utils";
   import type { Axis } from "$lib/chart";
   import { AxisLocation, AxisOrientation } from "$lib/chart";
   import { createEventDispatcher } from "svelte";
 
-  export let conf: Axis;
-  export let width: number;
-  export let height: number;
-  export let scale: ScaleLinear<number, number, never> | ScaleTime<number, number, never> | undefined;
-  export let showLabels = true;
+  interface Props {
+    conf: Axis;
+    width: number;
+    height: number;
+    scale: ScaleLinear<number, number, never> | ScaleTime<number, number, never> | undefined;
+    showLabels?: boolean;
+  }
+
+  let {
+    conf,
+    width,
+    height,
+    scale,
+    showLabels = true
+  }: Props = $props();
 
   let size = 16;
-  $: lineOffset = showLabels && conf.location == AxisLocation.START ? size : 0;
   const maxTicks = 200;
 
-  let labelBox: DOMRect | undefined;
-  let leftBox: DOMRect | undefined;
-  let rightBox: DOMRect | undefined;
+  let labelBox: DOMRect | undefined = $state();
+  let leftBox: DOMRect | undefined = $state();
+  let rightBox: DOMRect | undefined = $state();
 
   const distpatch = createEventDispatcher<{
     dimensions: {
@@ -28,27 +39,20 @@
     },
   }>();
 
-  $: if (labelBox || leftBox || rightBox) distpatch("dimensions", {
-    width: orNumber(labelBox?.width, 0) + conf.labelSpace,
-    height: orNumber(labelBox?.height, 0),
-    leftOverflow: Math.max(
-      orNumber(leftBox?.width, 0) / 2 -
-        (scale
-          ? Math.floor(
-              (scale(orDefault(majorTicks[0]?.n, 0)) - scale.range()[0]) / 10,
-            ) * 10
-          : 0),
-      0,
-    ),
-    rightOverflow: orNumber(rightBox?.width, 0)/2,
-  });
 
-  let autoMajorTicks: { n: number | Date; l: string }[] = [];
+  let autoMajorTicks: { n: number | Date; l: string }[] = $state([]);
   let manualMajorTicks: {
     n: number;
     l: string;
-  }[] = [];
-  $: {
+  }[] = $state([]);
+
+  let autoMinorTicks: { n: number | Date; l: string }[] = $state([]);
+  let manualMinorTicks: {
+    n: number;
+    l: string;
+  }[] = $state([]);
+  let lineOffset = $derived(showLabels && conf.location == AxisLocation.START ? size : 0);
+  run(() => {
     if (scale && conf.major.enabled && conf.major.auto.each != 0) {
       // Note: we are not allowed to assign these two variables to new values after this, or we
       // get a weird reactive loop when we access it in the reactive block that dispatch stuff.
@@ -92,15 +96,25 @@
         }
       }
     }
-  }
-  $: majorTicks = scale ? [...manualMajorTicks, ...autoMajorTicks] : [];
-
-  let autoMinorTicks: { n: number | Date; l: string }[] = [];
-  let manualMinorTicks: {
-    n: number;
-    l: string;
-  }[] = [];
-  $: {
+  });
+  let majorTicks = $derived(scale ? [...manualMajorTicks, ...autoMajorTicks] : []);
+  run(() => {
+    if (labelBox || leftBox || rightBox) distpatch("dimensions", {
+      width: orNumber(labelBox?.width, 0) + conf.labelSpace,
+      height: orNumber(labelBox?.height, 0),
+      leftOverflow: Math.max(
+        orNumber(leftBox?.width, 0) / 2 -
+          (scale
+            ? Math.floor(
+                (scale(orDefault(majorTicks[0]?.n, 0)) - scale.range()[0]) / 10,
+              ) * 10
+            : 0),
+        0,
+      ),
+      rightOverflow: orNumber(rightBox?.width, 0)/2,
+    });
+  });
+  run(() => {
     if (scale && conf.minor.enabled && conf.minor.auto.each != 0) {
       autoMinorTicks = [];
       const from = scale.domain()[0];
@@ -140,12 +154,12 @@
         }
       }
     }
-  }
-  $: minorTicks = scale
+  });
+  let minorTicks = $derived(scale
     ? [...manualMinorTicks, ...autoMinorTicks].filter(
         (d) => !majorTicks.find((dd) => dd.l != "" && dd.n == d.n),
       )
-    : [];
+    : []);
 </script>
 
 {#if scale}

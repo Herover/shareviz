@@ -5,11 +5,21 @@
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import { chartToEditor } from "../../../chartToEditorStore";
 
-  export let style: ReturnType<typeof lineStyle> | undefined = undefined;
-  export let key: string | undefined = undefined;
-  export let index: number = -1;
-  export let chartColors: string[] = [];
-  export let selected: boolean;
+  interface Props {
+    style?: ReturnType<typeof lineStyle> | undefined;
+    key?: string | undefined;
+    index?: number;
+    chartColors?: string[];
+    selected: boolean;
+  }
+
+  let {
+    style = undefined,
+    key = undefined,
+    index = -1,
+    chartColors = [],
+    selected
+  }: Props = $props();
 
   const dispatch = createEventDispatcher<{
     onSelect: { selected: boolean; replace: boolean };
@@ -43,12 +53,12 @@ const toggleHover = (me: Event | null) => {
 </script>
 
 <div
-  on:click={(e) => toggleSelect(e, null)}
-  on:keydown={(e) => toggleSelect(null, e)}
-  on:mouseover={(e) => toggleHover(e)}
-  on:mouseout={() => toggleHover(null)}
-  on:focus={(e) => toggleHover(e)}
-  on:blur={() => toggleHover(null)}
+  onclick={(e) => toggleSelect(e, null)}
+  onkeydown={(e) => toggleSelect(null, e)}
+  onmouseover={(e) => toggleHover(e)}
+  onmouseout={() => toggleHover(null)}
+  onfocus={(e) => toggleHover(e)}
+  onblur={() => toggleHover(null)}
   class:line-selected={selected}
   class:line-unselected={!selected}
   class="line-item"
@@ -69,8 +79,8 @@ const toggleHover = (me: Event | null) => {
         />
         &nbsp;
         <span
-          on:click={() => style.delete()}
-          on:keydown={(e) => (e.code == "Space" ? style.delete() : "")}
+          onclick={() => style.delete()}
+          onkeydown={(e) => (e.code == "Space" ? style.delete() : "")}
           role="button"
           tabindex="0"
           title="delete">❌</span

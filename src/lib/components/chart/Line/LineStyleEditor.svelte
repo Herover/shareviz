@@ -5,23 +5,33 @@
   import { formatData } from "./data";
   import { db } from "$lib/chartStore";
 
-  export let style: ReturnType<typeof lineStyle>;
-  export let unspecifiecKeys: null | string[] = null;
-  export let chartColors: string[];
-  export let values: ReturnType<typeof formatData>;
-  export let lineSpec: ReturnType<ReturnType<typeof db.chart>["line"]>;
+  interface Props {
+    style: ReturnType<typeof lineStyle>;
+    unspecifiecKeys?: null | string[];
+    chartColors: string[];
+    values: ReturnType<typeof formatData>;
+    lineSpec: ReturnType<ReturnType<typeof db.chart>["line"]>;
+  }
 
-  $: type = typeof values[0]?.value[0]?.x == "number" ? "number" : "date";
-  $: updateColor = (color: string) => {
+  let {
+    style,
+    unspecifiecKeys = null,
+    chartColors,
+    values,
+    lineSpec
+  }: Props = $props();
+
+  let type = $derived(typeof values[0]?.value[0]?.x == "number" ? "number" : "date");
+  let updateColor = $derived((color: string) => {
     if ($style.label.color == $style.color) {
       style.setLabelColor(color);
     }
     style.setColor(color);
-  };
-  $: updateLabelColor = (color: string) => {
+  });
+  let updateLabelColor = $derived((color: string) => {
     style.setLabelColor(color);
-  };
-  $: setLabelX = (value: string) => {
+  });
+  let setLabelX = $derived((value: string) => {
     const parsed = type == "number" ? Number.parseInt(value) : new Date(value).getTime();
     const proposed = values
       .find((e) => e.key == $style.k)
@@ -34,14 +44,14 @@
       style.setLabelY(proposed.y);
     }
     style.setLabelX(proposed.x instanceof Date ? proposed.x.getTime() : proposed.x);
-  };
+  });
 </script>
 
 <div class="line-style-editor">
   {#if unspecifiecKeys != null}
     <select
       value={$style.k}
-      on:change={(e) => style.setKey(e.currentTarget.value)}
+      onchange={(e) => style.setKey(e.currentTarget.value)}
     >
       <option>{$style.k}</option>
       {#each unspecifiecKeys as k}
@@ -52,13 +62,13 @@
 
   <input
     value={$style.label.text}
-    on:change={(e) => style.setLabelText(e.currentTarget.value)}
-    on:keyup={(e) => style.setLabelText(e.currentTarget.value)}
+    onchange={(e) => style.setLabelText(e.currentTarget.value)}
+    onkeyup={(e) => style.setLabelText(e.currentTarget.value)}
   />
 
   <select
     value={$style.label.location}
-    on:change={(e) => style.setLabelLocation(e.currentTarget.value)}
+    onchange={(e) => style.setLabelLocation(e.currentTarget.value)}
   >
     {#each Object.values(LabelLocation) as orientation}
       <option>{orientation}</option>
@@ -68,14 +78,14 @@
   {#if unspecifiecKeys != null && $style.label.location == LabelLocation.Float}
     <input
       value={type == "number" ? $style.label.x : new Date($style.label.x).toISOString().split("T")[0]}
-      on:change={(e) => setLabelX(e.currentTarget.value)}
-      on:keyup={(e) => setLabelX(e.currentTarget.value)}
+      onchange={(e) => setLabelX(e.currentTarget.value)}
+      onkeyup={(e) => setLabelX(e.currentTarget.value)}
       type={type}
       style="width: 104px;"
     />
     <input
       checked={$style.label.line == LabelStyleLine.Line}
-      on:change={(e) => style.setLabelLine(e.currentTarget.checked ? LabelStyleLine.Line : LabelStyleLine.None)}
+      onchange={(e) => style.setLabelLine(e.currentTarget.checked ? LabelStyleLine.Line : LabelStyleLine.None)}
       type="checkbox"
     />
   {/if}
@@ -94,14 +104,14 @@
 
   <input
     value={$style.width}
-    on:change={(e) => style.setwidth(Number.parseInt(e.currentTarget.value))}
-    on:keyup={(e) => style.setwidth(Number.parseInt(e.currentTarget.value))}
+    onchange={(e) => style.setwidth(Number.parseInt(e.currentTarget.value))}
+    onkeyup={(e) => style.setwidth(Number.parseInt(e.currentTarget.value))}
     type="number"
     style="width: 80px;"
   />
 
   {#if unspecifiecKeys != null}
-    <button on:click={() => style.delete()}>Delete</button>
+    <button onclick={() => style.delete()}>Delete</button>
   {/if}
 </div>
 

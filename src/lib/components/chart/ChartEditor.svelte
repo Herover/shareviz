@@ -6,11 +6,15 @@
   import EditorCollapsible from "./EditorCollapsible.svelte";
   import LineEditor from "./Line/LineEditor.svelte";
 
-  export let chartScope: ReturnType<typeof db.chart>;
-  export let spec: Root;
-  export let chartData: {
+  interface Props {
+    chartScope: ReturnType<typeof db.chart>;
+    spec: Root;
+    chartData: {
     [key: string]: DSVParsedArray<any>;
   };
+  }
+
+  let { chartScope, spec, chartData }: Props = $props();
 
   const addBarChart = () => {
     chartScope.addBarChart($chartScope.elements.length);
@@ -33,25 +37,25 @@
   <label>
     Title: <textarea
       value={$chartScope.title}
-      on:keyup={(e) => chartScope.setConfigTitle(e.currentTarget.value)}
+      onkeyup={(e) => chartScope.setConfigTitle(e.currentTarget.value)}
       class="control"
-    />
+></textarea>
   </label>
 </p>
 <p>
   <label>
     Sub title: <textarea
       value={$chartScope.subTitle}
-      on:keyup={(e) => chartScope.setConfigSubTitle(e.currentTarget.value)}
+      onkeyup={(e) => chartScope.setConfigSubTitle(e.currentTarget.value)}
       class="control"
-    />
+></textarea>
   </label>
 </p>
 <p>
   <label>
     Source text (left): <input
       value={$chartScope.sourceTextLeft}
-      on:keyup={(e) => chartScope.setSourceTextLeft(e.currentTarget.value)}
+      onkeyup={(e) => chartScope.setSourceTextLeft(e.currentTarget.value)}
       class="control"
     />
   </label>
@@ -60,7 +64,7 @@
   <label>
     Source link (left): <input
       value={$chartScope.sourceTextLeftLink}
-      on:keyup={(e) => chartScope.setSourceTextLeftLink(e.currentTarget.value)}
+      onkeyup={(e) => chartScope.setSourceTextLeftLink(e.currentTarget.value)}
       class="control"
     />
   </label>
@@ -69,7 +73,7 @@
   <label>
     Source text (right): <input
       value={$chartScope.sourceTextRight}
-      on:keyup={(e) => chartScope.setSourceTextRight(e.currentTarget.value)}
+      onkeyup={(e) => chartScope.setSourceTextRight(e.currentTarget.value)}
       class="control"
     />
   </label>
@@ -78,7 +82,7 @@
   <label>
     Source link (right): <input
       value={$chartScope.sourceTextRightLink}
-      on:keyup={(e) => chartScope.setSourceTextLeftRight(e.currentTarget.value)}
+      onkeyup={(e) => chartScope.setSourceTextLeftRight(e.currentTarget.value)}
       class="control"
     />
   </label>
@@ -87,9 +91,9 @@
   <label>
     Height: <input
       value={$chartScope.height}
-      on:keyup={(e) =>
+      onkeyup={(e) =>
         chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
-      on:change={(e) =>
+      onchange={(e) =>
         chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
       type="number"
       class="control"
@@ -100,9 +104,9 @@
   <label>
     Width: <input
       value={$chartScope.width}
-      on:keyup={(e) =>
+      onkeyup={(e) =>
         chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
-      on:change={(e) =>
+      onchange={(e) =>
         chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
       type="number"
       class="control"
@@ -125,16 +129,18 @@
         chart={chartScope}
         {chartData}
       />
-      <div slot="actions">
-        <button on:click={() => removeElement(i)}>Delete</button>
-        <button disabled={i == 0} on:click={() => moveElementUp(i)}
-          >Move up</button
-        >
-        <button
-          disabled={i == $chartScope.elements.length - 1}
-          on:click={() => moveElementDown(i)}>Move down</button
-        >
-      </div>
+      {#snippet actions()}
+            <div >
+          <button onclick={() => removeElement(i)}>Delete</button>
+          <button disabled={i == 0} onclick={() => moveElementUp(i)}
+            >Move up</button
+          >
+          <button
+            disabled={i == $chartScope.elements.length - 1}
+            onclick={() => moveElementDown(i)}>Move down</button
+          >
+        </div>
+          {/snippet}
     </EditorCollapsible>
   {:else if element.type == "line"}
     <EditorCollapsible
@@ -151,22 +157,24 @@
         {chartData}
         index={i}
       />
-      <div slot="actions">
-        <button on:click={() => removeElement(i)}>Delete</button>
-        <button disabled={i == 0} on:click={() => moveElementUp(i)}
-          >Move up</button
-        >
-        <button
-          disabled={i == $chartScope.elements.length - 1}
-          on:click={() => moveElementDown(i)}>Move down</button
-        >
-      </div>
+      {#snippet actions()}
+                <div >
+          <button onclick={() => removeElement(i)}>Delete</button>
+          <button disabled={i == 0} onclick={() => moveElementUp(i)}
+            >Move up</button
+          >
+          <button
+            disabled={i == $chartScope.elements.length - 1}
+            onclick={() => moveElementDown(i)}>Move down</button
+          >
+        </div>
+              {/snippet}
     </EditorCollapsible>
   {/if}
 {/each}
 
-<button on:click={() => addBarChart()}>+ Bars</button>
-<button on:click={() => addLineChart()}>+ Lines</button>
+<button onclick={() => addBarChart()}>+ Bars</button>
+<button onclick={() => addLineChart()}>+ Lines</button>
 
 <style>
   .control {

@@ -3,22 +3,31 @@
   import type { ScaleLinear, ScaleTime } from "d3-scale";
   import { createEventDispatcher } from "svelte";
 
-  export let line: LineStyleKey;
-  export let xScale:
+  interface Props {
+    line: LineStyleKey;
+    xScale: 
     | ScaleLinear<number, number, never>
     | ScaleTime<number, number, never>;
-  export let yScale:
+    yScale: 
     | ScaleLinear<number, number, never>
     | ScaleTime<number, number, never>;
-  export let editor = false;
+    editor?: boolean;
+  }
+
+  let {
+    line,
+    xScale,
+    yScale,
+    editor = false
+  }: Props = $props();
 
   const dispatch = createEventDispatcher<{
     edit: any[];
   }>();
 
   let lastMovePos = [0, 0];
-  let relativeMove = [0, 0];
-  let moving = false;
+  let relativeMove = $state([0, 0]);
+  let moving = $state(false);
   const startMove = (
     e: MouseEvent & { currentTarget: EventTarget & SVGGElement },
   ) => {
@@ -51,15 +60,15 @@
     }
   };
 
-  let box: { width: number; height: number };
+  let box: { width: number; height: number } = $state();
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <g
   transform="translate({xScale(
     typeof line.label.x == 'string' ? new Date(line.label.x) : line.label.x,
   )}, {yScale(line.label.y)})"
-  on:mousedown={(e) => startMove(e)}
+  onmousedown={(e) => startMove(e)}
 >
   <text
     x={line.label.rx + (moving ? relativeMove[0] : 0)}

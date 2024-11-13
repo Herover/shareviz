@@ -1,4 +1,4 @@
-import { SvelteComponent } from "svelte";
+import { type Component } from "svelte";
 
 import type { Root } from "$lib/chart";
 
@@ -13,7 +13,7 @@ interface ChartComponent {
   key: string,
   /** Actual component displayed in chart */
   // FIXME: types are not correct
-  component: () => Promise<typeof SvelteComponent<{
+  component: () => Promise<Component<{
     chartSpec: Root,
     componentSpec: any,
     data: {
@@ -30,11 +30,11 @@ interface ChartComponent {
     any
   >>,
   /** Component for editor */
-  editorComponent: SvelteComponent<any>,
+  editorComponent: Component<any>,
 }
 
 const components: { [key: string]: ChartComponent } = {};
-const componentCache: { [key: string]: typeof SvelteComponent<any, any> } = {};
+const componentCache: { [key: string]: Component<any, any> } = {};
 
 export const registerComponent = (component: ChartComponent) => {
   if (component.key in components) {

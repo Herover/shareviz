@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import { notifications } from "$lib/notificationStore";
@@ -6,27 +8,35 @@
   import { db as chartStore } from "$lib/chartStore";
   import { onDestroy, onMount } from "svelte";
 
-  let teamId: string | undefined;
-  $: teamId = $page.params.teamId;
-  $: console.log(teamId);
-  let charts: { chartRef: string; id: string; name: string }[] = [];
-  let team: Awaited<ReturnType<typeof user.getTeamCharts>> | undefined;
-  $: typeof teamId == "undefined"
-    ? user
-        .geUserCharts()
-        .then((c) => {
-          charts = c;
-          team = undefined;
-        })
-        .catch((e) => notifications.addError(e.message))
-    : user
-        .getTeamCharts(teamId)
-        .then((c) => {
-          charts = c.charts;
-          team = c;
-        })
-        .catch((e) => notifications.addError(e.message));
-  $: console.log(typeof teamId == "undefined", teamId);
+  let teamId: string | undefined = $state();
+  run(() => {
+    teamId = $page.params.teamId;
+  });
+  run(() => {
+    console.log(teamId);
+  });
+  let charts: { chartRef: string; id: string; name: string }[] = $state([]);
+  let team: Awaited<ReturnType<typeof user.getTeamCharts>> | undefined = $state();
+  run(() => {
+    typeof teamId == "undefined"
+      ? user
+          .geUserCharts()
+          .then((c) => {
+            charts = c;
+            team = undefined;
+          })
+          .catch((e) => notifications.addError(e.message))
+      : user
+          .getTeamCharts(teamId)
+          .then((c) => {
+            charts = c.charts;
+            team = c;
+          })
+          .catch((e) => notifications.addError(e.message));
+  });
+  run(() => {
+    console.log(typeof teamId == "undefined", teamId);
+  });
   const addTeam = async () => {
     const res = await fetch("/api/team", {
       method: "POST",
@@ -93,8 +103,8 @@
         </a>
       {/each}
       <div
-        on:click={() => addTeam()}
-        on:keypress={(e) => e.key == "Enter" && addTeam()}
+        onclick={() => addTeam()}
+        onkeypress={(e) => e.key == "Enter" && addTeam()}
         tabindex="0"
         role="button"
         class="option"
@@ -123,7 +133,7 @@
 
   <div class="side">
     <h3>
-      Charts <button on:click={() => newGraphic(true)}>Create new</button>
+      Charts <button onclick={() => newGraphic(true)}>Create new</button>
     </h3>
     <ul>
       {#each charts as chart}

@@ -4,10 +4,19 @@
   import { orNumber } from "$lib/utils";
   import { createEventDispatcher } from "svelte";
 
-  export let chartSpec: Root;
-  export let data: { [key: string]: any[] };
-  export let width: number | undefined = undefined;
-  export let editor: boolean;
+  interface Props {
+    chartSpec: Root;
+    data: { [key: string]: any[] };
+    width?: number | undefined;
+    editor: boolean;
+  }
+
+  let {
+    chartSpec = $bindable(),
+    data,
+    width = undefined,
+    editor
+  }: Props = $props();
 
   const dispatch = createEventDispatcher<{
     edit: {
@@ -31,7 +40,7 @@
     dispatch("edit", { k: type, v: [i, ...d] });
   };
 
-  $: chartWidth = orNumber(width, chartSpec.chart.width);
+  let chartWidth = $derived(orNumber(width, chartSpec.chart.width));
 
   const mkEditElement = (i: number) => {
     return (e: CustomEvent<any>) => editElement(i, e.detail)
@@ -59,7 +68,7 @@
       <span
         bind:innerText={chartSpec.chart.title}
         contenteditable="true"
-        on:keyup={(e) => editText("title", e)}
+        onkeyup={(e) => editText("title", e)}
         role="textbox"
         tabindex="0"
       ></span>
@@ -76,7 +85,7 @@
       <span
         bind:innerText={chartSpec.chart.subTitle}
         contenteditable="true"
-        on:keyup={(e) => editText("subTitle", e)}
+        onkeyup={(e) => editText("subTitle", e)}
         role="textbox"
         tabindex="0"
       ></span>
@@ -86,8 +95,8 @@
   </p>
   {#each chartSpec.chart.elements as element, i}
     {#await getComponent(element.type) then component}
-      <svelte:component
-        this={component}
+      {@const SvelteComponent = component}
+      <SvelteComponent
         componentSpec={element.d}
         {chartSpec}
         {data}
@@ -105,7 +114,7 @@
           href={editor ? null : chartSpec.chart.sourceTextLeftLink}
           bind:innerText={chartSpec.chart.sourceTextLeft}
           contenteditable="true"
-          on:keyup={(e) => editText("sourceLeft", e)}
+          onkeyup={(e) => editText("sourceLeft", e)}
           style="color:#888888"
         >
         </a>
@@ -113,7 +122,7 @@
         <a
           href={editor ? null : chartSpec.chart.sourceTextLeftLink}
           style="color:#888888"
-          on:keyup={(e) => editText("sourceLeft", e)}
+          onkeyup={(e) => editText("sourceLeft", e)}
           >{chartSpec.chart.sourceTextLeft}</a
         >
       {/if}
@@ -124,7 +133,7 @@
           href={editor ? null : chartSpec.chart.sourceTextRightLink}
           bind:innerText={chartSpec.chart.sourceTextRight}
           contenteditable="true"
-          on:keyup={(e) => editText("sourceRight", e)}
+          onkeyup={(e) => editText("sourceRight", e)}
           style="color:#888888"
         >
         </a>
@@ -132,7 +141,7 @@
         <a
           href={editor ? null : chartSpec.chart.sourceTextRightLink}
           style="color:#888888"
-          on:keyup={(e) => editText("sourceRight", e)}
+          onkeyup={(e) => editText("sourceRight", e)}
           >{chartSpec.chart.sourceTextRight}</a
         >
       {/if}

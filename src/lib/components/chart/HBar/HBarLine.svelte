@@ -1,12 +1,15 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { HBarTotalLabelStyle, type HBar } from "$lib/chart";
   import { createEventDispatcher } from "svelte";
   import HBarRect from "./HBarRect.svelte";
   import { formatNumber } from "$lib/utils";
 
-  export let conf: HBar;
-  export let i: number;
-  export let d: {
+  interface Props {
+    conf: HBar;
+    i: number;
+    d: {
     label: string;
     value: {
       label: string;
@@ -15,14 +18,29 @@
       to: number;
     }[];
   };
-  export let blockHeight: number;
-  export let blockMargin: number;
-  export let barMargin: number;
-  export let barHeight: number;
-  export let labelWidth: number;
-  export let valueHeight: number;
-  export let valueScale: (d: any) => number;
-  export let color: (d: any) => string;
+    blockHeight: number;
+    blockMargin: number;
+    barMargin: number;
+    barHeight: number;
+    labelWidth: number;
+    valueHeight: number;
+    valueScale: (d: any) => number;
+    color: (d: any) => string;
+  }
+
+  let {
+    conf,
+    i,
+    d,
+    blockHeight,
+    blockMargin,
+    barMargin,
+    barHeight,
+    labelWidth,
+    valueHeight,
+    valueScale,
+    color
+  }: Props = $props();
 
   const spacing = 2;
 
@@ -30,15 +48,17 @@
     labelOverflow: number;
   }>();
 
-  let outsideLabelBox: DOMRect | undefined;
-  $: if (
-    conf.totalLabels == HBarTotalLabelStyle.OUTSIDE &&
-    typeof outsideLabelBox != "undefined"
-  ) {
-    dispatch("labelOverflow", outsideLabelBox.width + spacing);
-  } else {
-    dispatch("labelOverflow", 0);
-  }
+  let outsideLabelBox: DOMRect | undefined = $state();
+  run(() => {
+    if (
+      conf.totalLabels == HBarTotalLabelStyle.OUTSIDE &&
+      typeof outsideLabelBox != "undefined"
+    ) {
+      dispatch("labelOverflow", outsideLabelBox.width + spacing);
+    } else {
+      dispatch("labelOverflow", 0);
+    }
+  });
 </script>
 
 <g transform="translate({0},{i * (blockHeight + blockMargin)})">

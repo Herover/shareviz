@@ -2,7 +2,11 @@
   import type { db } from "$lib/chartStore";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
 
-  export let style: ReturnType<typeof db.style>;
+  interface Props {
+    style: ReturnType<typeof db.style>;
+  }
+
+  let { style }: Props = $props();
 </script>
 
 <p>
@@ -10,9 +14,9 @@
     Title text size (em)
     <input
       value={$style.titleSize}
-      on:change={(e) =>
+      onchange={(e) =>
         style.setTitleSize(Number.parseFloat(e.currentTarget.value))}
-      on:keyup={(e) =>
+      onkeyup={(e) =>
         style.setTitleSize(Number.parseFloat(e.currentTarget.value))}
       step="0.1"
       type="number"
@@ -24,7 +28,7 @@
   <label>
     <input
       bind:checked={$style.titleBold}
-      on:change={(e) => style.setTitleBold(e.currentTarget.checked)}
+      onchange={(e) => style.setTitleBold(e.currentTarget.checked)}
       type="checkbox"
     />Bold
   </label>
@@ -35,9 +39,9 @@
     Subtitle text size (em)
     <input
       value={$style.subTitleSize}
-      on:change={(e) =>
+      onchange={(e) =>
         style.setSubTitleSize(Number.parseFloat(e.currentTarget.value))}
-      on:keyup={(e) =>
+      onkeyup={(e) =>
         style.setSubTitleSize(Number.parseFloat(e.currentTarget.value))}
       step="0.1"
       type="number"
@@ -49,7 +53,7 @@
   <label>
     <input
       bind:checked={$style.subTitleBold}
-      on:change={(e) => style.setSubTitleBold(e.currentTarget.checked)}
+      onchange={(e) => style.setSubTitleBold(e.currentTarget.checked)}
       type="checkbox"
     />Bold
   </label>
@@ -62,9 +66,9 @@
     Left
     <input
       value={$style.marginLeft}
-      on:change={(e) =>
+      onchange={(e) =>
         style.setMarginLeft(Number.parseFloat(e.currentTarget.value))}
-      on:keyup={(e) =>
+      onkeyup={(e) =>
         style.setMarginLeft(Number.parseFloat(e.currentTarget.value))}
       type="number"
       style="width: 90px"
@@ -74,9 +78,9 @@
     Right
     <input
       value={$style.marginRight}
-      on:change={(e) =>
+      onchange={(e) =>
         style.setMarginRight(Number.parseFloat(e.currentTarget.value))}
-      on:keyup={(e) =>
+      onkeyup={(e) =>
         style.setMarginRight(Number.parseFloat(e.currentTarget.value))}
       type="number"
       style="width: 90px"
@@ -87,9 +91,9 @@
     Top
     <input
       value={$style.marginTop}
-      on:change={(e) =>
+      onchange={(e) =>
         style.setMarginTop(Number.parseFloat(e.currentTarget.value))}
-      on:keyup={(e) =>
+      onkeyup={(e) =>
         style.setMarginTop(Number.parseFloat(e.currentTarget.value))}
       type="number"
       style="width: 90px"
@@ -99,9 +103,9 @@
     Bottom
     <input
       value={$style.marginBottom}
-      on:change={(e) =>
+      onchange={(e) =>
         style.setMarginBottom(Number.parseFloat(e.currentTarget.value))}
-      on:keyup={(e) =>
+      onkeyup={(e) =>
         style.setMarginBottom(Number.parseFloat(e.currentTarget.value))}
       type="number"
       style="width: 90px"

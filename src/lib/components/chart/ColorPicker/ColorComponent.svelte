@@ -3,15 +3,24 @@
   import { orNumber } from "$lib/utils";
   import chroma from "chroma-js";
 
-  export let h: number;
-  export let c: number;
-  export let l: number;
-  export let title: string;
+  interface Props {
+    h: number;
+    c: number;
+    l: number;
+    title: string;
+  }
 
-  $: l2 = Math.floor(Math.max(Math.min(orNumber(l), 100), 0));
-  $: c2 = Math.floor(Math.max(Math.min(orNumber(c), 100), 0));
-  $: h2 = Math.floor((orNumber(h) + 360) % 360);
-  $: lch = `oklch(${l2}% ${c2}% ${h2}deg)`;
+  let {
+    h,
+    c,
+    l,
+    title
+  }: Props = $props();
+
+  let l2 = $derived(Math.floor(Math.max(Math.min(orNumber(l), 100), 0)));
+  let c2 = $derived(Math.floor(Math.max(Math.min(orNumber(c), 100), 0)));
+  let h2 = $derived(Math.floor((orNumber(h) + 360) % 360));
+  let lch = $derived(`oklch(${l2}% ${c2}% ${h2}deg)`);
 
   const dispatch = createEventDispatcher<{ click: string }>();
   const onKey = (e: KeyboardEvent) => {
@@ -24,8 +33,8 @@
 
 <div
   style:background-color={`${chroma(lch).hex()}`}
-  on:click={() => dispatch("click", lch)}
-  on:keydown={onKey}
+  onclick={() => dispatch("click", lch)}
+  onkeydown={onKey}
   {title}
   class="color-component"
   role="button"
