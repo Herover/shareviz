@@ -16,9 +16,9 @@ export async function POST({ locals, params }) {
     return json({ message: "unauthorized" }, { status: 403 });
   }
 
-  const code = await db.addOrganizationInvite(params.id);
+  const { code, expires } = await db.addOrganizationInvite(params.id);
 
-  return json({ message: "ok", code }, { status: 200 });
+  return json({ message: "ok", code, expires: expires.toISOString() }, { status: 200 });
 }
 
 export async function GET({ locals, params }) {

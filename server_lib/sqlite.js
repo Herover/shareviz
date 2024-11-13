@@ -327,7 +327,7 @@ export const db = {
   addOrganizationInvite: async (/** @type {string} */ organizationId) => {
     const code = crypto.randomUUID();
     const expires = new Date();
-    expires.setMonth(expires.getMonth() + 1);
+    expires.setDate(expires.getDate() + 28);
     await drizzledb.insert(organizationInvites)
       .values({
         organizationId,
@@ -335,7 +335,7 @@ export const db = {
         role: ORGANIZATION_ROLES.MEMBER,
         expires: expires.toISOString(),
       });
-    return code;
+    return { code, expires };
   },
   getOrganizationInvites: async (/** @type {string} */ id) => {
     return await drizzledb.select()

@@ -1,36 +1,47 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { page } from "$app/stores";
   import { ORGANIZATION_ROLES } from "$lib/consts";
 
+  let invites: { code: string; expires: Date | null; used: boolean }[] = $state(
+    [],
+  );
+  let newInvites: typeof invites = $state([]);
   let inviteCode = $state("");
+  let newInviteCodeEl: HTMLInputElement | undefined = $state(undefined);
+
+  let selectInviteCodeInput = () => {
+    if (typeof newInviteCodeEl != "undefined") newInviteCodeEl.select();
+  };
+
   let createInvite = $derived(async () => {
     const res = await fetch(`/api/org/${$page.params.organizationId}/invite`, {
       method: "POST",
     });
     const data = await res.json();
     inviteCode = data.code;
+    invites = [
+      { code: data.code, expires: new Date(data.expires), used: false },
+      ...invites,
+    ];
   });
-
-  let invites: { code: string; expires: Date | null; used: boolean }[] = $state([]);
-  run(() => {
-    invites = (
-      $page.data.invites as {
+  $effect(() => {
+    invites = [
+      ...($page.data.invites as {
         code: string;
-        expires: Date | null;
+        expires: string | null;
         used: boolean;
-      }[]
-    )
-      .map((invite: any) => ({
+      }[]),
+      ...newInvites,
+    ]
+      .map((invite) => ({
         code: invite.code,
         used: invite.used,
         expires: invite.expires == null ? null : new Date(invite.expires),
       }))
       .sort(
         (a, b) =>
-          (a.expires?.getTime() ?? Infinity) -
-          (b.expires?.getTime() ?? Infinity),
+          (b.expires?.getTime() ?? -Infinity) -
+          (a.expires?.getTime() ?? -Infinity),
       );
   });
   let deleteInvite = $derived(async (code: string) => {
@@ -40,6 +51,9 @@
     });
     if (res.status == 200) {
       invites = invites.filter((e) => e.code != code);
+      if (inviteCode == code) {
+        inviteCode = "";
+      }
     }
   });
 </script>
@@ -49,7 +63,12 @@
 <p>
   <button onclick={() => createInvite()}>New invite</button>
   {#if inviteCode != ""}
-    <input value={inviteCode} />
+    <input
+      value={inviteCode}
+      onfocus={() => selectInviteCodeInput()}
+      onmouseup={() => selectInviteCodeInput()}
+      bind:this={newInviteCodeEl}
+    />
   {/if}
 </p>
 
@@ -97,7 +116,10 @@
   <tbody>
     {#each $page.data.orgUsers as user}
       <tr>
-        <td>{user.role == ORGANIZATION_ROLES.ADMIN ? "Administrator" : "user"}</td
+        <td
+          >{user.role == ORGANIZATION_ROLES.ADMIN
+            ? "Administrator"
+            : "user"}</td
         >
         <td>{user.name}</td>
       </tr>
