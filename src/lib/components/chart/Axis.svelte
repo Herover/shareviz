@@ -1,11 +1,8 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import type { ScaleLinear, ScaleTime } from "d3-scale";
   import { formatNumber, orDefault, orNumber } from "$lib/utils";
   import type { Axis } from "$lib/chart";
   import { AxisLocation, AxisOrientation } from "$lib/chart";
-  import { createEventDispatcher } from "svelte";
 
   interface Props {
     conf: Axis;
@@ -13,6 +10,12 @@
     height: number;
     scale: ScaleLinear<number, number, never> | ScaleTime<number, number, never> | undefined;
     showLabels?: boolean;
+    dimensions?: (d: {
+      width: number,
+      height: number,
+      leftOverflow?: number,
+      rightOverflow?: number,
+    }) => void,
   }
 
   let {
@@ -20,7 +23,8 @@
     width,
     height,
     scale,
-    showLabels = true
+    showLabels = true,
+    dimensions = () => {},
   }: Props = $props();
 
   let size = 16;
@@ -29,16 +33,6 @@
   let labelBox: DOMRect | undefined = $state();
   let leftBox: DOMRect | undefined = $state();
   let rightBox: DOMRect | undefined = $state();
-
-  const distpatch = createEventDispatcher<{
-    dimensions: {
-      width: number,
-      height: number,
-      leftOverflow?: number,
-      rightOverflow?: number
-    },
-  }>();
-
 
   let autoMajorTicks: { n: number | Date; l: string }[] = $state([]);
   let manualMajorTicks: {
@@ -52,12 +46,12 @@
     l: string;
   }[] = $state([]);
   let lineOffset = $derived(showLabels && conf.location == AxisLocation.START ? size : 0);
-  run(() => {
+  $effect(() => {
     if (scale && conf.major.enabled && conf.major.auto.each != 0) {
       // Note: we are not allowed to assign these two variables to new values after this, or we
       // get a weird reactive loop when we access it in the reactive block that dispatch stuff.
-      autoMajorTicks = [];
-      manualMajorTicks = [];
+      let computedMajorTicks: typeof autoMajorTicks = [];
+      let computedManualMajorTicks: typeof manualMajorTicks = [];
       const from = scale.domain()[0];
       const to = scale.domain()[1];
       if (typeof to == "number" && typeof from == "number") {
@@ -65,12 +59,12 @@
         const expectedTicks =
           1 + (to - customFrom) / conf.major.auto.each;
         if (expectedTicks > maxTicks) {
-          autoMajorTicks = [
+          computedMajorTicks = [
             { n: from, l: `Too many ticks (${expectedTicks})` },
           ];
         } else {
           for (let i = customFrom; i <= to; i += conf.major.auto.each) {
-            autoMajorTicks.push({
+            computedMajorTicks.push({
               n: i,
               l: conf.major.auto.labels ? formatNumber(
                 i,
@@ -80,14 +74,14 @@
             });
           }
         }
-        manualMajorTicks.concat(conf.major.ticks.filter(d => d.n <= to && customFrom <= d.n));
+        computedManualMajorTicks = conf.major.ticks.filter(d => d.n <= to && customFrom <= d.n);
       } else if (to instanceof Date && from instanceof Date) {
         let d = new Date(from);
         d.setDate(1);
         d.setMonth(0);
         let n = 0;
         while (d <= to && n < maxTicks) {
-          autoMajorTicks.push({
+          computedMajorTicks.push({
             n: new Date(d),
             l: conf.major.auto.labels ? d.getFullYear() + conf.major.afterLabel : "",
           });
@@ -95,11 +89,23 @@
           n++;
         }
       }
+      autoMajorTicks = computedMajorTicks;
+      manualMajorTicks = computedManualMajorTicks;
     }
   });
-  let majorTicks = $derived(scale ? [...manualMajorTicks, ...autoMajorTicks] : []);
-  run(() => {
-    if (labelBox || leftBox || rightBox) distpatch("dimensions", {
+  let majorTicks = $derived(
+    scale
+      ? [...manualMajorTicks, ...autoMajorTicks].sort((a, b) =>
+          a.n instanceof Date && b.n instanceof Date
+            ? a.n.getTime() - b.n.getTime()
+            : typeof a.n == "number" && typeof b.n == "number"
+              ? a.n - b.n
+              : 0,
+        )
+      : [],
+  );
+  $effect(() => {
+    if (labelBox || leftBox || rightBox) dimensions({
       width: orNumber(labelBox?.width, 0) + conf.labelSpace,
       height: orNumber(labelBox?.height, 0),
       leftOverflow: Math.max(
@@ -114,21 +120,21 @@
       rightOverflow: orNumber(rightBox?.width, 0)/2,
     });
   });
-  run(() => {
+  $effect(() => {
     if (scale && conf.minor.enabled && conf.minor.auto.each != 0) {
-      autoMinorTicks = [];
+      let computedMinorTicks: typeof autoMinorTicks = [];
       const from = scale.domain()[0];
       const to = scale.domain()[1];
       if (typeof to == "number" && typeof from == "number") {
         const expectedTicks =
           1 + (to - conf.minor.auto.from) / conf.minor.auto.each;
         if (expectedTicks > maxTicks) {
-          autoMinorTicks = [
+          computedMinorTicks = [
             { n: from, l: `Too many ticks (${expectedTicks})` },
           ];
         } else {
           for (let i = conf.minor.auto.from; i <= to; i += conf.minor.auto.each) {
-            autoMinorTicks.push({
+            computedMinorTicks.push({
               n: i,
               l: conf.minor.auto.labels ? formatNumber(
                 i,
@@ -145,7 +151,7 @@
         d.setMonth(0);
         let n = 0;
         while (d <= to && n < maxTicks) {
-          autoMinorTicks.push({
+          computedMinorTicks.push({
             n: new Date(d),
             l: conf.minor.auto.labels ? d.getFullYear() + conf.minor.afterLabel : "",
           });
@@ -153,6 +159,8 @@
           n++;
         }
       }
+      
+      autoMinorTicks = computedMinorTicks;
     }
   });
   let minorTicks = $derived(scale

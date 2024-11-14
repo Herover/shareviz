@@ -117,14 +117,14 @@
   Background color:
   <ColorPicker
     color={$style.bgColor}
-    on:change={(e) => style.setBGColor(e.detail)}
+    onchange={(s) => style.setBGColor(s)}
   />
 </p>
 <p>
   Text color:
   <ColorPicker
     color={$style.textColor}
-    on:change={(e) => style.setTextColor(e.detail)}
+    onchange={(s) => style.setTextColor(s)}
   />
 </p>
 

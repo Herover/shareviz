@@ -1,8 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import type { TransposedColumn } from "$lib/chart";
-
   // import type { Row } from "$lib/chart";
   import type { db } from "$lib/chartStore";
   import { valueParsers } from "$lib/utils";
@@ -20,7 +17,7 @@
 
   let transposedKeys = $state(transpose.from);
 
-  run(() => {
+  $effect(() => {
     if (!equal(transposedKeys, transpose.from)) {
       dataStore.setTransposeFromArray(i, transposedKeys);
     }

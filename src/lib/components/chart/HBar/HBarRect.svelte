@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import type { Axis, HBar } from "$lib/chart";
   import { formatNumber } from "$lib/utils";
   import chroma from "chroma-js";
@@ -36,7 +34,7 @@
   let display = $derived(textBox ? textBox.width + offset * 2 < width : true);
 
   let textColor = $state("#000000");
-  run(() => {
+  $effect(() => {
     try {
       // TODO: Examine if other difference functions work better here, ex. .distance, .contrast
       // or .contrastAPCA

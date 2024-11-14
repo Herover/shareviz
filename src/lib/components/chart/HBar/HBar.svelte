@@ -2,7 +2,7 @@
   import { run } from 'svelte/legacy';
 
   import { scaleLinear } from "d3-scale";
-  import { createEventDispatcher, onMount } from "svelte";
+  import { onMount } from "svelte";
   import type { Root, HBar } from "$lib/chart";
   import { AxisLocation } from "$lib/chart";
   import Axis from "../Axis.svelte";
@@ -23,26 +23,25 @@
     showLegend: boolean;
     showAxisLabels: boolean;
     width: number;
+    labelOverflow: (overflow: number) => void;
+    size?: (d: { height: number }) => void;
   }
 
   let {
     labelWidth,
     valueWidth,
     values,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     chartSpec,
     hBarSpec,
     label,
     showLegend,
     showAxisLabels,
-    width
+    width,
+    labelOverflow = () => {},
+    size = () => {},
   }: Props = $props();
 
-  const dispatch = createEventDispatcher<{
-    size: {
-      height: number;
-    };
-    labelOverflow: number;
-  }>();
 
   const valueHeight = 26;
   const barMargin = 0;
@@ -50,14 +49,8 @@
   let legendHeight = 0;
 
   let labelOverflows: number[] = $state([]);
-  run(() => {
-    labelOverflows = labelOverflows.slice(0, values.length);
-  });
-  run(() => {
-    dispatch(
-      "labelOverflow",
-      labelOverflows.reduce((acc, n) => Math.max(acc, n), 0),
-    );
+  $effect(() => {
+    labelOverflow(labelOverflows.slice(0, values.length).reduce((acc, n) => Math.max(acc, n), 0));
   });
 
   let scaleHeight =
@@ -93,7 +86,7 @@
     legendHeight +
     scaleHeight);
   onMount(() =>
-    dispatch("size", {
+    size({
       height:
         (blockHeight + blockMargin) * values.length -
         blockMargin +
@@ -103,7 +96,7 @@
     }),
   );
   run(() => {
-    dispatch("size", {
+    size({
       height:
         (blockHeight + blockMargin) * values.length -
         blockMargin +
@@ -119,7 +112,7 @@
     {#each hBarSpec.colors.byKey as d}
       {#if d.legend != "" && d.k != ""}
         <span class="legend-title"
-          ><div style="background-color:{d.c}" class="legend-box"></div>
+          ><span style="background-color:{d.c}" class="legend-box"></span>
           {d.legend}</span
         >
       {/if}
@@ -135,7 +128,7 @@
   <g transform="translate({labelWidth},{0})">
     <Axis
       width={valueWidth}
-      height={(blockHeight + blockMargin) * values.length - blockMargin}
+      height={(blockHeight + blockMargin) * values.length}
       scale={valueScale}
       conf={hBarSpec.axis}
       showLabels={showAxisLabels}
@@ -160,7 +153,7 @@
         {valueHeight}
         {valueScale}
         {color}
-        on:labelOverflow={(e) => (labelOverflows[i] = e.detail)}
+        labelOverflow={(n) => (labelOverflows[i] = n)}
       />
     {/each}
   </g>

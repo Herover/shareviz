@@ -1,8 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { HBarTotalLabelStyle, type HBar } from "$lib/chart";
-  import { createEventDispatcher } from "svelte";
   import HBarRect from "./HBarRect.svelte";
   import { formatNumber } from "$lib/utils";
 
@@ -26,6 +23,7 @@
     valueHeight: number;
     valueScale: (d: any) => number;
     color: (d: any) => string;
+    labelOverflow: (overflow: number) => void,
   }
 
   let {
@@ -39,24 +37,21 @@
     labelWidth,
     valueHeight,
     valueScale,
-    color
+    color,
+    labelOverflow = () => {},
   }: Props = $props();
 
   const spacing = 2;
 
-  const dispatch = createEventDispatcher<{
-    labelOverflow: number;
-  }>();
-
   let outsideLabelBox: DOMRect | undefined = $state();
-  run(() => {
+  $effect(() => {
     if (
       conf.totalLabels == HBarTotalLabelStyle.OUTSIDE &&
       typeof outsideLabelBox != "undefined"
     ) {
-      dispatch("labelOverflow", outsideLabelBox.width + spacing);
+      labelOverflow(outsideLabelBox.width + spacing);
     } else {
-      dispatch("labelOverflow", 0);
+      labelOverflow(0);
     }
   });
 </script>

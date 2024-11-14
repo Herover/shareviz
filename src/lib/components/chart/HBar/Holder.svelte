@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import type { Root, HBar as hBarType } from "$lib/chart";
   import { AxisRepeatMode } from "$lib/chart";
   import { group } from "$lib/utils";
@@ -24,17 +22,16 @@
     componentSpec,
     data,
     chartWidth,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     editor = false,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     index
   }: Props = $props();
 
   let groups = $derived(formatData(componentSpec, data, componentSpec.colors.byKey));
 
   let labelOverflows: number[] = $state([]);
-  run(() => {
-    labelOverflows = labelOverflows.slice(0, groups.length);
-  });
-  let labelOverflow = $derived(labelOverflows.reduce((acc, n) => Math.max(acc, n), 0));
+  let labelOverflow = $derived(labelOverflows.slice(0, groups.length).reduce((acc, n) => Math.max(acc, n), 0));
   let width =
     $derived(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight);
 
@@ -57,6 +54,6 @@
     label={k}
     showLegend={i == 0}
     showAxisLabels={showAxis(componentSpec.axis.repeat, i)}
-    on:labelOverflow={(e) => (labelOverflows[i] = e.detail)}
+    labelOverflow={(n) => (labelOverflows[i] = n)}
   />
 {/each}

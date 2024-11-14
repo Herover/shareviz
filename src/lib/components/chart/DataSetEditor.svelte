@@ -75,7 +75,7 @@ value3\tvalue4
 </ul>
 
 <button
-onclick={dataStore.addTranspose($dataStore.transpose.length)}
+  onclick={() => dataStore.addTranspose($dataStore.transpose.length)}
 >Add transpose</button>
 
 <p>Columns:</p>

@@ -11,7 +11,7 @@
   import type { ChartInfo } from "./../../../../server_lib/user";
   import { group, orDefault } from "$lib/utils";
 
-  let charts: ChartInfo[] | null = $state(null);
+  let charts = $state<ChartInfo[] | null>(null);
   let chartsByTeam =
     $derived(charts == null
       ? []

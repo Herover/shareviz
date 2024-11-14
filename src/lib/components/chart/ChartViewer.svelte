@@ -2,34 +2,31 @@
   import type { Root } from "$lib/chart";
   import { getComponent } from "$lib/components/chart/chartComponents";
   import { orNumber } from "$lib/utils";
-  import { createEventDispatcher } from "svelte";
 
   interface Props {
     chartSpec: Root;
     data: { [key: string]: any[] };
     width?: number | undefined;
     editor: boolean;
+    onedit: (d: {
+      k: string;
+      v: any;
+    }) => void;
   }
 
   let {
     chartSpec = $bindable(),
     data,
     width = undefined,
-    editor
+    editor,
+    onedit
   }: Props = $props();
-
-  const dispatch = createEventDispatcher<{
-    edit: {
-      k: string;
-      v: any;
-    };
-  }>();
 
   const editText = (
     target: string,
     e: KeyboardEvent & { currentTarget: EventTarget & HTMLElement },
   ) => {
-    dispatch("edit", {
+    onedit({
       k: target,
       v: e.currentTarget.innerText,
     });
@@ -37,7 +34,7 @@
 
   const editElement = (i: number, d: any) => {
     const type = chartSpec.chart.elements[i].type;
-    dispatch("edit", { k: type, v: [i, ...d] });
+    onedit({ k: type, v: [i, ...d] });
   };
 
   let chartWidth = $derived(orNumber(width, chartSpec.chart.width));
@@ -110,6 +107,8 @@
   <div class="source">
     <p class="source-left" dir="auto">
       {#if editor}
+        <!-- Disabled as it's not applicaple when innerText is set by svelte -->
+        <!-- svelte-ignore a11y_consider_explicit_label -->
         <a
           href={editor ? null : chartSpec.chart.sourceTextLeftLink}
           bind:innerText={chartSpec.chart.sourceTextLeft}
@@ -129,6 +128,8 @@
     </p>
     <p class="source-right" dir="auto">
       {#if editor}
+        <!-- Disabled as it's not applicaple when innerText is set by svelte -->
+        <!-- svelte-ignore a11y_consider_explicit_label -->
         <a
           href={editor ? null : chartSpec.chart.sourceTextRightLink}
           bind:innerText={chartSpec.chart.sourceTextRight}

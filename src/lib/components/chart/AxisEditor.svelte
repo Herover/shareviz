@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AxisLocation, AxisOrientation, AxisRepeatMode } from "$lib/chart";
+  import { AxisLocation, AxisRepeatMode } from "$lib/chart";
   import type { axis } from "$lib/chartStore";
   import AxisGridEditor from "./AxisGridEditor.svelte";
 

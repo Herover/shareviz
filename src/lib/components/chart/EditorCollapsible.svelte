@@ -1,6 +1,6 @@
 <script lang="ts">
-  
-  
+  // In the template, `!open` errors which doesn't make any sense.
+  /* eslint-disable @typescript-eslint/strict-boolean-expressions */
   interface Props {
     // eslint-disable-next-line svelte/valid-compile
     group: string | number;
@@ -14,7 +14,9 @@
   }
 
   let {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     group,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     key,
     label,
     startOpen = false,

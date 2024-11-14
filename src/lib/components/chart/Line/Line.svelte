@@ -53,11 +53,12 @@
   let dataSet = $derived(chartSpec.data.sets.find((set) => set.id == lineSpec.dataSet));
 
   let xAxisOverflow: { leftOverflow?: number, rightOverflow?: number } = $state({ leftOverflow: 0, rightOverflow: 0 });
+  $effect(() => console.log($state.snapshot(xAxisOverflow)))
   let yAxisWidth = $state(0);
   let labelWidth = $derived(labelBox ? labelBox.width + labelOffset : 0);
   let leftMargin = $state(0);
   let rightMargin = $state(0);
-  run(() => {
+  $effect(() => {
     if (lineSpec.y.axis.location == AxisLocation.START && lineSpec.style.default.label.location == LabelLocation.Left) {
       leftMargin = Math.max(Math.max(yAxisWidth, labelWidth), orNumber(xAxisOverflow.leftOverflow, 0));
       rightMargin = orDefault(xAxisOverflow.rightOverflow, 0);
@@ -210,13 +211,13 @@
 
 <svg {width} {height}>
   <g transform="translate(0, {topMargin})">
-    <Axis {height} {width} scale={yScale} conf={lineSpec.y.axis} on:dimensions={e => yAxisWidth = e.detail.width} />
+    <Axis {height} {width} scale={yScale} conf={lineSpec.y.axis} dimensions={d => yAxisWidth = d.width} />
     <Axis
       height={height - topMargin - bottomMargin}
       {width}
       scale={xScale}
       conf={lineSpec.x.axis}
-      on:dimensions={e => xAxisOverflow = e.detail}
+      dimensions={d => xAxisOverflow = d}
     />
     {#if lineSpec.stack}
       {#each stacked as d, i}

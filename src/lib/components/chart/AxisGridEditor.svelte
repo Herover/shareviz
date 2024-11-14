@@ -56,7 +56,7 @@
     Label tick color:
     <ColorPicker
       color={$conf.color}
-      on:change={e => conf.setColor(e.detail)}
+      onchange={s => conf.setColor(s)}
     />
   </p>
 

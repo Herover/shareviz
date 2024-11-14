@@ -6,9 +6,10 @@
   import DataSetEditor from "$lib/components/chart/DataSetsEditor.svelte";
   import EditorCollapsible from "$lib/components/chart/EditorCollapsible.svelte";
   import { onDestroy, onMount } from "svelte";
-  import { user } from "$lib/userStore";
+  import { page } from "$app/stores";
   import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
   import { computeData } from "$lib/data.js";
+    import type { DSVParsedArray } from "d3-dsv";
 
   let { data } = $props();
 
@@ -18,7 +19,7 @@
 
   onMount(() => {
     disconnect = db.connect();
-    db.load(data.id, !data.id.includes(localPrefix));
+    db.load(data.id, data.id.includes(localPrefix) == false);
   });
 
   onDestroy(() => {
@@ -27,32 +28,32 @@
 
   let chartSpec = $derived($db.doc as Root);
 
-  let chartData = $derived(computeData(chartSpec));
+  let chartData = $derived(computeData(chartSpec) as { [key: string]: DSVParsedArray<any>; });
     
-  let canEdit = $derived(chartSpec == null ? false : $db.mode == "local" || typeof chartSpec.meta.access.find(a => a.userId == $user.userId) != "undefined");
+  let canEdit = $derived(chartSpec == null ? false : $db.mode == "local" || typeof chartSpec.meta.access.find(a => a.userId == $page.data.session?.user?.id) != "undefined");
 
-  let edit = $derived((e: CustomEvent<{ k: string, v: any}>) => {
-    switch (e.detail.k) {
+  let edit = $derived((e: { k: string, v: any}) => {
+    switch (e.k) {
       case "title":
-        db.chart().setConfigTitle(e.detail.v);
+        db.chart().setConfigTitle(e.v);
         break;
     
       case "subTitle":
-        db.chart().setConfigSubTitle(e.detail.v);
+        db.chart().setConfigSubTitle(e.v);
         break;
     
       case "sourceLeft":
-        db.chart().setSourceTextLeft(e.detail.v);
+        db.chart().setSourceTextLeft(e.v);
         break;
     
       case "sourceRight":
-        db.chart().setSourceTextRight(e.detail.v);
+        db.chart().setSourceTextRight(e.v);
         break;
       
       case "line": {
-        const [i, a] = e.detail.v;
+        const [i, a] = e.v;
         if (a == "style") {
-          const [_1, _2, styleI, styleA, styleV] = e.detail.v;
+          const [_1, _2, styleI, styleA, styleV] = e.v;
           if (styleA == "labelRelativePos") {
             db.chart().line(i).lineStyle(styleI).setLabelXOffset(styleV[0]);
             db.chart().line(i).lineStyle(styleI).setLabelYOffset(styleV[1]);
@@ -62,7 +63,7 @@
       }
     
       default:
-        console.warn("attempting to edit unknown key", e.detail.k);
+        console.warn("attempting to edit unknown key", e.k);
         break;
     }
   });
@@ -126,7 +127,7 @@
       </div>
       <div class="chart-view">
         <div style:scale={viewScale / 100}>
-          <ChartViewer {chartSpec} data={chartData} editor={true} on:edit={e => edit(e)} />
+          <ChartViewer {chartSpec} data={chartData} editor={true} onedit={e => edit(e)} />
         </div>
       </div>
     </div>

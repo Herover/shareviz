@@ -18,6 +18,7 @@
     unspecifiecKeys = null,
     chartColors,
     values,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     lineSpec
   }: Props = $props();
 
@@ -93,13 +94,13 @@
   <ColorPicker
     color={$style.color}
     {chartColors}
-    on:change={(e) => updateColor(e.detail)}
+    onchange={(s) => updateColor(s)}
   />
 
   <ColorPicker
     color={$style.label.color}
     {chartColors}
-    on:change={(e) => updateLabelColor(e.detail)}
+    onchange={(s) => updateLabelColor(s)}
   />
 
   <input

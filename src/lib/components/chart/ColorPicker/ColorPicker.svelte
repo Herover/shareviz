@@ -1,13 +1,6 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import chroma from "chroma-js";
-  import { createEventDispatcher } from "svelte";
   import ColorComponent from "./ColorComponent.svelte";
-
-
-  
-
 
   interface Props {
     color: string;
@@ -15,6 +8,7 @@
     scheme?: any;
     chartColors?: string[];
     disabled?: boolean;
+    onchange: (c: string) => void;
   }
 
   let {
@@ -34,14 +28,15 @@
     "#b15928",
   ],
     chartColors = [],
-    disabled = false
+    disabled = false,
+    onchange = () => {},
   }: Props = $props();
 
   let l = $state(0);
   let c = $state(0);
   let h = $state(0);
 
-  run(() => {
+  $effect(() => {
     try {
       // TODO: This allows colors that cannot be rendered, is that OK?
       const parts = color.match(
@@ -52,9 +47,10 @@
         c = Number.parseFloat(parts[2]);
         h = Number.parseFloat(parts[3]);
       } else {
-        [l, c, h] = chroma(color).oklch();
-        l = l * 100;
-        c = c * (1 / 0.4) * 100;
+        let [l2, c2, h2] = chroma(color).oklch();
+        l = l2 * 100;
+        c = c2 * (1 / 0.4) * 100;
+        h = h2;
       }
     } catch (e) {
       console.warn(e);
@@ -95,7 +91,7 @@
     }
   };
 
-  run(() => {
+  $effect(() => {
     if (open) {
       input?.focus();
       opened = Date.now() + 100;
@@ -106,8 +102,6 @@
       document.removeEventListener("keyup", ev);
     }
   });
-
-  const dispatch = createEventDispatcher<{ change: string }>();
 
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.code != "Enter" && e.code != "Space") {
@@ -155,25 +149,25 @@
       <input
         value={color}
         bind:this={input}
-        onchange={(e) => dispatch("change", e.currentTarget.value)}
-        onkeyup={(e) => dispatch("change", e.currentTarget.value)}
+        onchange={(e) => onchange(e.currentTarget.value)}
+        onkeyup={(e) => onchange(e.currentTarget.value)}
       />
 
       <div class="component-row">
         <ColorComponent
-          on:click={(e) => dispatch("change", e.detail)}
+          on:click={(e) => onchange(e.detail)}
           h={h - hueStep}
           {c}
           {l}
           title="Hue left"
         /><ColorComponent
-          on:click={(e) => dispatch("change", e.detail)}
+          on:click={(e) => onchange(e.detail)}
           {h}
           {c}
           {l}
           title="Current color"
         /><ColorComponent
-          on:click={(e) => dispatch("change", e.detail)}
+          on:click={(e) => onchange(e.detail)}
           h={h + hueStep}
           {c}
           {l}
@@ -182,19 +176,19 @@
       </div>
       <div class="component-row">
         <ColorComponent
-          on:click={(e) => dispatch("change", e.detail)}
+          on:click={(e) => onchange(e.detail)}
           {h}
           c={c - chromaStep}
           {l}
           title="Chroma/saturation down"
         /><ColorComponent
-          on:click={(e) => dispatch("change", e.detail)}
+          on:click={(e) => onchange(e.detail)}
           {h}
           {c}
           {l}
           title="Current color"
         /><ColorComponent
-          on:click={(e) => dispatch("change", e.detail)}
+          on:click={(e) => onchange(e.detail)}
           {h}
           c={c + chromaStep}
           {l}
@@ -203,19 +197,19 @@
       </div>
       <div class="component-row">
         <ColorComponent
-          on:click={(e) => dispatch("change", e.detail)}
+          on:click={(e) => onchange(e.detail)}
           {h}
           {c}
           l={l - lightnessStep}
           title="Lightness down"
         /><ColorComponent
-          on:click={(e) => dispatch("change", e.detail)}
+          on:click={(e) => onchange(e.detail)}
           {h}
           {c}
           {l}
           title="Current color"
         /><ColorComponent
-          on:click={(e) => dispatch("change", e.detail)}
+          on:click={(e) => onchange(e.detail)}
           {h}
           {c}
           l={l + lightnessStep}
@@ -227,8 +221,8 @@
         <div class="holder">
           <div
             style:background-color={c}
-            onclick={() => dispatch("change", c)}
-            onkeyup={(e) => e.key === " " && dispatch("change", c)}
+            onclick={() => onchange(c)}
+            onkeyup={(e) => e.key === " " && onchange(c)}
             class="color-display"
             role="button"
             tabindex="0"
@@ -240,8 +234,8 @@
         <div class="holder">
           <div
             style:background-color={c}
-            onclick={() => dispatch("change", c)}
-            onkeyup={(e) => e.key === " " && dispatch("change", c)}
+            onclick={() => onchange(c)}
+            onkeyup={(e) => e.key === " " && onchange(c)}
             class="color-display"
             role="button"
             tabindex="0"

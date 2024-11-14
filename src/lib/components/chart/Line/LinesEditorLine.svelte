@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { lineStyle } from "$lib/chartStore";
   import { orDefault } from "$lib/utils";
-  import { createEventDispatcher } from "svelte";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import { chartToEditor } from "../../../chartToEditorStore";
 
@@ -11,6 +10,7 @@
     index?: number;
     chartColors?: string[];
     selected: boolean;
+    onSelect: (d: { selected: boolean; replace: boolean }) => void;
   }
 
   let {
@@ -18,12 +18,9 @@
     key = undefined,
     index = -1,
     chartColors = [],
-    selected
+    selected,
+    onSelect,
   }: Props = $props();
-
-  const dispatch = createEventDispatcher<{
-    onSelect: { selected: boolean; replace: boolean };
-  }>();
 
   const toggleSelect = (me: MouseEvent | null, ke: KeyboardEvent | null) => {
     let replace = true;
@@ -40,7 +37,7 @@
         replace = false;
       }
     }
-    dispatch("onSelect", { replace, selected: !selected });
+    onSelect({ replace, selected: !selected });
   };
 
 const toggleHover = (me: Event | null) => {
@@ -75,7 +72,7 @@ const toggleHover = (me: Event | null) => {
         <ColorPicker
           color={orDefault($style?.color, "#00000000")}
           {chartColors}
-          on:change={(e) => style.setColor(e.detail)}
+          onchange={(s) => style.setColor(s)}
         />
         &nbsp;
         <span
@@ -89,7 +86,7 @@ const toggleHover = (me: Event | null) => {
         <ColorPicker
           color={orDefault($style?.color, "#00000000")}
           {chartColors}
-          on:change={(e) => style.setColor(e.detail)}
+          onchange={(s) => style.setColor(s)}
         />
         &nbsp;
         <span style:visibility="hidden" title="delete">❌</span>

@@ -336,8 +336,8 @@
     style={defaultStyle}
     selected={defaultSelected}
     {chartColors}
-    on:onSelect={(e) =>
-      toggleSelect(null, e.detail.selected, e.detail.replace, null)}
+    onSelect={(d) =>
+      toggleSelect(null, d.selected, d.replace, null)}
   />
   {#each filteredValues as line, i}
     {#if line}
@@ -347,8 +347,8 @@
         selected={selected[line.d.key]}
         {chartColors}
         {index}
-        on:onSelect={(e) =>
-          toggleSelect(line.d.key, e.detail.selected, e.detail.replace, i)}
+        onSelect={(d) =>
+          toggleSelect(line.d.key, d.selected, d.replace, i)}
       />
     {/if}
   {/each}
@@ -381,7 +381,7 @@
           : mergedStyle.color}
         {chartColors}
         disabled={nonEditable}
-        on:change={(e) => setLineColor(e.detail)}
+        onchange={(s) => setLineColor(s)}
       />
       text color
       <ColorPicker
@@ -390,7 +390,7 @@
           : mergedStyle.label.color}
         {chartColors}
         disabled={nonEditable}
-        on:change={(e) => setTextColor(e.detail)}
+        onchange={(s) => setTextColor(s)}
       />
     </span>
   </p>

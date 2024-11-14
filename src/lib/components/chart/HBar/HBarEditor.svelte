@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   /** eslint-disable @typescript-eslint/strict-boolean-expressions */
   import {HBarTotalLabelStyle, type Root } from "$lib/chart";
-  import { colors, db } from "$lib/chartStore";
+  import { db } from "$lib/chartStore";
   import { group, orDefault } from "$lib/utils";
   import type { DSVParsedArray } from "d3-dsv";
   import AxisEditor from "../AxisEditor.svelte";
@@ -25,6 +23,7 @@
 
   let {
     spec,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     chart,
     dbHBar,
     chartData
@@ -39,13 +38,7 @@
   ]);
 
   let scale = $derived(dbHBar.scale());
-  let colorScale;
-  run(() => {
-    colorScale = null as unknown as ReturnType<typeof colors>;
-  });
-  run(() => {
-    colorScale = dbHBar.colors()
-  });
+  let colorScale = $state(dbHBar.colors());
 
   const deleteColor = (ci: number) => {
     colorScale.removeColorScaleColor(ci);
@@ -55,7 +48,7 @@
   };
 
   let groups = $derived(formatData($dbHBar, chartData, []/* $colorScale.byKey */));
-  run(() => {
+  $effect(() => {
     const computed = max(groups, (d) =>
       max(d.d, (dd) => max(dd.value, (ddd) => ddd.to)),
     );
@@ -270,8 +263,8 @@
           <td>
             <ColorPicker
               color={$colorScale.default}
-              on:change={(e) =>
-                colorScale.setColorScaleDefaultColor(e.detail)}
+              onchange={(s) =>
+                colorScale.setColorScaleDefaultColor(s)}
             />
           </td>
           <td> </td>
@@ -328,8 +321,8 @@
               <ColorPicker
                 color={color.c}
                 chartColors={$colorScale.byKey.map(c => c.c)}
-                on:change={(e) =>
-                  colorScale.setColorScaleColor(i, e.detail)}
+                onchange={(s) =>
+                  colorScale.setColorScaleColor(i, s)}
               />
             </td>
             <td
