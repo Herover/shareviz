@@ -196,6 +196,7 @@
     else {
       const def = {
         ...lineSpec.style.default,
+        label: { ...lineSpec.style.default.label },
       };
       def.label.text = def.label.text == "" ? "" : k;
 
@@ -306,7 +307,7 @@
         {/if}
       {/each}
     </g>
-    {#each stacked as d, i}
+    {#each stacked as d}
       {#if getStyle(d.key).symbols == LineSymbol.CIRCLE}
         {#each d.value as value}
           <circle
