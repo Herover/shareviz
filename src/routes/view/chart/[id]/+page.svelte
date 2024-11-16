@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { db } from "$lib/chartStore";
   import type { Root } from "$lib/chart.d.ts";
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
@@ -22,10 +20,10 @@
     });
   }
 
-  run(() => {
+  $effect(() => {
     if (live && $db.doc) chartSpec = $db.doc as Root;
   });
-  run(() => {
+  $effect(() => {
     if (!live) {
       fetch("/api/chart/" + data.id + "/data")
         .then((resp) => resp.json())
