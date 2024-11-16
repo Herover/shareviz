@@ -8,7 +8,7 @@
     data: { [key: string]: any[] };
     width?: number | undefined;
     editor: boolean;
-    onedit: (d: {
+    onedit?: (d: {
       k: string;
       v: any;
     }) => void;
@@ -19,7 +19,7 @@
     data,
     width = undefined,
     editor,
-    onedit
+    onedit = () => {},
   }: Props = $props();
 
   const editText = (
