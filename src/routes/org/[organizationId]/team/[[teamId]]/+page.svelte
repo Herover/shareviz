@@ -69,19 +69,11 @@
   // }
 
   const newGraphic = async (synced: boolean) => {
-    const docId = await chartStore.create(synced);
-    const res = await fetch("/api/chart", {
-      method: "POST",
-      body: JSON.stringify({
-        ref: docId,
-        teamId,
-      }),
-    });
-    if (res.status != 200) {
-      const data = await res.json();
-      notifications.addError(data.message);
-    } else {
+    try {
+      const docId = await chartStore.create(synced);
       goto("/editor/chart/" + docId);
+    } catch (err) {
+      notifications.addError((err as Error).message);
     }
   };
 </script>
