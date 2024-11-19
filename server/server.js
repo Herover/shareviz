@@ -531,8 +531,9 @@ export function startServer(server) {
       // }
       next();
     } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.op && ctx.agent.custom.user) {
-      if (ctx.data.c == "examples" && typeof ctx.data.create != "undefined") {
-        next();
+      // Only allow access to "examples", no create through websockets
+      if (ctx.data.c != "examples" || typeof ctx.data.create != "undefined") {
+        next("unauthorized");
       } else {
         next();
       }
