@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from "svelte/legacy";
 
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
@@ -7,7 +7,12 @@
   import { user } from "$lib/userStore";
   import { db as chartStore } from "$lib/chartStore";
   import { onDestroy, onMount } from "svelte";
+  import type { PageData } from "../../$types";
 
+  let { data }: { data: PageData } = $props();
+  $inspect(data).with(console.log);
+
+  let userToAddToTeam: string | undefined = $state();
   let teamId: string | undefined = $state();
   run(() => {
     teamId = $page.params.teamId;
@@ -16,7 +21,8 @@
     console.log(teamId);
   });
   let charts: { chartRef: string; id: string; name: string }[] = $state([]);
-  let team: Awaited<ReturnType<typeof user.getTeamCharts>> | undefined = $state();
+  let team: Awaited<ReturnType<typeof user.getTeamCharts>> | undefined =
+    $state();
   run(() => {
     typeof teamId == "undefined"
       ? user
@@ -70,10 +76,32 @@
 
   const newGraphic = async (synced: boolean) => {
     try {
-      const docId = await chartStore.create(synced);
+      const docId = await chartStore.create(synced, teamId);
       goto("/editor/chart/" + docId);
     } catch (err) {
       notifications.addError((err as Error).message);
+    }
+  };
+
+  const addMember = async () => {
+    const res = await fetch(`/api/team/${teamId}/members`, {
+      method: "POST",
+      body: JSON.stringify({ userId: userToAddToTeam }),
+    });
+    if (res.status != 200) {
+      const data = await res.json();
+      notifications.addError(data.message);
+    }
+  };
+
+  const removeTeamMember = async (userId: string) => {
+    const res = await fetch(`/api/team/${teamId}/members`, {
+      method: "DELETE",
+      body: JSON.stringify({ userId }),
+    });
+    if (res.status != 200) {
+      const data = await res.json();
+      notifications.addError(data.message);
     }
   };
 </script>
@@ -117,9 +145,30 @@
             {#if member.user.id == $page.data.session?.user?.id}
               (you)
             {/if}
+            <span
+              onclick={() => removeTeamMember(member.user.id)}
+              onkeydown={(e) =>
+                (e.key == "Enter" || e.key == " ") &&
+                removeTeamMember(member.user.id)}
+              title="remove from team"
+              tabindex="0"
+              role="button">❌</span
+            >
           </li>
         {/each}
       </ul>
+      <p>
+        Add new user to team:
+        <select bind:value={userToAddToTeam}>
+          <option value={null} selected disabled>Select user</option>
+          {#each data.orgUsers.filter((u) => team?.members.findIndex((m) => m.user.id == u.id) == -1) as user}
+            <option value={user.id}>{user.name}</option>
+          {/each}
+        </select>
+        <button onclick={addMember} disabled={userToAddToTeam == null}
+          >+ Add to team</button
+        >
+      </p>
     {/if}
   </div>
 
@@ -148,10 +197,10 @@
   .side:first-child {
     margin-left: 0;
     flex: initial;
+    width: 240px;
   }
 
   .options {
-    width: 240px;
     box-sizing: border-box;
     border: 1px solid var(--detail-color);
     background-color: var(--accent-bg-color);

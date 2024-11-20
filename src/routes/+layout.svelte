@@ -62,6 +62,10 @@
     background-color: #70ff86;
   }
 
+  :global([role=button]) {
+    cursor: pointer;
+  }
+
   :root {
     --main-bg-color: #ffffff;
     --accent-bg-color: #eeeeee;

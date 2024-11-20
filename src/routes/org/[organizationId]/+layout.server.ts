@@ -2,6 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import { db } from '../../../../server_lib/sqlite.js';
 import { ORGANIZATION_ROLES } from '$lib/consts.js';
 
+/** @type {import('./$types').PageServerLoad} */
 export async function load({ locals, params }) {
   const session = await locals.auth();
 

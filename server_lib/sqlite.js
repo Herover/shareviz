@@ -306,6 +306,20 @@ export const db = {
       });
   },
 
+  removeUserTeamsRelation: async (/** @type {string} */ teamId, /** @type {string} */ userId) => {
+    const users = await db.getTeamMembers(teamId);
+    const adminsAfterDelete = users.filter(u => u.user.id != userId && u.usersTeams.role == TEAM_ROLES.ADMIN);
+    if (adminsAfterDelete.length == 0) {
+      throw new Error("There must be at least 1 admin after removal");
+    }
+
+    await drizzledb.delete(usersTeams)
+      .where(and(
+        eq(usersTeams.userId, userId),
+        eq(usersTeams.teamId, teamId),
+      ));
+  },
+
   getOrganizationInvite: async (/** @type {string} */ code) => {
     const res = await drizzledb.select()
       .from(organizationInvites)
