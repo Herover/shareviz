@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import { notifications } from "$lib/notificationStore";
@@ -8,28 +6,26 @@
   import { db as chartStore } from "$lib/chartStore";
   import { onDestroy, onMount } from "svelte";
   import type { PageData } from "../../$types";
-    import { TEAM_ROLES } from "$lib/consts";
+  import { TEAM_ROLES } from "$lib/consts";
 
   let { data }: { data: PageData } = $props();
-  $inspect(data).with(console.log);
 
   let isTeamAdmin = $state(false);
   $effect(() => {
-    isTeamAdmin = team?.members.find((u) => u.user.id == data.session?.user?.id)?.role === TEAM_ROLES.ADMIN;
+    isTeamAdmin =
+      team?.members.find((u) => u.user.id == data.session?.user?.id)?.role ===
+      TEAM_ROLES.ADMIN;
   });
 
   let userToAddToTeam: string | undefined = $state();
   let teamId: string | undefined = $state();
-  run(() => {
+  $effect(() => {
     teamId = $page.params.teamId;
-  });
-  run(() => {
-    console.log(teamId);
   });
   let charts: { chartRef: string; id: string; name: string }[] = $state([]);
   let team: Awaited<ReturnType<typeof user.getTeamCharts>> | undefined =
     $state();
-  run(() => {
+  $effect(() => {
     typeof teamId == "undefined"
       ? user
           .geUserCharts()
@@ -45,9 +41,6 @@
             team = c;
           })
           .catch((e) => notifications.addError(e.message));
-  });
-  run(() => {
-    console.log(typeof teamId == "undefined", teamId);
   });
   const addTeam = async () => {
     const res = await fetch("/api/team", {
