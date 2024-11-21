@@ -8,9 +8,15 @@
   import { db as chartStore } from "$lib/chartStore";
   import { onDestroy, onMount } from "svelte";
   import type { PageData } from "../../$types";
+    import { TEAM_ROLES } from "$lib/consts";
 
   let { data }: { data: PageData } = $props();
   $inspect(data).with(console.log);
+
+  let isTeamAdmin = $state(false);
+  $effect(() => {
+    isTeamAdmin = team?.members.find((u) => u.user.id == data.session?.user?.id)?.role === TEAM_ROLES.ADMIN;
+  });
 
   let userToAddToTeam: string | undefined = $state();
   let teamId: string | undefined = $state();
@@ -157,18 +163,20 @@
           </li>
         {/each}
       </ul>
-      <p>
-        Add new user to team:
-        <select bind:value={userToAddToTeam}>
-          <option value={null} selected disabled>Select user</option>
-          {#each data.orgUsers.filter((u) => team?.members.findIndex((m) => m.user.id == u.id) == -1) as user}
-            <option value={user.id}>{user.name}</option>
-          {/each}
-        </select>
-        <button onclick={addMember} disabled={userToAddToTeam == null}
-          >+ Add to team</button
-        >
-      </p>
+      {#if isTeamAdmin}
+        <p>
+          Add new user to team:
+          <select bind:value={userToAddToTeam}>
+            <option value={null} selected disabled>Select user</option>
+            {#each data.orgUsers.filter((u) => team?.members.findIndex((m) => m.user.id == u.id) == -1) as user}
+              <option value={user.id}>{user.name}</option>
+            {/each}
+          </select>
+          <button onclick={addMember} disabled={userToAddToTeam == null}
+            >+ Add to team</button
+          >
+        </p>
+      {/if}
     {/if}
   </div>
 
