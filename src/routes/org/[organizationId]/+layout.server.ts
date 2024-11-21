@@ -21,11 +21,8 @@ export async function load({ locals, params }) {
   const userIsOrgAdmin = orgUsers
     .findIndex((e) => e.id == user.id && e.role == ORGANIZATION_ROLES.ADMIN) != -1;
 
-  const invites = userIsOrgAdmin ? await db.getOrganizationInvites(params.organizationId) : [];
-
   return {
     orgUsers,
     userIsOrgAdmin,
-    invites,
   };
 }

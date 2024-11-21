@@ -5,7 +5,7 @@
   import { user } from "$lib/userStore";
   import { db as chartStore } from "$lib/chartStore";
   import { onDestroy, onMount } from "svelte";
-  import type { PageData } from "../../$types";
+  import type { PageData } from "./$types";
   import { TEAM_ROLES } from "$lib/consts";
 
   let { data }: { data: PageData } = $props();
