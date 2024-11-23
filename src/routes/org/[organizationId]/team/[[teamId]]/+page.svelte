@@ -7,6 +7,7 @@
   import { onDestroy, onMount } from "svelte";
   import type { PageData } from "./$types";
   import { TEAM_ROLES } from "$lib/consts";
+  import { addTeam, addTeamMember, removeTeamMember } from "$lib/api";
 
   let { data }: { data: PageData } = $props();
 
@@ -42,16 +43,13 @@
           })
           .catch((e) => notifications.addError(e.message));
   });
-  const addTeam = async () => {
-    const res = await fetch("/api/team", {
-      method: "POST",
-      body: JSON.stringify({
-        name: "Test",
-        organizationId: $page.params.organizationId,
-      }),
-    });
-    const data = await res.json();
-    goto(`/org/${$page.params.organizationId}/team/${data.teamId}`);
+  const addNewTeam = async () => {
+    try {
+      const newTeamId = await addTeam("Test", $page.params.organizationId);
+      goto(`/org/${$page.params.organizationId}/team/${newTeamId}`);
+    } catch (err) {
+      notifications.addError((err as Error).message);
+    }
   };
 
   let disconnect = () => {};
@@ -61,17 +59,6 @@
   onMount(() => {
     disconnect = chartStore.connect();
   });
-  // $: {
-  //   if ($page.data.session?.user) {
-  //     disconnect = chartStore.connect();
-  //     fetch("/api/chart")
-  //       .then((req) => req.json())
-  //       .then((data) => (charts = data.charts))
-  //       .catch((e) => notifications.addError(e.message));
-  //   } else {
-  //     disconnect = () => {};
-  //   }
-  // }
 
   const newGraphic = async (synced: boolean) => {
     try {
@@ -83,24 +70,24 @@
   };
 
   const addMember = async () => {
-    const res = await fetch(`/api/team/${teamId}/members`, {
-      method: "POST",
-      body: JSON.stringify({ userId: userToAddToTeam }),
-    });
-    if (res.status != 200) {
-      const data = await res.json();
-      notifications.addError(data.message);
+    if (typeof userToAddToTeam == "undefined" || typeof teamId == "undefined") {
+      return;
+    }
+    try {
+      await addTeamMember(userToAddToTeam, teamId);
+    } catch (err) {
+      notifications.addError((err as Error).message);
     }
   };
 
-  const removeTeamMember = async (userId: string) => {
-    const res = await fetch(`/api/team/${teamId}/members`, {
-      method: "DELETE",
-      body: JSON.stringify({ userId }),
-    });
-    if (res.status != 200) {
-      const data = await res.json();
-      notifications.addError(data.message);
+  const removeMember = async (userId: string) => {
+    if (typeof teamId == "undefined") {
+      return;
+    }
+    try {
+      await removeTeamMember(userId, teamId);
+    } catch (err) {
+      notifications.addError((err as Error).message);
     }
   };
 </script>
@@ -122,8 +109,8 @@
         </a>
       {/each}
       <div
-        onclick={() => addTeam()}
-        onkeypress={(e) => e.key == "Enter" && addTeam()}
+        onclick={() => addNewTeam()}
+        onkeypress={(e) => e.key == "Enter" && addNewTeam()}
         tabindex="0"
         role="button"
         class="option"
@@ -145,10 +132,10 @@
               (you)
             {/if}
             <span
-              onclick={() => removeTeamMember(member.user.id)}
+              onclick={() => removeMember(member.user.id)}
               onkeydown={(e) =>
                 (e.key == "Enter" || e.key == " ") &&
-                removeTeamMember(member.user.id)}
+                removeMember(member.user.id)}
               title="remove from team"
               tabindex="0"
               role="button">❌</span
