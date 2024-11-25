@@ -26,7 +26,7 @@
     label,
     value,
     axis,
-    conf
+    conf,
   }: Props = $props();
 
   let textBox: DOMRect | undefined = $state();
@@ -65,7 +65,5 @@
     dominant-baseline="middle"
   >
     {formatNumber(value, axis.major.labelDivide, axis.major.labelThousands)}
-    <!-- Consider using invisible rectancle on top instead of this -->
-    <title>{label}: {value}</title>
   </text>
 {/if}

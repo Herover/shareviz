@@ -7,14 +7,14 @@
     conf: HBar;
     i: number;
     d: {
-    label: string;
-    value: {
       label: string;
-      value: number;
-      from: number;
-      to: number;
-    }[];
-  };
+      value: {
+        label: string;
+        value: number;
+        from: number;
+        to: number;
+      }[];
+    };
     blockHeight: number;
     blockMargin: number;
     barMargin: number;
@@ -23,7 +23,7 @@
     valueHeight: number;
     valueScale: (d: any) => number;
     color: (d: any) => string;
-    labelOverflow: (overflow: number) => void,
+    labelOverflow: (overflow: number) => void;
   }
 
   let {
@@ -90,5 +90,16 @@
         )}
       </text>
     {/if}
+  {/each}
+  {#each d.value as dd, ii}
+    <rect
+      x={labelWidth + valueScale(dd.from)}
+      y={(conf.stackSubCategories ? 0 : ii) * valueHeight + barMargin}
+      height={barHeight}
+      width={valueScale(dd.to - dd.from)}
+      fill="transparent"
+    >
+      <title>{dd.label}: {dd.value}</title>
+    </rect>
   {/each}
 </g>
