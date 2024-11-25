@@ -275,6 +275,7 @@
     display: inline-block;
     box-sizing: border-box;
     border: 1px solid;
+    top: 0.2em;
   }
   .color-display {
     width: 100%;
