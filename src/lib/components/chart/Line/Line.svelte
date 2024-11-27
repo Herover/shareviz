@@ -18,14 +18,15 @@
 
   interface Props {
     values: {
-    label: string;
-    key: string;
-    value: { x: number; y: number }[];
-  }[];
+      label: string;
+      key: string;
+      value: { x: number | Date; y: number }[];
+    }[];
     chartSpec: Root;
     lineSpec: Line;
     width: number;
     editor?: boolean;
+    maxY: number;
     index: number;
   }
 
@@ -35,6 +36,7 @@
     lineSpec,
     width,
     editor = false,
+    maxY,
     index
   }: Props = $props();
 
@@ -176,7 +178,7 @@
         .nice();
     }
   });
-  let maxY = $derived(orNumber(max(stacked, (d) => max(d.value, (dd) => dd.to)), 1));
+  // let maxY = $derived(orNumber(max(stacked, (d) => max(d.value, (dd) => dd.to)), 1));
   let yScale = $derived(scaleLinear()
     .range([height - topMargin - bottomMargin, 0])
     .domain(

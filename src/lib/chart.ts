@@ -214,6 +214,7 @@ export interface Line {
   fill: boolean
   style: LineStyle
   heightRatio: number
+  repeat: string
 }
 
 export interface X {

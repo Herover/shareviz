@@ -22,7 +22,15 @@
     lineSpec
   }: Props = $props();
 
-  let type = $derived(typeof values[0]?.value[0]?.x == "number" ? "number" : "date");
+  type Value = typeof values[number];
+  let flatValues = $derived(
+    values.reduce((acc, d) => {
+        acc = [...acc, ...d.d];
+        return acc;
+      }, [] as Value["d"])
+  );
+
+  let type = $derived(typeof flatValues[0]?.value[0]?.x == "number" ? "number" : "date");
   let updateColor = $derived((color: string) => {
     if ($style.label.color == $style.color) {
       style.setLabelColor(color);
@@ -34,11 +42,11 @@
   });
   let setLabelX = $derived((value: string) => {
     const parsed = type == "number" ? Number.parseInt(value) : new Date(value).getTime();
-    const proposed = values
+    const proposed = flatValues
       .find((e) => e.key == $style.k)
       ?.value.map(d => ({ d: Math.abs(parsed - d.x), x: d.x, y: d.y}))
       .sort((a, b) => a.d - b.d)[0] || { x: 0, y: 0 }
-    const proposedY = values
+    const proposedY = flatValues
       .find((e) => e.key == $style.k)
       ?.value.find((d) => d.x == proposed.x);
     if (typeof proposedY != "undefined") {

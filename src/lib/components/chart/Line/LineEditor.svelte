@@ -114,6 +114,20 @@
       </select>
     </label>
   </p>
+  <p>
+    <label>
+      Repeat for every:
+      <select
+        value={$dbLine.repeat}
+        onchange={(e) => dbLine.setRepeatKey(e.currentTarget.value)}
+      >
+        <option>{""}</option>
+        {#each columns as row}
+          <option>{row.key}</option>
+        {/each}
+      </select>
+    </label>
+  </p>
 {/if}
 <p>
   {#if xScale.dataRange}

@@ -130,8 +130,15 @@
     window.removeEventListener("keyup", keyUp);
   });
 
+  type Value = typeof values[number];
+  let flatValues = $derived(
+    values.reduce((acc, d) => {
+        acc = [...acc, ...d.d];
+        return acc;
+      }, [] as Value["d"])
+  );
   let searchString = $state("");
-  let filteredValues = $derived(values
+  let filteredValues = $derived(flatValues
     .filter(
       (e) =>
         Object.keys(e.d[0]).findIndex((k) =>
@@ -277,13 +284,13 @@
       lineSpec.defaultLineStyle().setLabelLocation(location);
     }
   });
-  let type = $derived(typeof values[0]?.value[0]?.x == "number" ? "number" : "date");
+  let type = $derived(typeof flatValues[0]?.value[0]?.x == "number" ? "number" : "date");
   let setLabelX = $derived((value: string) => {
     selectedIndexes.forEach((d) => {
       const style = d.style;
       const parsed =
         type == "number" ? Number.parseInt(value) : new Date(value).getTime();
-      const proposed = values
+      const proposed = flatValues
         .find((e) => e.key == d.k)
         ?.value.map((d) => ({
           d: Math.abs(parsed - (d.x as any)),
@@ -291,7 +298,7 @@
           y: d.y,
         }))
         .sort((a, b) => a.d - b.d)[0] || { x: 0, y: 0 };
-      const proposedY = values
+      const proposedY = flatValues
         .find((e) => e.key == d.k)
         ?.value.find((d) => d.x == proposed.x);
       if (typeof proposedY != "undefined") {
