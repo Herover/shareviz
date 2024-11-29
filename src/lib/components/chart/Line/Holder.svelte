@@ -29,12 +29,12 @@
   let maxY = $derived(max(charts, d => max(d.d, dd => max(dd.value, ddd => ddd.y))) ?? 1);
 </script>
 
-{#each charts as chart}
+{#each charts as chart, i}
   <Line
     {chartSpec}
     lineSpec={componentSpec}
     values={chart.d}
-    key={chart.k}
+    key={charts.length == 1 ? "" : i + 1 + "."}
     width={(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight)/ charts.length}
     {editor}
     {maxY}
@@ -42,3 +42,11 @@
     on:edit
   />
 {/each}
+
+{#if charts.length != 1}
+  <ol>
+    {#each charts as chart}
+    <li>{chart.k}</li> 
+    {/each}
+  </ol>
+{/if}

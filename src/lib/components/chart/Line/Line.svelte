@@ -149,6 +149,7 @@
 </script>
 
 <svg {width} {height}>
+  <text dominant-baseline="hanging">{key}</text>
   <g transform="translate(0, {topMargin})">
     <Axis {height} {width} scale={yScale} conf={lineSpec.y.axis} dimensions={d => yAxisWidth = d.width} />
     <Axis
