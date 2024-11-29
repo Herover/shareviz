@@ -141,9 +141,7 @@
   let filteredValues = $derived(flatValues
     .filter(
       (e) =>
-        Object.keys(e.d[0]).findIndex((k) =>
-          ("" + e.d[0]?.[k]).toLowerCase().includes(searchString.toLowerCase()),
-        ) != -1,
+        e.key.toLocaleLowerCase().includes(searchString.toLocaleLowerCase())
     )
     .sort(
       (a, b) =>

@@ -34,6 +34,7 @@
     {chartSpec}
     lineSpec={componentSpec}
     values={chart.d}
+    key={chart.k}
     width={(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight)/ charts.length}
     {editor}
     {maxY}

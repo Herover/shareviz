@@ -2,7 +2,7 @@
   import { run } from 'svelte/legacy';
 
   import { AxisLocation, LabelLocation, LineMissingStyle, LineSymbol, type Line, type Root } from "$lib/chart";
-  import { group, orDefault, orNumber, valueKinds, valueParsers } from "$lib/utils";
+  import { orDefault, orNumber, valueKinds, valueParsers } from "$lib/utils";
   import {
     scaleLinear,
     scaleTime,
@@ -18,10 +18,17 @@
 
   interface Props {
     values: {
-      label: string;
-      key: string;
-      value: { x: number | Date; y: number }[];
+        label: string;
+        key: string;
+        type: "missing" | "line";
+        value: {
+            x: number;
+            y: number;
+            to: number;
+            from: number;
+        }[];
     }[];
+    key: string;
     chartSpec: Root;
     lineSpec: Line;
     width: number;
@@ -32,6 +39,7 @@
 
   let {
     values,
+    key,
     chartSpec,
     lineSpec,
     width,
@@ -79,78 +87,6 @@
 
   let height = $derived(width * lineSpec.heightRatio);
 
-  const negativeOneToInf = (n: number) =>
-    n == -1 ? Number.POSITIVE_INFINITY : n;
-
-  // I'd prefer that each element in stacked is a array of line segments for a
-  // country. However, this is easier to compute and handle in template.
-  let stacked = $derived(values
-    .sort(
-      (a, b) =>
-        negativeOneToInf(lineSpec.style.byKey.findIndex((e) => e.k == b.key)) -
-        negativeOneToInf(lineSpec.style.byKey.findIndex((e) => e.k == a.key)),
-    )
-    .reduce(
-      (acc, line, i) => {
-        const lastLine =
-          lineSpec.stack && i != 0
-            ? acc[i - 1].value.map((d) => d.to)
-            : line.value.map(() => 0);
-
-        const values = group("x", line.value, (k, d) => ({ k, d }))
-          .map((d, i) => {
-            // Sum values if this line has multiple of the same X value, ex.
-            // same year multiple times.
-            const summed = d.d.reduce((acc, dd) => acc + dd.y, 0);
-            return {
-              x: d.d[0].x,
-              y: summed,
-              to: summed + lastLine[i],
-              from: lastLine[i],
-            };
-          })
-          // Split line parts into multiple if there's a NaN value
-          .reduce((acc2, value, i, arr) => {
-            if (Number.isNaN(value.y)) {
-              if (i != arr.length - 1 && !Number.isNaN(arr[i + 1].y)) {
-                acc2.push([]);
-              }
-            } else {
-              acc2[acc2.length - 1].push(value);
-            }
-
-            return acc2;
-          }, [[]] as { x: number; y: number; to: number; from: number }[][]);
-
-        values.filter(d => d.length != 0)
-          .forEach((value, i, arr) => {
-            acc.push({
-              label: line.label,
-              key: line.key,
-              type: "line",
-              value,
-            });
-            if (i != arr.length - 1) {
-              acc.push({
-                label: line.label,
-                key: line.key,
-                type: "missing",
-                value: [
-                  { ...value[value.length - 1] },
-                  { ...arr[i + 1][0] },
-                ],
-              });
-            }
-          });
-        return acc;
-      },
-      [] as {
-        label: string;
-        key: string;
-        type: "missing" | "line";
-        value: { x: number; y: number; to: number; from: number }[];
-      }[],
-    ));
   let columns = $derived([
     ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.keyType })), []),
     ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.valueType })), []),
@@ -223,7 +159,7 @@
       dimensions={d => xAxisOverflow = d}
     />
     {#if lineSpec.stack}
-      {#each stacked as d, i}
+      {#each values as d, i}
         <path
           d={draw(
             d.value
@@ -231,7 +167,7 @@
               .concat(
                 (
                   orDefault(
-                    stacked[i - 1]?.value,
+                    values[i - 1]?.value,
                     [
                       { x: xScale.domain()[0], to: 0 },
                       { x: xScale.domain()[1], to: 0 },
@@ -245,7 +181,7 @@
           fill={getStyle(d.key).color}
         />
       {/each}
-      {#each stacked as d}
+      {#each values as d}
         <path
           d={draw(d.value.map((e) => ({ x: e.x, y: e.to })))}
           stroke={getStyle(d.key).color}
@@ -255,7 +191,7 @@
       {/each}
     {:else}
       {#if lineSpec.fill}
-        {#each stacked as d}
+        {#each values as d}
           <path
             d={draw(
               d.value.concat([
@@ -267,7 +203,7 @@
           />
         {/each}
       {/if}
-      {#each stacked as d}
+      {#each values as d}
         <path
           d={draw(d.value)}
           stroke={d.type == "missing" && getStyle(d.key).missingStyle == LineMissingStyle.NONE ? "none" : getStyle(d.key).color}
@@ -279,9 +215,9 @@
     {/if}
 
     <g bind:contentRect={labelBox}>
-      {#each stacked as d, i}
+      {#each values as d, i}
         {#if getStyle(d.key).label.location == LabelLocation.Right}
-          {#if stacked.length == i + 1 || stacked[i + 1].key !== d.key}
+          {#if values.length == i + 1 || values[i + 1].key !== d.key}
             <text
               x={xScale(d.value[d.value.length - 1].x) + labelOffset}
               y={yScale(d.value[d.value.length - 1].to)}
@@ -294,7 +230,7 @@
             >
           {/if}
         {:else if getStyle(d.key).label.location == LabelLocation.Left}
-          {#if i == 0 || stacked[i - 1].key !== d.key}
+          {#if i == 0 || values[i - 1].key !== d.key}
             <text
               x={xScale(d.value[0].x) - labelOffset}
               y={yScale(d.value[0].to)}
@@ -309,7 +245,7 @@
         {/if}
       {/each}
     </g>
-    {#each stacked as d}
+    {#each values as d}
       {#if getStyle(d.key).symbols == LineSymbol.CIRCLE}
         {#each d.value as value}
           <circle
