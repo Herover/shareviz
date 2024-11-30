@@ -39,7 +39,6 @@
 
   let {
     values,
-    key,
     chartSpec,
     lineSpec,
     width,
@@ -53,7 +52,7 @@
   }>();
 
   let labelBox: DOMRect | undefined = $state();
-  const topMargin = 24;
+  const topMargin = 0;
   const bottomMargin = 24;
   const labelOffset = 16;
 
@@ -149,7 +148,6 @@
 </script>
 
 <svg {width} {height}>
-  <text dominant-baseline="hanging">{key}</text>
   <g transform="translate(0, {topMargin})">
     <Axis {height} {width} scale={yScale} conf={lineSpec.y.axis} dimensions={d => yAxisWidth = d.width} />
     <Axis

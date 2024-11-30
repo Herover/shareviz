@@ -29,24 +29,47 @@
   let maxY = $derived(max(charts, d => max(d.d, dd => max(dd.value, ddd => ddd.y))) ?? 1);
 </script>
 
-{#each charts as chart, i}
-  <Line
-    {chartSpec}
-    lineSpec={componentSpec}
-    values={chart.d}
-    key={charts.length == 1 ? "" : i + 1 + "."}
-    width={(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight)/ charts.length}
-    {editor}
-    {maxY}
-    {index}
-    on:edit
-  />
-{/each}
+<div class="line-charts">
+  {#each charts as chart, i}
+    <div
+      class="line-chart"
+      style:width="{(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight) / charts.length * 2}px"
+    >
+      <div class="line-chart-title"><span>{chart.k}</span></div>
+      <div class="line-chart-item">
+        <Line
+          {chartSpec}
+          lineSpec={componentSpec}
+          values={chart.d}
+          key={charts.length == 1 ? "" : i + 1 + "."}
+          width={(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight) / charts.length * 2}
+          {editor}
+          {maxY}
+          {index}
+          on:edit
+        />
+      </div>
+    </div>
+  {/each}
+</div>
 
-{#if charts.length != 1}
-  <ol>
-    {#each charts as chart}
-    <li>{chart.k}</li> 
-    {/each}
-  </ol>
-{/if}
+<style>
+  .line-charts {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: space-between;
+  }
+  .line-chart {
+    flex: 1 1 auto;
+    word-break: break-word;
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+  }
+  .line-chart-title {
+    flex: 1 1 auto;
+    padding-right: 16px;
+    font-weight: bold;
+  }
+</style>
