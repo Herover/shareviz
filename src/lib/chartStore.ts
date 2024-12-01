@@ -283,6 +283,7 @@ export const db = function createDB() {
             setYKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "y", "key", { r: 0, i: value }]),
             setCategoriesKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "categories", { r: 0, i: value }]),
             setRepeatKey: (value: string) => doc.submitOp(["chart", "elements", elementIndex, "d", "repeat", { r: 0, i: value }]),
+            setRepeatColumns: (value: number) => doc.submitOp(["chart", "elements", elementIndex, "d", "repeatColumns", { r: 0, i: value }]),
             setFill: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "d", "fill", { r: 0, i: value }]),
             setStack: (value: boolean) => doc.submitOp(["chart", "elements", elementIndex, "d", "stack", { r: 0, i: value }]),
             setHeightRatio: (value: number) => doc.submitOp(["chart", "elements", elementIndex, "d", "heightRatio", { r: 0, i: value }]),
@@ -500,6 +501,7 @@ export const db = function createDB() {
                 byKey: []
               },
               repeat: "",
+              repeatColumns: 4,
             } as Line,
           },
         }]),

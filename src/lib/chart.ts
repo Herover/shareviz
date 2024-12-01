@@ -215,6 +215,7 @@ export interface Line {
   style: LineStyle
   heightRatio: number
   repeat: string
+  repeatColumns: number
 }
 
 export interface X {

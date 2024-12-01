@@ -27,13 +27,15 @@
 
   let charts = $derived(formatData(componentSpec, data));
   let maxY = $derived(max(charts, d => max(d.d, dd => max(dd.value, ddd => ddd.y))) ?? 1);
+  // let perColumn = $derived(Math.ceil(Math.sqrt(charts.length)));
+  let perColumn = $derived(componentSpec.repeat != "" ? componentSpec.repeatColumns : 1);
 </script>
 
 <div class="line-charts">
   {#each charts as chart, i}
     <div
       class="line-chart"
-      style:width="{(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight) / charts.length * 2}px"
+      style:width="{(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight) / perColumn}px"
     >
       <div class="line-chart-title"><span>{chart.k}</span></div>
       <div class="line-chart-item">
@@ -42,7 +44,7 @@
           lineSpec={componentSpec}
           values={chart.d}
           key={charts.length == 1 ? "" : i + 1 + "."}
-          width={(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight) / charts.length * 2}
+          width={(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight) / perColumn}
           {editor}
           {maxY}
           {index}

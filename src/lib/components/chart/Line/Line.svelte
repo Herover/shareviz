@@ -52,7 +52,7 @@
   }>();
 
   let labelBox: DOMRect | undefined = $state();
-  const topMargin = 0;
+  const topMargin = 24;
   const bottomMargin = 24;
   const labelOffset = 16;
 

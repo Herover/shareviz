@@ -127,6 +127,19 @@
         {/each}
       </select>
     </label>
+    {#if $dbLine.repeat != ""}
+      <br>
+      <label>
+        Columns:
+        <input
+          value={$dbLine.repeatColumns}
+          onchange={(e) => dbLine.setRepeatColumns(Number.parseInt(e.currentTarget.value))}
+          onkeyup={(e) => dbLine.setRepeatColumns(Number.parseInt(e.currentTarget.value))}
+          type="number"
+          style="width: 90px"
+        />
+      </label>
+    {/if}
   </p>
 {/if}
 <p>
