@@ -72,6 +72,6 @@
   .line-chart-title {
     flex: 1 1 auto;
     padding-right: 16px;
-    font-weight: bold;
+    /* font-weight: bold; */
   }
 </style>

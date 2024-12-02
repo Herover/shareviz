@@ -15,6 +15,7 @@
       height: number,
       leftOverflow?: number,
       rightOverflow?: number,
+      labelHeight: number,
     }) => void,
   }
 
@@ -33,6 +34,7 @@
   let labelBox: DOMRect | undefined = $state();
   let leftBox: DOMRect | undefined = $state();
   let rightBox: DOMRect | undefined = $state();
+  let testBox: DOMRect | undefined = $state();
 
   let autoMajorTicks: { n: number | Date; l: string }[] = $state([]);
   let manualMajorTicks: {
@@ -118,6 +120,7 @@
         0,
       ),
       rightOverflow: orNumber(rightBox?.width, 0)/2,
+      labelHeight: orNumber(testBox?.height, 0),
     });
   });
   $effect(() => {
@@ -170,6 +173,7 @@
     : []);
 </script>
 
+<text bind:contentRect={testBox} aria-hidden="true" visibility="hidden">123</text>
 {#if scale}
   {#if conf.orientation == AxisOrientation.HORIZONTAL}
     {#if conf.minor.enabled}
@@ -220,14 +224,12 @@
             <text
               text-anchor="middle"
               dominant-baseline="hanging"
-              font-size={size}
               x={scale(tick.n)}>{tick.l}</text
             >
           {:else if conf.location == AxisLocation.END && tick.l}
             <text
               text-anchor="middle"
               y={height + size}
-              font-size={size}
               x={scale(tick.n)}>{tick.l}</text
             >
           {/if}
@@ -237,7 +239,6 @@
             <text
               text-anchor="middle"
               bind:contentRect={leftBox}
-              font-size={size}
               x={scale(tick.n)}
               visibility="hidden"
               aria-hidden="true">{tick.l}</text
@@ -246,7 +247,6 @@
             <text
               text-anchor="middle"
               bind:contentRect={rightBox}
-              font-size={size}
               x={scale(tick.n)}
               visibility="hidden"
               aria-hidden="true">{tick.l}</text
@@ -258,7 +258,7 @@
   {:else}
     <g bind:contentRect={labelBox}>
       {#if conf.major.enabled}
-        {#each majorTicks as tick}
+        {#each majorTicks as tick, i}
           <g transform="translate(0, {scale(tick.n)})">
             {#if showLabels}
               {#if conf.location == AxisLocation.START && tick.l}
@@ -315,3 +315,9 @@
     {/if}
   {/if}
 {/if}
+
+<style>
+  text {
+    font-size: var(--axis-text-size);
+  }
+</style>

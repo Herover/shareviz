@@ -54,6 +54,7 @@
   style:padding-bottom="{chartSpec.style.marginBottom}px"
   style:color={chartSpec.style.textColor}
   style:fill={chartSpec.style.textColor}
+  style:--axis-text-size={"0.9em"}
 >
   <p
     style:font-size="{chartSpec.style.titleSize}em"

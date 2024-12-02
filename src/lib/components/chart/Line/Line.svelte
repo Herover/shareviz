@@ -52,17 +52,17 @@
   }>();
 
   let labelBox: DOMRect | undefined = $state();
-  const topMargin = 24;
-  const bottomMargin = 24;
+  let topMargin = $state(0);
+  let bottomMargin = $state(0);
   const labelOffset = 16;
-
+  // $inspect(topMargin, bottomMargin).with(console.log)
   let t1 = Date.now()
   onMount(() => console.log("mounted!", Date.now() - t1))
 
   let dataSet = $derived(chartSpec.data.sets.find((set) => set.id == lineSpec.dataSet));
 
   let xAxisOverflow: { leftOverflow?: number, rightOverflow?: number } = $state({ leftOverflow: 0, rightOverflow: 0 });
-  $effect(() => console.log($state.snapshot(xAxisOverflow)))
+  // $effect(() => console.log($state.snapshot(xAxisOverflow)))
   let yAxisWidth = $state(0);
   let labelWidth = $derived(labelBox ? labelBox.width + labelOffset : 0);
   let leftMargin = $state(0);
@@ -115,13 +115,12 @@
   });
   // let maxY = $derived(orNumber(max(stacked, (d) => max(d.value, (dd) => dd.to)), 1));
   let yScale = $derived(scaleLinear()
-    .range([height - topMargin - bottomMargin, 0])
+    .range([height, 0])
     .domain(
       [0, maxY],
       // chartSpec.chart.scales.find((s) => s.name == lineSpec.y.scale)
       //   ?.dataRange || [0, 1],
-    )
-    .nice());
+    ));
 
   let draw = $derived(line<{ x: number; y: number }>()
     .x((d) => xScale(d.x))
@@ -147,15 +146,27 @@
     : null);
 </script>
 
-<svg {width} {height}>
+<svg {width} height={height + topMargin + bottomMargin}>
   <g transform="translate(0, {topMargin})">
-    <Axis {height} {width} scale={yScale} conf={lineSpec.y.axis} dimensions={d => yAxisWidth = d.width} />
     <Axis
-      height={height - topMargin - bottomMargin}
+      {height}
+      {width}
+      scale={yScale}
+      conf={lineSpec.y.axis}
+      dimensions={d => {
+        yAxisWidth = d.width;
+        topMargin = d.labelHeight;
+      }}
+    />
+    <Axis
+      height={height}
       {width}
       scale={xScale}
       conf={lineSpec.x.axis}
-      dimensions={d => xAxisOverflow = d}
+      dimensions={d => {
+        xAxisOverflow = d;
+        bottomMargin = d.labelHeight;
+      }}
     />
     {#if lineSpec.stack}
       {#each values as d, i}
