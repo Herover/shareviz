@@ -7,6 +7,7 @@
   import { AxisLocation } from "$lib/chart";
   import Axis from "../Axis.svelte";
   import HBarLine from "./HBarLine.svelte";
+  import Legend from '../Legend.svelte';
 
   
   interface Props {
@@ -108,16 +109,7 @@
 </script>
 
 {#if showLegend}
-  <p>
-    {#each hBarSpec.colors.byKey as d}
-      {#if d.legend != "" && d.k != ""}
-        <span class="legend-title"
-          ><span style="background-color:{d.c}" class="legend-box"></span>
-          {d.legend}</span
-        >
-      {/if}
-    {/each}
-  </p>
+  <Legend keys={hBarSpec.colors.byKey.filter(d => d.k != "").map(d => ({ color: d.c, legend: d.legend }))} />
 {/if}
 
 <p style="font-weight:bold;">
@@ -158,18 +150,3 @@
     {/each}
   </g>
 </svg>
-
-<style>
-  .legend-box {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    position: relative;
-    top: 0.1em;
-    margin-right: 0.2em;
-  }
-  .legend-title {
-    display: inline-block;
-    margin-right: 0.5em;
-  }
-</style>

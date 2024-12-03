@@ -155,6 +155,7 @@ export enum HBarTotalLabelStyle {
 }
 
 export enum LabelLocation {
+  None = "none",
   Left = "left",
   Right = "right",
   Float = "float",

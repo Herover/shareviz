@@ -1,8 +1,9 @@
 <script lang="ts">
-  import type { Root, Line as lineType } from "$lib/chart";
+  import { LabelLocation, type Root, type Line as lineType } from "$lib/chart";
     import { max } from "d3-array";
   import Line from "./Line.svelte";
   import { formatData } from "./data";
+  import Legend from "../Legend.svelte";
 
   interface Props {
     chartSpec: Root;
@@ -30,6 +31,11 @@
   // let perColumn = $derived(Math.ceil(Math.sqrt(charts.length)));
   let perColumn = $derived(componentSpec.repeat != "" ? componentSpec.repeatColumns : 1);
 </script>
+
+<!-- TODO: Should probably be a toggle setting -->
+{#if componentSpec.style.byKey.length != 0 && componentSpec.style.byKey[0].label.location == LabelLocation.None}
+  <Legend keys={componentSpec.style.byKey.filter(d => d.label.text != "").map(d => ({ color: d.color, legend: d.label.text }))} />
+{/if}
 
 <div class="line-charts">
   {#each charts as chart, i}
