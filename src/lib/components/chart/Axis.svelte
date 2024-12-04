@@ -263,7 +263,7 @@
   {:else}
     <g bind:contentRect={labelBox}>
       {#if conf.major.enabled}
-        {#each majorTicks as tick, i}
+        {#each majorTicks as tick}
           <g transform="translate(0, {scale(tick.n)})">
             {#if showLabels}
               {#if conf.location == AxisLocation.START && tick.l}
