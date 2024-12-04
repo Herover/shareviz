@@ -64,7 +64,7 @@
   let xAxisOverflow: { leftOverflow?: number, rightOverflow?: number } = $state({ leftOverflow: 0, rightOverflow: 0 });
   // $effect(() => console.log($state.snapshot(xAxisOverflow)))
   let yAxisWidth = $state(0);
-  let labelWidth = $derived(labelBox ? labelBox.width + labelOffset : 0);
+  let labelWidth = $derived(labelBox && labelBox.width != 0 ? labelBox.width + labelOffset : 0);
   let leftMargin = $state(0);
   let rightMargin = $state(0);
   $effect(() => {
@@ -77,7 +77,7 @@
     } else if (lineSpec.y.axis.location == AxisLocation.END && lineSpec.style.default.label.location == LabelLocation.Left) {
       leftMargin = Math.max(labelWidth, orNumber(xAxisOverflow.leftOverflow, 0));
       rightMargin = Math.max(yAxisWidth, orDefault(xAxisOverflow.rightOverflow, 0));
-    } else {
+    } else if (lineSpec.y.axis.location == AxisLocation.END && lineSpec.style.default.label.location == LabelLocation.Right) {
       leftMargin = orNumber(xAxisOverflow.leftOverflow, 0);
       rightMargin = Math.max(Math.max(yAxisWidth, labelWidth), orDefault(xAxisOverflow.rightOverflow, 0));
     }

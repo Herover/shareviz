@@ -76,7 +76,7 @@
             });
           }
         }
-        computedManualMajorTicks = conf.major.ticks.filter(d => d.n <= to && customFrom <= d.n);
+        computedManualMajorTicks = conf.major.ticks.filter(d => d.n <= to && from <= d.n);
       } else if (to instanceof Date && from instanceof Date) {
         let d = new Date(from);
         d.setDate(1);
@@ -91,7 +91,7 @@
           n++;
         }
       }
-      autoMajorTicks = computedMajorTicks;
+      autoMajorTicks = computedMajorTicks.filter(d => computedManualMajorTicks.findIndex(dd => dd.n == d.n) == -1);
       manualMajorTicks = computedManualMajorTicks;
     }
   });
@@ -110,6 +110,18 @@
     if (labelBox || leftBox || rightBox) dimensions({
       width: orNumber(labelBox?.width, 0) + conf.labelSpace,
       height: orNumber(labelBox?.height, 0),
+      leftOverflow: majorTicks.length == 2
+        ? 0
+        : Math.max(
+            orNumber(leftBox?.width, 0) / 2 -
+              (scale
+                ? Math.floor(
+                    (scale(orDefault(majorTicks[0]?.n, 0)) - scale.range()[0]) / 10,
+                  ) * 10
+                : 0),
+            0,
+          ),
+      rightOverflow: majorTicks.length == 2 ? 0 : orNumber(rightBox?.width, 0)/2,
       labelHeight: orNumber(testBox?.height, 0) + conf.major.tickSize + size,
     });
   });
@@ -161,6 +173,8 @@
         (d) => !majorTicks.find((dd) => dd.l != "" && dd.n == d.n),
       )
     : []);
+
+  let smooshedLabels = $derived(majorTicks.length == 2)
 </script>
 
 <text bind:contentRect={testBox} aria-hidden="true" visibility="hidden">123</text>
@@ -212,12 +226,13 @@
         {#if showLabels}
           {#if conf.location == AxisLocation.START && tick.l}
             <text
-              text-anchor="middle"
+              text-anchor={smooshedLabels ? (i == 0 ? "start" : "end") : "middle"}
               dominant-baseline="hanging"
               x={scale(tick.n)}>{tick.l}</text
             >
           {:else if conf.location == AxisLocation.END && tick.l}
             <text
+              text-anchor={smooshedLabels ? (i == 0 ? "start" : "end") : "middle"}
               dominant-baseline="hanging"
               y={height + conf.major.tickSize + size}
               x={scale(tick.n)}>{tick.l}</text
@@ -227,7 +242,7 @@
           <!-- Used to calculate labels overflowing outside of chart area -->
           {#if i == 0}
             <text
-              text-anchor="middle"
+              text-anchor={smooshedLabels ? (i == 0 ? "start" : "end") : "middle"}
               bind:contentRect={leftBox}
               x={scale(tick.n)}
               visibility="hidden"
@@ -235,7 +250,7 @@
             >
           {:else if i == majorTicks.length - 1}
             <text
-              text-anchor="middle"
+              text-anchor={smooshedLabels ? (i == 0 ? "start" : "end") : "middle"}
               bind:contentRect={rightBox}
               x={scale(tick.n)}
               visibility="hidden"
