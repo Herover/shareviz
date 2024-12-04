@@ -28,7 +28,7 @@
     dimensions = () => {},
   }: Props = $props();
 
-  let size = 16;
+  let size = 4;
   const maxTicks = 200;
 
   let labelBox: DOMRect | undefined = $state();
@@ -110,17 +110,7 @@
     if (labelBox || leftBox || rightBox) dimensions({
       width: orNumber(labelBox?.width, 0) + conf.labelSpace,
       height: orNumber(labelBox?.height, 0),
-      leftOverflow: Math.max(
-        orNumber(leftBox?.width, 0) / 2 -
-          (scale
-            ? Math.floor(
-                (scale(orDefault(majorTicks[0]?.n, 0)) - scale.range()[0]) / 10,
-              ) * 10
-            : 0),
-        0,
-      ),
-      rightOverflow: orNumber(rightBox?.width, 0)/2,
-      labelHeight: orNumber(testBox?.height, 0),
+      labelHeight: orNumber(testBox?.height, 0) + conf.major.tickSize + size,
     });
   });
   $effect(() => {
@@ -228,8 +218,8 @@
             >
           {:else if conf.location == AxisLocation.END && tick.l}
             <text
-              text-anchor="middle"
-              y={height + size}
+              dominant-baseline="hanging"
+              y={height + conf.major.tickSize + size}
               x={scale(tick.n)}>{tick.l}</text
             >
           {/if}
