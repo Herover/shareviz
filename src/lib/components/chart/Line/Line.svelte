@@ -156,7 +156,7 @@
       conf={lineSpec.y.axis}
       dimensions={d => {
         yAxisWidth = d.width;
-        topMargin = d.labelHeight;
+        topMargin = Math.min((d.topPos ?? 0), 0);
       }}
     />
     <Axis
