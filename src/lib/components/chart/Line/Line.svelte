@@ -67,19 +67,20 @@
   let labelWidth = $derived(labelBox && labelBox.width != 0 ? labelBox.width + labelOffset : 0);
   let leftMargin = $state(0);
   let rightMargin = $state(0);
+  let margin = 8//$derived(lineSpec.y.axis.labelSpace)
   $effect(() => {
     if (lineSpec.y.axis.location == AxisLocation.START && lineSpec.style.default.label.location == LabelLocation.Left) {
-      leftMargin = Math.max(Math.max(yAxisWidth, labelWidth), orNumber(xAxisOverflow.leftOverflow, 0));
-      rightMargin = orDefault(xAxisOverflow.rightOverflow, 0);
+      leftMargin = Math.max(Math.max(yAxisWidth, labelWidth), orNumber(xAxisOverflow.leftOverflow, 0)) + margin;
+      rightMargin = orDefault(xAxisOverflow.rightOverflow, 0) + margin;
     } else if (lineSpec.y.axis.location == AxisLocation.START && lineSpec.style.default.label.location == LabelLocation.Right) {
-      leftMargin = Math.max(yAxisWidth, orNumber(xAxisOverflow.leftOverflow, 0));
-      rightMargin = Math.max(labelWidth, orDefault(xAxisOverflow.rightOverflow, 0));
+      leftMargin = Math.max(yAxisWidth, orNumber(xAxisOverflow.leftOverflow, 0)) + margin;
+      rightMargin = Math.max(labelWidth, orDefault(xAxisOverflow.rightOverflow, 0)) + margin;
     } else if (lineSpec.y.axis.location == AxisLocation.END && lineSpec.style.default.label.location == LabelLocation.Left) {
-      leftMargin = Math.max(labelWidth, orNumber(xAxisOverflow.leftOverflow, 0));
-      rightMargin = Math.max(yAxisWidth, orDefault(xAxisOverflow.rightOverflow, 0));
+      leftMargin = Math.max(labelWidth, orNumber(xAxisOverflow.leftOverflow, 0)) + margin;
+      rightMargin = Math.max(yAxisWidth, orDefault(xAxisOverflow.rightOverflow, 0)) + margin;
     } else if (lineSpec.y.axis.location == AxisLocation.END && lineSpec.style.default.label.location == LabelLocation.Right) {
-      leftMargin = orNumber(xAxisOverflow.leftOverflow, 0);
-      rightMargin = Math.max(Math.max(yAxisWidth, labelWidth), orDefault(xAxisOverflow.rightOverflow, 0));
+      leftMargin = orNumber(xAxisOverflow.leftOverflow, 0) + margin;
+      rightMargin = Math.max(Math.max(yAxisWidth, labelWidth), orDefault(xAxisOverflow.rightOverflow, 0)) + margin;
     }
   });
 
@@ -146,7 +147,7 @@
     : null);
 </script>
 
-<svg {width} height={height + topMargin + bottomMargin}>
+<svg {width} height={height + topMargin + bottomMargin + (lineSpec.x.axis.major.tickWidth*2)}>
   <g transform="translate(0, {topMargin})">
     <Axis
       {height}

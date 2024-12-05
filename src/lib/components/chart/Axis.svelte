@@ -28,7 +28,8 @@
     dimensions = () => {},
   }: Props = $props();
 
-  let size = 4;
+  // TODO: more space on side with axis?
+  let size = $derived(conf.major.enabled ? conf.labelSpace : 0);
   const maxTicks = 200;
 
   let labelBox: DOMRect | undefined = $state();
@@ -108,7 +109,7 @@
   );
   $effect(() => {
     if (labelBox || leftBox || rightBox) dimensions({
-      width: orNumber(labelBox?.width, 0) + conf.labelSpace,
+      width: orNumber(labelBox?.width, 0),
       height: orNumber(labelBox?.height, 0),
       leftOverflow: majorTicks.length == 2
         ? 0
@@ -300,6 +301,7 @@
             x2={conf.major.grid ? width : conf.major.tickSize}
             y2={0}
             stroke={conf.major.color}
+            stroke-width={conf.major.tickWidth}
           />
         </g>
       {/each}
