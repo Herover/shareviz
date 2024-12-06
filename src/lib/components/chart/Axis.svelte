@@ -124,7 +124,7 @@
             0,
           ),
       rightOverflow: majorTicks.length == 2 ? 0 : orNumber(rightBox?.width, 0)/2,
-      topPos: typeof scale == "undefined" ? undefined : -((scale(majorTicks[majorTicks.length - 1]?.n ?? 0)) - orNumber(testBox?.height, 0) - 6),
+      topPos: typeof scale == "undefined" ? undefined : ((scale(majorTicks[majorTicks.length - 1]?.n ?? 0)) - orNumber(testBox?.height, 0) - 6),
       labelHeight: orNumber(testBox?.height, 0) + conf.major.tickSize + size,
     });
   });
