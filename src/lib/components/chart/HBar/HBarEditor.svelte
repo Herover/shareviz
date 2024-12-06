@@ -12,11 +12,9 @@
   
   interface Props {
     spec: Root;
-    // eslint-disable-next-line svelte/valid-compile
     chart: ReturnType<typeof db.chart>;
     dbHBar: ReturnType<ReturnType<typeof db.chart>["hBar"]>;
     chartData: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: DSVParsedArray<any>;
   };
   }

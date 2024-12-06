@@ -17,7 +17,6 @@
     label: string;
     value: { label: string; value: number; from: number; to: number }[];
   }[];
-    // eslint-disable-next-line svelte/valid-compile
     chartSpec: Root;
     hBarSpec: HBar;
     label: string;

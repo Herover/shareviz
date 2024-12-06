@@ -12,7 +12,6 @@
     chart: ReturnType<typeof db.chart>;
     dbLine: ReturnType<ReturnType<typeof db.chart>["line"]>;
     chartData: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: DSVParsedArray<any>;
   };
     index: number;

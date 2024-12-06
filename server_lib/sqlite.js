@@ -169,11 +169,10 @@ export const db = {
   /**
    * @returns {Promise<boolean>} add a new user-chart relation
    */
-  // eslint-disable-next-line no-unused-vars
   addUserChart: async (
     /** @type {string} */ userId,
     /** @type {string} */ chartId,
-    /** @type {number} */ typeId,
+    /** @type {number} */ _typeId,
   ) => {
     const res = await drizzledb.insert(userCharts).values({
       userId,

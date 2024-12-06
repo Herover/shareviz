@@ -31,4 +31,17 @@ export default ts.config(
       },
     },
   },
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error", // or "warn"
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
 );

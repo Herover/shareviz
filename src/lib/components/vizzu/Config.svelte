@@ -17,7 +17,6 @@
 </script>
 
 <div class="holder">
-  <!-- svelte-ignore a11y_label_has_associated_control -->
   <p><label>Title <TextInput value={$configChart?.title} onChange={(val) => db.setConfigTitle(index, val)}/></label></p>
 
 <!--   <p>

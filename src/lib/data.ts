@@ -7,9 +7,7 @@ export const computeData = (chartSpec?: Root) =>
     ? {}
     : chartSpec.data.sets.reduce(
         (acc, data) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           let set = dsvFormat("\t").parse<any, string>(data.raw, (row) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return data.rows.reduce((acc: any, rowInfo) => {
               const parser = valueParsers[rowInfo.type];
               if (typeof parser == "undefined") {
@@ -21,7 +19,6 @@ export const computeData = (chartSpec?: Root) =>
               acc[rowInfo.key] = parser.fn(row[rowInfo.key]);
 
               return acc;
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             }, {} as any);
           }) as any[];
 
@@ -53,6 +50,5 @@ export const computeData = (chartSpec?: Root) =>
 
           return acc;
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         {} as { [key: string]: any[] },
       );

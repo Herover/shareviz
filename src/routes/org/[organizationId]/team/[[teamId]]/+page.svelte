@@ -27,6 +27,7 @@
   let team: Awaited<ReturnType<typeof user.getTeamCharts>> | undefined =
     $state();
   $effect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     typeof teamId == "undefined"
       ? user
           .geUserCharts()
