@@ -1,16 +1,19 @@
-import { WebSocketServer } from 'ws';
-import WebSocketJSONStream from '@teamwork/websocket-json-stream';
-import json1 from 'ot-json1';
+import { WebSocketServer } from "ws";
+import WebSocketJSONStream from "@teamwork/websocket-json-stream";
+import json1 from "ot-json1";
 import { db } from "../server_lib/user.js";
-import { backend, connection } from '../server_lib/sharedb.js';
-import sharedb from 'sharedb';
-import { db as drizzledb, sessions, users } from "../server_lib/drizzle/schema.js"
-import { eq, gt } from 'drizzle-orm';
-
+import { backend, connection } from "../server_lib/sharedb.js";
+import sharedb from "sharedb";
+import {
+  db as drizzledb,
+  sessions,
+  users,
+} from "../server_lib/drizzle/schema.js";
+import { eq, gt } from "drizzle-orm";
 
 // Create initial document then fire callback
 export function createDoc(callback) {
-  var doc = connection.get('examples', '1');
+  var doc = connection.get("examples", "1");
   doc.fetch(function (err) {
     if (err) throw err;
     if (doc.type === null) {
@@ -18,9 +21,7 @@ export function createDoc(callback) {
       const defaultChart = {
         meta: {
           publicRead: true,
-          access: [
-            { userId: 1, write: true, read: true },
-          ],
+          access: [{ userId: 1, write: true, read: true }],
         },
         data: {
           sets: [
@@ -182,11 +183,31 @@ Region Nordjylland	2023	4989245`,
               colors: {
                 default: "#888888",
                 byKey: [
-                  { k: "Region Hovedstaden", legend: "Region Hovedstaden", c: "lch(38.24079414130722% 60 219.99901061253297)" },
-                  { k: "Region Nordjylland", legend: "Region Nordjylland", c: "lch(68.24079414130722% 65 39.99901061253297)" },
-                  { k: "Region Midtjylland", legend: "Region Midtjylland", c: "lch(78.24079414130722% 65 57.99901061253297)" },
-                  { k: "Region Syddanmark", legend: "Region Syddanmark", c: "lch(88.24079414130722% 60 93.99901061253297)" },
-                  { k: "Region Sjælland", legend: "Region Sjælland", c: "lch(68.24079414130722% 40 165.99901061253297)" },
+                  {
+                    k: "Region Hovedstaden",
+                    legend: "Region Hovedstaden",
+                    c: "lch(38.24079414130722% 60 219.99901061253297)",
+                  },
+                  {
+                    k: "Region Nordjylland",
+                    legend: "Region Nordjylland",
+                    c: "lch(68.24079414130722% 65 39.99901061253297)",
+                  },
+                  {
+                    k: "Region Midtjylland",
+                    legend: "Region Midtjylland",
+                    c: "lch(78.24079414130722% 65 57.99901061253297)",
+                  },
+                  {
+                    k: "Region Syddanmark",
+                    legend: "Region Syddanmark",
+                    c: "lch(88.24079414130722% 60 93.99901061253297)",
+                  },
+                  {
+                    k: "Region Sjælland",
+                    legend: "Region Sjælland",
+                    c: "lch(68.24079414130722% 40 165.99901061253297)",
+                  },
                 ],
               },
             },
@@ -224,11 +245,31 @@ Region Nordjylland	2023	4989245`,
                 colors: {
                   default: "#888888",
                   byKey: [
-                    { k: "Region Hovedstaden", legend: "Region Hovedstaden", c: "lch(38.24079414130722% 60 219.99901061253297)" },
-                    { k: "Region Nordjylland", legend: "Region Nordjylland", c: "lch(68.24079414130722% 65 39.99901061253297)" },
-                    { k: "Region Midtjylland", legend: "Region Midtjylland", c: "lch(78.24079414130722% 65 57.99901061253297)" },
-                    { k: "Region Syddanmark", legend: "Region Syddanmark", c: "lch(88.24079414130722% 60 93.99901061253297)" },
-                    { k: "Region Sjælland", legend: "Region Sjælland", c: "lch(68.24079414130722% 40 165.99901061253297)" },
+                    {
+                      k: "Region Hovedstaden",
+                      legend: "Region Hovedstaden",
+                      c: "lch(38.24079414130722% 60 219.99901061253297)",
+                    },
+                    {
+                      k: "Region Nordjylland",
+                      legend: "Region Nordjylland",
+                      c: "lch(68.24079414130722% 65 39.99901061253297)",
+                    },
+                    {
+                      k: "Region Midtjylland",
+                      legend: "Region Midtjylland",
+                      c: "lch(78.24079414130722% 65 57.99901061253297)",
+                    },
+                    {
+                      k: "Region Syddanmark",
+                      legend: "Region Syddanmark",
+                      c: "lch(88.24079414130722% 60 93.99901061253297)",
+                    },
+                    {
+                      k: "Region Sjælland",
+                      legend: "Region Sjælland",
+                      c: "lch(68.24079414130722% 40 165.99901061253297)",
+                    },
                   ],
                 },
                 rectLabels: false,
@@ -270,9 +311,10 @@ Region Nordjylland	2023	4989245`,
                     },
                     ticks: [],
                   },
-                }
+                },
               },
-            }, {
+            },
+            {
               type: "line",
               d: {
                 dataSet: "2",
@@ -377,23 +419,25 @@ Region Nordjylland	2023	4989245`,
                     symbols: "none",
                     missingStyle: "dashed",
                   },
-                  byKey: [{
-                    k: "Region Hovedstaden",
-                    color: "#ff8888",
-                    width: 4,
-                    label: {
-                      location: "float",
-                      text: "Hovedstaden",
+                  byKey: [
+                    {
+                      k: "Region Hovedstaden",
                       color: "#ff8888",
-                      x: 2015,
-                      y: 10443095,
-                      rx: -24,
-                      ry: -32,
-                      line: "line",
+                      width: 4,
+                      label: {
+                        location: "float",
+                        text: "Hovedstaden",
+                        color: "#ff8888",
+                        x: 2015,
+                        y: 10443095,
+                        rx: -24,
+                        ry: -32,
+                        line: "line",
+                      },
+                      symbols: "none",
+                      missingStyle: "dashed",
                     },
-                    symbols: "none",
-                    missingStyle: "dashed",
-                  }]
+                  ],
                 },
               },
             },
@@ -451,8 +495,7 @@ Region Nordjylland	2023	4989245`,
             coordSystem: "cartesian",
           }
         ] */
-
-      }
+      };
       doc.create(defaultChart, json1.type.uri, callback);
       return;
     }
@@ -461,40 +504,40 @@ Region Nordjylland	2023	4989245`,
 }
 
 /**
- * 
- * @param {import('http').Server} server 
+ *
+ * @param {import('http').Server} server
  */
 export function startServer(server) {
   /* console.log("STARTSERVER",server) */
   // Create a web server to serve files and listen to WebSocket connections
   // Connect any incoming WebSocket connection to ShareDB
   var wss = new WebSocketServer({ server, path: "/sharedb" });
-  wss.on('connection', function (ws, req) {
+  wss.on("connection", function (ws, req) {
     var stream = new WebSocketJSONStream(ws);
 
-    const cookies = req.headers.cookie ? req.headers.cookie.split(";").reduce((acc, part) => {
-      const [key, value] = part.trim().split("=");
-      acc[key] = value;
-      return acc;
-    }, {}) : {};
+    const cookies = req.headers.cookie
+      ? req.headers.cookie.split(";").reduce((acc, part) => {
+          const [key, value] = part.trim().split("=");
+          acc[key] = value;
+          return acc;
+        }, {})
+      : {};
     req.__sharevizAuthJSToken = cookies["authjs.session-token"];
 
     backend.listen(stream, req);
   });
 
-  backend.use('connect', function (ctx, next) {
-    console.log('connect');
+  backend.use("connect", function (ctx, next) {
+    console.log("connect");
     if (ctx.req.__sharevizAuthJSToken) {
-      drizzledb.select()
+      drizzledb
+        .select()
         .from(sessions)
         .where(
           eq(sessions.sessionToken, ctx.req.__sharevizAuthJSToken),
           gt(sessions.expires, new Date().toISOString()),
         )
-        .leftJoin(
-          users,
-          eq(sessions.userId, users.id),
-        )
+        .leftJoin(users, eq(sessions.userId, users.id))
         .then((result) => {
           if (typeof result != "undefined" && result.length == 1) {
             ctx.agent.custom.user = result[0].user;
@@ -508,29 +551,37 @@ export function startServer(server) {
           next();
         })
         .catch((e) => {
-          console.error("error", e)
+          console.error("error", e);
           next(e);
         });
     } else {
       next();
     }
   });
-  backend.use('receive', function (ctx, next) {
+  backend.use("receive", function (ctx, next) {
     console.log(
-      'receive',
+      "receive",
       ctx.data.a,
-      Object.keys(sharedb.MESSAGE_ACTIONS).find(k => sharedb.MESSAGE_ACTIONS[k] == ctx.data.a),
+      Object.keys(sharedb.MESSAGE_ACTIONS).find(
+        (k) => sharedb.MESSAGE_ACTIONS[k] == ctx.data.a,
+      ),
       /* JSON.stringify(ctx.data), */
     );
 
-    if (ctx.data.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.data.c == "examples") {
+    if (
+      ctx.data.a == sharedb.MESSAGE_ACTIONS.subscribe &&
+      ctx.data.c == "examples"
+    ) {
       // TODO: add authentication using `ctx.agent.custom.userId`
       // if (false) {
       //   console.log("unauthorized")
       //   return next("unauthorized");
       // }
       next();
-    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.op && ctx.agent.custom.user) {
+    } else if (
+      ctx.data.a == sharedb.MESSAGE_ACTIONS.op &&
+      ctx.agent.custom.user
+    ) {
       // Only allow access to "examples", no create through websockets
       if (ctx.data.c != "examples" || typeof ctx.data.create != "undefined") {
         next("unauthorized");
@@ -549,22 +600,30 @@ export function startServer(server) {
       next("unauthorized");
     }
   });
-  backend.use('reply', function (ctx, next) {
-    console.log('reply', /* JSON.stringify(ctx.reply) */);
-    if (ctx.reply.a == sharedb.MESSAGE_ACTIONS.queryFetch && ctx.reply?.data?.length) {
+  backend.use("reply", function (ctx, next) {
+    console.log("reply" /* JSON.stringify(ctx.reply) */);
+    if (
+      ctx.reply.a == sharedb.MESSAGE_ACTIONS.queryFetch &&
+      ctx.reply?.data?.length
+    ) {
       // When querying db, remove items user doesn't have access to
       // ctx.reply.data = ctx.reply?.data?.filter(
       //   e => e.data?.meta?.publicRead || e.data?.meta?.access.find(e => e.userId == ctx.agent.custom.userId && e.read)
       // );
       next("no queries");
-    } else if (ctx.reply.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.reply.c == "examples") {
+    } else if (
+      ctx.reply.a == sharedb.MESSAGE_ACTIONS.subscribe &&
+      ctx.reply.c == "examples"
+    ) {
       // When accessing chart, check if user is allowed to read
       db.getUserCharts(ctx.agent.custom.user.id, ctx.request.d)
         .then((charts) => {
           if (charts.length != 0) {
             next();
           } else {
-            console.log(`unauthorized reply on ${ctx.request.c} ${ctx.request.d}`);
+            console.log(
+              `unauthorized reply on ${ctx.request.c} ${ctx.request.d}`,
+            );
             next("unauthorized");
           }
         })
@@ -584,29 +643,29 @@ export function startServer(server) {
       next();
     }
   });
-  backend.use('receivePresence', function (ctx, next) {
-    console.log('receivePresence');
+  backend.use("receivePresence", function (ctx, next) {
+    console.log("receivePresence");
     next();
   });
-  backend.use('sendPresence', function (ctx, next) {
-    console.log('sendPresence');
+  backend.use("sendPresence", function (ctx, next) {
+    console.log("sendPresence");
     next();
   });
-  backend.use('query', function (ctx, next) {
-    console.log('query');
+  backend.use("query", function (ctx, next) {
+    console.log("query");
     next();
   });
-  backend.use('readSnapshots', function (ctx, next) {
-    console.log('readSnapshots');
+  backend.use("readSnapshots", function (ctx, next) {
+    console.log("readSnapshots");
     next();
   });
-  backend.use('op', function (ctx, next) {
-    console.log('op');
+  backend.use("op", function (ctx, next) {
+    console.log("op");
     next();
   });
 
-  backend.use('submit', function (ctx, next) {
-    console.log('submit', /* ctx.snapshot */);
+  backend.use("submit", function (ctx, next) {
+    console.log("submit" /* ctx.snapshot */);
     if (ctx.snapshot === null) {
       next();
       return;
@@ -614,7 +673,10 @@ export function startServer(server) {
     db.getUserCharts(ctx.agent.custom.user.id, ctx.id)
       .then((charts) => {
         // TODO: get rid of hard coded constant
-        if (charts.length != 0 && (charts[0].relationType === 1 || charts[0].teamId !== null)) {
+        if (
+          charts.length != 0 &&
+          (charts[0].relationType === 1 || charts[0].teamId !== null)
+        ) {
           next();
         } else {
           console.log(`unauthorized submit on ${ctx.collection} ${ctx.id}`);
@@ -630,17 +692,18 @@ export function startServer(server) {
     //   next("unauthorized");
     // }
   });
-  backend.use('apply', function (ctx, next) {
-    console.log('apply', /* ctx.agent.custom.userId, ctx */);
+  backend.use("apply", function (ctx, next) {
+    console.log("apply" /* ctx.agent.custom.userId, ctx */);
     ctx.extra.oldMeta = ctx.snapshot?.data?.meta;
 
-    if (typeof ctx.op.create == "object" && typeof ctx.snapshot?.data != "object") {
+    if (
+      typeof ctx.op.create == "object" &&
+      typeof ctx.snapshot?.data != "object"
+    ) {
       // When creating a new chart, always add current user to access list
       ctx.op.create.data.meta = {
         publicRead: false,
-        access: [
-          { userId: ctx.agent.custom.user.id, read: true, write: true },
-        ],
+        access: [{ userId: ctx.agent.custom.user.id, read: true, write: true }],
       };
 
       // db.addChart(ctx.id, "Chart name", ctx.agent.custom.user.id)
@@ -652,7 +715,10 @@ export function startServer(server) {
       db.getUserCharts(ctx.agent.custom.user.id, ctx.id)
         .then((charts) => {
           // TODO: get rid of hard coded constant
-          if (charts.length != 0 /* && (charts[0].relationType === 1 || charts[0].teamId !== null) */) {
+          if (
+            charts.length !=
+            0 /* && (charts[0].relationType === 1 || charts[0].teamId !== null) */
+          ) {
             next();
           } else {
             console.log(`unauthorized apply on ${ctx.collection} ${ctx.id}`);
@@ -673,8 +739,8 @@ export function startServer(server) {
     }
     // next();
   });
-  backend.use('commit', function (ctx, next) {
-    console.log('commit', /* ctx.snapshot */);
+  backend.use("commit", function (ctx, next) {
+    console.log("commit" /* ctx.snapshot */);
     if (typeof ctx.extra.oldMeta == "object" && ctx.snapshot?.data !== null) {
       // Ensure user can't edit meta object
       // TODO: add some sort of check to detect disallowed changes
@@ -683,8 +749,8 @@ export function startServer(server) {
     }
     next();
   });
-  backend.use('afterWrite', function (ctx, next) {
-    console.log('afterWrite');
+  backend.use("afterWrite", function (ctx, next) {
+    console.log("afterWrite");
     next();
   });
 }

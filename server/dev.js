@@ -5,7 +5,7 @@ export const webSocketDevServer = () => {
     name: "websocket",
     configureServer: {
       handler: (server) => {
-        if (!server.httpServer) return
+        if (!server.httpServer) return;
         createDoc(() => startServer(server.httpServer));
       },
     },

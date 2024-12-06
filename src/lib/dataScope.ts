@@ -3,7 +3,10 @@
 import equal from "fast-deep-equal";
 import { derived, type Readable } from "svelte/store";
 
-export const createScope = <T>(db: Readable<any>, scope: string | Array<string | number>) => {
+export const createScope = <T>(
+  db: Readable<any>,
+  scope: string | Array<string | number>,
+) => {
   const path = typeof scope == "string" ? scope.split(".") : scope;
   let val: T;
   return {

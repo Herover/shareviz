@@ -12,18 +12,18 @@ There's currently no hosted version, but there might be in the future.
 
 # Development
 
-* First install everything `npm install`.
+- First install everything `npm install`.
 
-* Then run any new database migrations `npx drizzle-kit migrate --config drizze.config.ts`.
+- Then run any new database migrations `npx drizzle-kit migrate --config drizze.config.ts`.
 
-* Run the dev server `npm run dev`, or `npm run dev -- --host` if you want to test with a external device.
+- Run the dev server `npm run dev`, or `npm run dev -- --host` if you want to test with a external device.
 
 # Production
 
-* Install everything `npm install`.
+- Install everything `npm install`.
 
-* Build the server `npm run build`.
+- Build the server `npm run build`.
 
-* Then run any new database migrations `npx drizzle-kit migrate --config drizze.config.ts`.
+- Then run any new database migrations `npx drizzle-kit migrate --config drizze.config.ts`.
 
-* Run the server `node server/prod.js`.
+- Run the server `node server/prod.js`.

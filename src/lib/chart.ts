@@ -1,88 +1,88 @@
 export interface Root {
-  meta: Meta
-  data: Data
-  chart: Chart
-  style: Style
+  meta: Meta;
+  data: Data;
+  chart: Chart;
+  style: Style;
 }
 
 export interface Meta {
-  publicRead: boolean
-  access: AccessItem[]
+  publicRead: boolean;
+  access: AccessItem[];
 }
 
 export interface AccessItem {
-  userId: string
-  read: boolean
-  write: boolean
+  userId: string;
+  read: boolean;
+  write: boolean;
 }
 
 export interface Data {
-  sets: Set[]
+  sets: Set[];
 }
 
 export interface Set {
-  id: string
-  type: string
-  raw: string
-  name: string
-  rows: Row[]
-  transpose: TransposedColumn[]
+  id: string;
+  type: string;
+  raw: string;
+  name: string;
+  rows: Row[];
+  transpose: TransposedColumn[];
 }
 
 export interface TransposedColumn {
   /** Columns to turn into rows */
-  from: string[]
+  from: string[];
   /** New column for keys/old column names */
-  toKey: string
+  toKey: string;
   /** New column for values */
-  toValue: string
+  toValue: string;
   /** Data type for values in toValue */
-  valueType: string
+  valueType: string;
   /** Data type for keys in from */
-  keyType: string
+  keyType: string;
 }
 
 export interface Row {
-  key: string
-  type: string
+  key: string;
+  type: string;
 }
 
 export interface Chart {
-  title: string
-  subTitle: string
-  width: number
-  height: number
-  chartType: string
-  scales: Scale[]
-  elements: Element[]
-  sourceTextLeft: string
-  sourceTextLeftLink: string
-  sourceTextRight: string
-  sourceTextRightLink: string
+  title: string;
+  subTitle: string;
+  width: number;
+  height: number;
+  chartType: string;
+  scales: Scale[];
+  elements: Element[];
+  sourceTextLeft: string;
+  sourceTextLeftLink: string;
+  sourceTextRight: string;
+  sourceTextRightLink: string;
 }
 
 export interface Scale {
-  name: string
-  dataKey: string
-  type: string
-  dataRange?: number[]
-  colors?: Colors
+  name: string;
+  dataKey: string;
+  type: string;
+  dataRange?: number[];
+  colors?: Colors;
 }
 
 export interface Colors {
-  default: string
-  byKey: ByKey[]
+  default: string;
+  byKey: ByKey[];
 }
 
 export interface ByKey {
-  k: string
-  c: string
-  legend: string
+  k: string;
+  c: string;
+  legend: string;
 }
 
 export interface Element {
-  type: string
-  d: HBar | Line
+  type: string;
+  d: HBar | Line;
 }
 
 export enum AxisRepeatMode {
@@ -92,32 +92,32 @@ export enum AxisRepeatMode {
 }
 
 export interface Axis {
-  location: AxisLocation
-  labelSpace: number
-  orientation: AxisOrientation
-  major: AxisGrid
-  minor: AxisGrid
-  repeat: AxisRepeatMode
+  location: AxisLocation;
+  labelSpace: number;
+  orientation: AxisOrientation;
+  major: AxisGrid;
+  minor: AxisGrid;
+  repeat: AxisRepeatMode;
 }
 
 export interface AxisGrid {
-  grid: boolean
-  enabled: boolean
-  tickSize: number
-  tickWidth: number
-  color: string
-  labelDivide: number
-  labelThousands: string
-  afterLabel: string
+  grid: boolean;
+  enabled: boolean;
+  tickSize: number;
+  tickWidth: number;
+  color: string;
+  labelDivide: number;
+  labelThousands: string;
+  afterLabel: string;
   auto: {
-    from: number
-    each: number
-    labels: boolean
-  }
+    from: number;
+    each: number;
+    labels: boolean;
+  };
   ticks: {
     n: number;
     l: string;
-  }[]
+  }[];
 }
 
 export enum AxisLocation {
@@ -132,20 +132,20 @@ export enum AxisOrientation {
 }
 
 export interface HBar {
-  axis: Axis
-  dataSet: string
-  categories: string
-  subCategories: string
-  stackSubCategories: boolean
+  axis: Axis;
+  dataSet: string;
+  categories: string;
+  subCategories: string;
+  stackSubCategories: boolean;
   /** Show how much of 100% value represents, eg. is a stacked 100% area chart */
-  portionSubCategories: boolean
-  value: string
-  labelWidth: number
-  repeat: string
-  scale: Scale
-  colors: Colors
-  rectLabels: boolean
-  totalLabels: HBarTotalLabelStyle
+  portionSubCategories: boolean;
+  value: string;
+  labelWidth: number;
+  repeat: string;
+  scale: Scale;
+  colors: Colors;
+  rectLabels: boolean;
+  totalLabels: HBarTotalLabelStyle;
 }
 
 export enum HBarTotalLabelStyle {
@@ -163,22 +163,22 @@ export enum LabelLocation {
 
 export enum LabelStyleLine {
   None = "none",
-  Line = "line"
+  Line = "line",
 }
 
 export interface LabelStyle {
-  location: LabelLocation
-  text: string
-  color: string
+  location: LabelLocation;
+  text: string;
+  color: string;
   /** x value when location is float */
-  x: number
+  x: number;
   /** y value when location is float */
-  y: number
+  y: number;
   /** Label relative position to calculated when location is float */
-  rx: number
+  rx: number;
   /** Label relative position to calculated when location is float */
-  ry: number
-  line: LabelStyleLine
+  ry: number;
+  line: LabelStyleLine;
 }
 
 export enum LineSymbol {
@@ -193,54 +193,54 @@ export enum LineMissingStyle {
 }
 
 export interface LineStyleKey {
-  k: string
-  color: string
-  width: number
-  label: LabelStyle
-  symbols: LineSymbol
-  missingStyle: LineMissingStyle
+  k: string;
+  color: string;
+  width: number;
+  label: LabelStyle;
+  symbols: LineSymbol;
+  missingStyle: LineMissingStyle;
 }
 
 export interface LineStyle {
-  default: LineStyleKey
-  byKey: LineStyleKey[]
+  default: LineStyleKey;
+  byKey: LineStyleKey[];
 }
 
 export interface Line {
-  dataSet: string
-  x: X
-  y: Y
-  categories: string
-  stack: boolean
-  fill: boolean
-  style: LineStyle
-  heightRatio: number
-  repeat: string
-  repeatColumns: number
+  dataSet: string;
+  x: X;
+  y: Y;
+  categories: string;
+  stack: boolean;
+  fill: boolean;
+  style: LineStyle;
+  heightRatio: number;
+  repeat: string;
+  repeatColumns: number;
 }
 
 export interface X {
-  axis: Axis
-  key: string
-  scale: string
+  axis: Axis;
+  key: string;
+  scale: string;
 }
 
 export interface Y {
-  axis: Axis
-  key: string
-  scale: string
+  axis: Axis;
+  key: string;
+  scale: string;
 }
 
 export interface Style {
-  marginTop: number
-  marginBottom: number
-  marginLeft: number
-  marginRight: number
-  titleSize: number
-  titleBold: boolean
-  subTitleSize: number
-  subTitleBold: boolean
-  sourceMargin: number
-  bgColor: string
-  textColor: string
+  marginTop: number;
+  marginBottom: number;
+  marginLeft: number;
+  marginRight: number;
+  titleSize: number;
+  titleBold: boolean;
+  subTitleSize: number;
+  subTitleBold: boolean;
+  sourceMargin: number;
+  bgColor: string;
+  textColor: string;
 }

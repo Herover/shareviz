@@ -4,7 +4,13 @@ enum Divide {
   Millions = 1000000,
 }
 
-export const formatNumber = (val: number, divide = Divide.None, thousandsDelim = ",", fractionDelim = ".", decimals = 1) => {
+export const formatNumber = (
+  val: number,
+  divide = Divide.None,
+  thousandsDelim = ",",
+  fractionDelim = ".",
+  decimals = 1,
+) => {
   const str = "" + val / divide;
 
   let res = "";
@@ -19,7 +25,12 @@ export const formatNumber = (val: number, divide = Divide.None, thousandsDelim =
   if (typeof fraction != "undefined" && fraction.length > 0 && decimals > 0) {
     const fractionNum = Number.parseFloat("0." + fraction);
     const d = Math.pow(10, decimals);
-    res += fractionDelim + (("" + (Math.round(fractionNum * d)) / d).split(".")[1] ?? "").padEnd(decimals, "0");
+    res +=
+      fractionDelim +
+      (("" + Math.round(fractionNum * d) / d).split(".")[1] ?? "").padEnd(
+        decimals,
+        "0",
+      );
   }
 
   /* if (fraction) {
@@ -40,13 +51,13 @@ export const formatNumber = (val: number, divide = Divide.None, thousandsDelim =
   // }
 
   return res;
-}
+};
 export const group = <T, U>(
   key: string,
   d: T[],
   f: (key: string, group: T[], i: number) => U = (k, d) => d as U,
 ): U[] => {
-  const groups = (orDefault(d, [])).reduce(
+  const groups = orDefault(d, []).reduce(
     (acc, line: any) => {
       const usedKey = orDefault(line[key], key);
       if (typeof acc[usedKey] != "undefined") {
@@ -67,7 +78,9 @@ export enum valueKinds {
   TEXT = "text",
   DATE = "date",
 }
-export const valueParsers: { [name: string]: { fn: (s: string) => any, type: valueKinds } } = {
+export const valueParsers: {
+  [name: string]: { fn: (s: string) => any; type: valueKinds };
+} = {
   number: {
     fn: (d: string) => Number.parseFloat(d),
     type: valueKinds.NUMBER,
@@ -100,7 +113,9 @@ export const valueParsers: { [name: string]: { fn: (s: string) => any, type: val
     fn: (d: string) => {
       const parts = d.match(/(\d{4})K(\d{1})/);
       if (parts && parts.length == 3) {
-        return new Date(`${parts[1]}-${("" + Number.parseInt(parts[2])*3).padStart(2, "0")}-01T00:00:00+00:00`);
+        return new Date(
+          `${parts[1]}-${("" + Number.parseInt(parts[2]) * 3).padStart(2, "0")}-01T00:00:00+00:00`,
+        );
       }
       return null;
     },
@@ -111,10 +126,11 @@ export const valueParsers: { [name: string]: { fn: (s: string) => any, type: val
 export const orDefault = <T>(n: T | undefined, def: T): T => {
   if (typeof n == "undefined" || Number.isNaN(n)) {
     return def;
-   }
-   return n;
+  }
+  return n;
 };
 export const orNumber = (n: number | undefined, def = 0) => orDefault(n, def);
 
 // Used to place un-ordered items last
-export const negativeOneToInf = (n: number) => n == -1 ? Number.POSITIVE_INFINITY : n;
+export const negativeOneToInf = (n: number) =>
+  n == -1 ? Number.POSITIVE_INFINITY : n;

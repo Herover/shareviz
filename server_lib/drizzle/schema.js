@@ -1,8 +1,14 @@
-import { integer, sqliteTable, text, primaryKey, unique } from "drizzle-orm/sqlite-core"
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import Database from 'better-sqlite3';
+import {
+  integer,
+  sqliteTable,
+  text,
+  primaryKey,
+  unique,
+} from "drizzle-orm/sqlite-core";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import Database from "better-sqlite3";
 
-const sqlite = new Database('auth.sqlite');
+const sqlite = new Database("auth.sqlite");
 export const db = drizzle({ client: sqlite });
 
 // Auth.js types
@@ -88,28 +94,22 @@ export const authenticators = sqliteTable(
 
 // Shareviz types
 
-export const organizations = sqliteTable(
-  "organizations",
-  {
-    id: text("id")
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-    name: text("name").notNull(),
-  },
-);
+export const organizations = sqliteTable("organizations", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+});
 
-export const teams = sqliteTable(
-  "teams",
-  {
-    id: text("id")
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-    name: text("name").notNull(),
-    organizationId: text("organizationId")
-      .notNull()
-      .references(() => organizations.id, { onDelete: "cascade" }),
-  },
-);
+export const teams = sqliteTable("teams", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  organizationId: text("organizationId")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+});
 
 export const usersTeams = sqliteTable(
   "usersTeams",
@@ -120,8 +120,7 @@ export const usersTeams = sqliteTable(
     teamId: text("teamId")
       .notNull()
       .references(() => teams.id, { onDelete: "cascade" }),
-    role: integer("role")
-      .notNull(),
+    role: integer("role").notNull(),
   },
   (t) => ({
     unq: unique("userTeamsUnique").on(t.userId, t.teamId),
@@ -137,8 +136,7 @@ export const usersOrganizations = sqliteTable(
     organizationId: text("organizationId")
       .notNull()
       .references(() => organizations.id, { onDelete: "cascade" }),
-    role: integer("role")
-      .notNull(),
+    role: integer("role").notNull(),
   },
   (t) => ({
     unq: unique("usersOrganizationsUnique").on(t.userId, t.organizationId),
@@ -175,33 +173,22 @@ export const teamsCharts = sqliteTable(
   }),
 );
 
-export const charts = sqliteTable(
-  "charts",
-  {
-    id: text("id")
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-    name: text("name")
-      .notNull(),
-    chartRef: text("chartRef")
-      .notNull()
-      .unique(),
-  },
-);
+export const charts = sqliteTable("charts", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  chartRef: text("chartRef").notNull().unique(),
+});
 
-export const organizationInvites = sqliteTable(
-  "organizationInvites",
-  {
-    code: text("code")
-      .primaryKey()
-      .notNull()
-      .$defaultFn(() => crypto.randomUUID()),
-    organizationId: text("organizationId")
-      .notNull(),
-    // Date this invite code was used
-    used: text("used"),
-    expires: text("expires"),
-    role: integer("role")
-      .notNull(),
-  },
-);
+export const organizationInvites = sqliteTable("organizationInvites", {
+  code: text("code")
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => crypto.randomUUID()),
+  organizationId: text("organizationId").notNull(),
+  // Date this invite code was used
+  used: text("used"),
+  expires: text("expires"),
+  role: integer("role").notNull(),
+});

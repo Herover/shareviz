@@ -1,4 +1,4 @@
-import { json } from '@sveltejs/kit';
+import { json } from "@sveltejs/kit";
 import { connection } from "../../../../../../server_lib/sharedb";
 
 export async function GET({ params }) {

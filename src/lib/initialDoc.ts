@@ -31,8 +31,26 @@ export const defDoc: Root = {
         colors: {
           default: "#888888",
           byKey: [
-            { k: "2023", c: "#aa2222", legend: "2023", x: 0, y: 0, rx: 0, ry: -32, line: "none" },
-            { k: "2022", c: "#ff8888", legend: "2022", x: 0, y: 0, rx: 0, ry: -32, line: "none" },
+            {
+              k: "2023",
+              c: "#aa2222",
+              legend: "2023",
+              x: 0,
+              y: 0,
+              rx: 0,
+              ry: -32,
+              line: "none",
+            },
+            {
+              k: "2022",
+              c: "#ff8888",
+              legend: "2022",
+              x: 0,
+              y: 0,
+              rx: 0,
+              ry: -32,
+              line: "none",
+            },
           ],
         },
       },

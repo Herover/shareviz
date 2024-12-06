@@ -1,5 +1,11 @@
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, } from "fs";
-import ShareDB from 'sharedb';
+import {
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+} from "fs";
+import ShareDB from "sharedb";
 
 /**
  * @typedef JSONDBSnapshot
@@ -24,7 +30,7 @@ import ShareDB from 'sharedb';
  */
 const pathAllowExpr = /^[a-zA-Z0-9.-]*$/;
 // Linux and windows both handle paths up to 255 bytes long, but we try to limit it anyways.
-const pathPartMaxLength = 50
+const pathPartMaxLength = 50;
 
 /**
  * @param {{ documentDir?: string; } & any} options
@@ -33,7 +39,7 @@ export function JSONDB(options) {
   if (!(this instanceof JSONDB)) return new JSONDB(options);
   ShareDB.DB.call(this, options);
 
-  this.documentDir = options.documentDir || "data"
+  this.documentDir = options.documentDir || "data";
 
   this.closed = false;
 
@@ -51,13 +57,21 @@ JSONDB.prototype.close = function (callback) {
   if (callback) callback();
 };
 
-
 // Persists an op and snapshot if it is for the next version. Calls back with
 // callback(err, succeeded)
-JSONDB.prototype.commit = function (collection, id, op, snapshot, options, callback) {
+JSONDB.prototype.commit = function (
+  collection,
+  id,
+  op,
+  snapshot,
+  options,
+  callback,
+) {
   try {
     if (collection.length > pathPartMaxLength) {
-      throw new Error("collection name is longer than " + pathPartMaxLength + " bytes");
+      throw new Error(
+        "collection name is longer than " + pathPartMaxLength + " bytes",
+      );
     }
     if (id.length > pathPartMaxLength) {
       throw new Error("id is longer than " + pathPartMaxLength + " bytes");
@@ -65,7 +79,9 @@ JSONDB.prototype.commit = function (collection, id, op, snapshot, options, callb
 
     const collectionPathPart = collection.match(pathAllowExpr);
     if (collectionPathPart.length != 1 && collectionPathPart[0].length != 0) {
-      throw new Error("collection name contains illegal characters or is invalid");
+      throw new Error(
+        "collection name contains illegal characters or is invalid",
+      );
     }
     const idPathPart = id.match(pathAllowExpr);
     if (idPathPart.length != 1 && idPathPart[0].length != 0) {
@@ -95,20 +111,23 @@ JSONDB.prototype.commit = function (collection, id, op, snapshot, options, callb
     if (document.ops.length == 0) {
       document.ops.push(op);
       document.snapshot = jsonSnapshot;
-    } else if (document.ops.length == jsonSnapshot.v - 1 /* && document.ops[document.ops.length - 1].v === jsonSnapshot.v */) {
+    } else if (
+      document.ops.length ==
+      jsonSnapshot.v -
+        1 /* && document.ops[document.ops.length - 1].v === jsonSnapshot.v */
+    ) {
       document.ops.push(op);
       document.snapshot = jsonSnapshot;
     } else {
       callback(null, false);
-      process.exit()
+      process.exit();
       return;
     }
 
     writeFileSync(documentPath, JSON.stringify(document));
 
     callback(null, true);
-  }
-  catch (err) {
+  } catch (err) {
     callback(err);
   }
 };
@@ -116,10 +135,18 @@ JSONDB.prototype.commit = function (collection, id, op, snapshot, options, callb
 // Get the named document from the database. The callback is called with (err,
 // snapshot). A snapshot with a version of zero is returned if the docuemnt
 // has never been created in the database.
-JSONDB.prototype.getSnapshot = function (collection, id, fields, options, callback) {
+JSONDB.prototype.getSnapshot = function (
+  collection,
+  id,
+  fields,
+  options,
+  callback,
+) {
   try {
     if (collection.length > pathPartMaxLength) {
-      throw new Error("collection name is longer than " + pathPartMaxLength + " bytes");
+      throw new Error(
+        "collection name is longer than " + pathPartMaxLength + " bytes",
+      );
     }
     if (id.length > pathPartMaxLength) {
       throw new Error("id is longer than " + pathPartMaxLength + " bytes");
@@ -127,7 +154,9 @@ JSONDB.prototype.getSnapshot = function (collection, id, fields, options, callba
 
     const collectionPathPart = collection.match(pathAllowExpr);
     if (collectionPathPart.length != 1 && collectionPathPart[0].length != 0) {
-      throw new Error("collection name contains illegal characters or is invalid");
+      throw new Error(
+        "collection name contains illegal characters or is invalid",
+      );
     }
     const idPathPart = id.match(pathAllowExpr);
     if (idPathPart.length != 1 && idPathPart[0].length != 0) {
@@ -157,8 +186,7 @@ JSONDB.prototype.getSnapshot = function (collection, id, fields, options, callba
     }
 
     callback(null, document.snapshot);
-  }
-  catch (err) {
+  } catch (err) {
     callback(err);
   }
 };
@@ -172,10 +200,19 @@ JSONDB.prototype.getSnapshot = function (collection, id, fields, options, callba
 // The version will be inferred from the parameters if it is missing.
 //
 // Callback should be called as callback(error, [list of ops]);
-JSONDB.prototype.getOps = function (collection, id, from, to, options, callback) {
+JSONDB.prototype.getOps = function (
+  collection,
+  id,
+  from,
+  to,
+  options,
+  callback,
+) {
   try {
     if (collection.length > pathPartMaxLength) {
-      throw new Error("collection name is longer than " + pathPartMaxLength + " bytes");
+      throw new Error(
+        "collection name is longer than " + pathPartMaxLength + " bytes",
+      );
     }
     if (id.length > pathPartMaxLength) {
       throw new Error("id is longer than " + pathPartMaxLength + " bytes");
@@ -183,7 +220,9 @@ JSONDB.prototype.getOps = function (collection, id, from, to, options, callback)
 
     const collectionPathPart = collection.match(pathAllowExpr);
     if (collectionPathPart.length != 1 && collectionPathPart[0].length != 0) {
-      throw new Error("collection name contains illegal characters or is invalid");
+      throw new Error(
+        "collection name contains illegal characters or is invalid",
+      );
     }
     const idPathPart = id.match(pathAllowExpr);
     if (idPathPart.length != 1 && idPathPart[0].length != 0) {
@@ -201,22 +240,33 @@ JSONDB.prototype.getOps = function (collection, id, from, to, options, callback)
     /** @type JSONDBData */
     const document = JSON.parse(readFileSync(documentPath).toString("utf8"));
 
-    return document.ops.filter((op) => from <= op.v && op.v < to).sort((a, b) => a.v - b.v);
-  }
-  catch (err) {
+    return document.ops
+      .filter((op) => from <= op.v && op.v < to)
+      .sort((a, b) => a.v - b.v);
+  } catch (err) {
     callback(err);
   }
 };
 
-JSONDB.prototype.query = function (collection, inputQuery, fields, options, callback) {
+JSONDB.prototype.query = function (
+  collection,
+  inputQuery,
+  fields,
+  options,
+  callback,
+) {
   try {
     if (collection.length > pathPartMaxLength) {
-      throw new Error("collection name is longer than " + pathPartMaxLength + " bytes");
+      throw new Error(
+        "collection name is longer than " + pathPartMaxLength + " bytes",
+      );
     }
 
     const collectionPathPart = collection.match(pathAllowExpr);
     if (collectionPathPart.length != 1 && collectionPathPart[0].length != 0) {
-      throw new Error("collection name contains illegal characters or is invalid");
+      throw new Error(
+        "collection name contains illegal characters or is invalid",
+      );
     }
 
     const collectionPath = `${this.documentDir}/${collectionPathPart}`;
@@ -225,19 +275,27 @@ JSONDB.prototype.query = function (collection, inputQuery, fields, options, call
 
     const results = [];
 
-    files.forEach(file => {
-      results.push(new Promise((resolve, reject) => {
-        this.getSnapshot(collection, file.split(".")[0], null, null, (err, snap) => {
-          if (err) reject(err);
-          resolve(snap);
-        });
-      }))
+    files.forEach((file) => {
+      results.push(
+        new Promise((resolve, reject) => {
+          this.getSnapshot(
+            collection,
+            file.split(".")[0],
+            null,
+            null,
+            (err, snap) => {
+              if (err) reject(err);
+              resolve(snap);
+            },
+          );
+        }),
+      );
     });
 
     Promise.all(results)
-      .then(docs => callback(null, docs))
-      .catch(err => callback(err));
+      .then((docs) => callback(null, docs))
+      .catch((err) => callback(err));
   } catch (err) {
     callback(err);
   }
-}
+};

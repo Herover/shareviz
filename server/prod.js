@@ -1,7 +1,7 @@
 import express from "express";
-import { createServer } from 'http'
+import { createServer } from "http";
 import { createDoc, startServer } from "./server.js";
-import { handler } from '../build/handler.js';
+import { handler } from "../build/handler.js";
 
 const port = 5173;
 const app = express();

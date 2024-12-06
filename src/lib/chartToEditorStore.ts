@@ -1,9 +1,9 @@
 // Handles some communication between editor and chart
-import { writable } from 'svelte/store';
+import { writable } from "svelte/store";
 
-export const chartToEditor = function createDB() {
+export const chartToEditor = (function createDB() {
   const { subscribe, set } = writable<{
-    highlight: any[],
+    highlight: any[];
   }>({ highlight: [] });
 
   return {
@@ -12,4 +12,4 @@ export const chartToEditor = function createDB() {
       set({ highlight: value });
     },
   };
-}();
+})();

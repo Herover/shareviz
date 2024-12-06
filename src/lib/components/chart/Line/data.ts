@@ -1,29 +1,29 @@
 import type { Line } from "../../../chart";
 import { group, negativeOneToInf } from "../../../utils";
 
-export const formatData = (componentSpec: Line, data: { [key: string]: any[] }) => 
-  group(
-    componentSpec.repeat,
-    data[componentSpec.dataSet],
-    (k1, g1) => ({
-      k: k1,
-      d: group(
-        componentSpec.categories,
-        g1,
-        (k2, g2) => ({
-          label: k2,
-          key: k2,
-          d: g2,
-          value: g2.map((d) => ({
-            x: d[componentSpec.x.key] as number | Date,
-            y: d[componentSpec.y.key] as number,
-          })),
-        }),
-      )
+export const formatData = (
+  componentSpec: Line,
+  data: { [key: string]: any[] },
+) =>
+  group(componentSpec.repeat, data[componentSpec.dataSet], (k1, g1) => ({
+    k: k1,
+    d: group(componentSpec.categories, g1, (k2, g2) => ({
+      label: k2,
+      key: k2,
+      d: g2,
+      value: g2.map((d) => ({
+        x: d[componentSpec.x.key] as number | Date,
+        y: d[componentSpec.y.key] as number,
+      })),
+    }))
       .sort(
         (a, b) =>
-          negativeOneToInf(componentSpec.style.byKey.findIndex((e) => e.k == b.key)) -
-          negativeOneToInf(componentSpec.style.byKey.findIndex((e) => e.k == a.key)),
+          negativeOneToInf(
+            componentSpec.style.byKey.findIndex((e) => e.k == b.key),
+          ) -
+          negativeOneToInf(
+            componentSpec.style.byKey.findIndex((e) => e.k == a.key),
+          ),
       )
       .reduce(
         (acc, line, i) => {
@@ -31,7 +31,7 @@ export const formatData = (componentSpec: Line, data: { [key: string]: any[] }) 
             componentSpec.stack && i != 0
               ? acc[i - 1].value.map((d) => d.to)
               : line.value.map(() => 0);
-  
+
           const values = group("x", line.value, (k, d) => ({ k, d }))
             .map((d, i) => {
               // Sum values if this line has multiple of the same X value, ex.
@@ -45,19 +45,23 @@ export const formatData = (componentSpec: Line, data: { [key: string]: any[] }) 
               };
             })
             // Split line parts into multiple if there's a NaN value
-            .reduce((acc2, value, i, arr) => {
-              if (Number.isNaN(value.y)) {
-                if (i != arr.length - 1 && !Number.isNaN(arr[i + 1].y)) {
-                  acc2.push([]);
+            .reduce(
+              (acc2, value, i, arr) => {
+                if (Number.isNaN(value.y)) {
+                  if (i != arr.length - 1 && !Number.isNaN(arr[i + 1].y)) {
+                    acc2.push([]);
+                  }
+                } else {
+                  acc2[acc2.length - 1].push(value);
                 }
-              } else {
-                acc2[acc2.length - 1].push(value);
-              }
-  
-              return acc2;
-            }, [[]] as { x: number; y: number; to: number; from: number }[][]);
-  
-          values.filter(d => d.length != 0)
+
+                return acc2;
+              },
+              [[]] as { x: number; y: number; to: number; from: number }[][],
+            );
+
+          values
+            .filter((d) => d.length != 0)
             .forEach((value, i, arr) => {
               acc.push({
                 label: line.label,
@@ -70,10 +74,7 @@ export const formatData = (componentSpec: Line, data: { [key: string]: any[] }) 
                   label: line.label,
                   key: line.key,
                   type: "missing",
-                  value: [
-                    { ...value[value.length - 1] },
-                    { ...arr[i + 1][0] },
-                  ],
+                  value: [{ ...value[value.length - 1] }, { ...arr[i + 1][0] }],
                 });
               }
             });
@@ -86,5 +87,4 @@ export const formatData = (componentSpec: Line, data: { [key: string]: any[] }) 
           value: { x: number; y: number; to: number; from: number }[];
         }[],
       ),
-    }),
-  );
+  }));

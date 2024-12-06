@@ -91,22 +91,15 @@
           "name": "account_userId_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
         "account_provider_providerAccountId_pk": {
-          "columns": [
-            "provider",
-            "providerAccountId"
-          ],
+          "columns": ["provider", "providerAccountId"],
           "name": "account_provider_providerAccountId_pk"
         }
       },
@@ -176,9 +169,7 @@
       "indexes": {
         "authenticator_credentialID_unique": {
           "name": "authenticator_credentialID_unique",
-          "columns": [
-            "credentialID"
-          ],
+          "columns": ["credentialID"],
           "isUnique": true
         }
       },
@@ -187,22 +178,15 @@
           "name": "authenticator_userId_user_id_fk",
           "tableFrom": "authenticator",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
         "authenticator_userId_credentialID_pk": {
-          "columns": [
-            "userId",
-            "credentialID"
-          ],
+          "columns": ["userId", "credentialID"],
           "name": "authenticator_userId_credentialID_pk"
         }
       },
@@ -237,9 +221,7 @@
       "indexes": {
         "charts_chartRef_unique": {
           "name": "charts_chartRef_unique",
-          "columns": [
-            "chartRef"
-          ],
+          "columns": ["chartRef"],
           "isUnique": true
         }
       },
@@ -348,12 +330,8 @@
           "name": "session_userId_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -393,12 +371,8 @@
           "name": "teams_organizationId_organizations_id_fk",
           "tableFrom": "teams",
           "tableTo": "organizations",
-          "columnsFrom": [
-            "organizationId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organizationId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -428,10 +402,7 @@
       "indexes": {
         "teamsChartsUnique": {
           "name": "teamsChartsUnique",
-          "columns": [
-            "teamId",
-            "userId"
-          ],
+          "columns": ["teamId", "userId"],
           "isUnique": true
         }
       },
@@ -440,12 +411,8 @@
           "name": "teamsCharts_teamId_teams_id_fk",
           "tableFrom": "teamsCharts",
           "tableTo": "teams",
-          "columnsFrom": [
-            "teamId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["teamId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -453,12 +420,8 @@
           "name": "teamsCharts_userId_charts_id_fk",
           "tableFrom": "teamsCharts",
           "tableTo": "charts",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -488,10 +451,7 @@
       "indexes": {
         "userChartsUnique": {
           "name": "userChartsUnique",
-          "columns": [
-            "userId",
-            "chartId"
-          ],
+          "columns": ["userId", "chartId"],
           "isUnique": true
         }
       },
@@ -500,12 +460,8 @@
           "name": "usersCharts_userId_user_id_fk",
           "tableFrom": "usersCharts",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -513,12 +469,8 @@
           "name": "usersCharts_chartId_charts_id_fk",
           "tableFrom": "usersCharts",
           "tableTo": "charts",
-          "columnsFrom": [
-            "chartId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["chartId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -569,9 +521,7 @@
       "indexes": {
         "user_email_unique": {
           "name": "user_email_unique",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         }
       },
@@ -608,10 +558,7 @@
       "indexes": {
         "usersOrganizationsUnique": {
           "name": "usersOrganizationsUnique",
-          "columns": [
-            "userId",
-            "organizationId"
-          ],
+          "columns": ["userId", "organizationId"],
           "isUnique": true
         }
       },
@@ -620,12 +567,8 @@
           "name": "usersOrganizations_userId_user_id_fk",
           "tableFrom": "usersOrganizations",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -633,12 +576,8 @@
           "name": "usersOrganizations_organizationId_organizations_id_fk",
           "tableFrom": "usersOrganizations",
           "tableTo": "organizations",
-          "columnsFrom": [
-            "organizationId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organizationId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -675,10 +614,7 @@
       "indexes": {
         "userTeamsUnique": {
           "name": "userTeamsUnique",
-          "columns": [
-            "userId",
-            "teamId"
-          ],
+          "columns": ["userId", "teamId"],
           "isUnique": true
         }
       },
@@ -687,12 +623,8 @@
           "name": "usersTeams_userId_user_id_fk",
           "tableFrom": "usersTeams",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -700,12 +632,8 @@
           "name": "usersTeams_teamId_teams_id_fk",
           "tableFrom": "usersTeams",
           "tableTo": "teams",
-          "columnsFrom": [
-            "teamId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["teamId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -743,10 +671,7 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "verificationToken_identifier_token_pk": {
-          "columns": [
-            "identifier",
-            "token"
-          ],
+          "columns": ["identifier", "token"],
           "name": "verificationToken_identifier_token_pk"
         }
       },
