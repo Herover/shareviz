@@ -136,6 +136,7 @@
         acc = [...acc, ...d.d];
         return acc;
       }, [] as Value["d"])
+      .filter((e, i, arr) => arr.findIndex(e2 => e2.key == e.key) >= i)
   );
   let searchString = $state("");
   let filteredValues = $derived(flatValues
