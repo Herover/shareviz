@@ -44,12 +44,7 @@ module.exports = {
     ],
     "@typescript-eslint/no-explicit-any": "off",
   },
-  ignorePatterns: [
-    "svelte.config.js",
-    ".eslintrc.cjs",
-    "vite.config.ts",
-    "/server/",
-  ],
+  ignorePatterns: ["svelte.config.js", ".eslintrc.cjs", "vite.config.ts", "/server/"],
   env: {
     browser: false,
     node: true,

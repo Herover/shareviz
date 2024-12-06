@@ -17,9 +17,7 @@ export const user = (function create() {
     const data = await resp.json();
 
     if (resp.status != 200) {
-      notifications.addError(
-        orDefault(data.message, "Unknown error " + resp.statusText),
-      );
+      notifications.addError(orDefault(data.message, "Unknown error " + resp.statusText));
       return;
     }
 
@@ -46,17 +44,13 @@ export const user = (function create() {
       const data = await resp.json();
 
       if (resp.status != 200) {
-        notifications.addError(
-          orDefault(data.message, "Unknown error " + resp.statusText),
-        );
+        notifications.addError(orDefault(data.message, "Unknown error " + resp.statusText));
         return { charts: [], members: [], name: "" };
       }
 
       return data;
     },
-    geUserCharts: async (): Promise<
-      { id: string; name: string; chartRef: string }[]
-    > => {
+    geUserCharts: async (): Promise<{ id: string; name: string; chartRef: string }[]> => {
       const resp = await fetch(`/api/user/charts`, {
         method: "GET",
       });
@@ -64,9 +58,7 @@ export const user = (function create() {
       const data = await resp.json();
 
       if (resp.status != 200) {
-        notifications.addError(
-          orDefault(data.message, "Unknown error " + resp.statusText),
-        );
+        notifications.addError(orDefault(data.message, "Unknown error " + resp.statusText));
         return [];
       }
 

@@ -9,7 +9,7 @@
   import { page } from "$app/stores";
   import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
   import { computeData } from "$lib/data.js";
-    import type { DSVParsedArray } from "d3-dsv";
+  import type { DSVParsedArray } from "d3-dsv";
 
   let { data } = $props();
 
@@ -28,28 +28,34 @@
 
   let chartSpec = $derived($db.doc as Root);
 
-  let chartData = $derived(computeData(chartSpec) as { [key: string]: DSVParsedArray<any>; });
-    
-  let canEdit = $derived(chartSpec == null ? false : $db.mode == "local" || typeof chartSpec.meta.access.find(a => a.userId == $page.data.session?.user?.id) != "undefined");
+  let chartData = $derived(computeData(chartSpec) as { [key: string]: DSVParsedArray<any> });
 
-  let edit = $derived((e: { k: string, v: any}) => {
+  let canEdit = $derived(
+    chartSpec == null
+      ? false
+      : $db.mode == "local" ||
+          typeof chartSpec.meta.access.find((a) => a.userId == $page.data.session?.user?.id) !=
+            "undefined",
+  );
+
+  let edit = $derived((e: { k: string; v: any }) => {
     switch (e.k) {
       case "title":
         db.chart().setConfigTitle(e.v);
         break;
-    
+
       case "subTitle":
         db.chart().setConfigSubTitle(e.v);
         break;
-    
+
       case "sourceLeft":
         db.chart().setSourceTextLeft(e.v);
         break;
-    
+
       case "sourceRight":
         db.chart().setSourceTextRight(e.v);
         break;
-      
+
       case "line": {
         const [i, a] = e.v;
         if (a == "style") {
@@ -61,7 +67,7 @@
         }
         break;
       }
-    
+
       default:
         console.warn("attempting to edit unknown key", e.k);
         break;
@@ -75,43 +81,39 @@
       <div class="chart-controls-primary chart-controls">
         <input
           value={$db?.chartInfo?.name}
-          onchange={e => db.updateInfo({ name: e.currentTarget.value })}
+          onchange={(e) => db.updateInfo({ name: e.currentTarget.value })}
           disabled={!canEdit || $db.chartInfo == null}
         />
         {#if canEdit}
-        <EditorCollapsible
-          group="controls"
-          key="data"
-          label="Data sets"
-          startOpen={chartSpec.data.sets.length == 0}
-        >
-          <DataSetEditor chartData={chartSpec.data} store={db} />
-        </EditorCollapsible>
-        <EditorCollapsible
-          group="controls"
-          key="style"
-          label="Style"
-        >
-          <StyleEditor style={db.style()} />
-        </EditorCollapsible>
-        <EditorCollapsible
-          group="controls"
-          key="main"
-          label="Chart settings"
-          startOpen={chartSpec.data.sets.length != 0}
-        >
-          <ChartEditor spec={chartSpec} chartScope={db.chart()} {chartData} />
-        </EditorCollapsible>
-        <EditorCollapsible group="controls" key="main" label="Export">
-          <a href="/view/chart/{data.id}">Embed link</a>
-          <input
-            value={window.location.protocol +
-              "//" +
-              window.location.host +
-              "/view/chart/" +
-              data.id}
-          />
-        </EditorCollapsible>
+          <EditorCollapsible
+            group="controls"
+            key="data"
+            label="Data sets"
+            startOpen={chartSpec.data.sets.length == 0}
+          >
+            <DataSetEditor chartData={chartSpec.data} store={db} />
+          </EditorCollapsible>
+          <EditorCollapsible group="controls" key="style" label="Style">
+            <StyleEditor style={db.style()} />
+          </EditorCollapsible>
+          <EditorCollapsible
+            group="controls"
+            key="main"
+            label="Chart settings"
+            startOpen={chartSpec.data.sets.length != 0}
+          >
+            <ChartEditor spec={chartSpec} chartScope={db.chart()} {chartData} />
+          </EditorCollapsible>
+          <EditorCollapsible group="controls" key="main" label="Export">
+            <a href="/view/chart/{data.id}">Embed link</a>
+            <input
+              value={window.location.protocol +
+                "//" +
+                window.location.host +
+                "/view/chart/" +
+                data.id}
+            />
+          </EditorCollapsible>
         {:else}
           <p>You do not have editor access to this chart.</p>
         {/if}
@@ -127,7 +129,7 @@
       </div>
       <div class="chart-view">
         <div style:scale={viewScale / 100}>
-          <ChartViewer {chartSpec} data={chartData} editor={true} onedit={e => edit(e)} />
+          <ChartViewer {chartSpec} data={chartData} editor={true} onedit={(e) => edit(e)} />
         </div>
       </div>
     </div>
@@ -145,12 +147,10 @@
         <p>Asdf</p>
       </div>
     </div>
+  {:else if $db.missing}
+    <p>Could not find chart</p>
   {:else}
-    {#if $db.missing}
-      <p>Could not find chart</p>
-    {:else}
-      <p>Loading, hopefully...</p>
-    {/if}
+    <p>Loading, hopefully...</p>
   {/if}
 </div>
 

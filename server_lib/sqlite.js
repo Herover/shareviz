@@ -23,19 +23,11 @@ export const ORGANIZATION_ROLES = {
 };
 
 export const db = {
-  getUser: async (
-    /** @type {{ username?: string, id?: string }} */ { username, id },
-  ) => {
+  getUser: async (/** @type {{ username?: string, id?: string }} */ { username, id }) => {
     return drizzledb
       .select()
       .from(users)
-      .where(
-        username
-          ? eq(users.email, username)
-          : id
-            ? eq(users.id, id)
-            : undefined,
-      );
+      .where(username ? eq(users.email, username) : id ? eq(users.id, id) : undefined);
   },
   getUserTeams: async (/** @type {string} */ userId) => {
     // return new Promise((resolve, reject) => {
@@ -64,10 +56,7 @@ export const db = {
     return drizzledb
       .select()
       .from(usersOrganizations)
-      .innerJoin(
-        organizations,
-        eq(usersOrganizations.organizationId, organizations.id),
-      )
+      .innerJoin(organizations, eq(usersOrganizations.organizationId, organizations.id))
       .where(eq(usersOrganizations.userId, userId));
   },
 
@@ -84,10 +73,7 @@ export const db = {
       .from(userCharts)
       .innerJoin(charts, eq(charts.id, userCharts.chartId))
       .where(
-        and(
-          eq(userCharts.userId, userId),
-          chartRef ? eq(charts.chartRef, chartRef) : undefined,
-        ),
+        and(eq(userCharts.userId, userId), chartRef ? eq(charts.chartRef, chartRef) : undefined),
       );
     // return new Promise((resolve, reject) => {
     //   const stmt = db.prepare(`
@@ -197,9 +183,7 @@ export const db = {
    * @returns {Promise<boolean>} delete a user-chart relation
    */
   removeUserChart: async (/** @type {string} */ userChartId) => {
-    const res = await drizzledb
-      .delete(userCharts)
-      .where(eq(userCharts.chartId, userChartId));
+    const res = await drizzledb.delete(userCharts).where(eq(userCharts.chartId, userChartId));
     // .returning({ id: userCharts.id });
     return res.changes != 0;
     // return new Promise((resolve, reject) => {
@@ -217,14 +201,8 @@ export const db = {
   /**
    * @returns {Promise<boolean>} update a charts info
    */
-  updateChart: async (
-    /** @type {string} */ chartRef,
-    /** @type {string} */ name,
-  ) => {
-    const res = await drizzledb
-      .update(charts)
-      .set({ name })
-      .where(eq(charts.chartRef, chartRef));
+  updateChart: async (/** @type {string} */ chartRef, /** @type {string} */ name) => {
+    const res = await drizzledb.update(charts).set({ name }).where(eq(charts.chartRef, chartRef));
     return res.changes != 0;
     // return new Promise((resolve, reject) => {
     //   resolve();
@@ -246,10 +224,7 @@ export const db = {
    * @returns {Promise<{ id: string, name: string, chartRef: string }>} update a charts info
    */
   getChart: async (/** @type {string} */ chartRef) => {
-    const res = await drizzledb
-      .select()
-      .from(charts)
-      .where(eq(charts.chartRef, chartRef));
+    const res = await drizzledb.select().from(charts).where(eq(charts.chartRef, chartRef));
     return res[0];
     // return new Promise((resolve, reject) => {
     // resolve("");
@@ -275,10 +250,7 @@ export const db = {
     // });
   },
 
-  addOrganization: async (
-    /** @type {string} */ name,
-    /** @type {Date|null} */ expires = null,
-  ) => {
+  addOrganization: async (/** @type {string} */ name, /** @type {Date|null} */ expires = null) => {
     const expireVal = expires == null ? null : expires.toISOString();
     const resOrg = await drizzledb
       .insert(organizations)
@@ -297,10 +269,7 @@ export const db = {
     return { id: resOrg[0].id, code: resInvite[0].code };
   },
 
-  addTeam: async (
-    /** @type {string} */ name,
-    /** @type {string} */ organizationId,
-  ) => {
+  addTeam: async (/** @type {string} */ name, /** @type {string} */ organizationId) => {
     const res = await drizzledb
       .insert(teams)
       .values({
@@ -312,10 +281,7 @@ export const db = {
   },
 
   getTeam: async (/** @type {string} */ teamId) => {
-    const res = await drizzledb
-      .select()
-      .from(teams)
-      .where(eq(teams.id, teamId));
+    const res = await drizzledb.select().from(teams).where(eq(teams.id, teamId));
     return res[0];
   },
 
@@ -355,10 +321,7 @@ export const db = {
     });
   },
 
-  removeUserTeamsRelation: async (
-    /** @type {string} */ teamId,
-    /** @type {string} */ userId,
-  ) => {
+  removeUserTeamsRelation: async (/** @type {string} */ teamId, /** @type {string} */ userId) => {
     const users = await db.getTeamMembers(teamId);
     const adminsAfterDelete = users.filter(
       (u) => u.user.id != userId && u.usersTeams.role == TEAM_ROLES.ADMIN,
@@ -376,10 +339,7 @@ export const db = {
     const res = await drizzledb
       .select()
       .from(organizationInvites)
-      .innerJoin(
-        organizations,
-        eq(organizationInvites.organizationId, organizations.id),
-      )
+      .innerJoin(organizations, eq(organizationInvites.organizationId, organizations.id))
       .where(eq(organizationInvites.code, code));
 
     if (res.length != 1) {
@@ -413,10 +373,7 @@ export const db = {
       .from(organizationInvites)
       .where(eq(organizationInvites.organizationId, id));
   },
-  deleteInvite: async (
-    /** @type {string} */ id,
-    /** @type {string} */ code,
-  ) => {
+  deleteInvite: async (/** @type {string} */ id, /** @type {string} */ code) => {
     return await drizzledb
       .delete(organizationInvites)
       .where(
@@ -428,20 +385,12 @@ export const db = {
       );
   },
 
-  addUserOrganizationRelation: async (
-    /** @type {string} */ code,
-    /** @type {string} */ userId,
-  ) => {
+  addUserOrganizationRelation: async (/** @type {string} */ code, /** @type {string} */ userId) => {
     return drizzledb.transaction(async (tx) => {
       const invite = await tx
         .select()
         .from(organizationInvites)
-        .where(
-          and(
-            eq(organizationInvites.code, code),
-            isNull(organizationInvites.used),
-          ),
-        );
+        .where(and(eq(organizationInvites.code, code), isNull(organizationInvites.used)));
       if (invite.length != 1) {
         tx.rollback();
       }
@@ -472,8 +421,7 @@ const init = async () => {
   if (orgs === 0) {
     const newOrg = await db.addOrganization("New organization");
     console.log(
-      "Created initial organization with code http://localhost:5173/invite?code=" +
-        newOrg.code,
+      "Created initial organization with code http://localhost:5173/invite?code=" + newOrg.code,
     );
   }
 };

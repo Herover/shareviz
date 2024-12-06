@@ -1,5 +1,4 @@
 <script lang="ts">
-  
   interface Props {
     onChange: (val: any) => void;
     setValue: any;
@@ -8,12 +7,13 @@
     group: string;
   }
 
-  let {
-    onChange,
-    setValue,
-    value,
-    group
-  }: Props = $props();
+  let { onChange, setValue, value, group }: Props = $props();
 </script>
 
-<input onclick={e => onChange(e.currentTarget.value)} checked={value == setValue} type="radio" name="{group}" value={setValue}/>
+<input
+  onclick={(e) => onChange(e.currentTarget.value)}
+  checked={value == setValue}
+  type="radio"
+  name={group}
+  value={setValue}
+/>

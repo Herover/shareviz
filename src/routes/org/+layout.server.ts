@@ -5,11 +5,7 @@ export async function load({ locals }) {
   const session = await locals.auth();
 
   const user = session?.user;
-  if (
-    session == null ||
-    typeof user == "undefined" ||
-    typeof user.id != "string"
-  ) {
+  if (session == null || typeof user == "undefined" || typeof user.id != "string") {
     redirect(302, "/");
   }
 

@@ -6,21 +6,12 @@
 
   interface Props {
     lines: LineStyleKey[];
-    xScale: 
-    | ScaleLinear<number, number, never>
-    | ScaleTime<number, number, never>;
-    yScale: 
-    | ScaleLinear<number, number, never>
-    | ScaleTime<number, number, never>;
+    xScale: ScaleLinear<number, number, never> | ScaleTime<number, number, never>;
+    yScale: ScaleLinear<number, number, never> | ScaleTime<number, number, never>;
     editor?: boolean;
   }
 
-  let {
-    lines,
-    xScale,
-    yScale,
-    editor = false
-  }: Props = $props();
+  let { lines, xScale, yScale, editor = false }: Props = $props();
 
   const dispatch = createEventDispatcher<{
     edit: any[];

@@ -45,10 +45,7 @@
 
   let outsideLabelBox: DOMRect | undefined = $state();
   $effect(() => {
-    if (
-      conf.totalLabels == HBarTotalLabelStyle.OUTSIDE &&
-      typeof outsideLabelBox != "undefined"
-    ) {
+    if (conf.totalLabels == HBarTotalLabelStyle.OUTSIDE && typeof outsideLabelBox != "undefined") {
       labelOverflow(outsideLabelBox.width + spacing);
     } else {
       labelOverflow(0);
@@ -57,9 +54,7 @@
 </script>
 
 <g transform="translate({0},{i * (blockHeight + blockMargin)})">
-  <text x={0} y={blockHeight / 2} dominant-baseline="middle" text-anchor="start"
-    >{d.label}</text
-  >
+  <text x={0} y={blockHeight / 2} dominant-baseline="middle" text-anchor="start">{d.label}</text>
 
   {#each d.value as dd, ii}
     <HBarRect
@@ -78,9 +73,7 @@
       <text
         bind:contentRect={outsideLabelBox}
         x={labelWidth + valueScale(dd.to) + spacing}
-        y={(conf.stackSubCategories ? 0 : ii) * valueHeight +
-          barMargin +
-          barHeight / 2}
+        y={(conf.stackSubCategories ? 0 : ii) * valueHeight + barMargin + barHeight / 2}
         dominant-baseline="middle"
       >
         {formatNumber(

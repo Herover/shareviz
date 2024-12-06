@@ -14,8 +14,7 @@
   let isTeamAdmin = $state(false);
   $effect(() => {
     isTeamAdmin =
-      team?.members.find((u) => u.user.id == data.session?.user?.id)?.role ===
-      TEAM_ROLES.ADMIN;
+      team?.members.find((u) => u.user.id == data.session?.user?.id)?.role === TEAM_ROLES.ADMIN;
   });
 
   let userToAddToTeam: string | undefined = $state();
@@ -24,8 +23,7 @@
     teamId = $page.params.teamId;
   });
   let charts: { chartRef: string; id: string; name: string }[] = $state([]);
-  let team: Awaited<ReturnType<typeof user.getTeamCharts>> | undefined =
-    $state();
+  let team: Awaited<ReturnType<typeof user.getTeamCharts>> | undefined = $state();
   $effect(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     typeof teamId == "undefined"
@@ -98,14 +96,9 @@
     <h3>Teams</h3>
 
     <div class="options">
-      <a class="option" href={`/org/${$page.params.organizationId}/team`}>
-        Your charts
-      </a>
+      <a class="option" href={`/org/${$page.params.organizationId}/team`}> Your charts </a>
       {#each $user.teams as team}
-        <a
-          href={`/org/${$page.params.organizationId}/team/${team.teams.id}`}
-          class="option"
-        >
+        <a href={`/org/${$page.params.organizationId}/team/${team.teams.id}`} class="option">
           {team.teams.name}
         </a>
       {/each}
@@ -134,9 +127,7 @@
             {/if}
             <span
               onclick={() => removeMember(member.user.id)}
-              onkeydown={(e) =>
-                (e.key == "Enter" || e.key == " ") &&
-                removeMember(member.user.id)}
+              onkeydown={(e) => (e.key == "Enter" || e.key == " ") && removeMember(member.user.id)}
               title="remove from team"
               tabindex="0"
               role="button">❌</span
@@ -153,9 +144,7 @@
               <option value={user.id}>{user.name}</option>
             {/each}
           </select>
-          <button onclick={addMember} disabled={userToAddToTeam == null}
-            >+ Add to team</button
-          >
+          <button onclick={addMember} disabled={userToAddToTeam == null}>+ Add to team</button>
         </p>
       {/if}
     {/if}

@@ -14,16 +14,13 @@
     { l: "Always show", k: AxisRepeatMode.ALL },
     { l: "Only on first", k: AxisRepeatMode.FIRST },
     { l: "Only on last", k: AxisRepeatMode.LAST },
-  ]
+  ];
 </script>
 
 <p>
   <label>
     Location:
-    <select
-      value={$conf.location}
-      onchange={(e) => conf.setLocation(e.currentTarget.value)}
-    >
+    <select value={$conf.location} onchange={(e) => conf.setLocation(e.currentTarget.value)}>
       {#each Object.values(AxisLocation) as location}
         <option>{location}</option>
       {/each}
@@ -38,6 +35,7 @@
       value={$conf.labelSpace}
       onchange={(e) => conf.setLabelSpace(Number.parseInt(e.currentTarget.value))}
     />
+  </label>
 </p>
 
 <p>
@@ -52,10 +50,11 @@
         <option value={repeat.k}>{repeat.l}</option>
       {/each}
     </select>
+  </label>
 </p>
 
 <u>Major gridlines:</u>
 <AxisGridEditor conf={conf.major} />
 
 <u>Minor gridlines:</u>
-<AxisGridEditor conf={conf.minor} isMinor={true}/>
+<AxisGridEditor conf={conf.minor} isMinor={true} />

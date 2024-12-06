@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from "svelte/legacy";
 
   import { page } from "$app/stores";
   import { NotificationLevel, notifications } from "$lib/notificationStore";
   import { user } from "$lib/userStore";
   interface Props {
-    children?: import('svelte').Snippet;
+    children?: import("svelte").Snippet;
   }
 
   let { children }: Props = $props();
@@ -62,7 +62,7 @@
     background-color: #70ff86;
   }
 
-  :global([role=button]) {
+  :global([role="button"]) {
     cursor: pointer;
   }
 

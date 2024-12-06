@@ -6,8 +6,8 @@
     label: string;
     startOpen?: boolean;
     lvl?: number;
-    actions?: import('svelte').Snippet;
-    children?: import('svelte').Snippet;
+    actions?: import("svelte").Snippet;
+    children?: import("svelte").Snippet;
   }
 
   let {
@@ -19,7 +19,7 @@
     startOpen = false,
     lvl = 1,
     actions,
-    children
+    children,
   }: Props = $props();
 
   let open = $state(startOpen || false);
@@ -27,11 +27,7 @@
 
 <div class="container">
   <div class="header-content">
-    <button
-      class:header-open={open}
-      onclick={() => (open = !open)}
-      class="header"
-    >
+    <button class:header-open={open} onclick={() => (open = !open)} class="header">
       <!-- h3 is technically not allowed inside a button, but appears like the most accessible solution if we want a
         clickable header -->
       {#if lvl == 1}

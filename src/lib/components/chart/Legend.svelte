@@ -2,7 +2,7 @@
   let {
     keys,
   }: {
-    keys: { color: string, legend: string }[],
+    keys: { color: string; legend: string }[];
   } = $props();
 </script>
 

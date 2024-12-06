@@ -1,6 +1,6 @@
 <script lang="ts">
   /** eslint-disable @typescript-eslint/strict-boolean-expressions */
-  import {HBarTotalLabelStyle, type Root } from "$lib/chart";
+  import { HBarTotalLabelStyle, type Root } from "$lib/chart";
   import { db } from "$lib/chartStore";
   import { group, orDefault } from "$lib/utils";
   import type { DSVParsedArray } from "d3-dsv";
@@ -9,14 +9,13 @@
   import { max } from "d3-array";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
 
-  
   interface Props {
     spec: Root;
     chart: ReturnType<typeof db.chart>;
     dbHBar: ReturnType<ReturnType<typeof db.chart>["hBar"]>;
     chartData: {
-    [key: string]: DSVParsedArray<any>;
-  };
+      [key: string]: DSVParsedArray<any>;
+    };
   }
 
   let {
@@ -24,14 +23,20 @@
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     chart,
     dbHBar,
-    chartData
+    chartData,
   }: Props = $props();
 
   let dataSet = $derived(spec.data.sets.find((set) => set.id == $dbHBar.dataSet));
 
   let columns = $derived([
-    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toKey, type: e.keyType })), []),
-    ...orDefault(dataSet?.transpose?.map(e => ({ key: e.toValue, type: e.valueType })), []),
+    ...orDefault(
+      dataSet?.transpose?.map((e) => ({ key: e.toKey, type: e.keyType })),
+      [],
+    ),
+    ...orDefault(
+      dataSet?.transpose?.map((e) => ({ key: e.toValue, type: e.valueType })),
+      [],
+    ),
     ...orDefault(dataSet?.rows, []),
   ]);
 
@@ -45,11 +50,9 @@
     colorScale.addColorScaleColor(ci);
   };
 
-  let groups = $derived(formatData($dbHBar, chartData, []/* $colorScale.byKey */));
+  let groups = $derived(formatData($dbHBar, chartData, [] /* $colorScale.byKey */));
   $effect(() => {
-    const computed = max(groups, (d) =>
-      max(d.d, (dd) => max(dd.value, (ddd) => ddd.to)),
-    );
+    const computed = max(groups, (d) => max(d.d, (dd) => max(dd.value, (ddd) => ddd.to)));
     if (
       typeof computed == "number" &&
       !Number.isNaN(computed) &&
@@ -59,30 +62,28 @@
     }
   });
 
-  let unusedGroups = $derived(orDefault(groups[0]?.d[0]?.value, [])
-    .map((d) => d.label)
-    .filter((k) => $colorScale.byKey.findIndex((c) => c.k == k) == -1));
+  let unusedGroups = $derived(
+    orDefault(groups[0]?.d[0]?.value, [])
+      .map((d) => d.label)
+      .filter((k) => $colorScale.byKey.findIndex((c) => c.k == k) == -1),
+  );
   let automateColorKeys = $derived(() => {
     if (typeof $dbHBar.dataSet != "undefined" && typeof chartData[$dbHBar.dataSet] != "undefined") {
-      const key = typeof $dbHBar.subCategories != "undefined" ? $dbHBar.subCategories : $dbHBar.categories;
+      const key =
+        typeof $dbHBar.subCategories != "undefined" ? $dbHBar.subCategories : $dbHBar.categories;
       const dataSet = chartData[$dbHBar.dataSet];
       const groups = group(key, dataSet, (k) => k);
       groups.forEach((k) => {
-        if (
-          !$colorScale.byKey.find(
-            (d) => d.k == k,
-          )
-        ) {
+        if (!$colorScale.byKey.find((d) => d.k == k)) {
           const n = $colorScale.byKey.length;
-          const keyIndex =
-            typeof n != "undefined" ? n : 0;
-            colorScale.addColorScaleColor(
-              keyIndex,
-              k,
-              // TODO: only use known "good" color schemes
-              `lch(${25 + Math.random() * 50}% ${80 + Math.random() * 20} ${Math.random() * 360})`,
-              k,
-            );
+          const keyIndex = typeof n != "undefined" ? n : 0;
+          colorScale.addColorScaleColor(
+            keyIndex,
+            k,
+            // TODO: only use known "good" color schemes
+            `lch(${25 + Math.random() * 50}% ${80 + Math.random() * 20} ${Math.random() * 360})`,
+            k,
+          );
         }
       });
     }
@@ -93,18 +94,17 @@
 
   let removeExtraColorKeys = $derived(() => {
     if (typeof $dbHBar.dataSet != "undefined" && typeof chartData[$dbHBar.dataSet] != "undefined") {
-      const key = typeof $dbHBar.subCategories != "undefined" ? $dbHBar.subCategories : $dbHBar.categories;
+      const key =
+        typeof $dbHBar.subCategories != "undefined" ? $dbHBar.subCategories : $dbHBar.categories;
       const dataSet = chartData[$dbHBar.dataSet];
       const groups = group(key, dataSet, (k) => k);
       let removed = 0;
-      $colorScale.byKey.forEach(
-        (c, keyIndex) => {
-          if (typeof groups.find((k) => c.k == k) != "undefined") {
-            colorScale.removeColorScaleColor(keyIndex - removed);
-            removed++;
-          }
-        },
-      );
+      $colorScale.byKey.forEach((c, keyIndex) => {
+        if (typeof groups.find((k) => c.k == k) != "undefined") {
+          colorScale.removeColorScaleColor(keyIndex - removed);
+          removed++;
+        }
+      });
     }
   });
 
@@ -119,10 +119,7 @@
 <p>
   <label>
     Data set:
-    <select
-      value={$dbHBar.dataSet}
-      onchange={(e) => dbHBar.setDataSet(e.currentTarget.value)}
-    >
+    <select value={$dbHBar.dataSet} onchange={(e) => dbHBar.setDataSet(e.currentTarget.value)}>
       <option>{""}</option>
       {#each spec.data.sets as set}
         <option value={set.id}>{set.name}</option>
@@ -134,10 +131,8 @@
   <label>
     Label width: <input
       value={$dbHBar.labelWidth}
-      onkeyup={(e) =>
-        dbHBar.setLabelWidth(Number.parseInt(e.currentTarget.value))}
-      onchange={(e) =>
-        dbHBar.setLabelWidth(Number.parseInt(e.currentTarget.value))}
+      onkeyup={(e) => dbHBar.setLabelWidth(Number.parseInt(e.currentTarget.value))}
+      onchange={(e) => dbHBar.setLabelWidth(Number.parseInt(e.currentTarget.value))}
       type="number"
     />
   </label>
@@ -178,7 +173,7 @@
         checked={$dbHBar.stackSubCategories}
         onchange={(e) => dbHBar.setStackSubCategories(e.currentTarget.checked)}
         type="checkbox"
-      >
+      />
     </label>
     {#if $dbHBar.stackSubCategories}
       <label>
@@ -187,17 +182,14 @@
           checked={$dbHBar.portionSubCategories}
           onchange={(e) => dbHBar.setPortionSubCategories(e.currentTarget.checked)}
           type="checkbox"
-        >
+        />
       </label>
     {/if}
   </p>
   <p>
     <label>
       Values from:
-      <select
-        value={$dbHBar.value}
-        onchange={(e) => dbHBar.setValue(e.currentTarget.value)}
-      >
+      <select value={$dbHBar.value} onchange={(e) => dbHBar.setValue(e.currentTarget.value)}>
         <option>{""}</option>
         {#each columns.filter((r) => r.type == "number") as row}
           <option>{row.key}</option>
@@ -210,14 +202,8 @@
       >Scale from:
       <input
         value={$scale.dataRange?.[0] ?? 0}
-        onkeyup={(e) =>
-          scale.setScaleFrom(
-            Number.parseInt(e.currentTarget.value),
-          )}
-        onchange={(e) =>
-          scale.setScaleFrom(
-            Number.parseInt(e.currentTarget.value),
-          )}
+        onkeyup={(e) => scale.setScaleFrom(Number.parseInt(e.currentTarget.value))}
+        onchange={(e) => scale.setScaleFrom(Number.parseInt(e.currentTarget.value))}
         type="number"
         style="width: 90px"
       />
@@ -226,10 +212,8 @@
       to
       <input
         value={$scale.dataRange?.[1] ?? 1}
-        onkeyup={(e) =>
-          scale.setScaleTo(Number.parseInt(e.currentTarget.value))}
-        onchange={(e) =>
-          scale.setScaleTo(Number.parseInt(e.currentTarget.value))}
+        onkeyup={(e) => scale.setScaleTo(Number.parseInt(e.currentTarget.value))}
+        onchange={(e) => scale.setScaleTo(Number.parseInt(e.currentTarget.value))}
         type="number"
         style="width: 90px"
       />
@@ -248,21 +232,14 @@
           <td>
             <input
               value={$colorScale.default}
-              onchange={(e) =>
-                colorScale.setColorScaleDefaultColor(
-                  e.currentTarget.value,
-                )}
-              onkeyup={(e) =>
-                colorScale.setColorScaleDefaultColor(
-                  e.currentTarget.value,
-                )}
+              onchange={(e) => colorScale.setColorScaleDefaultColor(e.currentTarget.value)}
+              onkeyup={(e) => colorScale.setColorScaleDefaultColor(e.currentTarget.value)}
             />
           </td>
           <td>
             <ColorPicker
               color={$colorScale.default}
-              onchange={(s) =>
-                colorScale.setColorScaleDefaultColor(s)}
+              onchange={(s) => colorScale.setColorScaleDefaultColor(s)}
             />
           </td>
           <td> </td>
@@ -285,11 +262,7 @@
             <td>
               <select
                 value={color.k}
-                onchange={(e) =>
-                  colorScale.setColorScaleKey(
-                    i,
-                    e.currentTarget.value,
-                  )}
+                onchange={(e) => colorScale.setColorScaleKey(i, e.currentTarget.value)}
               >
                 <option>{""}</option>
                 {#if color.k}
@@ -303,54 +276,32 @@
             <td>
               <input
                 value={color.c}
-                onchange={(e) =>
-                  colorScale.setColorScaleColor(
-                    i,
-                    e.currentTarget.value,
-                  )}
-                onkeyup={(e) =>
-                  colorScale.setColorScaleColor(
-                    i,
-                    e.currentTarget.value,
-                  )}
+                onchange={(e) => colorScale.setColorScaleColor(i, e.currentTarget.value)}
+                onkeyup={(e) => colorScale.setColorScaleColor(i, e.currentTarget.value)}
               />
             </td>
             <td>
               <ColorPicker
                 color={color.c}
-                chartColors={$colorScale.byKey.map(c => c.c)}
-                onchange={(s) =>
-                  colorScale.setColorScaleColor(i, s)}
+                chartColors={$colorScale.byKey.map((c) => c.c)}
+                onchange={(s) => colorScale.setColorScaleColor(i, s)}
               />
             </td>
             <td
               ><input
                 value={color.legend}
-                onchange={(e) =>
-                  colorScale.setColorScaleLegend(
-                    i,
-                    e.currentTarget.value,
-                  )}
-                onkeyup={(e) =>
-                  colorScale.setColorScaleLegend(
-                    i,
-                    e.currentTarget.value,
-                  )}
+                onchange={(e) => colorScale.setColorScaleLegend(i, e.currentTarget.value)}
+                onkeyup={(e) => colorScale.setColorScaleLegend(i, e.currentTarget.value)}
               />
             </td>
             <td>
-              <button onclick={() => deleteColor(i)}>
-                Delete
-              </button>
+              <button onclick={() => deleteColor(i)}> Delete </button>
             </td>
           </tr>
         {/each}
       </tbody>
     </table>
-    <button
-      onclick={() => addColor($colorScale.byKey.length)}
-      >Add new</button
-    >
+    <button onclick={() => addColor($colorScale.byKey.length)}>Add new</button>
     <button onclick={automateColorKeys}>Add missing data keys</button>
     <button onclick={removeExtraColorKeys}>Remove extra data keys</button>
   {/if}
@@ -380,10 +331,7 @@
   <p>
     <label
       >Repeat for each:
-      <select
-        value={$dbHBar.repeat}
-        onchange={(e) => dbHBar.setRepeat(e.currentTarget.value)}
-      >
+      <select value={$dbHBar.repeat} onchange={(e) => dbHBar.setRepeat(e.currentTarget.value)}>
         <option>{""}</option>
         {#each columns as row}
           <option>{row.key}</option>
@@ -401,7 +349,8 @@
     width: 100%;
     box-sizing: border-box;
   }
-  .color-control input, .color-control select {
+  .color-control input,
+  .color-control select {
     width: 100%;
     box-sizing: border-box;
   }

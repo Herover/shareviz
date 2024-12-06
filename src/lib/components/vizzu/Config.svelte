@@ -3,7 +3,7 @@
   import type { TableByRecords } from "vizzu/dist/types/data";
 
   import { db } from "$lib/sharedbVizzu";
-	import { createScope } from '$lib/dataScope';
+  import { createScope } from "$lib/dataScope";
   import Channel from "./Channel.svelte";
   import TextInput from "../TextInput.svelte";
 
@@ -17,9 +17,16 @@
 </script>
 
 <div class="holder">
-  <p><label>Title <TextInput value={$configChart?.title} onChange={(val) => db.setConfigTitle(index, val)}/></label></p>
+  <p>
+    <label
+      >Title <TextInput
+        value={$configChart?.title}
+        onChange={(val) => db.setConfigTitle(index, val)}
+      /></label
+    >
+  </p>
 
-<!--   <p>
+  <!--   <p>
     X
     {#each $configChart?.channels?.x?.set || [] as channel, i}
       <select value={channel} on:change={e => db.setConfigX(index, i, e.currentTarget.value)}>
@@ -64,8 +71,11 @@
 
   <p>
     Geometry
-    <select value={$configChart?.geometry} onchange={e => db.setConfigGeometry(index, e.currentTarget.value)}>
-      {#each ['rectangle', 'circle', 'area', 'line'] as geom}
+    <select
+      value={$configChart?.geometry}
+      onchange={(e) => db.setConfigGeometry(index, e.currentTarget.value)}
+    >
+      {#each ["rectangle", "circle", "area", "line"] as geom}
         <option value={geom}>{geom}</option>
       {/each}
     </select>
@@ -73,8 +83,11 @@
 
   <p>
     Coordinate system
-    <select value={$configChart?.coordSystem} onchange={e => db.setConfigCoordSystem(index, e.currentTarget.value)}>
-      {#each ['cartesian', 'polar'] as coord}
+    <select
+      value={$configChart?.coordSystem}
+      onchange={(e) => db.setConfigCoordSystem(index, e.currentTarget.value)}
+    >
+      {#each ["cartesian", "polar"] as coord}
         <option value={coord}>{coord}</option>
       {/each}
     </select>

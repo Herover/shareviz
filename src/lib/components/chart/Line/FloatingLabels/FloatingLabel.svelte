@@ -5,21 +5,12 @@
 
   interface Props {
     line: LineStyleKey;
-    xScale: 
-    | ScaleLinear<number, number, never>
-    | ScaleTime<number, number, never>;
-    yScale: 
-    | ScaleLinear<number, number, never>
-    | ScaleTime<number, number, never>;
+    xScale: ScaleLinear<number, number, never> | ScaleTime<number, number, never>;
+    yScale: ScaleLinear<number, number, never> | ScaleTime<number, number, never>;
     editor?: boolean;
   }
 
-  let {
-    line,
-    xScale,
-    yScale,
-    editor = false
-  }: Props = $props();
+  let { line, xScale, yScale, editor = false }: Props = $props();
 
   const dispatch = createEventDispatcher<{
     edit: any[];
@@ -28,9 +19,7 @@
   let lastMovePos = [0, 0];
   let relativeMove = $state([0, 0]);
   let moving = $state(false);
-  const startMove = (
-    e: MouseEvent & { currentTarget: EventTarget & SVGGElement },
-  ) => {
+  const startMove = (e: MouseEvent & { currentTarget: EventTarget & SVGGElement }) => {
     if (editor) {
       lastMovePos = [e.clientX, e.clientY];
       moving = true;
@@ -42,10 +31,7 @@
     if (editor) {
       dispatch("edit", [
         "labelRelativePos",
-        [
-          line.label.rx + e.clientX - lastMovePos[0],
-          line.label.ry + e.clientY - lastMovePos[1],
-        ],
+        [line.label.rx + e.clientX - lastMovePos[0], line.label.ry + e.clientY - lastMovePos[1]],
       ]);
       lastMovePos = [e.clientX, e.clientY];
       relativeMove = [0, 0];

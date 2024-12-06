@@ -19,15 +19,18 @@
     chartColors,
     values,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    lineSpec
+    lineSpec,
   }: Props = $props();
 
-  type Value = typeof values[number];
+  type Value = (typeof values)[number];
   let flatValues = $derived(
-    values.reduce((acc, d) => {
+    values.reduce(
+      (acc, d) => {
         acc = [...acc, ...d.d];
         return acc;
-      }, [] as Value["d"])
+      },
+      [] as Value["d"],
+    ),
   );
 
   let type = $derived(typeof flatValues[0]?.value[0]?.x == "number" ? "number" : "date");
@@ -44,8 +47,8 @@
     const parsed = type == "number" ? Number.parseInt(value) : new Date(value).getTime();
     const proposed = flatValues
       .find((e) => e.key == $style.k)
-      ?.value.map(d => ({ d: Math.abs(parsed - d.x), x: d.x, y: d.y}))
-      .sort((a, b) => a.d - b.d)[0] || { x: 0, y: 0 }
+      ?.value.map((d) => ({ d: Math.abs(parsed - d.x), x: d.x, y: d.y }))
+      .sort((a, b) => a.d - b.d)[0] || { x: 0, y: 0 };
     const proposedY = flatValues
       .find((e) => e.key == $style.k)
       ?.value.find((d) => d.x == proposed.x);
@@ -58,10 +61,7 @@
 
 <div class="line-style-editor">
   {#if unspecifiecKeys != null}
-    <select
-      value={$style.k}
-      onchange={(e) => style.setKey(e.currentTarget.value)}
-    >
+    <select value={$style.k} onchange={(e) => style.setKey(e.currentTarget.value)}>
       <option>{$style.k}</option>
       {#each unspecifiecKeys as k}
         <option>{k}</option>
@@ -86,30 +86,25 @@
 
   {#if unspecifiecKeys != null && $style.label.location == LabelLocation.Float}
     <input
-      value={type == "number" ? $style.label.x : new Date($style.label.x).toISOString().split("T")[0]}
+      value={type == "number"
+        ? $style.label.x
+        : new Date($style.label.x).toISOString().split("T")[0]}
       onchange={(e) => setLabelX(e.currentTarget.value)}
       onkeyup={(e) => setLabelX(e.currentTarget.value)}
-      type={type}
+      {type}
       style="width: 104px;"
     />
     <input
       checked={$style.label.line == LabelStyleLine.Line}
-      onchange={(e) => style.setLabelLine(e.currentTarget.checked ? LabelStyleLine.Line : LabelStyleLine.None)}
+      onchange={(e) =>
+        style.setLabelLine(e.currentTarget.checked ? LabelStyleLine.Line : LabelStyleLine.None)}
       type="checkbox"
     />
   {/if}
 
-  <ColorPicker
-    color={$style.color}
-    {chartColors}
-    onchange={(s) => updateColor(s)}
-  />
+  <ColorPicker color={$style.color} {chartColors} onchange={(s) => updateColor(s)} />
 
-  <ColorPicker
-    color={$style.label.color}
-    {chartColors}
-    onchange={(s) => updateLabelColor(s)}
-  />
+  <ColorPicker color={$style.label.color} {chartColors} onchange={(s) => updateLabelColor(s)} />
 
   <input
     value={$style.width}

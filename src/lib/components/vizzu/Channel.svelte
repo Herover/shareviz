@@ -2,6 +2,7 @@
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let radioGroups = 0;
 </script>
+
 <script lang="ts">
   import type { Config } from "vizzu";
 
@@ -18,12 +19,7 @@
     configScope: ReturnType<typeof db.channelScope>;
   }
 
-  let {
-    configChannel = {},
-    configData,
-    title = "",
-    configScope
-  }: Props = $props();
+  let { configChannel = {}, configData, title = "", configScope }: Props = $props();
 
   let showMore = $state(false);
 
@@ -39,16 +35,20 @@
   <p>
     {title}
     {#each configChannel?.set || [] as channel, i}
-      <select value={channel} onchange={e => configScope.set(i, e.currentTarget.value)}>
+      <select value={channel} onchange={(e) => configScope.set(i, e.currentTarget.value)}>
         <option value={null}></option>
         {#each configData?.series || [] as series}
           <option value={series.name}>{series.name}</option>
         {/each}
       </select>
-    {/each}<button onclick={() => configScope.add(orNumber(configChannel?.set?.length), (configData?.series || [])[0].name)}>+</button>
+    {/each}<button
+      onclick={() =>
+        configScope.add(orNumber(configChannel?.set?.length), (configData?.series || [])[0].name)}
+      >+</button
+    >
   </p>
 
-  <button class="show-more" onclick={() => showMore = !showMore}>
+  <button class="show-more" onclick={() => (showMore = !showMore)}>
     {#if showMore}
       Show less
     {:else}
@@ -58,36 +58,167 @@
 
   {#if showMore}
     <div class="advanced">
-      <label>Title <TextInput value={configChannel?.title} onChange={(val) => configScope.setTitle(val)}/></label>
+      <label
+        >Title <TextInput
+          value={configChannel?.title}
+          onChange={(val) => configScope.setTitle(val)}
+        /></label
+      >
       <p>Axis</p>
-      <label><RadioInput onChange={val => configScope.setAxis(val)} value={axis} group={title + "axis"} setValue={"auto"}/>Auto</label>
-      <label><RadioInput onChange={val => configScope.setAxis(val)} value={axis} group={title + "axis"} setValue={true}/>Yes</label>
-      <label><RadioInput onChange={val => configScope.setAxis(val)} value={axis} group={title + "axis"} setValue={false}/>No</label>
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setAxis(val)}
+          value={axis}
+          group={title + "axis"}
+          setValue={"auto"}
+        />Auto</label
+      >
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setAxis(val)}
+          value={axis}
+          group={title + "axis"}
+          setValue={true}
+        />Yes</label
+      >
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setAxis(val)}
+          value={axis}
+          group={title + "axis"}
+          setValue={false}
+        />No</label
+      >
 
       <p>Labels</p>
-      <label><RadioInput onChange={val => configScope.setLabels(val)} value={labels} group={title + "labels"} setValue={"auto"}/>Auto</label>
-      <label><RadioInput onChange={val => configScope.setLabels(val)} value={labels} group={title + "labels"} setValue={true}/>Yes</label>
-      <label><RadioInput onChange={val => configScope.setLabels(val)} value={labels} group={title + "labels"} setValue={false}/>No</label>
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setLabels(val)}
+          value={labels}
+          group={title + "labels"}
+          setValue={"auto"}
+        />Auto</label
+      >
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setLabels(val)}
+          value={labels}
+          group={title + "labels"}
+          setValue={true}
+        />Yes</label
+      >
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setLabels(val)}
+          value={labels}
+          group={title + "labels"}
+          setValue={false}
+        />No</label
+      >
 
       <p>Ticks</p>
-      <label><RadioInput onChange={val => configScope.  setTicks(val)} value={ticks} group={title + "ticks"} setValue={"auto"}/>Auto</label>
-      <label><RadioInput onChange={val => configScope.  setTicks(val)} value={ticks} group={title + "ticks"} setValue={true}/>Yes</label>
-      <label><RadioInput onChange={val => configScope.  setTicks(val)} value={ticks} group={title + "ticks"} setValue={false}/>No</label>
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setTicks(val)}
+          value={ticks}
+          group={title + "ticks"}
+          setValue={"auto"}
+        />Auto</label
+      >
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setTicks(val)}
+          value={ticks}
+          group={title + "ticks"}
+          setValue={true}
+        />Yes</label
+      >
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setTicks(val)}
+          value={ticks}
+          group={title + "ticks"}
+          setValue={false}
+        />No</label
+      >
 
       <p>Interlacing</p>
-      <label><RadioInput onChange={val => configScope.  setInterlacing(val)} value={interlacing} group={title + "interlacing"} setValue={"auto"}/>Auto</label>
-      <label><RadioInput onChange={val => configScope.  setInterlacing(val)} value={interlacing} group={title + "interlacing"} setValue={true}/>Yes</label>
-      <label><RadioInput onChange={val => configScope.  setInterlacing(val)} value={interlacing} group={title + "interlacing"} setValue={false}/>No</label>
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setInterlacing(val)}
+          value={interlacing}
+          group={title + "interlacing"}
+          setValue={"auto"}
+        />Auto</label
+      >
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setInterlacing(val)}
+          value={interlacing}
+          group={title + "interlacing"}
+          setValue={true}
+        />Yes</label
+      >
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setInterlacing(val)}
+          value={interlacing}
+          group={title + "interlacing"}
+          setValue={false}
+        />No</label
+      >
 
       <p>Guides</p>
-      <label><RadioInput onChange={val => configScope.  setGuides(val)} value={guides} group={title + "guides"} setValue={"auto"}/>Auto</label>
-      <label><RadioInput onChange={val => configScope.  setGuides(val)} value={guides} group={title + "guides"} setValue={true}/>Yes</label>
-      <label><RadioInput onChange={val => configScope.  setGuides(val)} value={guides} group={title + "guides"} setValue={false}/>No</label>
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setGuides(val)}
+          value={guides}
+          group={title + "guides"}
+          setValue={"auto"}
+        />Auto</label
+      >
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setGuides(val)}
+          value={guides}
+          group={title + "guides"}
+          setValue={true}
+        />Yes</label
+      >
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setGuides(val)}
+          value={guides}
+          group={title + "guides"}
+          setValue={false}
+        />No</label
+      >
 
       <p>Marker Guides</p>
-      <label><RadioInput onChange={val => configScope.  setMarkerGuides(val)} value={markerGuides} group={title + "markerGuides"} setValue={"auto"}/>Auto</label>
-      <label><RadioInput onChange={val => configScope.  setMarkerGuides(val)} value={markerGuides} group={title + "markerGuides"} setValue={true}/>Yes</label>
-      <label><RadioInput onChange={val => configScope.  setMarkerGuides(val)} value={markerGuides} group={title + "markerGuides"} setValue={false}/>No</label>
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setMarkerGuides(val)}
+          value={markerGuides}
+          group={title + "markerGuides"}
+          setValue={"auto"}
+        />Auto</label
+      >
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setMarkerGuides(val)}
+          value={markerGuides}
+          group={title + "markerGuides"}
+          setValue={true}
+        />Yes</label
+      >
+      <label
+        ><RadioInput
+          onChange={(val) => configScope.setMarkerGuides(val)}
+          value={markerGuides}
+          group={title + "markerGuides"}
+          setValue={false}
+        />No</label
+      >
     </div>
   {/if}
 </div>

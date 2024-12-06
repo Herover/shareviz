@@ -8,10 +8,7 @@
     data: { [key: string]: any[] };
     width?: number | undefined;
     editor: boolean;
-    onedit?: (d: {
-      k: string;
-      v: any;
-    }) => void;
+    onedit?: (d: { k: string; v: any }) => void;
   }
 
   let {
@@ -40,8 +37,8 @@
   let chartWidth = $derived(orNumber(width, chartSpec.chart.width));
 
   const mkEditElement = (i: number) => {
-    return (e: CustomEvent<any>) => editElement(i, e.detail)
-  }
+    return (e: CustomEvent<any>) => editElement(i, e.detail);
+  };
 </script>
 
 <div
@@ -122,8 +119,7 @@
         <a
           href={editor ? null : chartSpec.chart.sourceTextLeftLink}
           style="color:#888888"
-          onkeyup={(e) => editText("sourceLeft", e)}
-          >{chartSpec.chart.sourceTextLeft}</a
+          onkeyup={(e) => editText("sourceLeft", e)}>{chartSpec.chart.sourceTextLeft}</a
         >
       {/if}
     </p>
@@ -143,8 +139,7 @@
         <a
           href={editor ? null : chartSpec.chart.sourceTextRightLink}
           style="color:#888888"
-          onkeyup={(e) => editText("sourceRight", e)}
-          >{chartSpec.chart.sourceTextRight}</a
+          onkeyup={(e) => editText("sourceRight", e)}>{chartSpec.chart.sourceTextRight}</a
         >
       {/if}
     </p>

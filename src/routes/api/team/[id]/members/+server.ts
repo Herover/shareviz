@@ -5,11 +5,7 @@ export async function POST({ request, locals, params }) {
   const session = await locals.auth();
 
   const user = session?.user;
-  if (
-    session == null ||
-    typeof user == "undefined" ||
-    typeof user.id != "string"
-  ) {
+  if (session == null || typeof user == "undefined" || typeof user.id != "string") {
     return json({ message: "invalid token" }, { status: 400 });
   }
 
@@ -46,11 +42,7 @@ export async function DELETE({ request, locals, params }) {
   const session = await locals.auth();
 
   const user = session?.user;
-  if (
-    session == null ||
-    typeof user == "undefined" ||
-    typeof user.id != "string"
-  ) {
+  if (session == null || typeof user == "undefined" || typeof user.id != "string") {
     return json({ message: "invalid token" }, { status: 400 });
   }
 
@@ -71,13 +63,8 @@ export async function DELETE({ request, locals, params }) {
   try {
     await db.removeUserTeamsRelation(params.id, userId);
   } catch (err) {
-    if (
-      (err as Error).message == "There must be at least 1 admin after removal"
-    ) {
-      return json(
-        { message: "There must be at least 1 admin after removal" },
-        { status: 400 },
-      );
+    if ((err as Error).message == "There must be at least 1 admin after removal") {
+      return json({ message: "There must be at least 1 admin after removal" }, { status: 400 });
     } else {
       throw err;
     }

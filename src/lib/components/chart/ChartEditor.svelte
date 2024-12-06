@@ -10,8 +10,8 @@
     chartScope: ReturnType<typeof db.chart>;
     spec: Root;
     chartData: {
-    [key: string]: DSVParsedArray<any>;
-  };
+      [key: string]: DSVParsedArray<any>;
+    };
   }
 
   let { chartScope, spec, chartData }: Props = $props();
@@ -39,7 +39,7 @@
       value={$chartScope.title}
       onkeyup={(e) => chartScope.setConfigTitle(e.currentTarget.value)}
       class="control"
-></textarea>
+    ></textarea>
   </label>
 </p>
 <p>
@@ -48,7 +48,7 @@
       value={$chartScope.subTitle}
       onkeyup={(e) => chartScope.setConfigSubTitle(e.currentTarget.value)}
       class="control"
-></textarea>
+    ></textarea>
   </label>
 </p>
 <p>
@@ -91,10 +91,8 @@
   <label>
     Height: <input
       value={$chartScope.height}
-      onkeyup={(e) =>
-        chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
-      onchange={(e) =>
-        chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
+      onkeyup={(e) => chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
+      onchange={(e) => chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
       type="number"
       class="control"
     />
@@ -104,10 +102,8 @@
   <label>
     Width: <input
       value={$chartScope.width}
-      onkeyup={(e) =>
-        chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
-      onchange={(e) =>
-        chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
+      onkeyup={(e) => chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
+      onchange={(e) => chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
       type="number"
       class="control"
     />
@@ -123,24 +119,16 @@
       startOpen={true}
       lvl={2}
     >
-      <HBarEditor
-        {spec}
-        dbHBar={chartScope.hBar(i)}
-        chart={chartScope}
-        {chartData}
-      />
+      <HBarEditor {spec} dbHBar={chartScope.hBar(i)} chart={chartScope} {chartData} />
       {#snippet actions()}
-            <div >
+        <div>
           <button onclick={() => removeElement(i)}>Delete</button>
-          <button disabled={i == 0} onclick={() => moveElementUp(i)}
-            >Move up</button
-          >
-          <button
-            disabled={i == $chartScope.elements.length - 1}
-            onclick={() => moveElementDown(i)}>Move down</button
+          <button disabled={i == 0} onclick={() => moveElementUp(i)}>Move up</button>
+          <button disabled={i == $chartScope.elements.length - 1} onclick={() => moveElementDown(i)}
+            >Move down</button
           >
         </div>
-          {/snippet}
+      {/snippet}
     </EditorCollapsible>
   {:else if element.type == "line"}
     <EditorCollapsible
@@ -150,25 +138,16 @@
       startOpen={true}
       lvl={2}
     >
-      <LineEditor
-        {spec}
-        dbLine={chartScope.line(i)}
-        chart={chartScope}
-        {chartData}
-        index={i}
-      />
+      <LineEditor {spec} dbLine={chartScope.line(i)} chart={chartScope} {chartData} index={i} />
       {#snippet actions()}
-                <div >
+        <div>
           <button onclick={() => removeElement(i)}>Delete</button>
-          <button disabled={i == 0} onclick={() => moveElementUp(i)}
-            >Move up</button
-          >
-          <button
-            disabled={i == $chartScope.elements.length - 1}
-            onclick={() => moveElementDown(i)}>Move down</button
+          <button disabled={i == 0} onclick={() => moveElementUp(i)}>Move up</button>
+          <button disabled={i == $chartScope.elements.length - 1} onclick={() => moveElementDown(i)}
+            >Move down</button
           >
         </div>
-              {/snippet}
+      {/snippet}
     </EditorCollapsible>
   {/if}
 {/each}

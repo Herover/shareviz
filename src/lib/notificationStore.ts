@@ -6,15 +6,13 @@ export enum NotificationLevel {
 }
 
 export const notifications = (() => {
-  const { subscribe, update } = writable<
-    { message: string; type: NotificationLevel; n: number }[]
-  >([]);
+  const { subscribe, update } = writable<{ message: string; type: NotificationLevel; n: number }[]>(
+    [],
+  );
 
   const addNotification = (type: NotificationLevel, message: string) => {
     update((notifications) => {
-      const existing = notifications.find(
-        (n) => n.message === message && n.type === type,
-      );
+      const existing = notifications.find((n) => n.message === message && n.type === type);
       if (existing) {
         existing.n++;
       } else {
@@ -27,10 +25,8 @@ export const notifications = (() => {
 
   return {
     subscribe,
-    addError: (message: string) =>
-      addNotification(NotificationLevel.ERROR, message),
-    addInfo: (message: string) =>
-      addNotification(NotificationLevel.INFO, message),
+    addError: (message: string) => addNotification(NotificationLevel.ERROR, message),
+    addInfo: (message: string) => addNotification(NotificationLevel.INFO, message),
     read: (i: number) =>
       update((notifications) => {
         notifications.splice(i, 1);

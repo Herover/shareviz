@@ -7,26 +7,18 @@ export async function load({ locals, params }) {
   const session = await locals.auth();
 
   const user = session?.user;
-  if (
-    session == null ||
-    typeof user == "undefined" ||
-    typeof user.id != "string"
-  ) {
+  if (session == null || typeof user == "undefined" || typeof user.id != "string") {
     redirect(302, "/");
   }
 
-  const orgUsers = (await db.getOrganizationUsers(params.organizationId)).map(
-    (user) => ({
-      name: user.user.name,
-      id: user.user.id,
-      image: user.user.image,
-      role: user.usersOrganizations.role,
-    }),
-  );
+  const orgUsers = (await db.getOrganizationUsers(params.organizationId)).map((user) => ({
+    name: user.user.name,
+    id: user.user.id,
+    image: user.user.image,
+    role: user.usersOrganizations.role,
+  }));
   const userIsOrgAdmin =
-    orgUsers.findIndex(
-      (e) => e.id == user.id && e.role == ORGANIZATION_ROLES.ADMIN,
-    ) != -1;
+    orgUsers.findIndex((e) => e.id == user.id && e.role == ORGANIZATION_ROLES.ADMIN) != -1;
 
   return {
     orgUsers,

@@ -68,9 +68,7 @@ export const db = (function createDB() {
       doc = connection.get("examples", id);
 
       presence = connection.getPresence("x-" + id);
-      presence.subscribe((e: any) =>
-        console.log("presence subscribe callback", e),
-      );
+      presence.subscribe((e: any) => console.log("presence subscribe callback", e));
       const presences: { [key: string]: PresenceData } = {};
       const presenceTargets: { [key: string]: string } = {};
       presence.on("receive", (presenceId: string, data: any) => {
@@ -84,10 +82,7 @@ export const db = (function createDB() {
             return d;
           });
         } else {
-          if (
-            presences[presenceId] &&
-            presenceTargets[presences[presenceId].selected]
-          ) {
+          if (presences[presenceId] && presenceTargets[presences[presenceId].selected]) {
             delete presenceTargets[presences[presenceId].selected];
           }
           presences[presenceId] = {
@@ -153,15 +148,7 @@ export const db = (function createDB() {
       return {
         ...scoped,
         add: (index: number, value: string) => {
-          doc.submitOp([
-            "specs",
-            configIndex,
-            "channels",
-            channelKey,
-            "set",
-            index,
-            { i: value },
-          ]);
+          doc.submitOp(["specs", configIndex, "channels", channelKey, "set", index, { i: value }]);
         },
         set: (index: number, value: string | null) => {
           if (!doc.data.specs[configIndex].channels[channelKey]) {
@@ -173,15 +160,7 @@ export const db = (function createDB() {
               { r: 0, i: { set: [value] } },
             ]);
           } else if (value == null || value == "") {
-            doc.submitOp([
-              "specs",
-              configIndex,
-              "channels",
-              channelKey,
-              "set",
-              index,
-              { r: 0 },
-            ]);
+            doc.submitOp(["specs", configIndex, "channels", channelKey, "set", index, { r: 0 }]);
           } else {
             doc.submitOp([
               "specs",
@@ -197,8 +176,7 @@ export const db = (function createDB() {
         setAxis: (val: string | boolean | undefined) => {
           if (val == "true") val = true;
           if (val == "false") val = false;
-          if (doc.data.specs[configIndex].channels[channelKey].axis == val)
-            return;
+          if (doc.data.specs[configIndex].channels[channelKey].axis == val) return;
           doc.submitOp([
             "specs",
             configIndex,
@@ -207,8 +185,7 @@ export const db = (function createDB() {
             "axis",
             {
               r:
-                typeof doc.data.specs[configIndex].channels[channelKey].axis ==
-                "undefined"
+                typeof doc.data.specs[configIndex].channels[channelKey].axis == "undefined"
                   ? undefined
                   : 0,
               i: val,
@@ -218,8 +195,7 @@ export const db = (function createDB() {
         setLabels: (val: string | boolean | undefined) => {
           if (val == "true") val = true;
           if (val == "false") val = false;
-          if (doc.data.specs[configIndex].channels[channelKey].labels == val)
-            return;
+          if (doc.data.specs[configIndex].channels[channelKey].labels == val) return;
           doc.submitOp([
             "specs",
             configIndex,
@@ -228,8 +204,7 @@ export const db = (function createDB() {
             "labels",
             {
               r:
-                typeof doc.data.specs[configIndex].channels[channelKey]
-                  .labels == "undefined"
+                typeof doc.data.specs[configIndex].channels[channelKey].labels == "undefined"
                   ? undefined
                   : 0,
               i: val,
@@ -239,8 +214,7 @@ export const db = (function createDB() {
         setTicks: (val: string | boolean | undefined) => {
           if (val == "true") val = true;
           if (val == "false") val = false;
-          if (doc.data.specs[configIndex].channels[channelKey].ticks == val)
-            return;
+          if (doc.data.specs[configIndex].channels[channelKey].ticks == val) return;
           doc.submitOp([
             "specs",
             configIndex,
@@ -249,8 +223,7 @@ export const db = (function createDB() {
             "ticks",
             {
               r:
-                typeof doc.data.specs[configIndex].channels[channelKey].ticks ==
-                "undefined"
+                typeof doc.data.specs[configIndex].channels[channelKey].ticks == "undefined"
                   ? undefined
                   : 0,
               i: val,
@@ -260,10 +233,7 @@ export const db = (function createDB() {
         setInterlacing: (val: string | boolean | undefined) => {
           if (val == "true") val = true;
           if (val == "false") val = false;
-          if (
-            doc.data.specs[configIndex].channels[channelKey].interlacing == val
-          )
-            return;
+          if (doc.data.specs[configIndex].channels[channelKey].interlacing == val) return;
           doc.submitOp([
             "specs",
             configIndex,
@@ -272,8 +242,7 @@ export const db = (function createDB() {
             "interlacing",
             {
               r:
-                typeof doc.data.specs[configIndex].channels[channelKey]
-                  .interlacing == "undefined"
+                typeof doc.data.specs[configIndex].channels[channelKey].interlacing == "undefined"
                   ? undefined
                   : 0,
               i: val,
@@ -283,8 +252,7 @@ export const db = (function createDB() {
         setGuides: (val: string | boolean | undefined) => {
           if (val == "true") val = true;
           if (val == "false") val = false;
-          if (doc.data.specs[configIndex].channels[channelKey].guides == val)
-            return;
+          if (doc.data.specs[configIndex].channels[channelKey].guides == val) return;
           doc.submitOp([
             "specs",
             configIndex,
@@ -293,8 +261,7 @@ export const db = (function createDB() {
             "guides",
             {
               r:
-                typeof doc.data.specs[configIndex].channels[channelKey]
-                  .guides == "undefined"
+                typeof doc.data.specs[configIndex].channels[channelKey].guides == "undefined"
                   ? undefined
                   : 0,
               i: val,
@@ -304,10 +271,7 @@ export const db = (function createDB() {
         setMarkerGuides: (val: string | boolean | undefined) => {
           if (val == "true") val = true;
           if (val == "false") val = false;
-          if (
-            doc.data.specs[configIndex].channels[channelKey].markerGuides == val
-          )
-            return;
+          if (doc.data.specs[configIndex].channels[channelKey].markerGuides == val) return;
           doc.submitOp([
             "specs",
             configIndex,
@@ -316,8 +280,7 @@ export const db = (function createDB() {
             "markerGuides",
             {
               r:
-                typeof doc.data.specs[configIndex].channels[channelKey]
-                  .markerGuides == "undefined"
+                typeof doc.data.specs[configIndex].channels[channelKey].markerGuides == "undefined"
                   ? undefined
                   : 0,
               i: val,
@@ -325,34 +288,14 @@ export const db = (function createDB() {
           ]);
         },
         setTitle: (value: string | null) => {
-          if (
-            !doc.data.specs[configIndex].channels[channelKey].title &&
-            value
-          ) {
-            doc.submitOp([
-              "specs",
-              configIndex,
-              "channels",
-              channelKey,
-              "title",
-              { i: value },
-            ]);
+          if (!doc.data.specs[configIndex].channels[channelKey].title && value) {
+            doc.submitOp(["specs", configIndex, "channels", channelKey, "title", { i: value }]);
           } else if (
             doc.data.specs[configIndex].channels[channelKey].title &&
             (value == null || value == "")
           ) {
-            doc.submitOp([
-              "specs",
-              configIndex,
-              "channels",
-              channelKey,
-              "title",
-              { r: 0 },
-            ]);
-          } else if (
-            doc.data.specs[configIndex].channels[channelKey].title &&
-            value
-          ) {
+            doc.submitOp(["specs", configIndex, "channels", channelKey, "title", { r: 0 }]);
+          } else if (doc.data.specs[configIndex].channels[channelKey].title && value) {
             doc.submitOp([
               "specs",
               configIndex,

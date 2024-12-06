@@ -4,11 +4,7 @@ import json1 from "ot-json1";
 import { db } from "../server_lib/user.js";
 import { backend, connection } from "../server_lib/sharedb.js";
 import sharedb from "sharedb";
-import {
-  db as drizzledb,
-  sessions,
-  users,
-} from "../server_lib/drizzle/schema.js";
+import { db as drizzledb, sessions, users } from "../server_lib/drizzle/schema.js";
 import { eq, gt } from "drizzle-orm";
 
 // Create initial document then fire callback
@@ -562,26 +558,18 @@ export function startServer(server) {
     console.log(
       "receive",
       ctx.data.a,
-      Object.keys(sharedb.MESSAGE_ACTIONS).find(
-        (k) => sharedb.MESSAGE_ACTIONS[k] == ctx.data.a,
-      ),
+      Object.keys(sharedb.MESSAGE_ACTIONS).find((k) => sharedb.MESSAGE_ACTIONS[k] == ctx.data.a),
       /* JSON.stringify(ctx.data), */
     );
 
-    if (
-      ctx.data.a == sharedb.MESSAGE_ACTIONS.subscribe &&
-      ctx.data.c == "examples"
-    ) {
+    if (ctx.data.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.data.c == "examples") {
       // TODO: add authentication using `ctx.agent.custom.userId`
       // if (false) {
       //   console.log("unauthorized")
       //   return next("unauthorized");
       // }
       next();
-    } else if (
-      ctx.data.a == sharedb.MESSAGE_ACTIONS.op &&
-      ctx.agent.custom.user
-    ) {
+    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.op && ctx.agent.custom.user) {
       // Only allow access to "examples", no create through websockets
       if (ctx.data.c != "examples" || typeof ctx.data.create != "undefined") {
         next("unauthorized");
@@ -602,28 +590,20 @@ export function startServer(server) {
   });
   backend.use("reply", function (ctx, next) {
     console.log("reply" /* JSON.stringify(ctx.reply) */);
-    if (
-      ctx.reply.a == sharedb.MESSAGE_ACTIONS.queryFetch &&
-      ctx.reply?.data?.length
-    ) {
+    if (ctx.reply.a == sharedb.MESSAGE_ACTIONS.queryFetch && ctx.reply?.data?.length) {
       // When querying db, remove items user doesn't have access to
       // ctx.reply.data = ctx.reply?.data?.filter(
       //   e => e.data?.meta?.publicRead || e.data?.meta?.access.find(e => e.userId == ctx.agent.custom.userId && e.read)
       // );
       next("no queries");
-    } else if (
-      ctx.reply.a == sharedb.MESSAGE_ACTIONS.subscribe &&
-      ctx.reply.c == "examples"
-    ) {
+    } else if (ctx.reply.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.reply.c == "examples") {
       // When accessing chart, check if user is allowed to read
       db.getUserCharts(ctx.agent.custom.user.id, ctx.request.d)
         .then((charts) => {
           if (charts.length != 0) {
             next();
           } else {
-            console.log(
-              `unauthorized reply on ${ctx.request.c} ${ctx.request.d}`,
-            );
+            console.log(`unauthorized reply on ${ctx.request.c} ${ctx.request.d}`);
             next("unauthorized");
           }
         })
@@ -673,10 +653,7 @@ export function startServer(server) {
     db.getUserCharts(ctx.agent.custom.user.id, ctx.id)
       .then((charts) => {
         // TODO: get rid of hard coded constant
-        if (
-          charts.length != 0 &&
-          (charts[0].relationType === 1 || charts[0].teamId !== null)
-        ) {
+        if (charts.length != 0 && (charts[0].relationType === 1 || charts[0].teamId !== null)) {
           next();
         } else {
           console.log(`unauthorized submit on ${ctx.collection} ${ctx.id}`);
@@ -696,10 +673,7 @@ export function startServer(server) {
     console.log("apply" /* ctx.agent.custom.userId, ctx */);
     ctx.extra.oldMeta = ctx.snapshot?.data?.meta;
 
-    if (
-      typeof ctx.op.create == "object" &&
-      typeof ctx.snapshot?.data != "object"
-    ) {
+    if (typeof ctx.op.create == "object" && typeof ctx.snapshot?.data != "object") {
       // When creating a new chart, always add current user to access list
       ctx.op.create.data.meta = {
         publicRead: false,
@@ -716,8 +690,7 @@ export function startServer(server) {
         .then((charts) => {
           // TODO: get rid of hard coded constant
           if (
-            charts.length !=
-            0 /* && (charts[0].relationType === 1 || charts[0].teamId !== null) */
+            charts.length != 0 /* && (charts[0].relationType === 1 || charts[0].teamId !== null) */
           ) {
             next();
           } else {

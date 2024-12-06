@@ -10,12 +10,7 @@
     title: string;
   }
 
-  let {
-    h,
-    c,
-    l,
-    title
-  }: Props = $props();
+  let { h, c, l, title }: Props = $props();
 
   let l2 = $derived(Math.floor(Math.max(Math.min(orNumber(l), 100), 0)));
   let c2 = $derived(Math.floor(Math.max(Math.min(orNumber(c), 100), 0)));

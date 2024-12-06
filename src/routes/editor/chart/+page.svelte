@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from "svelte/legacy";
 
   import { SignIn, SignOut } from "@auth/sveltekit/components";
   import { page } from "$app/stores";
@@ -12,14 +12,15 @@
   import { group, orDefault } from "$lib/utils";
 
   let charts = $state<ChartInfo[] | null>(null);
-  let chartsByTeam =
-    $derived(charts == null
+  let chartsByTeam = $derived(
+    charts == null
       ? []
       : group(
           "teamId",
           charts.filter((d) => d.teamId != null),
           (k, g) => ({ k, g }),
-        ));
+        ),
+  );
   let userCharts = $derived(charts == null ? [] : charts.filter((d) => d.teamId == null));
 
   let disconnect = $state(() => {});
@@ -30,9 +31,9 @@
     if ($page.data.session?.user) {
       disconnect = db.connect();
       fetch("/api/chart")
-        .then(req => req.json())
-        .then(data => charts = data.charts)
-        .catch(e => notifications.addError(e.message));
+        .then((req) => req.json())
+        .then((data) => (charts = data.charts))
+        .catch((e) => notifications.addError(e.message));
     } else {
       disconnect = () => {};
       charts = null;
@@ -70,10 +71,7 @@
         {/each}
         {#each chartsByTeam as byTeam}
           <h2>
-            {orDefault(
-              $user.teams.find((d) => d.id == byTeam.k)?.name,
-              "Your charts",
-            )}
+            {orDefault($user.teams.find((d) => d.id == byTeam.k)?.name, "Your charts")}
           </h2>
           {#each byTeam.g as chart}
             <p dir="auto">

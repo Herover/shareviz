@@ -1,10 +1,7 @@
 import type { Line } from "../../../chart";
 import { group, negativeOneToInf } from "../../../utils";
 
-export const formatData = (
-  componentSpec: Line,
-  data: { [key: string]: any[] },
-) =>
+export const formatData = (componentSpec: Line, data: { [key: string]: any[] }) =>
   group(componentSpec.repeat, data[componentSpec.dataSet], (k1, g1) => ({
     k: k1,
     d: group(componentSpec.categories, g1, (k2, g2) => ({
@@ -18,12 +15,8 @@ export const formatData = (
     }))
       .sort(
         (a, b) =>
-          negativeOneToInf(
-            componentSpec.style.byKey.findIndex((e) => e.k == b.key),
-          ) -
-          negativeOneToInf(
-            componentSpec.style.byKey.findIndex((e) => e.k == a.key),
-          ),
+          negativeOneToInf(componentSpec.style.byKey.findIndex((e) => e.k == b.key)) -
+          negativeOneToInf(componentSpec.style.byKey.findIndex((e) => e.k == a.key)),
       )
       .reduce(
         (acc, line, i) => {

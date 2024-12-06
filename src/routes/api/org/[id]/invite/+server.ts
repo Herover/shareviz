@@ -6,11 +6,7 @@ export async function POST({ locals, params }) {
   const session = await locals.auth();
 
   const user = session?.user;
-  if (
-    session == null ||
-    typeof user == "undefined" ||
-    typeof user.id != "string"
-  ) {
+  if (session == null || typeof user == "undefined" || typeof user.id != "string") {
     return json({ message: "invalid token" }, { status: 400 });
   }
 
@@ -26,21 +22,14 @@ export async function POST({ locals, params }) {
 
   const { code, expires } = await db.addOrganizationInvite(params.id);
 
-  return json(
-    { message: "ok", code, expires: expires.toISOString() },
-    { status: 200 },
-  );
+  return json({ message: "ok", code, expires: expires.toISOString() }, { status: 200 });
 }
 
 export async function GET({ locals, params }) {
   const session = await locals.auth();
 
   const user = session?.user;
-  if (
-    session == null ||
-    typeof user == "undefined" ||
-    typeof user.id != "string"
-  ) {
+  if (session == null || typeof user == "undefined" || typeof user.id != "string") {
     return json({ message: "invalid token" }, { status: 400 });
   }
 
@@ -63,11 +52,7 @@ export async function DELETE({ locals, params, request }) {
   const session = await locals.auth();
 
   const user = session?.user;
-  if (
-    session == null ||
-    typeof user == "undefined" ||
-    typeof user.id != "string"
-  ) {
+  if (session == null || typeof user == "undefined" || typeof user.id != "string") {
     return json({ message: "invalid token" }, { status: 400 });
   }
 

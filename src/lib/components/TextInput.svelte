@@ -9,4 +9,4 @@
   let { value = "", onChange }: Props = $props();
 </script>
 
-<input value={orDefault(value, "")} onkeyup={(e) => onChange(e.currentTarget.value)}/>
+<input value={orDefault(value, "")} onkeyup={(e) => onChange(e.currentTarget.value)} />

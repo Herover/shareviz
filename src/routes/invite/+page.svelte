@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { SignIn } from "@auth/sveltekit/components"
+  import { SignIn } from "@auth/sveltekit/components";
   import { page } from "$app/stores";
-  import { goto } from '$app/navigation';
+  import { goto } from "$app/navigation";
 
   let message = $state("");
 
@@ -18,7 +18,7 @@
     } else {
       goto("/editor/chart");
     }
-  })
+  });
 </script>
 
 {#if message}
@@ -34,7 +34,7 @@
 {:else}
   <SignIn provider="github">
     {#snippet submitButton()}
-                <span >Sign In with GitHub</span>
-              {/snippet}
+      <span>Sign In with GitHub</span>
+    {/snippet}
   </SignIn>
 {/if}

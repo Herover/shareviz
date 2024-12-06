@@ -40,13 +40,13 @@
     onSelect({ replace, selected: !selected });
   };
 
-const toggleHover = (me: Event | null) => {
-  if (me == null) {
-    chartToEditor.setHighlight([]);
-  } else {
-    chartToEditor.setHighlight(["elements", index, key]);
-  }
-};
+  const toggleHover = (me: Event | null) => {
+    if (me == null) {
+      chartToEditor.setHighlight([]);
+    } else {
+      chartToEditor.setHighlight(["elements", index, key]);
+    }
+  };
 </script>
 
 <div

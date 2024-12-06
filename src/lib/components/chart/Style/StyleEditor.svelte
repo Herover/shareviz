@@ -14,10 +14,8 @@
     Title text size (em)
     <input
       value={$style.titleSize}
-      onchange={(e) =>
-        style.setTitleSize(Number.parseFloat(e.currentTarget.value))}
-      onkeyup={(e) =>
-        style.setTitleSize(Number.parseFloat(e.currentTarget.value))}
+      onchange={(e) => style.setTitleSize(Number.parseFloat(e.currentTarget.value))}
+      onkeyup={(e) => style.setTitleSize(Number.parseFloat(e.currentTarget.value))}
       step="0.1"
       type="number"
       class="control"
@@ -39,10 +37,8 @@
     Subtitle text size (em)
     <input
       value={$style.subTitleSize}
-      onchange={(e) =>
-        style.setSubTitleSize(Number.parseFloat(e.currentTarget.value))}
-      onkeyup={(e) =>
-        style.setSubTitleSize(Number.parseFloat(e.currentTarget.value))}
+      onchange={(e) => style.setSubTitleSize(Number.parseFloat(e.currentTarget.value))}
+      onkeyup={(e) => style.setSubTitleSize(Number.parseFloat(e.currentTarget.value))}
       step="0.1"
       type="number"
       class="control"
@@ -66,10 +62,8 @@
     Left
     <input
       value={$style.marginLeft}
-      onchange={(e) =>
-        style.setMarginLeft(Number.parseFloat(e.currentTarget.value))}
-      onkeyup={(e) =>
-        style.setMarginLeft(Number.parseFloat(e.currentTarget.value))}
+      onchange={(e) => style.setMarginLeft(Number.parseFloat(e.currentTarget.value))}
+      onkeyup={(e) => style.setMarginLeft(Number.parseFloat(e.currentTarget.value))}
       type="number"
       style="width: 90px"
     />
@@ -78,10 +72,8 @@
     Right
     <input
       value={$style.marginRight}
-      onchange={(e) =>
-        style.setMarginRight(Number.parseFloat(e.currentTarget.value))}
-      onkeyup={(e) =>
-        style.setMarginRight(Number.parseFloat(e.currentTarget.value))}
+      onchange={(e) => style.setMarginRight(Number.parseFloat(e.currentTarget.value))}
+      onkeyup={(e) => style.setMarginRight(Number.parseFloat(e.currentTarget.value))}
       type="number"
       style="width: 90px"
     />
@@ -91,10 +83,8 @@
     Top
     <input
       value={$style.marginTop}
-      onchange={(e) =>
-        style.setMarginTop(Number.parseFloat(e.currentTarget.value))}
-      onkeyup={(e) =>
-        style.setMarginTop(Number.parseFloat(e.currentTarget.value))}
+      onchange={(e) => style.setMarginTop(Number.parseFloat(e.currentTarget.value))}
+      onkeyup={(e) => style.setMarginTop(Number.parseFloat(e.currentTarget.value))}
       type="number"
       style="width: 90px"
     />
@@ -103,10 +93,8 @@
     Bottom
     <input
       value={$style.marginBottom}
-      onchange={(e) =>
-        style.setMarginBottom(Number.parseFloat(e.currentTarget.value))}
-      onkeyup={(e) =>
-        style.setMarginBottom(Number.parseFloat(e.currentTarget.value))}
+      onchange={(e) => style.setMarginBottom(Number.parseFloat(e.currentTarget.value))}
+      onkeyup={(e) => style.setMarginBottom(Number.parseFloat(e.currentTarget.value))}
       type="number"
       style="width: 90px"
     />
@@ -115,17 +103,11 @@
 
 <p>
   Background color:
-  <ColorPicker
-    color={$style.bgColor}
-    onchange={(s) => style.setBGColor(s)}
-  />
+  <ColorPicker color={$style.bgColor} onchange={(s) => style.setBGColor(s)} />
 </p>
 <p>
   Text color:
-  <ColorPicker
-    color={$style.textColor}
-    onchange={(s) => style.setTextColor(s)}
-  />
+  <ColorPicker color={$style.textColor} onchange={(s) => style.setTextColor(s)} />
 </p>
 
 <style>

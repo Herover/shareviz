@@ -8,11 +8,7 @@ export async function GET({ locals }) {
   const session = await locals.auth();
 
   const user = session?.user;
-  if (
-    session == null ||
-    typeof user == "undefined" ||
-    typeof user.id != "string"
-  ) {
+  if (session == null || typeof user == "undefined" || typeof user.id != "string") {
     return json({ message: "invalid token" }, { status: 400 });
   }
   const charts = await db.getUserCharts(user.id);
@@ -24,11 +20,7 @@ export async function POST({ request, locals }) {
   const session = await locals.auth();
 
   const user = session?.user;
-  if (
-    session == null ||
-    typeof user == "undefined" ||
-    typeof user.id != "string"
-  ) {
+  if (session == null || typeof user == "undefined" || typeof user.id != "string") {
     return json({ message: "invalid token" }, { status: 400 });
   }
 

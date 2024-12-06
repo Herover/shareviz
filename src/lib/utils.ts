@@ -27,10 +27,7 @@ export const formatNumber = (
     const d = Math.pow(10, decimals);
     res +=
       fractionDelim +
-      (("" + Math.round(fractionNum * d) / d).split(".")[1] ?? "").padEnd(
-        decimals,
-        "0",
-      );
+      (("" + Math.round(fractionNum * d) / d).split(".")[1] ?? "").padEnd(decimals, "0");
   }
 
   /* if (fraction) {
@@ -132,5 +129,4 @@ export const orDefault = <T>(n: T | undefined, def: T): T => {
 export const orNumber = (n: number | undefined, def = 0) => orDefault(n, def);
 
 // Used to place un-ordered items last
-export const negativeOneToInf = (n: number) =>
-  n == -1 ? Number.POSITIVE_INFINITY : n;
+export const negativeOneToInf = (n: number) => (n == -1 ? Number.POSITIVE_INFINITY : n);

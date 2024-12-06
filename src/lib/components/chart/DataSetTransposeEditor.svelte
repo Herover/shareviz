@@ -5,7 +5,6 @@
   import { valueParsers } from "$lib/utils";
   import equal from "fast-deep-equal";
 
-  
   interface Props {
     // export let columns: Row[];
     dataStore: ReturnType<typeof db.dataSet>;
@@ -28,9 +27,7 @@
   From
   <select bind:value={transposedKeys} multiple>
     {#each $dataStore.rows as col}
-      <option selected={transpose.from.includes(col.key) ? true : null}
-        >{col.key}</option
-      >
+      <option selected={transpose.from.includes(col.key) ? true : null}>{col.key}</option>
     {/each}
   </select>
   <br />
@@ -64,6 +61,6 @@
       <option>{type}</option>
     {/each}
   </select>
-  <br>
+  <br />
   <button onclick={() => dataStore.removeTranspose(i)}>Delete</button>
 </il>

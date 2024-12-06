@@ -13,9 +13,7 @@ export async function load({ url, locals }) {
         console.log(joinedOrgs);
         return {
           organizationName: org.organizations.name,
-          alreadyJoined: joinedOrgs.some(
-            (e) => e.organizations.id == org.organizations.id,
-          ),
+          alreadyJoined: joinedOrgs.some((e) => e.organizations.id == org.organizations.id),
         };
       } catch (error) {
         console.log((error as Error).message);

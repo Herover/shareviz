@@ -14,7 +14,10 @@
     dataStore.setRaw(newRaw);
     const names = getColumnNames($dataStore, newRaw);
     dataStore.setColumns(
-      names.map(key => ({ key, type: orDefault($dataStore.rows.find(e => e.key === key)?.type, "text") }))
+      names.map((key) => ({
+        key,
+        type: orDefault($dataStore.rows.find((e) => e.key === key)?.type, "text"),
+      })),
     );
   };
 
@@ -36,11 +39,13 @@
       value={$dataStore.raw}
       onchange={(e) => updateColumns(e.currentTarget.value)}
       rows="4"
-      placeholder={$dataStore.type == "tsv" ? `column1\tcolumn2
+      placeholder={$dataStore.type == "tsv"
+        ? `column1\tcolumn2
 value1\tvalue2
 value3\tvalue4
-...` : ""}
-></textarea></label
+...`
+        : ""}
+    ></textarea></label
   >
 </p>
 <p>
@@ -56,10 +61,7 @@ value3\tvalue4
 <p>
   <label
     >Format
-    <select
-      value={$dataStore.type}
-      onchange={(e) => dataStore.setType(e.currentTarget.value)}
-    >
+    <select value={$dataStore.type} onchange={(e) => dataStore.setType(e.currentTarget.value)}>
       {#each ["tsv"] as row}
         <option>{row}</option>
       {/each}
@@ -69,14 +71,12 @@ value3\tvalue4
 
 <p>Columns to rows (transpose)</p>
 <ul>
-{#each $dataStore.transpose as transpose, i}
-  <DataSetTransposeEditor {dataStore} {transpose} {i} />
-{/each}
+  {#each $dataStore.transpose as transpose, i}
+    <DataSetTransposeEditor {dataStore} {transpose} {i} />
+  {/each}
 </ul>
 
-<button
-  onclick={() => dataStore.addTranspose($dataStore.transpose.length)}
->Add transpose</button>
+<button onclick={() => dataStore.addTranspose($dataStore.transpose.length)}>Add transpose</button>
 
 <p>Columns:</p>
 <ul>

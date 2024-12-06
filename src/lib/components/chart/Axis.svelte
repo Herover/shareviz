@@ -11,23 +11,16 @@
     scale: ScaleLinear<number, number, never> | ScaleTime<number, number, never> | undefined;
     showLabels?: boolean;
     dimensions?: (d: {
-      width: number,
-      height: number,
-      leftOverflow?: number,
-      rightOverflow?: number,
-      topPos?: number,
-      labelHeight: number,
-    }) => void,
+      width: number;
+      height: number;
+      leftOverflow?: number;
+      rightOverflow?: number;
+      topPos?: number;
+      labelHeight: number;
+    }) => void;
   }
 
-  let {
-    conf,
-    width,
-    height,
-    scale,
-    showLabels = true,
-    dimensions = () => {},
-  }: Props = $props();
+  let { conf, width, height, scale, showLabels = true, dimensions = () => {} }: Props = $props();
 
   // TODO: more space on side with axis?
   let size = $derived(conf.major.enabled ? conf.labelSpace : 0);
@@ -60,25 +53,21 @@
       const to = scale.domain()[1];
       if (typeof to == "number" && typeof from == "number") {
         const customFrom = Math.max(Math.min(conf.major.auto.from, to), from);
-        const expectedTicks =
-          1 + (to - customFrom) / conf.major.auto.each;
+        const expectedTicks = 1 + (to - customFrom) / conf.major.auto.each;
         if (expectedTicks > maxTicks) {
-          computedMajorTicks = [
-            { n: from, l: `Too many ticks (${expectedTicks})` },
-          ];
+          computedMajorTicks = [{ n: from, l: `Too many ticks (${expectedTicks})` }];
         } else {
           for (let i = customFrom; i <= to; i += conf.major.auto.each) {
             computedMajorTicks.push({
               n: i,
-              l: conf.major.auto.labels ? formatNumber(
-                i,
-                conf.major.labelDivide,
-                conf.major.labelThousands,
-              ) + conf.major.afterLabel : "",
+              l: conf.major.auto.labels
+                ? formatNumber(i, conf.major.labelDivide, conf.major.labelThousands) +
+                  conf.major.afterLabel
+                : "",
             });
           }
         }
-        computedManualMajorTicks = conf.major.ticks.filter(d => d.n <= to && from <= d.n);
+        computedManualMajorTicks = conf.major.ticks.filter((d) => d.n <= to && from <= d.n);
       } else if (to instanceof Date && from instanceof Date) {
         let d = new Date(from);
         d.setDate(1);
@@ -93,7 +82,9 @@
           n++;
         }
       }
-      autoMajorTicks = computedMajorTicks.filter(d => computedManualMajorTicks.findIndex(dd => dd.n == d.n) == -1);
+      autoMajorTicks = computedMajorTicks.filter(
+        (d) => computedManualMajorTicks.findIndex((dd) => dd.n == d.n) == -1,
+      );
       manualMajorTicks = computedManualMajorTicks;
     }
   });
@@ -109,24 +100,30 @@
       : [],
   );
   $effect(() => {
-    if (labelBox || leftBox || rightBox) dimensions({
-      width: orNumber(labelBox?.width, 0),
-      height: orNumber(labelBox?.height, 0),
-      leftOverflow: majorTicks.length == 2
-        ? 0
-        : Math.max(
-            orNumber(leftBox?.width, 0) / 2 -
-              (scale
-                ? Math.floor(
-                    (scale(orDefault(majorTicks[0]?.n, 0)) - scale.range()[0]) / 10,
-                  ) * 10
-                : 0),
-            0,
-          ),
-      rightOverflow: majorTicks.length == 2 ? 0 : orNumber(rightBox?.width, 0)/2,
-      topPos: (majorTicks.length == 0 || majorTicks[majorTicks.length - 1].l == "" || typeof scale == "undefined") ? undefined : ((scale(majorTicks[majorTicks.length - 1]?.n ?? 0)) - orNumber(testBox?.height, 0) - 6),
-      labelHeight: orNumber(testBox?.height, 0) + conf.major.tickSize + size,
-    });
+    if (labelBox || leftBox || rightBox)
+      dimensions({
+        width: orNumber(labelBox?.width, 0),
+        height: orNumber(labelBox?.height, 0),
+        leftOverflow:
+          majorTicks.length == 2
+            ? 0
+            : Math.max(
+                orNumber(leftBox?.width, 0) / 2 -
+                  (scale
+                    ? Math.floor((scale(orDefault(majorTicks[0]?.n, 0)) - scale.range()[0]) / 10) *
+                      10
+                    : 0),
+                0,
+              ),
+        rightOverflow: majorTicks.length == 2 ? 0 : orNumber(rightBox?.width, 0) / 2,
+        topPos:
+          majorTicks.length == 0 ||
+          majorTicks[majorTicks.length - 1].l == "" ||
+          typeof scale == "undefined"
+            ? undefined
+            : scale(majorTicks[majorTicks.length - 1]?.n ?? 0) - orNumber(testBox?.height, 0) - 6,
+        labelHeight: orNumber(testBox?.height, 0) + conf.major.tickSize + size,
+      });
   });
   $effect(() => {
     if (scale && conf.minor.enabled && conf.minor.auto.each != 0) {
@@ -134,25 +131,21 @@
       const from = scale.domain()[0];
       const to = scale.domain()[1];
       if (typeof to == "number" && typeof from == "number") {
-        const expectedTicks =
-          1 + (to - conf.minor.auto.from) / conf.minor.auto.each;
+        const expectedTicks = 1 + (to - conf.minor.auto.from) / conf.minor.auto.each;
         if (expectedTicks > maxTicks) {
-          computedMinorTicks = [
-            { n: from, l: `Too many ticks (${expectedTicks})` },
-          ];
+          computedMinorTicks = [{ n: from, l: `Too many ticks (${expectedTicks})` }];
         } else {
           for (let i = conf.minor.auto.from; i <= to; i += conf.minor.auto.each) {
             computedMinorTicks.push({
               n: i,
-              l: conf.minor.auto.labels ? formatNumber(
-                i,
-                conf.minor.labelDivide,
-                conf.minor.labelThousands,
-              ) + conf.minor.afterLabel : "",
+              l: conf.minor.auto.labels
+                ? formatNumber(i, conf.minor.labelDivide, conf.minor.labelThousands) +
+                  conf.minor.afterLabel
+                : "",
             });
           }
         }
-        manualMinorTicks = conf.minor.ticks.filter(d => d.n <= to && from <= d.n);
+        manualMinorTicks = conf.minor.ticks.filter((d) => d.n <= to && from <= d.n);
       } else if (to instanceof Date && from instanceof Date) {
         let d = new Date(from);
         d.setDate(1);
@@ -167,17 +160,19 @@
           n++;
         }
       }
-      
+
       autoMinorTicks = computedMinorTicks;
     }
   });
-  let minorTicks = $derived(scale
-    ? [...manualMinorTicks, ...autoMinorTicks].filter(
-        (d) => !majorTicks.find((dd) => dd.l != "" && dd.n == d.n),
-      )
-    : []);
+  let minorTicks = $derived(
+    scale
+      ? [...manualMinorTicks, ...autoMinorTicks].filter(
+          (d) => !majorTicks.find((dd) => dd.l != "" && dd.n == d.n),
+        )
+      : [],
+  );
 
-  let smooshedLabels = $derived(majorTicks.length == 2)
+  let smooshedLabels = $derived(majorTicks.length == 2);
 </script>
 
 <text bind:contentRect={testBox} aria-hidden="true" visibility="hidden">123</text>
@@ -187,7 +182,8 @@
       {#if conf.location == AxisLocation.START}
         {#each minorTicks as tick}
           <path
-            d="m {scale(tick.n)},{lineOffset - conf.minor.tickSize} L {scale(tick.n)},{conf.minor.grid
+            d="m {scale(tick.n)},{lineOffset - conf.minor.tickSize} L {scale(tick.n)},{conf.minor
+              .grid
               ? height
               : lineOffset}"
             stroke={conf.minor.color}
@@ -197,9 +193,9 @@
       {:else}
         {#each minorTicks as tick}
           <path
-            d="m {scale(tick.n)},{height + conf.minor.tickSize} L {scale(tick.n)},{(conf.minor.grid
+            d="m {scale(tick.n)},{height + conf.minor.tickSize} L {scale(tick.n)},{conf.minor.grid
               ? 0
-              : height)}"
+              : height}"
             stroke={conf.minor.color}
             stroke-width={conf.minor.tickWidth}
           />
@@ -211,7 +207,8 @@
       {#each majorTicks as tick, i}
         {#if conf.location == AxisLocation.START}
           <path
-            d="m {scale(tick.n)},{lineOffset - conf.major.tickSize} L {scale(tick.n)},{conf.major.grid
+            d="m {scale(tick.n)},{lineOffset - conf.major.tickSize} L {scale(tick.n)},{conf.major
+              .grid
               ? height
               : lineOffset}"
             stroke={conf.major.color}
@@ -219,9 +216,9 @@
           />
         {:else}
           <path
-            d="m {scale(tick.n)},{height + conf.major.tickSize} L {scale(tick.n)},{(conf.major.grid
+            d="m {scale(tick.n)},{height + conf.major.tickSize} L {scale(tick.n)},{conf.major.grid
               ? -0
-              : height)}"
+              : height}"
             stroke={conf.major.color}
             stroke-width={conf.major.tickWidth}
           />

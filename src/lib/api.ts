@@ -4,10 +4,7 @@
  * @param organizationId organization id team belongs to
  * @returns new team id
  */
-export async function addTeam(
-  name: string,
-  organizationId: string,
-): Promise<string> {
+export async function addTeam(name: string, organizationId: string): Promise<string> {
   const res = await fetch("/api/team", {
     method: "POST",
     body: JSON.stringify({
@@ -23,10 +20,7 @@ export async function addTeam(
   return data.teamId;
 }
 
-export async function addTeamMember(
-  userId: string,
-  teamId: string,
-): Promise<void> {
+export async function addTeamMember(userId: string, teamId: string): Promise<void> {
   const res = await fetch(`/api/team/${teamId}/members`, {
     method: "POST",
     body: JSON.stringify({ userId }),
@@ -37,10 +31,7 @@ export async function addTeamMember(
   }
 }
 
-export async function removeTeamMember(
-  userId: string,
-  teamId: string,
-): Promise<void> {
+export async function removeTeamMember(userId: string, teamId: string): Promise<void> {
   const res = await fetch(`/api/team/${teamId}/members`, {
     method: "DELETE",
     body: JSON.stringify({ userId }),

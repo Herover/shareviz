@@ -27,10 +27,7 @@ export const computeData = (chartSpec?: Root) =>
 
             const valueParser = valueParsers[transpose.valueType];
             const keyParser = valueParsers[transpose.keyType];
-            if (
-              typeof valueParser != "undefined" &&
-              typeof keyParser != "undefined"
-            ) {
+            if (typeof valueParser != "undefined" && typeof keyParser != "undefined") {
               // TODO
               transpose.from.forEach((key) => {
                 set.forEach((row) => {

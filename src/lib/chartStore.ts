@@ -55,11 +55,7 @@ export const db = (function createDB() {
       data: initial == null ? initial : JSON.parse(initial),
     } as {
       data: any;
-      create: (
-        data: any,
-        type: any,
-        cb: (error: Error | undefined) => any,
-      ) => any;
+      create: (data: any, type: any, cb: (error: Error | undefined) => any) => any;
       submitOp: (op: any) => any;
       on: (ev: string, listener: (a: any) => any) => any;
       subscribe: (listener: (d: any) => any) => any;
@@ -165,15 +161,11 @@ export const db = (function createDB() {
         ...d,
         doc: null,
       }));
-      doc = synced
-        ? connection.get("examples", docId)
-        : getLocalDoc("examples", docId);
+      doc = synced ? connection.get("examples", docId) : getLocalDoc("examples", docId);
       doc.on("error", (e: Error) => notifications.addError(e.message));
 
       presence = connection.getPresence("x-" + docId);
-      presence.subscribe((e: any) =>
-        console.log("presence subscribe callback", e),
-      );
+      presence.subscribe((e: any) => console.log("presence subscribe callback", e));
       const presences: { [key: string]: PresenceData } = {};
       const presenceTargets: { [key: string]: string } = {};
       presence.on("receive", (presenceId: string, data: any) => {
@@ -188,8 +180,7 @@ export const db = (function createDB() {
         } else {
           if (
             typeof presences[presenceId] != "undefined" &&
-            typeof presenceTargets[presences[presenceId].selected] !=
-              "undefined"
+            typeof presenceTargets[presences[presenceId].selected] != "undefined"
           ) {
             delete presenceTargets[presences[presenceId].selected];
           }
@@ -211,8 +202,7 @@ export const db = (function createDB() {
       // localPresence = presence.create();
 
       const onData = (e?: Error) => {
-        if (e && typeof e.message == "string")
-          notifications.addError(e.message);
+        if (e && typeof e.message == "string") notifications.addError(e.message);
         console.log("doc", doc, doc.data);
         update((d) => ({
           doc: doc.data,
@@ -262,9 +252,7 @@ export const db = (function createDB() {
             .catch((err) => reject(err));
         } else {
           const docId = (synced ? "" : localPrefix) + crypto.randomUUID();
-          doc = synced
-            ? connection.get("examples", docId)
-            : getLocalDoc("examples", docId);
+          doc = synced ? connection.get("examples", docId) : getLocalDoc("examples", docId);
           doc.on("error", (e: Error) => console.warn("doc error", e));
           doc.create();
           resolve(docId);
@@ -313,11 +301,7 @@ export const db = (function createDB() {
       return {
         ...scoped,
         hBar: (elementIndex: number) => {
-          const hbarScope = createScope<HBar>(scoped, [
-            "elements",
-            elementIndex,
-            "d",
-          ]);
+          const hbarScope = createScope<HBar>(scoped, ["elements", elementIndex, "d"]);
 
           return {
             ...hbarScope,
@@ -367,32 +351,11 @@ export const db = (function createDB() {
                 { r: 0, i: value },
               ]),
             setValue: (value: string) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "value",
-                { r: 0, i: value },
-              ]),
+              doc.submitOp(["chart", "elements", elementIndex, "d", "value", { r: 0, i: value }]),
             setRepeat: (value: string) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "repeat",
-                { r: 0, i: value },
-              ]),
+              doc.submitOp(["chart", "elements", elementIndex, "d", "repeat", { r: 0, i: value }]),
             setDataSet: (value: string) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "dataSet",
-                { r: 0, i: value },
-              ]),
+              doc.submitOp(["chart", "elements", elementIndex, "d", "dataSet", { r: 0, i: value }]),
             setRectLabels: (value: boolean) =>
               doc.submitOp([
                 "chart",
@@ -417,23 +380,12 @@ export const db = (function createDB() {
           };
         },
         line: (elementIndex: number) => {
-          const hbarScope = createScope<Line>(scoped, [
-            "elements",
-            elementIndex,
-            "d",
-          ]);
+          const hbarScope = createScope<Line>(scoped, ["elements", elementIndex, "d"]);
 
           return {
             ...hbarScope,
             setDataSet: (value: string) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "dataSet",
-                { r: 0, i: value },
-              ]),
+              doc.submitOp(["chart", "elements", elementIndex, "d", "dataSet", { r: 0, i: value }]),
             setXKey: (value: string) =>
               doc.submitOp([
                 "chart",
@@ -464,14 +416,7 @@ export const db = (function createDB() {
                 { r: 0, i: value },
               ]),
             setRepeatKey: (value: string) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "repeat",
-                { r: 0, i: value },
-              ]),
+              doc.submitOp(["chart", "elements", elementIndex, "d", "repeat", { r: 0, i: value }]),
             setRepeatColumns: (value: number) =>
               doc.submitOp([
                 "chart",
@@ -482,23 +427,9 @@ export const db = (function createDB() {
                 { r: 0, i: value },
               ]),
             setFill: (value: boolean) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "fill",
-                { r: 0, i: value },
-              ]),
+              doc.submitOp(["chart", "elements", elementIndex, "d", "fill", { r: 0, i: value }]),
             setStack: (value: boolean) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "stack",
-                { r: 0, i: value },
-              ]),
+              doc.submitOp(["chart", "elements", elementIndex, "d", "stack", { r: 0, i: value }]),
             setHeightRatio: (value: number) =>
               doc.submitOp([
                 "chart",
@@ -510,10 +441,8 @@ export const db = (function createDB() {
               ]),
             xAxis: axis(hbarScope, ["x", "axis"], doc),
             yAxis: axis(hbarScope, ["y", "axis"], doc),
-            defaultLineStyle: () =>
-              lineStyle(hbarScope, ["style", "default"], doc),
-            lineStyle: (i: number) =>
-              lineStyle(hbarScope, ["style", "byKey", i], doc),
+            defaultLineStyle: () => lineStyle(hbarScope, ["style", "default"], doc),
+            lineStyle: (i: number) => lineStyle(hbarScope, ["style", "byKey", i], doc),
             addLineStyle: (
               i: number,
               d: {
@@ -553,14 +482,11 @@ export const db = (function createDB() {
               ]),
           };
         },
-        setConfigTitle: (value: string) =>
-          doc.submitOp(["chart", "title", { r: 0, i: value }]),
+        setConfigTitle: (value: string) => doc.submitOp(["chart", "title", { r: 0, i: value }]),
         setConfigSubTitle: (value: string) =>
           doc.submitOp(["chart", "subTitle", { r: 0, i: value }]),
-        setConfigHeight: (value: number) =>
-          doc.submitOp(["chart", "height", { r: 0, i: value }]),
-        setConfigWidth: (value: number) =>
-          doc.submitOp(["chart", "width", { r: 0, i: value }]),
+        setConfigHeight: (value: number) => doc.submitOp(["chart", "height", { r: 0, i: value }]),
+        setConfigWidth: (value: number) => doc.submitOp(["chart", "width", { r: 0, i: value }]),
         setSourceTextLeft: (value: string) =>
           doc.submitOp(["chart", "sourceTextLeft", { r: 0, i: value }]),
         setSourceTextLeftLink: (value: string) =>
@@ -570,28 +496,10 @@ export const db = (function createDB() {
         setSourceTextLeftRight: (value: string) =>
           doc.submitOp(["chart", "sourceTextLeftRight", { r: 0, i: value }]),
         setScaleFrom: (scaleIndex: number, value: number) =>
-          doc.submitOp([
-            "chart",
-            "scales",
-            scaleIndex,
-            "dataRange",
-            0,
-            { r: 0, i: value },
-          ]),
+          doc.submitOp(["chart", "scales", scaleIndex, "dataRange", 0, { r: 0, i: value }]),
         setScaleTo: (scaleIndex: number, value: number) =>
-          doc.submitOp([
-            "chart",
-            "scales",
-            scaleIndex,
-            "dataRange",
-            1,
-            { r: 0, i: value },
-          ]),
-        setColorScaleKey: (
-          scaleIndex: number,
-          colorIndex: number,
-          value: string,
-        ) =>
+          doc.submitOp(["chart", "scales", scaleIndex, "dataRange", 1, { r: 0, i: value }]),
+        setColorScaleKey: (scaleIndex: number, colorIndex: number, value: string) =>
           doc.submitOp([
             "chart",
             "scales",
@@ -602,11 +510,7 @@ export const db = (function createDB() {
             "k",
             { r: 0, i: value },
           ]),
-        setColorScaleColor: (
-          scaleIndex: number,
-          colorIndex: number,
-          value: string,
-        ) =>
+        setColorScaleColor: (scaleIndex: number, colorIndex: number, value: string) =>
           doc.submitOp([
             "chart",
             "scales",
@@ -617,11 +521,7 @@ export const db = (function createDB() {
             "c",
             { r: 0, i: value },
           ]),
-        setColorScaleLegend: (
-          scaleIndex: number,
-          colorIndex: number,
-          value: string,
-        ) =>
+        setColorScaleLegend: (scaleIndex: number, colorIndex: number, value: string) =>
           doc.submitOp([
             "chart",
             "scales",
@@ -632,13 +532,7 @@ export const db = (function createDB() {
             "legend",
             { r: 0, i: value },
           ]),
-        addColorScaleColor: (
-          scaleIndex: number,
-          colorIndex: number,
-          k = "",
-          c = "",
-          legend = "",
-        ) =>
+        addColorScaleColor: (scaleIndex: number, colorIndex: number, k = "", c = "", legend = "") =>
           doc.submitOp([
             "chart",
             "scales",
@@ -649,24 +543,9 @@ export const db = (function createDB() {
             { i: { c, k, legend } },
           ]),
         removeColorScaleColor: (scaleIndex: number, colorIndex: number) =>
-          doc.submitOp([
-            "chart",
-            "scales",
-            scaleIndex,
-            "colors",
-            "byKey",
-            colorIndex,
-            { r: 0 },
-          ]),
+          doc.submitOp(["chart", "scales", scaleIndex, "colors", "byKey", colorIndex, { r: 0 }]),
         setColorScaleDefaultColor: (scaleIndex: number, value: string) =>
-          doc.submitOp([
-            "chart",
-            "scales",
-            scaleIndex,
-            "colors",
-            "default",
-            { r: 0, i: value },
-          ]),
+          doc.submitOp(["chart", "scales", scaleIndex, "colors", "default", { r: 0, i: value }]),
         moveColorUp: (scaleIndex: number, colorIndex: number) =>
           doc.submitOp([
             "chart",
@@ -905,26 +784,20 @@ export const db = (function createDB() {
 
       return {
         ...styleScope,
-        setTitleBold: (value: boolean) =>
-          doc.submitOp(["style", "titleBold", { r: 0, i: value }]),
+        setTitleBold: (value: boolean) => doc.submitOp(["style", "titleBold", { r: 0, i: value }]),
         setSubTitleBold: (value: boolean) =>
           doc.submitOp(["style", "subTitleBold", { r: 0, i: value }]),
-        setTitleSize: (value: number) =>
-          doc.submitOp(["style", "titleSize", { r: 0, i: value }]),
+        setTitleSize: (value: number) => doc.submitOp(["style", "titleSize", { r: 0, i: value }]),
         setSubTitleSize: (value: number) =>
           doc.submitOp(["style", "subTitleSize", { r: 0, i: value }]),
-        setMarginLeft: (value: number) =>
-          doc.submitOp(["style", "marginLeft", { r: 0, i: value }]),
+        setMarginLeft: (value: number) => doc.submitOp(["style", "marginLeft", { r: 0, i: value }]),
         setMarginRight: (value: number) =>
           doc.submitOp(["style", "marginRight", { r: 0, i: value }]),
-        setMarginTop: (value: number) =>
-          doc.submitOp(["style", "marginTop", { r: 0, i: value }]),
+        setMarginTop: (value: number) => doc.submitOp(["style", "marginTop", { r: 0, i: value }]),
         setMarginBottom: (value: number) =>
           doc.submitOp(["style", "marginBottom", { r: 0, i: value }]),
-        setBGColor: (value: string) =>
-          doc.submitOp(["style", "bgColor", { r: 0, i: value }]),
-        setTextColor: (value: string) =>
-          doc.submitOp(["style", "textColor", { r: 0, i: value }]),
+        setBGColor: (value: string) => doc.submitOp(["style", "bgColor", { r: 0, i: value }]),
+        setTextColor: (value: string) => doc.submitOp(["style", "textColor", { r: 0, i: value }]),
       };
     },
     dataSet: (index: number) => {
@@ -932,32 +805,16 @@ export const db = (function createDB() {
 
       return {
         ...dataSetScope,
-        setRaw: (value: string) =>
-          doc.submitOp(["data", "sets", index, "raw", { r: 0, i: value }]),
+        setRaw: (value: string) => doc.submitOp(["data", "sets", index, "raw", { r: 0, i: value }]),
         setType: (value: string) =>
           doc.submitOp(["data", "sets", index, "type", { r: 0, i: value }]),
         setName: (value: string) =>
           doc.submitOp(["data", "sets", index, "name", { r: 0, i: value }]),
 
         setColumnType: (colIndex: number, value: string) =>
-          doc.submitOp([
-            "data",
-            "sets",
-            index,
-            "rows",
-            colIndex,
-            "type",
-            { r: 0, i: value },
-          ]),
+          doc.submitOp(["data", "sets", index, "rows", colIndex, "type", { r: 0, i: value }]),
         addColumn: (colIndex: number, key: string, type: string) =>
-          doc.submitOp([
-            "data",
-            "sets",
-            index,
-            "rows",
-            colIndex,
-            { i: { key, type } },
-          ]),
+          doc.submitOp(["data", "sets", index, "rows", colIndex, { i: { key, type } }]),
         removeColumn: (colIndex: number) =>
           doc.submitOp(["data", "sets", index, "rows", colIndex, { r: true }]),
         setColumns: (value: { key: string; type: string }[]) =>
@@ -981,14 +838,7 @@ export const db = (function createDB() {
             },
           ]),
         removeTranspose: (transposeIndex: number) =>
-          doc.submitOp([
-            "data",
-            "sets",
-            index,
-            "transpose",
-            transposeIndex,
-            { r: true },
-          ]),
+          doc.submitOp(["data", "sets", index, "transpose", transposeIndex, { r: true }]),
         setTransposeToKey: (transposeIndex: number, value: string) =>
           doc.submitOp([
             "data",
@@ -1051,11 +901,7 @@ export const db = (function createDB() {
             fromIndex,
             { r: true },
           ]),
-        setTransposeFrom: (
-          transposeIndex: number,
-          fromIndex: number,
-          value: string,
-        ) =>
+        setTransposeFrom: (transposeIndex: number, fromIndex: number, value: string) =>
           doc.submitOp([
             "data",
             "sets",
@@ -1097,45 +943,25 @@ export const db = (function createDB() {
   };
 })();
 
-export const axis = (
-  scope: ReturnType<typeof createScope>,
-  key: string[],
-  doc: any,
-) => {
+export const axis = (scope: ReturnType<typeof createScope>, key: string[], doc: any) => {
   const axisScope = createScope<Axis>(scope, key);
 
   return {
     ...axisScope,
     setLocation: (value: string) =>
-      doc.submitOp([
-        ...axisScope.path.slice(1),
-        "location",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...axisScope.path.slice(1), "location", { r: 0, i: value }]),
     setOrientation: (value: string) =>
-      doc.submitOp([
-        ...axisScope.path.slice(1),
-        "orientation",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...axisScope.path.slice(1), "orientation", { r: 0, i: value }]),
     setRepeat: (value: string) =>
       doc.submitOp([...axisScope.path.slice(1), "repeat", { r: 0, i: value }]),
     setLabelSpace: (value: number) =>
-      doc.submitOp([
-        ...axisScope.path.slice(1),
-        "labelSpace",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...axisScope.path.slice(1), "labelSpace", { r: 0, i: value }]),
     major: axisGrid(axisScope, "major", doc),
     minor: axisGrid(axisScope, "minor", doc),
   };
 };
 
-export const axisGrid = (
-  scope: ReturnType<typeof createScope>,
-  key: string,
-  doc: any,
-) => {
+export const axisGrid = (scope: ReturnType<typeof createScope>, key: string, doc: any) => {
   const majorScope = createScope<AxisGrid>(scope, [key]);
 
   return {
@@ -1143,89 +969,33 @@ export const axisGrid = (
     setGrid: (value: boolean) =>
       doc.submitOp([...majorScope.path.slice(1), "grid", { r: 0, i: value }]),
     setEnabled: (value: boolean) =>
-      doc.submitOp([
-        ...majorScope.path.slice(1),
-        "enabled",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...majorScope.path.slice(1), "enabled", { r: 0, i: value }]),
     setTickSize: (value: number) =>
-      doc.submitOp([
-        ...majorScope.path.slice(1),
-        "tickSize",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...majorScope.path.slice(1), "tickSize", { r: 0, i: value }]),
     setTickWidth: (value: number) =>
-      doc.submitOp([
-        ...majorScope.path.slice(1),
-        "tickWidth",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...majorScope.path.slice(1), "tickWidth", { r: 0, i: value }]),
     setColor: (value: string) =>
       doc.submitOp([...majorScope.path.slice(1), "color", { r: 0, i: value }]),
     setLabelDivide: (value: number) =>
-      doc.submitOp([
-        ...majorScope.path.slice(1),
-        "labelDivide",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...majorScope.path.slice(1), "labelDivide", { r: 0, i: value }]),
     setLabelThousands: (value: string) =>
-      doc.submitOp([
-        ...majorScope.path.slice(1),
-        "labelThousands",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...majorScope.path.slice(1), "labelThousands", { r: 0, i: value }]),
     setAutoFrom: (value: number) =>
-      doc.submitOp([
-        ...majorScope.path.slice(1),
-        "auto",
-        "from",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...majorScope.path.slice(1), "auto", "from", { r: 0, i: value }]),
     setAutoEach: (value: number) =>
-      doc.submitOp([
-        ...majorScope.path.slice(1),
-        "auto",
-        "each",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...majorScope.path.slice(1), "auto", "each", { r: 0, i: value }]),
     setAutoLabels: (value: boolean) =>
-      doc.submitOp([
-        ...majorScope.path.slice(1),
-        "auto",
-        "labels",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...majorScope.path.slice(1), "auto", "labels", { r: 0, i: value }]),
     setAfterLabel: (value: string) =>
-      doc.submitOp([
-        ...majorScope.path.slice(1),
-        "afterLabel",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...majorScope.path.slice(1), "afterLabel", { r: 0, i: value }]),
     addTick: (index: number) =>
-      doc.submitOp([
-        ...majorScope.path.slice(1),
-        "ticks",
-        index,
-        { i: { n: 0, l: "" } },
-      ]),
+      doc.submitOp([...majorScope.path.slice(1), "ticks", index, { i: { n: 0, l: "" } }]),
     removeTick: (index: number) =>
       doc.submitOp([...majorScope.path.slice(1), "ticks", index, { r: 0 }]),
     setTickValue: (tickIndex: number, value: number) =>
-      doc.submitOp([
-        ...majorScope.path.slice(1),
-        "ticks",
-        tickIndex,
-        "n",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...majorScope.path.slice(1), "ticks", tickIndex, "n", { r: 0, i: value }]),
     setTickLabel: (tickIndex: number, value: string) =>
-      doc.submitOp([
-        ...majorScope.path.slice(1),
-        "ticks",
-        tickIndex,
-        "l",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...majorScope.path.slice(1), "ticks", tickIndex, "l", { r: 0, i: value }]),
   };
 };
 
@@ -1239,79 +1009,30 @@ export const lineStyle = (
   return {
     ...styleScope,
     setLabelLocation: (value: string) =>
-      doc.submitOp([
-        ...styleScope.path.slice(1),
-        "label",
-        "location",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...styleScope.path.slice(1), "label", "location", { r: 0, i: value }]),
     setLabelText: (value: string) =>
-      doc.submitOp([
-        ...styleScope.path.slice(1),
-        "label",
-        "text",
-        { r: 0, i: value },
-      ]),
-    setKey: (value: string) =>
-      doc.submitOp([...styleScope.path.slice(1), "k", { r: 0, i: value }]),
+      doc.submitOp([...styleScope.path.slice(1), "label", "text", { r: 0, i: value }]),
+    setKey: (value: string) => doc.submitOp([...styleScope.path.slice(1), "k", { r: 0, i: value }]),
     setColor: (value: string) =>
       doc.submitOp([...styleScope.path.slice(1), "color", { r: 0, i: value }]),
     setLabelColor: (value: string) =>
-      doc.submitOp([
-        ...styleScope.path.slice(1),
-        "label",
-        "color",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...styleScope.path.slice(1), "label", "color", { r: 0, i: value }]),
     setwidth: (value: number) =>
       doc.submitOp([...styleScope.path.slice(1), "width", { r: 0, i: value }]),
     setSymbols: (value: string) =>
-      doc.submitOp([
-        ...styleScope.path.slice(1),
-        "symbols",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...styleScope.path.slice(1), "symbols", { r: 0, i: value }]),
     setLabelX: (value: number) =>
-      doc.submitOp([
-        ...styleScope.path.slice(1),
-        "label",
-        "x",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...styleScope.path.slice(1), "label", "x", { r: 0, i: value }]),
     setLabelY: (value: number) =>
-      doc.submitOp([
-        ...styleScope.path.slice(1),
-        "label",
-        "y",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...styleScope.path.slice(1), "label", "y", { r: 0, i: value }]),
     setLabelXOffset: (value: number) =>
-      doc.submitOp([
-        ...styleScope.path.slice(1),
-        "label",
-        "rx",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...styleScope.path.slice(1), "label", "rx", { r: 0, i: value }]),
     setLabelYOffset: (value: number) =>
-      doc.submitOp([
-        ...styleScope.path.slice(1),
-        "label",
-        "ry",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...styleScope.path.slice(1), "label", "ry", { r: 0, i: value }]),
     setLabelLine: (value: string) =>
-      doc.submitOp([
-        ...styleScope.path.slice(1),
-        "label",
-        "line",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...styleScope.path.slice(1), "label", "line", { r: 0, i: value }]),
     setMissingStyle: (value: string) =>
-      doc.submitOp([
-        ...styleScope.path.slice(1),
-        "missingStyle",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...styleScope.path.slice(1), "missingStyle", { r: 0, i: value }]),
     delete: () => doc.submitOp([...styleScope.path.slice(1), { r: 0 }]),
   };
 };
@@ -1326,19 +1047,9 @@ export const scale = (
   return {
     ...scaleScope,
     setScaleFrom: (value: number) =>
-      doc.submitOp([
-        ...scaleScope.path.slice(1),
-        "dataRange",
-        0,
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...scaleScope.path.slice(1), "dataRange", 0, { r: 0, i: value }]),
     setScaleTo: (value: number) =>
-      doc.submitOp([
-        ...scaleScope.path.slice(1),
-        "dataRange",
-        1,
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...scaleScope.path.slice(1), "dataRange", 1, { r: 0, i: value }]),
   };
 };
 
@@ -1352,21 +1063,9 @@ export const colors = (
   return {
     ...scaleScope,
     setColorScaleKey: (colorIndex: number, value: string) =>
-      doc.submitOp([
-        ...scaleScope.path.slice(1),
-        "byKey",
-        colorIndex,
-        "k",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...scaleScope.path.slice(1), "byKey", colorIndex, "k", { r: 0, i: value }]),
     setColorScaleColor: (colorIndex: number, value: string) =>
-      doc.submitOp([
-        ...scaleScope.path.slice(1),
-        "byKey",
-        colorIndex,
-        "c",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...scaleScope.path.slice(1), "byKey", colorIndex, "c", { r: 0, i: value }]),
     setColorScaleLegend: (colorIndex: number, value: string) =>
       doc.submitOp([
         ...scaleScope.path.slice(1),
@@ -1376,25 +1075,11 @@ export const colors = (
         { r: 0, i: value },
       ]),
     addColorScaleColor: (colorIndex: number, k = "", c = "", legend = "") =>
-      doc.submitOp([
-        ...scaleScope.path.slice(1),
-        "byKey",
-        colorIndex,
-        { i: { c, k, legend } },
-      ]),
+      doc.submitOp([...scaleScope.path.slice(1), "byKey", colorIndex, { i: { c, k, legend } }]),
     removeColorScaleColor: (colorIndex: number) =>
-      doc.submitOp([
-        ...scaleScope.path.slice(1),
-        "byKey",
-        colorIndex,
-        { r: 0 },
-      ]),
+      doc.submitOp([...scaleScope.path.slice(1), "byKey", colorIndex, { r: 0 }]),
     setColorScaleDefaultColor: (value: string) =>
-      doc.submitOp([
-        ...scaleScope.path.slice(1),
-        "default",
-        { r: 0, i: value },
-      ]),
+      doc.submitOp([...scaleScope.path.slice(1), "default", { r: 0, i: value }]),
     moveColorUp: (colorIndex: number) =>
       doc.submitOp([
         ...scaleScope.path.slice(1),

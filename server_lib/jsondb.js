@@ -1,10 +1,4 @@
-import {
-  readFileSync,
-  writeFileSync,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-} from "fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "fs";
 import ShareDB from "sharedb";
 
 /**
@@ -59,19 +53,10 @@ JSONDB.prototype.close = function (callback) {
 
 // Persists an op and snapshot if it is for the next version. Calls back with
 // callback(err, succeeded)
-JSONDB.prototype.commit = function (
-  collection,
-  id,
-  op,
-  snapshot,
-  options,
-  callback,
-) {
+JSONDB.prototype.commit = function (collection, id, op, snapshot, options, callback) {
   try {
     if (collection.length > pathPartMaxLength) {
-      throw new Error(
-        "collection name is longer than " + pathPartMaxLength + " bytes",
-      );
+      throw new Error("collection name is longer than " + pathPartMaxLength + " bytes");
     }
     if (id.length > pathPartMaxLength) {
       throw new Error("id is longer than " + pathPartMaxLength + " bytes");
@@ -79,9 +64,7 @@ JSONDB.prototype.commit = function (
 
     const collectionPathPart = collection.match(pathAllowExpr);
     if (collectionPathPart.length != 1 && collectionPathPart[0].length != 0) {
-      throw new Error(
-        "collection name contains illegal characters or is invalid",
-      );
+      throw new Error("collection name contains illegal characters or is invalid");
     }
     const idPathPart = id.match(pathAllowExpr);
     if (idPathPart.length != 1 && idPathPart[0].length != 0) {
@@ -113,8 +96,7 @@ JSONDB.prototype.commit = function (
       document.snapshot = jsonSnapshot;
     } else if (
       document.ops.length ==
-      jsonSnapshot.v -
-        1 /* && document.ops[document.ops.length - 1].v === jsonSnapshot.v */
+      jsonSnapshot.v - 1 /* && document.ops[document.ops.length - 1].v === jsonSnapshot.v */
     ) {
       document.ops.push(op);
       document.snapshot = jsonSnapshot;
@@ -135,18 +117,10 @@ JSONDB.prototype.commit = function (
 // Get the named document from the database. The callback is called with (err,
 // snapshot). A snapshot with a version of zero is returned if the docuemnt
 // has never been created in the database.
-JSONDB.prototype.getSnapshot = function (
-  collection,
-  id,
-  fields,
-  options,
-  callback,
-) {
+JSONDB.prototype.getSnapshot = function (collection, id, fields, options, callback) {
   try {
     if (collection.length > pathPartMaxLength) {
-      throw new Error(
-        "collection name is longer than " + pathPartMaxLength + " bytes",
-      );
+      throw new Error("collection name is longer than " + pathPartMaxLength + " bytes");
     }
     if (id.length > pathPartMaxLength) {
       throw new Error("id is longer than " + pathPartMaxLength + " bytes");
@@ -154,9 +128,7 @@ JSONDB.prototype.getSnapshot = function (
 
     const collectionPathPart = collection.match(pathAllowExpr);
     if (collectionPathPart.length != 1 && collectionPathPart[0].length != 0) {
-      throw new Error(
-        "collection name contains illegal characters or is invalid",
-      );
+      throw new Error("collection name contains illegal characters or is invalid");
     }
     const idPathPart = id.match(pathAllowExpr);
     if (idPathPart.length != 1 && idPathPart[0].length != 0) {
@@ -200,19 +172,10 @@ JSONDB.prototype.getSnapshot = function (
 // The version will be inferred from the parameters if it is missing.
 //
 // Callback should be called as callback(error, [list of ops]);
-JSONDB.prototype.getOps = function (
-  collection,
-  id,
-  from,
-  to,
-  options,
-  callback,
-) {
+JSONDB.prototype.getOps = function (collection, id, from, to, options, callback) {
   try {
     if (collection.length > pathPartMaxLength) {
-      throw new Error(
-        "collection name is longer than " + pathPartMaxLength + " bytes",
-      );
+      throw new Error("collection name is longer than " + pathPartMaxLength + " bytes");
     }
     if (id.length > pathPartMaxLength) {
       throw new Error("id is longer than " + pathPartMaxLength + " bytes");
@@ -220,9 +183,7 @@ JSONDB.prototype.getOps = function (
 
     const collectionPathPart = collection.match(pathAllowExpr);
     if (collectionPathPart.length != 1 && collectionPathPart[0].length != 0) {
-      throw new Error(
-        "collection name contains illegal characters or is invalid",
-      );
+      throw new Error("collection name contains illegal characters or is invalid");
     }
     const idPathPart = id.match(pathAllowExpr);
     if (idPathPart.length != 1 && idPathPart[0].length != 0) {
@@ -240,33 +201,21 @@ JSONDB.prototype.getOps = function (
     /** @type JSONDBData */
     const document = JSON.parse(readFileSync(documentPath).toString("utf8"));
 
-    return document.ops
-      .filter((op) => from <= op.v && op.v < to)
-      .sort((a, b) => a.v - b.v);
+    return document.ops.filter((op) => from <= op.v && op.v < to).sort((a, b) => a.v - b.v);
   } catch (err) {
     callback(err);
   }
 };
 
-JSONDB.prototype.query = function (
-  collection,
-  inputQuery,
-  fields,
-  options,
-  callback,
-) {
+JSONDB.prototype.query = function (collection, inputQuery, fields, options, callback) {
   try {
     if (collection.length > pathPartMaxLength) {
-      throw new Error(
-        "collection name is longer than " + pathPartMaxLength + " bytes",
-      );
+      throw new Error("collection name is longer than " + pathPartMaxLength + " bytes");
     }
 
     const collectionPathPart = collection.match(pathAllowExpr);
     if (collectionPathPart.length != 1 && collectionPathPart[0].length != 0) {
-      throw new Error(
-        "collection name contains illegal characters or is invalid",
-      );
+      throw new Error("collection name contains illegal characters or is invalid");
     }
 
     const collectionPath = `${this.documentDir}/${collectionPathPart}`;
@@ -278,16 +227,10 @@ JSONDB.prototype.query = function (
     files.forEach((file) => {
       results.push(
         new Promise((resolve, reject) => {
-          this.getSnapshot(
-            collection,
-            file.split(".")[0],
-            null,
-            null,
-            (err, snap) => {
-              if (err) reject(err);
-              resolve(snap);
-            },
-          );
+          this.getSnapshot(collection, file.split(".")[0], null, null, (err, snap) => {
+            if (err) reject(err);
+            resolve(snap);
+          });
         }),
       );
     });

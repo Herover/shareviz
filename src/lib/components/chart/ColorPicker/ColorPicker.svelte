@@ -14,19 +14,19 @@
   let {
     color,
     scheme = [
-    "#a6cee3",
-    "#1f78b4",
-    "#b2df8a",
-    "#33a02c",
-    "#fb9a99",
-    "#e31a1c",
-    "#fdbf6f",
-    "#ff7f00",
-    "#cab2d6",
-    "#6a3d9a",
-    "#ffff99",
-    "#b15928",
-  ],
+      "#a6cee3",
+      "#1f78b4",
+      "#b2df8a",
+      "#33a02c",
+      "#fb9a99",
+      "#e31a1c",
+      "#fdbf6f",
+      "#ff7f00",
+      "#cab2d6",
+      "#6a3d9a",
+      "#ffff99",
+      "#b15928",
+    ],
     chartColors = [],
     disabled = false,
     onchange = () => {},
@@ -39,9 +39,7 @@
   $effect(() => {
     try {
       // TODO: This allows colors that cannot be rendered, is that OK?
-      const parts = color.match(
-        /oklch\((\d+\.?\d*)[, %]+(\d+\.?\d*)%[, ]+(\d+\.?\d*)(?:deg)?\)/,
-      );
+      const parts = color.match(/oklch\((\d+\.?\d*)[, %]+(\d+\.?\d*)%[, ]+(\d+\.?\d*)(?:deg)?\)/);
       if (parts != null && parts.length == 4) {
         l = Number.parseFloat(parts[1]);
         c = Number.parseFloat(parts[2]);
@@ -78,10 +76,8 @@
         // TODO: make more generic in case we nest components more than 3 times.
         (
           (e.target as HTMLElement)?.parentElement === container ||
-          (e.target as HTMLElement)?.parentElement?.parentElement ===
-            container ||
-          (e.target as HTMLElement)?.parentElement?.parentElement
-            ?.parentElement === container
+          (e.target as HTMLElement)?.parentElement?.parentElement === container ||
+          (e.target as HTMLElement)?.parentElement?.parentElement?.parentElement === container
         )
       )
     ) {

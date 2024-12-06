@@ -27,7 +27,7 @@
     if (!live) {
       fetch("/api/chart/" + data.id + "/data")
         .then((resp) => resp.json())
-        .then((data) => chartSpec = data.chart)
+        .then((data) => (chartSpec = data.chart))
         .catch((err) => console.error(err));
     }
   });

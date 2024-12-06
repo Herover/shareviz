@@ -9,8 +9,8 @@
     chartSpec: Root;
     componentSpec: hBarType;
     data: {
-    [key: string]: any[];
-  };
+      [key: string]: any[];
+    };
     chartWidth: number;
     editor?: boolean;
     index: number;
@@ -24,15 +24,16 @@
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     editor = false,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    index
+    index,
   }: Props = $props();
 
   let groups = $derived(formatData(componentSpec, data, componentSpec.colors.byKey));
 
   let labelOverflows: number[] = $state([]);
-  let labelOverflow = $derived(labelOverflows.slice(0, groups.length).reduce((acc, n) => Math.max(acc, n), 0));
-  let width =
-    $derived(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight);
+  let labelOverflow = $derived(
+    labelOverflows.slice(0, groups.length).reduce((acc, n) => Math.max(acc, n), 0),
+  );
+  let width = $derived(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight);
 
   let showAxis = $derived((type: AxisRepeatMode, i: number) => {
     if (type == AxisRepeatMode.ALL) return true;
