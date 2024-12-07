@@ -10,7 +10,19 @@ Not ready for production.
 
 There's currently no hosted version, but there might be in the future.
 
-# Development
+# Running the code
+
+These environvent variables should be defined in both dev and prod settings:
+
+```
+ORIGIN="http://localhost:5173" # Only required in prod
+AUTH_TRUST_HOST=true # Only required in prod
+AUTH_SECRET="X"
+AUTH_GITHUB_ID=Y
+AUTH_GITHUB_SECRET=Z
+```
+
+## Development
 
 - First install everything `npm install`.
 
@@ -18,7 +30,7 @@ There's currently no hosted version, but there might be in the future.
 
 - Run the dev server `npm run dev`, or `npm run dev -- --host` if you want to test with a external device.
 
-# Production
+## Production
 
 - Install everything `npm install`.
 
