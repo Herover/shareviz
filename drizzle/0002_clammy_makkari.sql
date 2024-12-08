@@ -1,0 +1,1 @@
+ALTER TABLE `charts` ADD `created` integer NOT NULL;

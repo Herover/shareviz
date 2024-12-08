@@ -22,7 +22,7 @@
   $effect(() => {
     teamId = $page.params.teamId;
   });
-  let charts: { chartRef: string; id: string; name: string }[] = $state([]);
+  let charts: { chartRef: string; id: string; name: string, created: number }[] = $state([]);
   let team: Awaited<ReturnType<typeof user.getTeamCharts>> | undefined = $state();
   $effect(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -156,7 +156,10 @@
     </h3>
     <ul>
       {#each charts as chart}
-        <li><a href="/editor/chart/{chart.chartRef}">{chart.name}</a></li>
+        <li>
+          <a href="/editor/chart/{chart.chartRef}">{chart.name}</a>
+          <small>{new Date(chart.created).toISOString()}</small>
+        </li>
       {/each}
     </ul>
   </div>

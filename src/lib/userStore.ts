@@ -33,7 +33,7 @@ export const user = (function create() {
     getTeamCharts: async (
       teamId: string,
     ): Promise<{
-      charts: { id: string; name: string; chartRef: string }[];
+      charts: { id: string; name: string; chartRef: string, created: number }[];
       members: { role: number; user: { id: string; name: string } }[];
       name: string;
     }> => {
@@ -50,7 +50,7 @@ export const user = (function create() {
 
       return data;
     },
-    geUserCharts: async (): Promise<{ id: string; name: string; chartRef: string }[]> => {
+    geUserCharts: async (): Promise<{ id: string; name: string; chartRef: string, created: number }[]> => {
       const resp = await fetch(`/api/user/charts`, {
         method: "GET",
       });

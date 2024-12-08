@@ -5,7 +5,6 @@ import {
   organizationInvites,
   organizations,
   teams,
-  teamsCharts,
   userCharts,
   users,
   usersOrganizations,
@@ -69,6 +68,8 @@ export const db = {
         id: charts.id,
         name: charts.name,
         chartRef: charts.chartRef,
+        teamId: charts.teamId,
+        created: charts.created,
       })
       .from(userCharts)
       .innerJoin(charts, eq(charts.id, userCharts.chartId))
@@ -133,6 +134,8 @@ export const db = {
         .values({
           name,
           chartRef: ref,
+          teamId,
+          created: Date.now(),
         })
         .returning({ id: charts.id });
       console.log(chartRef);
@@ -140,13 +143,6 @@ export const db = {
         chartId: chartRef[0].id,
         userId,
       });
-
-      if (typeof teamId != "undefined") {
-        await tx.insert(teamsCharts).values({
-          chartId: chartRef[0].id,
-          teamId,
-        });
-      }
 
       return chartRef[0].id;
     });
@@ -291,12 +287,10 @@ export const db = {
         id: charts.id,
         name: charts.name,
         chartRef: charts.chartRef,
+        created: charts.created,
       })
-      .from(usersTeams)
-      .innerJoin(teams, eq(usersTeams.teamId, teams.id))
-      .innerJoin(teamsCharts, eq(teamsCharts.teamId, teams.id))
-      .innerJoin(charts, eq(charts.id, teamsCharts.chartId))
-      .where(and(eq(usersTeams.teamId, id)));
+      .from(charts)
+      .where(eq(charts.teamId, id));
 
     return res;
   },

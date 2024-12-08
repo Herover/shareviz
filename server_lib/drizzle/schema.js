@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 
 const sqlite = new Database("auth.sqlite");
-export const db = drizzle({ client: sqlite });
+export const db = drizzle({ client: sqlite,logger: true });
 
 // Auth.js types
 
@@ -152,27 +152,17 @@ export const userCharts = sqliteTable(
   }),
 );
 
-export const teamsCharts = sqliteTable(
-  "teamsCharts",
-  {
-    teamId: text("teamId")
-      .notNull()
-      .references(() => teams.id, { onDelete: "cascade" }),
-    chartId: text("userId")
-      .notNull()
-      .references(() => charts.id, { onDelete: "cascade" }),
-  },
-  (t) => ({
-    unq: unique("teamsChartsUnique").on(t.teamId, t.chartId),
-  }),
-);
-
 export const charts = sqliteTable("charts", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
   chartRef: text("chartRef").notNull().unique(),
+  teamId: text("teamId")
+    .references(() => teams.id, { onDelete: "set null" }),
+  created: integer("created")
+    .notNull(),
+  archived: integer("archived"),
 });
 
 export const organizationInvites = sqliteTable("organizationInvites", {
