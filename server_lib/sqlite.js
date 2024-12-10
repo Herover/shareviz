@@ -71,52 +71,10 @@ export const db = {
         teamId: charts.teamId,
         created: charts.created,
       })
-      .from(userCharts)
-      .innerJoin(charts, eq(charts.id, userCharts.chartId))
-      .where(
-        and(eq(userCharts.userId, userId), chartRef ? eq(charts.chartRef, chartRef) : undefined),
-      );
-    // return new Promise((resolve, reject) => {
-    //   const stmt = db.prepare(`
-    //     SELECT
-    //       charts.id AS id,
-    //       charts.name AS name,
-    //       teams_users.team_id AS teamId,
-    //       charts.chart_ref AS chartRef,
-    //       NULL AS relationType
-    //     FROM
-    //       teams_users
-    //       INNER JOIN teams ON teams_users.team_id = teams.id
-    //       INNER JOIN teams_charts ON teams_charts.team_id = teams.id
-    //       INNER JOIN charts ON charts.id = teams_charts.chart_id
-    //     WHERE
-    //       teams_users.user_id = ? ${typeof chartRef == "undefined" ? "" : " AND charts.chart_ref = ?"}
-    //     UNION
-    //     SELECT
-    //       charts.id AS id,
-    //       charts.name AS name,
-    //       NULL AS teamId,
-    //       charts.chart_ref AS chartRef,
-    //       users_charts.relation_type AS relationType
-    //     FROM
-    //       users_charts
-    //       INNER JOIN charts ON charts.id = users_charts.chart_id
-    //     WHERE
-    //       users_charts.user_id = ? ${typeof chartRef == "undefined" ? "" : " AND charts.chart_ref = ?"}
-    //   `);
-
-    //   stmt.all(typeof chartRef == "undefined" ? [userId, userId] : [userId, chartRef, userId, chartRef], function (err, rows) {
-    //     if (err) reject(err);
-    //     resolve(rows.map((row) => ({
-    //       id: "" + row.id,
-    //       name: row.name,
-    //       teamId: row.teamId == null ? null : "" + row.teamId,
-    //       relationType: row.relationType == null ? null : row.relationType,
-    //       chartId: row.chartId,
-    //       chartRef: row.chartRef,
-    //     })));
-    //   }).finalize();
-    // });
+      .from(users)
+      .innerJoin(usersTeams, eq(usersTeams.userId, users.id))
+      .innerJoin(charts, eq(usersTeams.teamId, charts.teamId))
+      .where(and(eq(users.id, userId), chartRef ? eq(charts.chartRef, chartRef) : undefined));
   },
 
   /**
