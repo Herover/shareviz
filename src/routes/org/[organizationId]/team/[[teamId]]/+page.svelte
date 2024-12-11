@@ -22,7 +22,8 @@
   $effect(() => {
     teamId = $page.params.teamId;
   });
-  let charts: { chartRef: string; id: string; name: string, created: number }[] = $state([]);
+  let charts: { chartRef: string; id: string; name: string; created: number; updated: number }[] =
+    $state([]);
   let team: Awaited<ReturnType<typeof user.getTeamCharts>> | undefined = $state();
   $effect(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -89,6 +90,33 @@
       notifications.addError((err as Error).message);
     }
   };
+
+  const formatRelativeTime = (date: number): string => {
+    const now = new Date();
+    const msAgo = now.getTime() - date;
+    const d = new Date(date);
+    if (date == 0) {
+      return "Never";
+    } else if (msAgo < 1000 * 10) {
+      return "Seconds ago";
+    } else if (msAgo < 1000 * 60) {
+      return `${Math.floor(msAgo / 1000)} seconds ago`;
+    } else if (msAgo < 1000 * 60 * 60) {
+      return `${Math.floor(msAgo / (60 * 1000))} minutes ago`;
+    } else if (
+      d.getDate() == now.getDate() &&
+      d.getMonth() == now.getMonth() &&
+      d.getFullYear == now.getFullYear
+    ) {
+      return `${Math.floor(msAgo / (60 * 60 * 1000))} hours ago`;
+    } else {
+      return `${Math.floor(msAgo / (24 * 60 * 60 * 1000))} days ago`;
+    }
+  };
+  const formatDate = (date: number): string => {
+    const d = new Date(date);
+    return `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
+  };
 </script>
 
 <div class="holder">
@@ -154,14 +182,26 @@
     <h3>
       Charts <button onclick={() => newGraphic(true)}>Create new</button>
     </h3>
-    <ul>
-      {#each charts as chart}
-        <li>
-          <a href="/editor/chart/{chart.chartRef}">{chart.name}</a>
-          <small>{new Date(chart.created).toISOString()}</small>
-        </li>
-      {/each}
-    </ul>
+    <table class="charts">
+      <thead>
+        <tr>
+          <th> Name </th>
+          <th style:width="120px"> Updated </th>
+          <th style:width="100px"> Created </th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each charts as chart}
+          <tr>
+            <td>
+              <b><a href="/editor/chart/{chart.chartRef}">{chart.name}</a></b>
+            </td>
+            <td>{formatRelativeTime(chart.updated)}</td>
+            <td>{formatDate(chart.created)}</td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -206,5 +246,12 @@
   }
   .add-option {
     text-align: center;
+  }
+
+  .charts {
+    width: 100%;
+  }
+  .charts th {
+    text-align: start;
   }
 </style>

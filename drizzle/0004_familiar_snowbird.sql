@@ -1,0 +1,1 @@
+ALTER TABLE `charts` ADD `updated` integer DEFAULT 0 NOT NULL;

@@ -713,7 +713,7 @@ export function startServer(server) {
     // next();
   });
   backend.use("commit", function (ctx, next) {
-    console.log("commit" /* ctx.snapshot */);
+    console.log("commit" /* , ctx.snapshot */);
     if (typeof ctx.extra.oldMeta == "object" && ctx.snapshot?.data !== null) {
       // Ensure user can't edit meta object
       // TODO: add some sort of check to detect disallowed changes
@@ -723,7 +723,9 @@ export function startServer(server) {
     next();
   });
   backend.use("afterWrite", function (ctx, next) {
-    console.log("afterWrite");
-    next();
+    console.log("afterWrite" /* , ctx */);
+    db.updateChart(ctx.id, { updated: Date.now() })
+      .then(() => next())
+      .catch((e) => next(e));
   });
 }

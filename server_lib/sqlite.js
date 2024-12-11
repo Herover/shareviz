@@ -70,6 +70,7 @@ export const db = {
         chartRef: charts.chartRef,
         teamId: charts.teamId,
         created: charts.created,
+        updated: charts.updated,
       })
       .from(users)
       .innerJoin(usersTeams, eq(usersTeams.userId, users.id))
@@ -94,9 +95,9 @@ export const db = {
           chartRef: ref,
           teamId,
           created: Date.now(),
+          updated: 0,
         })
         .returning({ id: charts.id });
-      console.log(chartRef);
       await tx.insert(userCharts).values({
         chartId: chartRef[0].id,
         userId,
@@ -155,8 +156,11 @@ export const db = {
   /**
    * @returns {Promise<boolean>} update a charts info
    */
-  updateChart: async (/** @type {string} */ chartRef, /** @type {string} */ name) => {
-    const res = await drizzledb.update(charts).set({ name }).where(eq(charts.chartRef, chartRef));
+  updateChart: async (
+    /** @type {string} */ chartRef,
+    /** @type {{ name: string, updated: number, teamId: string }} */ fields,
+  ) => {
+    const res = await drizzledb.update(charts).set(fields).where(eq(charts.chartRef, chartRef));
     return res.changes != 0;
     // return new Promise((resolve, reject) => {
     //   resolve();
@@ -246,6 +250,7 @@ export const db = {
         name: charts.name,
         chartRef: charts.chartRef,
         created: charts.created,
+        updated: charts.updated,
       })
       .from(charts)
       .where(eq(charts.teamId, id));

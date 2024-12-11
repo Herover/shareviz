@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 
 const sqlite = new Database("auth.sqlite");
-export const db = drizzle({ client: sqlite,logger: true });
+export const db = drizzle({ client: sqlite, logger: true });
 
 // Auth.js types
 
@@ -158,10 +158,9 @@ export const charts = sqliteTable("charts", {
     .$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
   chartRef: text("chartRef").notNull().unique(),
-  teamId: text("teamId")
-    .references(() => teams.id, { onDelete: "set null" }),
-  created: integer("created")
-    .notNull(),
+  teamId: text("teamId").references(() => teams.id, { onDelete: "set null" }),
+  created: integer("created").notNull(),
+  updated: integer("updated").notNull().default(0),
   archived: integer("archived"),
 });
 
