@@ -110,7 +110,17 @@
     ) {
       return `${Math.floor(msAgo / (60 * 60 * 1000))} hours ago`;
     } else {
-      return `${Math.floor(msAgo / (24 * 60 * 60 * 1000))} days ago`;
+      now.setHours(0);
+      now.setMinutes(0);
+      now.setSeconds(0);
+      now.setMilliseconds(0);
+      d.setHours(0);
+      d.setMinutes(0);
+      d.setSeconds(0);
+      d.setMilliseconds(0);
+      const diff = now.getTime() - d.getTime();
+
+      return `${Math.floor(diff / (24 * 60 * 60 * 1000))} days ago`;
     }
   };
   const formatDate = (date: number): string => {
