@@ -130,3 +130,40 @@ export const orNumber = (n: number | undefined, def = 0) => orDefault(n, def);
 
 // Used to place un-ordered items last
 export const negativeOneToInf = (n: number) => (n == -1 ? Number.POSITIVE_INFINITY : n);
+
+export const formatRelativeTime = (date: number): string => {
+  const now = new Date();
+  const msAgo = now.getTime() - date;
+  const d = new Date(date);
+  if (date == 0) {
+    return "Never";
+  } else if (msAgo < 1000 * 10) {
+    return "Seconds ago";
+  } else if (msAgo < 1000 * 60) {
+    return `${Math.floor(msAgo / 1000)} seconds ago`;
+  } else if (msAgo < 1000 * 60 * 60) {
+    return `${Math.floor(msAgo / (60 * 1000))} minutes ago`;
+  } else if (
+    d.getDate() == now.getDate() &&
+    d.getMonth() == now.getMonth() &&
+    d.getFullYear == now.getFullYear
+  ) {
+    return `${Math.floor(msAgo / (60 * 60 * 1000))} hours ago`;
+  } else {
+    now.setHours(0);
+    now.setMinutes(0);
+    now.setSeconds(0);
+    now.setMilliseconds(0);
+    d.setHours(0);
+    d.setMinutes(0);
+    d.setSeconds(0);
+    d.setMilliseconds(0);
+    const diff = now.getTime() - d.getTime();
+
+    return `${Math.floor(diff / (24 * 60 * 60 * 1000))} days ago`;
+  }
+};
+export const formatDate = (date: number): string => {
+  const d = new Date(date);
+  return `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
+};

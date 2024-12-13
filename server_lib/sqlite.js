@@ -2,6 +2,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import {
   charts,
   db as drizzledb,
+  folders,
   organizationInvites,
   organizations,
   teams,
@@ -368,6 +369,46 @@ export const db = {
       });
       return res.changes == 1;
     });
+  },
+
+  addFolder: async (
+    /** @type {string} */ name,
+    /** @type {string} */ teamId,
+    /** @type {string} */ parentId,
+  ) => {
+    const r = await drizzledb
+      .insert(folders)
+      .values({
+        name,
+        teamId,
+        parentId,
+        created: Date.now(),
+      })
+      .returning({ id: folders.id });
+
+    return r[0].id;
+  },
+  editFolder: async (
+    /** @type {string} */ id,
+    /** @type {{ name?: string, parentId?: string }} */ attr,
+  ) => {
+    await drizzledb
+      .update(folders)
+      .set({
+        name: attr.name,
+        parentId: attr.parentId,
+      })
+      .where(eq(folders.id, id));
+  },
+  getFolders: async (/** @type {string} */ teamId) => {
+    return drizzledb.select().from(folders).where(eq(folders.teamId, teamId));
+  },
+  getFolder: async (/** @type {string} */ folderId) => {
+    const lst = await drizzledb.select().from(folders).where(eq(folders.id, folderId));
+    if (lst.length == 0) {
+      throw new Error("Folder not found");
+    }
+    return lst[0];
   },
 };
 

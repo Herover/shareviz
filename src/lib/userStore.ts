@@ -33,7 +33,15 @@ export const user = (function create() {
     getTeamCharts: async (
       teamId: string,
     ): Promise<{
-      charts: { id: string; name: string; chartRef: string; created: number; updated: number }[];
+      charts: {
+        id: string;
+        name: string;
+        chartRef: string;
+        folderId?: string;
+        created: number;
+        updated: number;
+      }[];
+      folders: { id: string; name: string; created: number; parentId?: string }[];
       members: { role: number; user: { id: string; name: string } }[];
       name: string;
     }> => {
@@ -45,7 +53,7 @@ export const user = (function create() {
 
       if (resp.status != 200) {
         notifications.addError(orDefault(data.message, "Unknown error " + resp.statusText));
-        return { charts: [], members: [], name: "" };
+        return { charts: [], members: [], name: "", folders: [] };
       }
 
       return data;

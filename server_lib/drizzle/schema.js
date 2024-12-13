@@ -162,6 +162,21 @@ export const charts = sqliteTable("charts", {
   created: integer("created").notNull(),
   updated: integer("updated").notNull().default(0),
   archived: integer("archived"),
+  folderId: text("folderId").references(() => folders.id, { onDelete: "cascade" }),
+});
+
+export const folders = sqliteTable("folder", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  parentId: text("folderId").references(
+    /** @type () => import("drizzle-orm/sqlite-core").AnySQLiteColumn */ () => folders.id,
+    { onDelete: "cascade" },
+  ),
+  name: text("name").notNull(),
+  teamId: text("teamId").references(() => teams.id, { onDelete: "set null" }),
+  created: integer("created").notNull(),
+  archived: integer("archived"),
 });
 
 export const organizationInvites = sqliteTable("organizationInvites", {

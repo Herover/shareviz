@@ -41,3 +41,32 @@ export async function removeTeamMember(userId: string, teamId: string): Promise<
     throw new Error(data.message);
   }
 }
+
+export async function addFolder(name: string, teamId: string, parentId: string): Promise<void> {
+  const res = await fetch(`/api/folder`, {
+    method: "POST",
+    body: JSON.stringify({
+      name,
+      teamId,
+      parentId,
+    }),
+  });
+  if (res.status != 200) {
+    const data = await res.json();
+    throw new Error(data.message);
+  }
+}
+
+export async function editFolder(
+  folderId: string,
+  attributes: { parentId?: string; name?: string },
+): Promise<void> {
+  const res = await fetch(`/api/folder/${folderId}`, {
+    method: "PUT",
+    body: JSON.stringify(attributes),
+  });
+  if (res.status != 200) {
+    const data = await res.json();
+    throw new Error(data.message);
+  }
+}

@@ -8,6 +8,8 @@
   import type { PageData } from "./$types";
   import { TEAM_ROLES } from "$lib/consts";
   import { addTeam, addTeamMember, removeTeamMember } from "$lib/api";
+  import ChartList from "$lib/components/chart-list/ChartList.svelte";
+  import type { FolderItem } from "$lib/components/chart-list/types";
 
   let { data }: { data: PageData } = $props();
 
@@ -22,8 +24,7 @@
   $effect(() => {
     teamId = $page.params.teamId;
   });
-  let charts: { chartRef: string; id: string; name: string; created: number; updated: number }[] =
-    $state([]);
+  let directory: FolderItem[] = $state([]);
   let team: Awaited<ReturnType<typeof user.getTeamCharts>> | undefined = $state();
   $effect(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -31,17 +32,75 @@
       ? user
           .geUserCharts()
           .then((c) => {
-            charts = c;
+            directory = c.map((c) => ({
+              type: "file",
+              chartRef: c.chartRef,
+              id: c.id,
+              name: c.name,
+              created: c.created,
+              updated: c.updated,
+            }));
             team = undefined;
           })
           .catch((e) => notifications.addError(e.message))
-      : user
-          .getTeamCharts(teamId)
-          .then((c) => {
-            charts = c.charts;
-            team = c;
-          })
-          .catch((e) => notifications.addError(e.message));
+      : user.getTeamCharts(teamId).then((c) => {
+          const dirList = c.folders.reduce(
+            (acc, f) => {
+              if (typeof acc[f.parentId ?? ""] == "undefined") {
+                acc[f.parentId ?? ""] = [
+                  {
+                    type: "folder",
+                    id: f.id,
+                    name: f.name,
+                    open: false,
+                    created: f.created,
+                    updated: 0,
+                    contents: [],
+                  } as FolderItem,
+                ];
+              } else {
+                acc[f.parentId ?? ""].push({
+                  type: "folder",
+                  id: f.id,
+                  name: f.name,
+                  open: false,
+                  created: f.created,
+                  updated: 0,
+                  contents: [],
+                } as FolderItem);
+              }
+              return acc;
+            },
+            { "": [] } as { [key: string]: FolderItem[] },
+          );
+
+          c.charts.forEach((c) =>
+            dirList[c.folderId ?? ""].push({
+              type: "file",
+              chartRef: c.chartRef,
+              id: c.id,
+              name: c.name,
+              created: c.created,
+              updated: c.updated,
+            }),
+          );
+
+          const buildDir = (path: string): FolderItem[] => {
+            const folder: FolderItem[] = [];
+            dirList[path].forEach((item) => {
+              if (item.type == "folder") {
+                item.contents = buildDir(item.id);
+              }
+              folder.push(item);
+            });
+            return folder;
+          };
+
+          directory = buildDir("");
+
+          team = c;
+        });
+    // .catch((e) => {notifications.addError(e.message); throw e});
   });
   const addNewTeam = async () => {
     try {
@@ -89,43 +148,6 @@
     } catch (err) {
       notifications.addError((err as Error).message);
     }
-  };
-
-  const formatRelativeTime = (date: number): string => {
-    const now = new Date();
-    const msAgo = now.getTime() - date;
-    const d = new Date(date);
-    if (date == 0) {
-      return "Never";
-    } else if (msAgo < 1000 * 10) {
-      return "Seconds ago";
-    } else if (msAgo < 1000 * 60) {
-      return `${Math.floor(msAgo / 1000)} seconds ago`;
-    } else if (msAgo < 1000 * 60 * 60) {
-      return `${Math.floor(msAgo / (60 * 1000))} minutes ago`;
-    } else if (
-      d.getDate() == now.getDate() &&
-      d.getMonth() == now.getMonth() &&
-      d.getFullYear == now.getFullYear
-    ) {
-      return `${Math.floor(msAgo / (60 * 60 * 1000))} hours ago`;
-    } else {
-      now.setHours(0);
-      now.setMinutes(0);
-      now.setSeconds(0);
-      now.setMilliseconds(0);
-      d.setHours(0);
-      d.setMinutes(0);
-      d.setSeconds(0);
-      d.setMilliseconds(0);
-      const diff = now.getTime() - d.getTime();
-
-      return `${Math.floor(diff / (24 * 60 * 60 * 1000))} days ago`;
-    }
-  };
-  const formatDate = (date: number): string => {
-    const d = new Date(date);
-    return `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
   };
 </script>
 
@@ -192,26 +214,7 @@
     <h3>
       Charts <button onclick={() => newGraphic(true)}>Create new</button>
     </h3>
-    <table class="charts">
-      <thead>
-        <tr>
-          <th> Name </th>
-          <th style:width="120px"> Updated </th>
-          <th style:width="100px"> Created </th>
-        </tr>
-      </thead>
-      <tbody>
-        {#each charts as chart}
-          <tr>
-            <td>
-              <b><a href="/editor/chart/{chart.chartRef}">{chart.name}</a></b>
-            </td>
-            <td>{formatRelativeTime(chart.updated)}</td>
-            <td>{formatDate(chart.created)}</td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
+    <ChartList contents={directory} />
   </div>
 </div>
 
@@ -256,12 +259,5 @@
   }
   .add-option {
     text-align: center;
-  }
-
-  .charts {
-    width: 100%;
-  }
-  .charts th {
-    text-align: start;
   }
 </style>

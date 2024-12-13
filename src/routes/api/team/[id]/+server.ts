@@ -14,10 +14,12 @@ export async function GET({ params, locals }) {
   const team = await db.getTeam(params.id);
   const members = await db.getTeamMembers(params.id);
   const charts = await db.getTeamCharts(params.id);
+  const folders = await db.getFolders(params.id);
   return json(
     {
       charts,
       members: members.map((e) => ({ user: e.user, role: e.usersTeams.role })),
+      folders,
       name: team.name,
       organizationId: team.organizationId,
     },
