@@ -58,7 +58,7 @@ export async function removeTeamMember(userId: string, teamId: string): Promise<
   }
 }
 
-export async function addFolder(name: string, teamId: string, parentId: string): Promise<void> {
+export async function addFolder(name: string, teamId: string, parentId?: string): Promise<string> {
   const res = await fetch(`/api/folder`, {
     method: "POST",
     body: JSON.stringify({
@@ -67,20 +67,36 @@ export async function addFolder(name: string, teamId: string, parentId: string):
       parentId,
     }),
   });
+  const data = await res.json();
+  if (res.status != 200) {
+    throw new Error(data.message);
+  }
+  return data.id;
+}
+
+export async function editFolder(
+  folderId: string,
+  attributes: { parentId?: string | null; name?: string },
+): Promise<void> {
+  const res = await fetch(`/api/folder/${folderId}`, {
+    method: "PUT",
+    body: JSON.stringify(attributes),
+  });
   if (res.status != 200) {
     const data = await res.json();
     throw new Error(data.message);
   }
 }
 
-export async function editFolder(
-  folderId: string,
-  attributes: { parentId?: string; name?: string },
+export async function editChartInfo(
+  id: string,
+  attributes: { name?: string; folderId?: string | null },
 ): Promise<void> {
-  const res = await fetch(`/api/folder/${folderId}`, {
+  const res = await fetch("/api/chart/" + id, {
     method: "PUT",
     body: JSON.stringify(attributes),
   });
+
   if (res.status != 200) {
     const data = await res.json();
     throw new Error(data.message);

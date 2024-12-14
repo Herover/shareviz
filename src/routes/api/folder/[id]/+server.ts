@@ -10,9 +10,6 @@ export async function PUT({ params, request, locals }) {
   }
 
   const { name, parentId } = await request.json();
-  if (typeof name != "string") {
-    return json({ message: "invalid name" }, { status: 400 });
-  }
 
   const folder = await db.getFolder(params.id);
 

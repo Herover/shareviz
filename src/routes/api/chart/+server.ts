@@ -24,7 +24,7 @@ export async function POST({ request, locals }) {
     return json({ message: "invalid token" }, { status: 400 });
   }
 
-  const { teamId }: { teamId?: string } = await request.json();
+  const { teamId, folderId }: { teamId?: string; folderId?: string } = await request.json();
 
   const ref = crypto.randomUUID();
   const doc = connection.get("examples", ref);
@@ -35,6 +35,6 @@ export async function POST({ request, locals }) {
     }),
   );
 
-  const id = await db.addChart(ref, "Chart name", user.id, teamId);
+  const id = await db.addChart(ref, "Chart name", user.id, teamId, folderId);
   return json({ message: "ok", id, ref }, { status: 200 });
 }

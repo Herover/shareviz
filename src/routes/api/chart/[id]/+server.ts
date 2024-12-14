@@ -29,10 +29,7 @@ export async function PUT({ params, request, locals }) {
     return json({ message: "invalid token" }, { status: 400 });
   }
 
-  const { name } = await request.json();
-  if (typeof name != "string") {
-    return json({ message: "invalid name" }, { status: 400 });
-  }
+  const { name, folderId }: { name?: string; folderId?: string } = await request.json();
 
   try {
     // Check if user can access chart
@@ -41,7 +38,7 @@ export async function PUT({ params, request, locals }) {
       throw new Error("chart not found");
     }
 
-    await db.updateChart(params.id, name);
+    await db.updateChart(params.id, { name, folderId });
     return json({});
   } catch (err) {
     console.error(err);

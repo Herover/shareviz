@@ -28,6 +28,7 @@ import {
 } from "./chart";
 import { notifications } from "./notificationStore";
 import { orDefault } from "./utils";
+import { editChartInfo } from "./api";
 // import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
 
@@ -234,12 +235,12 @@ export const db = (function createDB() {
           );
       }
     },
-    create: (synced: boolean, teamId?: string) => {
+    create: (synced: boolean, teamId?: string, folderId?: string) => {
       return new Promise<string>((resolve, reject) => {
         if (synced) {
           fetch("/api/chart", {
             method: "POST",
-            body: JSON.stringify({ teamId }),
+            body: JSON.stringify({ teamId, folderId }),
           })
             .then((res) => res.json())
             .then((data) => {
@@ -277,14 +278,12 @@ export const db = (function createDB() {
     },
 
     updateInfo: async (info: { name: string }) => {
-      const res = await fetch("/api/chart/" + id, {
-        method: "PUT",
-        body: JSON.stringify({ name: info.name }),
-      });
+      if (typeof id == "undefined") return;
 
-      if (res.status != 200) {
-        notifications.addError("Unable to update");
-        return;
+      try {
+        editChartInfo(id, info);
+      } catch (e) {
+        notifications.addError((e as Error).message);
       }
 
       update((d) => ({

@@ -87,6 +87,7 @@ export const db = {
     /** @type {string} */ name,
     /** @type {string} */ userId,
     /** @type {string | undefined} */ teamId,
+    /** @type {string | undefined} */ folderId,
   ) => {
     return drizzledb.transaction(async (tx) => {
       const chartRef = await tx
@@ -97,6 +98,7 @@ export const db = {
           teamId,
           created: Date.now(),
           updated: 0,
+          folderId,
         })
         .returning({ id: charts.id });
       await tx.insert(userCharts).values({
@@ -159,7 +161,7 @@ export const db = {
    */
   updateChart: async (
     /** @type {string} */ chartRef,
-    /** @type {{ name: string, updated: number, teamId: string }} */ fields,
+    /** @type {{ name?: string, updated?: number, teamId?: string, folderId?: string }} */ fields,
   ) => {
     const res = await drizzledb.update(charts).set(fields).where(eq(charts.chartRef, chartRef));
     return res.changes != 0;
@@ -252,6 +254,7 @@ export const db = {
         chartRef: charts.chartRef,
         created: charts.created,
         updated: charts.updated,
+        folderId: charts.folderId,
       })
       .from(charts)
       .where(eq(charts.teamId, id));
@@ -390,7 +393,7 @@ export const db = {
   },
   editFolder: async (
     /** @type {string} */ id,
-    /** @type {{ name?: string, parentId?: string }} */ attr,
+    /** @type {{ name?: string, parentId?: string | null }} */ attr,
   ) => {
     await drizzledb
       .update(folders)
