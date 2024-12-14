@@ -1,3 +1,19 @@
+import type { TeamResponse } from "$lib/../routes/api/team/[id]/+server";
+
+export async function getTeam(teamId: string): Promise<TeamResponse> {
+  const resp = await fetch(`/api/team/${teamId}`, {
+    method: "GET",
+  });
+
+  const data = await resp.json();
+
+  if (resp.status != 200) {
+    throw new Error(data.message);
+  }
+
+  return data;
+}
+
 /**
  * Creates a new team
  * @param name name of new team

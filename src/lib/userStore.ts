@@ -30,34 +30,6 @@ export const user = (function create() {
   return {
     subscribe,
     update: fetchLoggedIn,
-    getTeamCharts: async (
-      teamId: string,
-    ): Promise<{
-      charts: {
-        id: string;
-        name: string;
-        chartRef: string;
-        folderId?: string;
-        created: number;
-        updated: number;
-      }[];
-      folders: { id: string; name: string; created: number; parentId?: string }[];
-      members: { role: number; user: { id: string; name: string } }[];
-      name: string;
-    }> => {
-      const resp = await fetch(`/api/team/${teamId}`, {
-        method: "GET",
-      });
-
-      const data = await resp.json();
-
-      if (resp.status != 200) {
-        notifications.addError(orDefault(data.message, "Unknown error " + resp.statusText));
-        return { charts: [], members: [], name: "", folders: [] };
-      }
-
-      return data;
-    },
     geUserCharts: async (): Promise<
       { id: string; name: string; chartRef: string; created: number; updated: number }[]
     > => {

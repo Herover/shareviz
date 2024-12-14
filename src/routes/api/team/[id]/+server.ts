@@ -1,6 +1,23 @@
 import { json } from "@sveltejs/kit";
 import { db } from "../../../../../server_lib/sqlite";
 
+export type TeamResponse = {
+  charts: Awaited<ReturnType<typeof db.getTeamCharts>>;
+  members: {
+    user: {
+      id: string;
+      name: string | null;
+      email: string | null;
+      emailVerified: Date | null;
+      image: string | null;
+    };
+    role: number;
+  }[];
+  folders: Awaited<ReturnType<typeof db.getFolders>>;
+  name: string;
+  organizationId: string;
+};
+
 export async function GET({ params, locals }) {
   const session = await locals.auth();
 
@@ -22,7 +39,7 @@ export async function GET({ params, locals }) {
       folders,
       name: team.name,
       organizationId: team.organizationId,
-    },
+    } satisfies TeamResponse,
     { status: 200 },
   );
 }
