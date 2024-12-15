@@ -1,6 +1,5 @@
 <script lang="ts">
   import { editChartInfo, editFolder } from "$lib/api";
-  import { formatDate } from "$lib/utils";
   import File from "./File.svelte";
   import type { FolderItem } from "./types";
 
@@ -86,44 +85,42 @@
   };
 </script>
 
-<p>
-  <span
-    role="button"
-    tabindex="0"
-    onclick={() => (path = [])}
-    onkeydown={(e) => (e.key == "Enter" || e.key == " ") && (path = [])}
-    ondrop={() => moveTo(null)}
-    ondragover={(e) => e.preventDefault()}
-  >
-    Charts
-  </span>
-  {#each pathNamed as part, i}
-    {" "} /
-    {#if i == pathNamed.length - 1}
-      <input
-        value={part.name}
-        onblur={(e) => {
-          editFolder(part.id, { name: e.currentTarget.value });
-          nameOverride[part.id] = e.currentTarget.value;
-        }}
-      />
-    {:else}
-      <span
-        role="button"
-        tabindex="0"
-        onclick={() => onChangeFolder(path.slice(0, i + 1))}
-        onkeydown={(e) =>
-          (e.key == "Enter" || e.key == " ") && onChangeFolder(path.slice(0, i + 1))}
-        ondrop={() => moveTo(part.id)}
-        ondragover={(e) => e.preventDefault()}>{part.name}</span
-      >
-    {/if}
-  {/each}
-</p>
+<span
+  role="button"
+  tabindex="0"
+  onclick={() => (path = [])}
+  onkeydown={(e) => (e.key == "Enter" || e.key == " ") && (path = [])}
+  ondrop={() => moveTo(null)}
+  ondragover={(e) => e.preventDefault()}
+>
+  Charts
+</span>
+{#each pathNamed as part, i}
+  {" "} /
+  {#if i == pathNamed.length - 1}
+    <input
+      value={part.name}
+      onblur={(e) => {
+        editFolder(part.id, { name: e.currentTarget.value });
+        nameOverride[part.id] = e.currentTarget.value;
+      }}
+    />
+  {:else}
+    <span
+      role="button"
+      tabindex="0"
+      onclick={() => onChangeFolder(path.slice(0, i + 1))}
+      onkeydown={(e) => (e.key == "Enter" || e.key == " ") && onChangeFolder(path.slice(0, i + 1))}
+      ondrop={() => moveTo(part.id)}
+      ondragover={(e) => e.preventDefault()}>{part.name}</span
+    >
+  {/if}
+{/each}
+<p></p>
 <table class="charts">
   <thead>
     <tr>
-      <th style:width="24px"></th>
+      <th style:width="2em"></th>
       <th>
         Name
         <button
@@ -147,28 +144,16 @@
             {item}
             onSelect={(selected) => (selectedFiles[item.chartRef] = selected)}
             selected={selectedFiles[item.chartRef] == true}
+            link="/editor/chart/{item.chartRef}"
           />
         {:else if item.type == "folder"}
-          <tr
-            ondragstart={() => (selectedFolders[item.id] = true)}
-            ondragover={(e) => e.preventDefault()}
-            ondrop={() => moveTo(item.id)}
-            draggable="true"
-          >
-            <td>
-              <input type="checkbox" bind:checked={selectedFolders[item.id]} />
-            </td>
-            <td
-              role="button"
-              tabindex="0"
-              onclick={() => onChangeFolder([...path, item.id])}
-              onkeydown={(e) => (e.key == "Enter" || e.key == " ") && path.push(item.id)}
-              colspan="2"
-            >
-              {nameOverride[item.id] ?? item.name}
-            </td>
-            <td>{formatDate(item.created)}</td>
-          </tr>
+          <File
+            {item}
+            onSelect={(selected) => (selectedFolders[item.id] = selected)}
+            selected={selectedFolders[item.id] == true}
+            onChangeFolder={(id) => path.push(id)}
+            onMoveItems={(id) => moveTo(id)}
+          />
         {/if}
       {/each}
     {/if}
@@ -178,8 +163,12 @@
 <style>
   .charts {
     width: 100%;
+    border-spacing: 0px;
   }
   .charts th {
     text-align: start;
+    font-weight: normal;
+    color: var(--text-secondary);
+    padding-bottom: 0.5em;
   }
 </style>
