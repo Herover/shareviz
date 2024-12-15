@@ -9,19 +9,37 @@
     link?: string;
     onChangeFolder?: (id: string) => void;
     onMoveItems?: (id: string) => void;
+    onDragEnd: () => void;
+    onDragStart: () => void;
+    isDragging?: boolean;
   }
 
-  let { item, onSelect, selected, link, onChangeFolder, onMoveItems }: Props = $props();
+  let {
+    item,
+    onSelect,
+    selected,
+    link,
+    onChangeFolder,
+    onMoveItems,
+    onDragEnd,
+    onDragStart,
+    isDragging,
+  }: Props = $props();
 
   const ondragstart = (e: DragEvent & { currentTarget: EventTarget & HTMLTableRowElement }) => {
     e.dataTransfer?.setData("application/id", item.id);
     onSelect(true);
+    onDragStart();
+  };
+  const ondragend = () => {
+    onDragEnd();
   };
 </script>
 
 <tr
   class:selected
   {ondragstart}
+  {ondragend}
   ondrop={() => onMoveItems && onMoveItems(item.id)}
   ondragover={(e) => e.preventDefault()}
   draggable="true"
@@ -43,6 +61,7 @@
         tabindex="0"
         onclick={() => onChangeFolder(item.id)}
         onkeydown={(e) => e.key == " " && onChangeFolder(item.id)}
+        class:drag-target={isDragging}
       >
         {item.name}
       </span>
@@ -65,10 +84,11 @@
     padding-top: 0.5em;
     padding-bottom: 0.5em;
   }
-  td,
-  tr {
-  }
   .selected {
     background-color: #deeefc;
+  }
+  .drag-target {
+    border: 2px var(--text-primary);
+    border-style: dashed;
   }
 </style>

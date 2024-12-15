@@ -77,12 +77,17 @@
     }, [] as string[]);
     for (let i = 0; i < folderIds.length; i++) {
       const folderId = folderIds[i];
+      if (folderId == destinationId) {
+        continue;
+      }
       await editFolder(folderId, { parentId: destinationId });
       selectedFolders[folderId] = false;
     }
 
     onUpdate();
   };
+
+  let isDragging: boolean = $state(false);
 </script>
 
 <span
@@ -92,6 +97,7 @@
   onkeydown={(e) => (e.key == "Enter" || e.key == " ") && (path = [])}
   ondrop={() => moveTo(null)}
   ondragover={(e) => e.preventDefault()}
+  class:drag-target={isDragging && path.length != 0}
 >
   Charts
 </span>
@@ -109,6 +115,7 @@
     <span
       role="button"
       tabindex="0"
+      class:drag-target={isDragging}
       onclick={() => onChangeFolder(path.slice(0, i + 1))}
       onkeydown={(e) => (e.key == "Enter" || e.key == " ") && onChangeFolder(path.slice(0, i + 1))}
       ondrop={() => moveTo(part.id)}
@@ -116,7 +123,6 @@
     >
   {/if}
 {/each}
-<p></p>
 <table class="charts">
   <thead>
     <tr>
@@ -145,6 +151,8 @@
             onSelect={(selected) => (selectedFiles[item.chartRef] = selected)}
             selected={selectedFiles[item.chartRef] == true}
             link="/editor/chart/{item.chartRef}"
+            onDragStart={() => (isDragging = true)}
+            onDragEnd={() => (isDragging = false)}
           />
         {:else if item.type == "folder"}
           <File
@@ -153,6 +161,9 @@
             selected={selectedFolders[item.id] == true}
             onChangeFolder={(id) => path.push(id)}
             onMoveItems={(id) => moveTo(id)}
+            onDragStart={() => (isDragging = true)}
+            onDragEnd={() => (isDragging = false)}
+            {isDragging}
           />
         {/if}
       {/each}
@@ -170,5 +181,9 @@
     font-weight: normal;
     color: var(--text-secondary);
     padding-bottom: 0.5em;
+  }
+  .drag-target {
+    border: 2px var(--text-primary);
+    border-style: dashed;
   }
 </style>
