@@ -6,7 +6,7 @@
     item: FolderItem;
     onSelect: (selected: boolean) => void;
     selected: boolean;
-    link?: string;
+    link: string;
     onChangeFolder?: (id: string) => void;
     onMoveItems?: (id: string) => void;
     onDragEnd: () => void;
@@ -50,21 +50,16 @@
   <td>
     {#if item.type == "folder"}
       <span class="icon">📁</span>
-    {:else}
-      <span class="icon">📊</span>
-    {/if}
-    {#if link}
-      <a href={link}>{item.name}</a>
-    {:else if onChangeFolder}
-      <span
-        role="button"
-        tabindex="0"
-        onclick={() => onChangeFolder(item.id)}
-        onkeydown={(e) => e.key == " " && onChangeFolder(item.id)}
+      <a
+        href={link}
+        onclick={() => onChangeFolder && onChangeFolder(item.id)}
         class:drag-target={isDragging}
       >
         {item.name}
-      </span>
+      </a>
+    {:else}
+      <span class="icon">📊</span>
+      <a href={link}>{item.name}</a>
     {/if}
   </td>
   <td>{formatRelativeTime(item.updated)}</td>

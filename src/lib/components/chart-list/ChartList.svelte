@@ -8,14 +8,15 @@
     onCreateFolder: (parentId?: string) => void;
     onAddChart: (folderId?: string) => void;
     onUpdate: () => void;
+    path: string[];
+    basePath: string;
   }
 
-  let { contents, onAddChart, onCreateFolder, onUpdate }: Props = $props();
+  let { contents, onAddChart, onCreateFolder, onUpdate, path, basePath }: Props = $props();
 
   let selectedFiles: { [key: string]: boolean } = $state({});
   let selectedFolders: { [key: string]: boolean } = $state({});
 
-  let path: string[] = $state([]);
   const onChangeFolder = (newPath: string[]) => {
     path = newPath;
     selectedFiles = {};
@@ -90,17 +91,14 @@
   let isDragging: boolean = $state(false);
 </script>
 
-<span
-  role="button"
-  tabindex="0"
-  onclick={() => (path = [])}
-  onkeydown={(e) => (e.key == "Enter" || e.key == " ") && (path = [])}
+<a
+  href={basePath}
   ondrop={() => moveTo(null)}
   ondragover={(e) => e.preventDefault()}
   class:drag-target={isDragging && path.length != 0}
 >
   Charts
-</span>
+</a>
 {#each pathNamed as part, i}
   {" "} /
   {#if i == pathNamed.length - 1}
@@ -112,14 +110,11 @@
       }}
     />
   {:else}
-    <span
-      role="button"
-      tabindex="0"
+    <a
+      href={basePath + "/" + path.slice(0, i + 1)}
       class:drag-target={isDragging}
-      onclick={() => onChangeFolder(path.slice(0, i + 1))}
-      onkeydown={(e) => (e.key == "Enter" || e.key == " ") && onChangeFolder(path.slice(0, i + 1))}
       ondrop={() => moveTo(part.id)}
-      ondragover={(e) => e.preventDefault()}>{part.name}</span
+      ondragover={(e) => e.preventDefault()}>{part.name}</a
     >
   {/if}
 {/each}
@@ -159,10 +154,11 @@
             {item}
             onSelect={(selected) => (selectedFolders[item.id] = selected)}
             selected={selectedFolders[item.id] == true}
-            onChangeFolder={(id) => path.push(id)}
+            onChangeFolder={(id) => onChangeFolder([...path, id])}
             onMoveItems={(id) => moveTo(id)}
             onDragStart={() => (isDragging = true)}
             onDragEnd={() => (isDragging = false)}
+            link={basePath + "/" + path.join("/") + "/" + item.id}
             {isDragging}
           />
         {/if}

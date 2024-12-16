@@ -12,7 +12,9 @@
     <div class="icon">ShareViz</div>
     <nav>
       {#if $page.params.organizationId}
-        <div class="nav-item"><a href="/org/{$page.params.organizationId}/team">Overview</a></div>
+        <div class="nav-item">
+          <a href="/org/{$page.params.organizationId}/team/charts">Team</a>
+        </div>
         <div class="nav-item"><a href="/org/{$page.params.organizationId}">Organization</a></div>
       {/if}
       <div class="nav-item"><a href="/org/user">User</a></div>

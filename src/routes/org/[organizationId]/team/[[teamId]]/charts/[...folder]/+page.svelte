@@ -5,7 +5,7 @@
   import { user } from "$lib/userStore";
   import { db as chartStore } from "$lib/chartStore";
   import { onDestroy, onMount } from "svelte";
-  import type { PageData } from "./$types";
+  import type { PageData } from "../../$types";
   import { TEAM_ROLES } from "$lib/consts";
   import { addFolder, addTeam, addTeamMember, getTeam, removeTeamMember } from "$lib/api";
   import ChartList from "$lib/components/chart-list/ChartList.svelte";
@@ -100,7 +100,7 @@
   const addNewTeam = async () => {
     try {
       const newTeamId = await addTeam("Test", $page.params.organizationId);
-      goto(`/org/${$page.params.organizationId}/team/${newTeamId}`);
+      goto(`/org/${$page.params.organizationId}/team/${newTeamId}/charts`);
     } catch (err) {
       notifications.addError((err as Error).message);
     }
@@ -150,6 +150,8 @@
     // TODO: we should just manually add the new folder instead of reload entire team
     await updateTeam(teamId);
   };
+
+  const folderPath = $derived($page.params["folder"].split("/").filter((e) => e != ""));
 </script>
 
 <div class="holder">
@@ -157,9 +159,9 @@
     <h3>Teams</h3>
 
     <div class="options">
-      <a class="option" href={`/org/${$page.params.organizationId}/team`}> Your charts </a>
+      <a class="option" href={`/org/${$page.params.organizationId}/team/charts`}> Your charts </a>
       {#each $user.teams as team}
-        <a href={`/org/${$page.params.organizationId}/team/${team.teams.id}`} class="option">
+        <a href={`/org/${$page.params.organizationId}/team/${team.teams.id}/charts`} class="option">
           {team.teams.name}
         </a>
       {/each}
@@ -218,6 +220,8 @@
       onCreateFolder={(parentId) => teamId && onAddFolder("New folder", teamId, parentId)}
       onUpdate={() => teamId && updateTeam(teamId)}
       onAddChart={(id) => newGraphic(true, id)}
+      basePath={`/org/${$page.params["organizationId"]}/team/${teamId}/charts`}
+      path={folderPath}
     />
   </div>
 </div>
