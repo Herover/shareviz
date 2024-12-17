@@ -1,6 +1,6 @@
 <script lang="ts">
   import { LabelLocation, type Root, type Line as lineType } from "$lib/chart";
-  import { max } from "d3-array";
+  import { max, min } from "d3-array";
   import Line from "./Line.svelte";
   import { formatData } from "./data";
   import Legend from "../Legend.svelte";
@@ -20,6 +20,7 @@
 
   let charts = $derived(formatData(componentSpec, data));
   let maxY = $derived(max(charts, (d) => max(d.d, (dd) => max(dd.value, (ddd) => ddd.y))) ?? 1);
+  let minY = $derived(min(charts, (d) => min(d.d, (dd) => min(dd.value, (ddd) => ddd.y))) ?? 1);
   // let perColumn = $derived(Math.ceil(Math.sqrt(charts.length)));
   let perColumn = $derived(componentSpec.repeat != "" ? componentSpec.repeatColumns : 1);
 </script>
@@ -51,6 +52,7 @@
             perColumn}
           {editor}
           {maxY}
+          {minY}
           {index}
           on:edit
         />

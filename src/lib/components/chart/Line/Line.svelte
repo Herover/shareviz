@@ -36,10 +36,11 @@
     width: number;
     editor?: boolean;
     maxY: number;
+    minY: number;
     index: number;
   }
 
-  let { values, chartSpec, lineSpec, width, editor = false, maxY, index }: Props = $props();
+  let { values, chartSpec, lineSpec, width, editor = false, maxY, minY, index }: Props = $props();
 
   const dispatch = createEventDispatcher<{
     edit: any[];
@@ -140,11 +141,13 @@
   });
   // let maxY = $derived(orNumber(max(stacked, (d) => max(d.value, (dd) => dd.to)), 1));
   let yScale = $derived(
-    scaleLinear().range([height, 0]).domain(
-      [0, maxY],
-      // chartSpec.chart.scales.find((s) => s.name == lineSpec.y.scale)
-      //   ?.dataRange || [0, 1],
-    ),
+    scaleLinear()
+      .range([height, 0])
+      .domain(
+        [Math.min(0, minY), Math.max(0, maxY)],
+        // chartSpec.chart.scales.find((s) => s.name == lineSpec.y.scale)
+        //   ?.dataRange || [0, 1],
+      ),
   );
 
   let draw = $derived(
