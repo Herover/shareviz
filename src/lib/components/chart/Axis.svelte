@@ -31,11 +31,9 @@
   let rightBox: DOMRect | undefined = $state();
   let testBox: DOMRect | undefined = $state();
 
-  let autoMajorTicks: { n: number | Date; l: string }[] = $state([]);
-  let manualMajorTicks: {
-    n: number;
-    l: string;
-  }[] = $state([]);
+  let autoMajorTicks: { n: number | Date; l: string; textAnchor: "start" | "middle" | "end" }[] =
+    $state([]);
+  let manualMajorTicks: typeof autoMajorTicks = $state([]);
 
   let autoMinorTicks: { n: number | Date; l: string }[] = $state([]);
   let manualMinorTicks: {
@@ -55,7 +53,9 @@
         const customFrom = Math.max(Math.min(conf.major.auto.from, to), from);
         const expectedTicks = 1 + (to - customFrom) / conf.major.auto.each;
         if (expectedTicks > maxTicks) {
-          computedMajorTicks = [{ n: from, l: `Too many ticks (${expectedTicks})` }];
+          computedMajorTicks = [
+            { n: from, l: `Too many ticks (${expectedTicks})`, textAnchor: "middle" },
+          ];
         } else {
           for (let i = customFrom; i <= to; i += conf.major.auto.each) {
             computedMajorTicks.push({
@@ -64,10 +64,13 @@
                 ? formatNumber(i, conf.major.labelDivide, conf.major.labelThousands) +
                   conf.major.afterLabel
                 : "",
+              textAnchor: "middle",
             });
           }
         }
-        computedManualMajorTicks = conf.major.ticks.filter((d) => d.n <= to && from <= d.n);
+        computedManualMajorTicks = conf.major.ticks
+          .filter((d) => d.n <= to && from <= d.n)
+          .map((e) => ({ ...e, textAnchor: "middle" }));
       } else if (to instanceof Date && from instanceof Date) {
         let d = new Date(from);
         d.setDate(1);
@@ -77,6 +80,7 @@
           computedMajorTicks.push({
             n: new Date(d),
             l: conf.major.auto.labels ? d.getFullYear() + conf.major.afterLabel : "",
+            textAnchor: "middle",
           });
           d.setFullYear(d.getFullYear() + conf.major.auto.each);
           n++;
@@ -88,15 +92,25 @@
       manualMajorTicks = computedManualMajorTicks;
     }
   });
-  let majorTicks = $derived(
+  let majorTicks: typeof manualMajorTicks = $derived(
     scale
-      ? [...manualMajorTicks, ...autoMajorTicks].sort((a, b) =>
-          a.n instanceof Date && b.n instanceof Date
-            ? a.n.getTime() - b.n.getTime()
-            : typeof a.n == "number" && typeof b.n == "number"
-              ? a.n - b.n
-              : 0,
-        )
+      ? [...manualMajorTicks, ...autoMajorTicks]
+          .sort((a, b) =>
+            a.n instanceof Date && b.n instanceof Date
+              ? a.n.getTime() - b.n.getTime()
+              : typeof a.n == "number" && typeof b.n == "number"
+                ? a.n - b.n
+                : 0,
+          )
+          .map((e, i, arr) => ({
+            ...e,
+            textAnchor:
+              arr.length <= 2 && (scale.domain()[0] == e.n || scale.domain()[1] == e.n)
+                ? i == 0
+                  ? "start"
+                  : "end"
+                : "middle",
+          }))
       : [],
   );
   $effect(() => {
@@ -104,18 +118,14 @@
       dimensions({
         width: orNumber(labelBox?.width, 0),
         height: orNumber(labelBox?.height, 0),
-        leftOverflow:
-          majorTicks.length == 2
-            ? 0
-            : Math.max(
-                orNumber(leftBox?.width, 0) / 2 -
-                  (scale
-                    ? Math.floor((scale(orDefault(majorTicks[0]?.n, 0)) - scale.range()[0]) / 10) *
-                      10
-                    : 0),
-                0,
-              ),
-        rightOverflow: majorTicks.length == 2 ? 0 : orNumber(rightBox?.width, 0) / 2,
+        leftOverflow: Math.max(
+          orNumber(leftBox?.width, 0) / 2 -
+            (scale
+              ? Math.floor((scale(orDefault(majorTicks[0]?.n, 0)) - scale.range()[0]) / 10) * 10
+              : 0),
+          0,
+        ),
+        rightOverflow: orNumber(rightBox?.width, 0) / 2,
         topPos:
           majorTicks.length == 0 ||
           majorTicks[majorTicks.length - 1].l == "" ||
@@ -171,8 +181,6 @@
         )
       : [],
   );
-
-  let smooshedLabels = $derived(majorTicks.length == 2);
 </script>
 
 <text bind:contentRect={testBox} aria-hidden="true" visibility="hidden">123</text>
@@ -225,14 +233,12 @@
         {/if}
         {#if showLabels}
           {#if conf.location == AxisLocation.START && tick.l}
-            <text
-              text-anchor={smooshedLabels ? (i == 0 ? "start" : "end") : "middle"}
-              dominant-baseline="hanging"
-              x={scale(tick.n)}>{tick.l}</text
+            <text text-anchor={tick.textAnchor} dominant-baseline="hanging" x={scale(tick.n)}
+              >{tick.l}</text
             >
           {:else if conf.location == AxisLocation.END && tick.l}
             <text
-              text-anchor={smooshedLabels ? (i == 0 ? "start" : "end") : "middle"}
+              text-anchor={tick.textAnchor}
               dominant-baseline="hanging"
               y={height + conf.major.tickSize + size}
               x={scale(tick.n)}>{tick.l}</text
@@ -242,7 +248,7 @@
           <!-- Used to calculate labels overflowing outside of chart area -->
           {#if i == 0}
             <text
-              text-anchor={smooshedLabels ? (i == 0 ? "start" : "end") : "middle"}
+              text-anchor={tick.textAnchor}
               bind:contentRect={leftBox}
               x={scale(tick.n)}
               visibility="hidden"
@@ -250,7 +256,7 @@
             >
           {:else if i == majorTicks.length - 1}
             <text
-              text-anchor={smooshedLabels ? (i == 0 ? "start" : "end") : "middle"}
+              text-anchor={tick.textAnchor}
               bind:contentRect={rightBox}
               x={scale(tick.n)}
               visibility="hidden"
