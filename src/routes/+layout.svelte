@@ -4,6 +4,7 @@
   import { page } from "$app/stores";
   import { NotificationLevel, notifications } from "$lib/notificationStore";
   import { user } from "$lib/userStore";
+  import { settings } from "$lib/settingsStore.svelte";
   interface Props {
     children?: import("svelte").Snippet;
   }
@@ -15,6 +16,17 @@
       user.update();
     }
   });
+
+  $effect(() => {
+    if (settings.theme == "dark") {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+  });
+
+  // TODO: UI
+  (window as any).setTheme = (theme: typeof settings.theme) => (settings.theme = theme);
 </script>
 
 <div class="notifications">
@@ -66,17 +78,29 @@
     cursor: pointer;
   }
 
-  :root {
+  :global(body) {
     --main-bg-color: #ffffff;
     --accent-bg-color: #eeeeee;
     --detail-color: #aaaaaa;
     --text-primary: #000000;
     --text-secondary: #666666;
+
     --width-wide: 1200px;
+  }
+  :global(body.dark-mode) {
+    --main-bg-color: #1a1a22;
+    --accent-bg-color: #0c0b0f;
+    --detail-color: #b7b7b7;
+    --text-primary: #c2c2c2;
+    --text-secondary: #949494;
+    --link: #9098fd;
   }
 
   :global(body) {
     background-color: var(--main-bg-color);
     color: var(--text-primary);
+  }
+  :global(a, a:link, a:visited, a:hover, a:active) {
+    color: var(--link);
   }
 </style>
