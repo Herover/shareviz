@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { type Root } from "$lib/chart";
+  import { type LineRepeatSettingsKey, type Root } from "$lib/chart";
   import { db } from "$lib/chartStore";
   import type { DSVParsedArray } from "d3-dsv";
   import AxisEditor from "../AxisEditor.svelte";
   import { formatData } from "./data";
   import { orDefault } from "$lib/utils";
   import LinesEditor from "./LinesEditor.svelte";
+  import CategoryList from "../CategoryList.svelte";
 
   interface Props {
     spec: Root;
@@ -53,6 +54,20 @@
     }),
   );
   let chartColors = $derived($dbLine.style.byKey.map((s) => s.color));
+
+  $effect(() => {
+    if (typeof $dbLine.repeatSettings == "undefined") {
+      dbLine.updateRepeatSettings(
+        values.map((e) => e.k),
+        undefined,
+      );
+    } else {
+      values
+        .map((e) => e.k)
+        .filter((k) => $dbLine.repeatSettings.byKey.findIndex((e) => e.k == k) == -1)
+        .forEach((k) => dbLine.addRepeatSetting($dbLine.repeatSettings.byKey.length, k));
+    }
+  });
 </script>
 
 <p>
@@ -126,6 +141,19 @@
           style="width: 90px"
         />
       </label>
+
+      {#snippet repeatTitle(d: LineRepeatSettingsKey)}
+        {d.k}
+      {/snippet}
+      <CategoryList
+        values={$dbLine.repeatSettings.byKey.map((e) => ({ k: e.k, d: e }))}
+        onfocus={() => {}}
+        onblur={() => {}}
+        searchFn={(str, d) => d.k.toLocaleLowerCase().includes(str.toLocaleLowerCase())}
+        title={repeatTitle}
+        moveUp={(_k, i) => dbLine.moveRepeatUp(i)}
+        moveDown={(_k, i) => dbLine.moveRepeatDown(i)}
+      />
     {/if}
   </p>
 {/if}

@@ -206,6 +206,16 @@ export interface LineStyle {
   byKey: LineStyleKey[];
 }
 
+export interface LineRepeatSettingsKey {
+  k: string;
+  title: string;
+}
+
+export interface LineRepeatSettings {
+  default: LineRepeatSettingsKey;
+  byKey: LineRepeatSettingsKey[];
+}
+
 export interface Line {
   dataSet: string;
   x: X;
@@ -217,6 +227,7 @@ export interface Line {
   heightRatio: number;
   repeat: string;
   repeatColumns: number;
+  repeatSettings: LineRepeatSettings;
 }
 
 export interface X {

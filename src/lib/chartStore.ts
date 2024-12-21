@@ -25,6 +25,8 @@ import {
   LabelStyleLine,
   LineSymbol,
   LineMissingStyle,
+  type LineRepeatSettingsKey,
+  type LineRepeatSettings,
 } from "./chart";
 import { notifications } from "./notificationStore";
 import { orDefault } from "./utils";
@@ -425,6 +427,62 @@ export const db = (function createDB() {
                 "repeatColumns",
                 { r: 0, i: value },
               ]),
+            repeatSettings: (i: number) =>
+              repeatSettings(hbarScope, ["repeatSettings", "byKey", i], doc),
+            moveRepeatUp: (i: number) =>
+              doc.submitOp([
+                ...hbarScope.path.slice(1),
+                "repeatSettings",
+                "byKey",
+                [i, { p: 0 }],
+                [i - 1, { d: 0 }],
+              ]),
+            moveRepeatDown: (i: number) =>
+              doc.submitOp([
+                ...hbarScope.path.slice(1),
+                "repeatSettings",
+                "byKey",
+                [i, { p: 0 }],
+                [i + 1, { d: 0 }],
+              ]),
+            addRepeatSetting: (i: number, k: string) =>
+              doc.submitOp([
+                "chart",
+                "elements",
+                elementIndex,
+                "d",
+                "repeatSettings",
+                "byKey",
+                i,
+                {
+                  i: {
+                    k,
+                    title: "",
+                  } as LineRepeatSettingsKey,
+                },
+              ]),
+            // TODO: remove after figuring out a better upgrade strategy
+            updateRepeatSettings: (keys: string[], r: 0 | undefined) =>
+              doc.submitOp([
+                "chart",
+                "elements",
+                elementIndex,
+                "d",
+                "repeatSettings",
+                {
+                  i: {
+                    default: {
+                      k: "",
+                      title: "",
+                    },
+                    byKey: keys.map((k) => ({
+                      k,
+                      title: "",
+                    })),
+                  } as LineRepeatSettings,
+                  r,
+                },
+              ]),
             setFill: (value: boolean) =>
               doc.submitOp(["chart", "elements", elementIndex, "d", "fill", { r: 0, i: value }]),
             setStack: (value: boolean) =>
@@ -756,6 +814,13 @@ export const db = (function createDB() {
                   },
                   repeat: "",
                   repeatColumns: 4,
+                  repeatSettings: {
+                    default: {
+                      k: "",
+                      title: "",
+                    },
+                    byKey: [],
+                  },
                 } as Line,
               },
             },
@@ -1033,6 +1098,20 @@ export const lineStyle = (
     setMissingStyle: (value: string) =>
       doc.submitOp([...styleScope.path.slice(1), "missingStyle", { r: 0, i: value }]),
     delete: () => doc.submitOp([...styleScope.path.slice(1), { r: 0 }]),
+  };
+};
+
+export const repeatSettings = (
+  scope: ReturnType<typeof createScope>,
+  key: (string | number)[],
+  doc: any,
+) => {
+  const settingsScope = createScope<LineRepeatSettingsKey>(scope, key);
+
+  return {
+    ...settingsScope,
+    setLabel: (value: string) =>
+      doc.submitOp([...settingsScope.path.slice(1), "label", { r: 0, i: value }]),
   };
 };
 
