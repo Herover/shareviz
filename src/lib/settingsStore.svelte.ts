@@ -15,9 +15,8 @@ const getSettings = () => {
   if (typeof settingsStr == "string") {
     return JSON.parse(settingsStr);
   } else {
-    return {
-      theme: "system",
-    };
+    // Silly-copy
+    return JSON.parse(JSON.stringify(defaultSettings));
   }
 };
 
