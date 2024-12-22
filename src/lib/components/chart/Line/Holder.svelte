@@ -48,7 +48,7 @@
       style:width="{(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight) /
         perColumn}px"
     >
-      <div class="line-chart-title"><span>{chart.k}</span></div>
+      <div class="line-chart-title"><span>{chart.label}</span></div>
       <div class="line-chart-item">
         <Line
           {chartSpec}

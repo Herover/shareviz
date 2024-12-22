@@ -461,6 +461,16 @@ export const db = (function createDB() {
                   } as LineRepeatSettingsKey,
                 },
               ]),
+            removeRepeatSettings: (indexes: number[]) =>
+              doc.submitOp(
+                indexes.map((i) => [
+                  ...hbarScope.path.slice(1),
+                  "repeatSettings",
+                  "byKey",
+                  i,
+                  { r: 0 },
+                ]),
+              ),
             // TODO: remove after figuring out a better upgrade strategy
             updateRepeatSettings: (keys: string[], r: 0 | undefined) =>
               doc.submitOp([
@@ -1111,7 +1121,7 @@ export const repeatSettings = (
   return {
     ...settingsScope,
     setLabel: (value: string) =>
-      doc.submitOp([...settingsScope.path.slice(1), "label", { r: 0, i: value }]),
+      doc.submitOp([...settingsScope.path.slice(1), "title", { r: 0, i: value }]),
   };
 };
 

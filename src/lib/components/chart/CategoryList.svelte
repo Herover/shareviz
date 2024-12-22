@@ -4,14 +4,18 @@
   interface Props {
     values: { k: string; d: unknown }[];
     title: (d: any) => ReturnType<import("svelte").Snippet>;
-    onfocus: (k: string, i: number, d: (typeof values)[number]["d"]) => void;
-    onblur: (k: string, i: number, d: (typeof values)[number]["d"]) => void;
+    onfocus?: (k: string, i: number, d: (typeof values)[number]["d"]) => void;
+    onblur?: (k: string, i: number, d: (typeof values)[number]["d"]) => void;
     searchFn: (str: string, d: (typeof values)[number]) => boolean;
     moveUp: (k: string, i: number) => void;
     moveDown: (k: string, i: number) => void;
+    onSelectedChanged: (values: { [key: string]: boolean }, indexes: number[]) => void;
   }
 
-  let { values, title, onfocus, onblur, searchFn, moveUp, moveDown }: Props = $props();
+  let { values, title, onfocus, onblur, searchFn, moveUp, moveDown, onSelectedChanged }: Props =
+    $props();
+
+  let selected: { [key: string]: boolean } = $state({});
 
   let searchString = $state("");
   const filteredValues: typeof values = $derived(
@@ -39,7 +43,6 @@
     window.removeEventListener("keyup", keyUp);
   });
 
-  let selected: { [key: string]: boolean } = $state({});
   let updateSelect = $derived(
     (key: string | null, select: boolean, replace: boolean, lineIndex: number | null) => {
       if (rangedSelect) {
@@ -78,6 +81,12 @@
       }
 
       lastSelected = lineIndex;
+      onSelectedChanged(
+        selected,
+        Object.keys(selected)
+          .filter((k) => selected[k])
+          .map((k) => values.findIndex((v) => v.k == k)),
+      );
     },
   );
   const toggleSelect = (me: MouseEvent | null, ke: KeyboardEvent | null, k: string, i: number) => {
@@ -115,10 +124,10 @@
       <div
         onclick={(e) => toggleSelect(e, null, line.k, i)}
         onkeydown={(e) => toggleSelect(null, e, line.k, i)}
-        onmouseover={() => onfocus(line.k, i, line)}
-        onmouseout={() => onblur(line.k, i, null)}
-        onfocus={() => onfocus(line.k, i, line.d)}
-        onblur={() => onblur(line.k, i, line.d)}
+        onmouseover={() => onfocus && onfocus(line.k, i, line)}
+        onmouseout={() => onblur && onblur(line.k, i, null)}
+        onfocus={() => onfocus && onfocus(line.k, i, line.d)}
+        onblur={() => onblur && onblur(line.k, i, line.d)}
         class:line-selected={selected[line.k]}
         class:line-unselected={!selected[line.k]}
         class="line-item"

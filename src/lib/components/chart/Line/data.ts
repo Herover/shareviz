@@ -4,6 +4,7 @@ import { group, negativeOneToInf } from "../../../utils";
 export const formatData = (componentSpec: Line, data: { [key: string]: any[] }) =>
   group(componentSpec.repeat, data[componentSpec.dataSet], (k1, g1) => ({
     k: k1,
+    label: componentSpec.repeatSettings.byKey.find((e) => e.k == k1)?.title || k1,
     d: group(componentSpec.categories, g1, (k2, g2) => ({
       label: k2,
       key: k2,

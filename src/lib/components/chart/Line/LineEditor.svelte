@@ -66,8 +66,19 @@
         .map((e) => e.k)
         .filter((k) => $dbLine.repeatSettings.byKey.findIndex((e) => e.k == k) == -1)
         .forEach((k) => dbLine.addRepeatSetting($dbLine.repeatSettings.byKey.length, k));
+      dbLine.removeRepeatSettings(
+        $dbLine.repeatSettings.byKey
+          .map((e, i) => ({ i, e }))
+          .filter((e) => values.findIndex((v) => v.k == e.e.k) == -1)
+          .map((e) => e.i),
+      );
     }
   });
+
+  let selectedIndexes: number[] = $state([]);
+  const setRepeatedLabel = (value: string) => {
+    selectedIndexes.forEach((i) => dbLine.repeatSettings(i).setLabel(value));
+  };
 </script>
 
 <p>
@@ -146,14 +157,25 @@
         {d.k}
       {/snippet}
       <CategoryList
-        values={$dbLine.repeatSettings.byKey.map((e) => ({ k: e.k, d: e }))}
-        onfocus={() => {}}
-        onblur={() => {}}
+        values={($dbLine.repeatSettings?.byKey || []).map((e) => ({ k: e.k, d: e }))}
+        onSelectedChanged={(selected, indexes) => (selectedIndexes = indexes)}
         searchFn={(str, d) => d.k.toLocaleLowerCase().includes(str.toLocaleLowerCase())}
         title={repeatTitle}
         moveUp={(_k, i) => dbLine.moveRepeatUp(i)}
         moveDown={(_k, i) => dbLine.moveRepeatDown(i)}
       />
+      {#if selectedIndexes.length != 0}
+        <label>
+          Label
+          <input
+            value={selectedIndexes.length == 1
+              ? $dbLine.repeatSettings.byKey[selectedIndexes[0]].title ||
+                $dbLine.repeatSettings.byKey[selectedIndexes[0]].k
+              : ""}
+            onkeyup={(e) => setRepeatedLabel(e.currentTarget.value)}
+          />
+        </label>
+      {/if}
     {/if}
   </p>
 {/if}
