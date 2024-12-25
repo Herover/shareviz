@@ -105,7 +105,15 @@
           .map((e, i, arr) => ({
             ...e,
             textAnchor:
-              arr.length <= 2 && (scale.domain()[0] == e.n || scale.domain()[1] == e.n)
+              arr.length <= 2 &&
+              ((e.n instanceof Date &&
+                scale.domain()[0] instanceof Date &&
+                // @ts-expect-error: if e.n is a date, then scale.domain will also return dates
+                (scale.domain()[0].getTime() == e.n.getTime() ||
+                  // @ts-expect-error: if e.n is a date, then scale.domain will also return dates
+                  scale.domain()[1].getTime() == e.n.getTime())) ||
+                scale.domain()[0] == e.n ||
+                scale.domain()[1] == e.n)
                 ? i == 0
                   ? "start"
                   : "end"
