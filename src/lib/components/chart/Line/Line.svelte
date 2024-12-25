@@ -13,7 +13,6 @@
   import { scaleLinear, scaleTime, type ScaleLinear, type ScaleTime } from "d3-scale";
   import { line } from "d3-shape";
   import Axis from "../Axis.svelte";
-  import { max, min } from "d3-array";
   import FloatingLabels from "./FloatingLabels/FloatingLabels.svelte";
   import { createEventDispatcher, onMount } from "svelte";
   import { chartToEditor } from "$lib/chartToEditorStore";
@@ -37,10 +36,23 @@
     editor?: boolean;
     maxY: number;
     minY: number;
+    maxX: number;
+    minX: number;
     index: number;
   }
 
-  let { values, chartSpec, lineSpec, width, editor = false, maxY, minY, index }: Props = $props();
+  let {
+    values,
+    chartSpec,
+    lineSpec,
+    width,
+    editor = false,
+    maxY,
+    minY,
+    maxX,
+    minX,
+    index,
+  }: Props = $props();
 
   const dispatch = createEventDispatcher<{
     edit: any[];
@@ -112,13 +124,6 @@
     ...orDefault(dataSet?.rows, []),
   ]);
 
-  let minX = $derived(orNumber(min(values, (d) => min(d.value, (dd) => dd.x))));
-  let maxX = $derived(
-    orNumber(
-      max(values, (d) => max(d.value, (dd) => dd.x)),
-      1,
-    ),
-  );
   let xType = $derived(
     orDefault(
       valueParsers[orDefault(columns.find((r) => r.key == lineSpec.x.key)?.type, "")]?.type,

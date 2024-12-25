@@ -27,7 +27,10 @@
     ),
   );
   let maxY = $derived(max(charts, (d) => max(d.d, (dd) => max(dd.value, (ddd) => ddd.y))) ?? 1);
-  let minY = $derived(min(charts, (d) => min(d.d, (dd) => min(dd.value, (ddd) => ddd.y))) ?? 1);
+  let minY = $derived(min(charts, (d) => min(d.d, (dd) => min(dd.value, (ddd) => ddd.y))) ?? 0);
+  let maxX = $derived(max(charts, (d) => max(d.d, (dd) => max(dd.value, (ddd) => ddd.x))) ?? 1);
+  let minX = $derived(min(charts, (d) => min(d.d, (dd) => min(dd.value, (ddd) => ddd.x))) ?? 0);
+
   // let perColumn = $derived(Math.ceil(Math.sqrt(charts.length)));
   let perColumn = $derived(componentSpec.repeat != "" ? componentSpec.repeatColumns : 1);
 </script>
@@ -60,6 +63,8 @@
           {editor}
           {maxY}
           {minY}
+          {maxX}
+          {minX}
           {index}
           on:edit
         />
