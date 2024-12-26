@@ -229,6 +229,26 @@ export const db = {
       .returning({ code: organizationInvites.code });
     return { id: resOrg[0].id, code: resInvite[0].code };
   },
+  getOrganization: async (/** @type {string} */ id, /** @type {string | undefined} */ userId) => {
+    if (typeof userId != "undefined") {
+      const orgs = await drizzledb
+        .select()
+        .from(organizations)
+        .innerJoin(usersOrganizations, eq(usersOrganizations.userId, userId))
+        .where(eq(organizations.id, id));
+      if (orgs.length != 1) {
+        throw new Error("Organization not found");
+      }
+
+      return orgs[0];
+    }
+    const orgs = await drizzledb.select().from(organizations).where(eq(organizations.id, id));
+    if (orgs.length != 1) {
+      throw new Error("Organization not found");
+    }
+
+    return { organizations: orgs[0] };
+  },
 
   addTeam: async (/** @type {string} */ name, /** @type {string} */ organizationId) => {
     const res = await drizzledb

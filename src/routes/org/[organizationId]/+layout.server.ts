@@ -11,6 +11,8 @@ export async function load({ locals, params }) {
     redirect(302, "/");
   }
 
+  const organization = await db.getOrganization(params.organizationId, user.id);
+
   const orgUsers = (await db.getOrganizationUsers(params.organizationId)).map((user) => ({
     name: user.user.name,
     id: user.user.id,
@@ -21,6 +23,7 @@ export async function load({ locals, params }) {
     orgUsers.findIndex((e) => e.id == user.id && e.role == ORGANIZATION_ROLES.ADMIN) != -1;
 
   return {
+    organization,
     orgUsers,
     userIsOrgAdmin,
   };
