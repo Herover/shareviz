@@ -724,8 +724,10 @@ export function startServer(server) {
   });
   backend.use("afterWrite", function (ctx, next) {
     console.log("afterWrite" /* , ctx */);
-    db.updateChart(ctx.id, { updated: Date.now() })
-      .then(() => next())
-      .catch((e) => next(e));
+    if (typeof ctx.op.op == "object" && ctx.op.op != null) {
+      db.updateChart(ctx.id, { updated: Date.now() })
+        .then(() => next())
+        .catch((e) => next(e));
+    }
   });
 }
