@@ -1,4 +1,4 @@
-import { redirect } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 import { db } from "../../../../server_lib/sqlite.js";
 import { ORGANIZATION_ROLES } from "$lib/consts.js";
 
@@ -11,7 +11,15 @@ export async function load({ locals, params }) {
     redirect(302, "/");
   }
 
-  const organization = await db.getOrganization(params.organizationId, user.id);
+  let organization: Awaited<ReturnType<typeof db.getOrganization>>;
+  try {
+    organization = await db.getOrganization(params.organizationId, user.id);
+  } catch (e) {
+    if ((e as Error).message == "Organization not found") {
+      return error(404, { message: (e as Error).message });
+    }
+    throw e;
+  }
 
   const orgUsers = (await db.getOrganizationUsers(params.organizationId)).map((user) => ({
     name: user.user.name,
