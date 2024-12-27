@@ -17,8 +17,7 @@
   let selectedFiles: { [key: string]: boolean } = $state({});
   let selectedFolders: { [key: string]: boolean } = $state({});
 
-  const onChangeFolder = (newPath: string[]) => {
-    path = newPath;
+  const onChangeFolder = () => {
     selectedFiles = {};
     selectedFolders = {};
   };
@@ -154,7 +153,7 @@
             {item}
             onSelect={(selected) => (selectedFolders[item.id] = selected)}
             selected={selectedFolders[item.id] == true}
-            onChangeFolder={(id) => onChangeFolder([...path, id])}
+            onChangeFolder={() => onChangeFolder()}
             onMoveItems={(id) => moveTo(id)}
             onDragStart={() => (isDragging = true)}
             onDragEnd={() => (isDragging = false)}

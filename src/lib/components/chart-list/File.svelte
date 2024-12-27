@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import { formatDate, formatRelativeTime } from "$lib/utils";
   import type { FolderItem } from "./types";
 
@@ -34,6 +35,16 @@
   const ondragend = () => {
     onDragEnd();
   };
+
+  const clickRow = (e: MouseEvent) => {
+    console.log(e);
+    if (e.buttons != 0) {
+      return;
+    }
+
+    goto(link);
+    e.preventDefault();
+  };
 </script>
 
 <tr
@@ -47,7 +58,7 @@
   <td>
     <input checked={selected} onchange={(e) => onSelect(e.currentTarget.checked)} type="checkbox" />
   </td>
-  <td>
+  <td onclick={(e) => clickRow(e)}>
     {#if item.type == "folder"}
       <span class="icon">📁</span>
       <a
@@ -62,8 +73,8 @@
       <a href={link}>{item.name}</a>
     {/if}
   </td>
-  <td>{formatRelativeTime(item.updated)}</td>
-  <td>{formatDate(item.created)}</td>
+  <td onclick={(e) => clickRow(e)}>{formatRelativeTime(item.updated)}</td>
+  <td onclick={(e) => clickRow(e)}>{formatDate(item.created)}</td>
 </tr>
 
 <style>
@@ -79,6 +90,7 @@
     padding-top: 0.5em;
     padding-bottom: 0.5em;
   }
+  tr:hover,
   .selected {
     background-color: #deeefc;
   }
