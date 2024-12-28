@@ -28,6 +28,9 @@
     path.reduce(
       (acc, e) => {
         const dir = acc.dir.find((f) => f.id == e);
+        if (typeof dir == "undefined") {
+          return acc;
+        }
         if (dir?.type != "folder") {
           console.error("Unable to find path name");
           return acc;
@@ -110,7 +113,7 @@
     />
   {:else}
     <a
-      href={basePath + "/" + path.slice(0, i + 1)}
+      href={basePath + "/" + path.slice(0, i + 1).join("/")}
       class:drag-target={isDragging}
       ondrop={() => moveTo(part.id)}
       ondragover={(e) => e.preventDefault()}>{part.name}</a
@@ -157,7 +160,7 @@
             onMoveItems={(id) => moveTo(id)}
             onDragStart={() => (isDragging = true)}
             onDragEnd={() => (isDragging = false)}
-            link={basePath + "/" + path.join("/") + "/" + item.id}
+            link={basePath + "/" + [...path, ""].join("/") + item.id}
             {isDragging}
           />
         {/if}
