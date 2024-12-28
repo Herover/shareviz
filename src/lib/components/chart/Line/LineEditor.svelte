@@ -11,18 +11,19 @@
   interface Props {
     spec: Root;
     chart: ReturnType<typeof db.chart>;
-    dbLine: ReturnType<ReturnType<typeof db.chart>["line"]>;
     chartData: {
       [key: string]: DSVParsedArray<any>;
     };
     index: number;
   }
 
-  let { spec, chart, dbLine, chartData, index }: Props = $props();
+  let { spec, chart, chartData, index }: Props = $props();
 
-  let dataSet = $derived(spec.data.sets.find((set) => set.id == $dbLine.dataSet));
+  let chartSpec = chart.line(index);
 
-  let values = $derived(formatData($dbLine, chartData));
+  let dataSet = $derived(spec.data.sets.find((set) => set.id == $chartSpec.dataSet));
+
+  let values = $derived(formatData($chartSpec, chartData));
   let columns = $derived([
     ...orDefault(
       dataSet?.transpose?.map((e) => ({ key: e.toKey, type: e.keyType })),
@@ -35,7 +36,7 @@
     ...orDefault(dataSet?.rows, []),
   ]);
 
-  let xScaleIndex = $derived(spec.chart.scales.findIndex((s) => s.name == $dbLine.x.scale));
+  let xScaleIndex = $derived(spec.chart.scales.findIndex((s) => s.name == $chartSpec.x.scale));
   let xScale = $derived(
     orDefault(spec.chart.scales[xScaleIndex], {
       dataRange: [0, 1],
@@ -44,7 +45,7 @@
       type: "",
     }),
   );
-  let yScaleIndex = $derived(spec.chart.scales.findIndex((s) => s.name == $dbLine.y.scale));
+  let yScaleIndex = $derived(spec.chart.scales.findIndex((s) => s.name == $chartSpec.y.scale));
   let yScale = $derived(
     orDefault(spec.chart.scales[yScaleIndex], {
       dataRange: [0, 1],
@@ -53,21 +54,21 @@
       type: "",
     }),
   );
-  let chartColors = $derived($dbLine.style.byKey.map((s) => s.color));
+  let chartColors = $derived($chartSpec.style.byKey.map((s) => s.color));
 
   $effect(() => {
-    if (typeof $dbLine.repeatSettings == "undefined") {
-      dbLine.updateRepeatSettings(
+    if (typeof $chartSpec.repeatSettings == "undefined") {
+      chartSpec.updateRepeatSettings(
         values.map((e) => e.k),
         undefined,
       );
     } else {
       values
         .map((e) => e.k)
-        .filter((k) => $dbLine.repeatSettings.byKey.findIndex((e) => e.k == k) == -1)
-        .forEach((k) => dbLine.addRepeatSetting($dbLine.repeatSettings.byKey.length, k));
-      dbLine.removeRepeatSettings(
-        $dbLine.repeatSettings.byKey
+        .filter((k) => $chartSpec.repeatSettings.byKey.findIndex((e) => e.k == k) == -1)
+        .forEach((k) => chartSpec.addRepeatSetting($chartSpec.repeatSettings.byKey.length, k));
+      chartSpec.removeRepeatSettings(
+        $chartSpec.repeatSettings.byKey
           .map((e, i) => ({ i, e }))
           .filter((e) => values.findIndex((v) => v.k == e.e.k) == -1)
           .map((e) => e.i),
@@ -77,14 +78,17 @@
 
   let selectedIndexes: number[] = $state([]);
   const setRepeatedLabel = (value: string) => {
-    selectedIndexes.forEach((i) => dbLine.repeatSettings(i).setLabel(value));
+    selectedIndexes.forEach((i) => chartSpec.repeatSettings(i).setLabel(value));
   };
 </script>
 
 <p>
   <label>
     Data set:
-    <select value={$dbLine.dataSet} onchange={(e) => dbLine.setDataSet(e.currentTarget.value)}>
+    <select
+      value={$chartSpec.dataSet}
+      onchange={(e) => chartSpec.setDataSet(e.currentTarget.value)}
+    >
       <option>{""}</option>
       {#each spec.data.sets as set}
         <option value={set.id}>{set.name}</option>
@@ -97,7 +101,7 @@
   <p>
     <label>
       X values from:
-      <select value={$dbLine.x.key} onchange={(e) => dbLine.setXKey(e.currentTarget.value)}>
+      <select value={$chartSpec.x.key} onchange={(e) => chartSpec.setXKey(e.currentTarget.value)}>
         <option>{""}</option>
         {#each columns as row}
           <option>{row.key}</option>
@@ -108,7 +112,7 @@
   <p>
     <label>
       Y values from:
-      <select value={$dbLine.y.key} onchange={(e) => dbLine.setYKey(e.currentTarget.value)}>
+      <select value={$chartSpec.y.key} onchange={(e) => chartSpec.setYKey(e.currentTarget.value)}>
         <option>{""}</option>
         {#each columns as row}
           <option>{row.key}</option>
@@ -120,8 +124,8 @@
     <label>
       Categories from:
       <select
-        value={$dbLine.categories}
-        onchange={(e) => dbLine.setCategoriesKey(e.currentTarget.value)}
+        value={$chartSpec.categories}
+        onchange={(e) => chartSpec.setCategoriesKey(e.currentTarget.value)}
       >
         <option>{""}</option>
         {#each columns as row}
@@ -133,21 +137,24 @@
   <p>
     <label>
       Repeat for every:
-      <select value={$dbLine.repeat} onchange={(e) => dbLine.setRepeatKey(e.currentTarget.value)}>
+      <select
+        value={$chartSpec.repeat}
+        onchange={(e) => chartSpec.setRepeatKey(e.currentTarget.value)}
+      >
         <option>{""}</option>
         {#each columns as row}
           <option>{row.key}</option>
         {/each}
       </select>
     </label>
-    {#if $dbLine.repeat != ""}
+    {#if $chartSpec.repeat != ""}
       <br />
       <label>
         Columns:
         <input
-          value={$dbLine.repeatColumns}
-          onchange={(e) => dbLine.setRepeatColumns(Number.parseInt(e.currentTarget.value))}
-          onkeyup={(e) => dbLine.setRepeatColumns(Number.parseInt(e.currentTarget.value))}
+          value={$chartSpec.repeatColumns}
+          onchange={(e) => chartSpec.setRepeatColumns(Number.parseInt(e.currentTarget.value))}
+          onkeyup={(e) => chartSpec.setRepeatColumns(Number.parseInt(e.currentTarget.value))}
           type="number"
           style="width: 90px"
         />
@@ -157,20 +164,20 @@
         {d.k}
       {/snippet}
       <CategoryList
-        values={($dbLine.repeatSettings?.byKey || []).map((e) => ({ k: e.k, d: e }))}
+        values={($chartSpec.repeatSettings?.byKey || []).map((e) => ({ k: e.k, d: e }))}
         onSelectedChanged={(selected, indexes) => (selectedIndexes = indexes)}
         searchFn={(str, d) => d.k.toLocaleLowerCase().includes(str.toLocaleLowerCase())}
         title={repeatTitle}
-        moveUp={(_k, i) => dbLine.moveRepeatUp(i)}
-        moveDown={(_k, i) => dbLine.moveRepeatDown(i)}
+        moveUp={(_k, i) => chartSpec.moveRepeatUp(i)}
+        moveDown={(_k, i) => chartSpec.moveRepeatDown(i)}
       />
       {#if selectedIndexes.length != 0}
         <label>
           Label
           <input
             value={selectedIndexes.length == 1
-              ? $dbLine.repeatSettings.byKey[selectedIndexes[0]].title ||
-                $dbLine.repeatSettings.byKey[selectedIndexes[0]].k
+              ? $chartSpec.repeatSettings.byKey[selectedIndexes[0]].title ||
+                $chartSpec.repeatSettings.byKey[selectedIndexes[0]].k
               : ""}
             onkeyup={(e) => setRepeatedLabel(e.currentTarget.value)}
           />
@@ -231,8 +238,8 @@
   <label>
     Fill:
     <input
-      bind:checked={$dbLine.fill}
-      onchange={(e) => dbLine.setFill(e.currentTarget.checked)}
+      bind:checked={$chartSpec.fill}
+      onchange={(e) => chartSpec.setFill(e.currentTarget.checked)}
       type="checkbox"
     />
   </label>
@@ -241,8 +248,8 @@
   <label>
     Stack:
     <input
-      bind:checked={$dbLine.stack}
-      onchange={(e) => dbLine.setStack(e.currentTarget.checked)}
+      bind:checked={$chartSpec.stack}
+      onchange={(e) => chartSpec.setStack(e.currentTarget.checked)}
       type="checkbox"
     />
   </label>
@@ -251,8 +258,8 @@
   <label>
     Height is
     <input
-      value={$dbLine.heightRatio * 100}
-      onchange={(e) => dbLine.setHeightRatio(Number.parseFloat(e.currentTarget.value) / 100)}
+      value={$chartSpec.heightRatio * 100}
+      onchange={(e) => chartSpec.setHeightRatio(Number.parseFloat(e.currentTarget.value) / 100)}
       type="number"
       style:width="50px"
     />
@@ -261,11 +268,11 @@
 </p>
 
 <p>Line style</p>
-<LinesEditor {chartColors} {values} lineSpec={dbLine} {index} />
+<LinesEditor {chartColors} {values} lineSpec={chartSpec} {index} />
 <br />
 
 <b>X axis</b>
-<AxisEditor conf={dbLine.xAxis} />
+<AxisEditor conf={chartSpec.xAxis} />
 
 <b>Y axis</b>
-<AxisEditor conf={dbLine.yAxis} />
+<AxisEditor conf={chartSpec.yAxis} />

@@ -12,21 +12,23 @@
   interface Props {
     spec: Root;
     chart: ReturnType<typeof db.chart>;
-    dbHBar: ReturnType<ReturnType<typeof db.chart>["hBar"]>;
     chartData: {
       [key: string]: DSVParsedArray<any>;
     };
+    index: number;
   }
 
   let {
     spec,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     chart,
-    dbHBar,
     chartData,
+    index,
   }: Props = $props();
 
-  let dataSet = $derived(spec.data.sets.find((set) => set.id == $dbHBar.dataSet));
+  let chartSpec = chart.hBar(index);
+
+  let dataSet = $derived(spec.data.sets.find((set) => set.id == $chartSpec.dataSet));
 
   let columns = $derived([
     ...orDefault(
@@ -40,8 +42,8 @@
     ...orDefault(dataSet?.rows, []),
   ]);
 
-  let scale = $derived(dbHBar.scale());
-  let colorScale = $state(dbHBar.colors());
+  let scale = $derived(chartSpec.scale());
+  let colorScale = $state(chartSpec.colors());
 
   const deleteColor = (ci: number) => {
     colorScale.removeColorScaleColor(ci);
@@ -50,15 +52,15 @@
     colorScale.addColorScaleColor(ci);
   };
 
-  let groups = $derived(formatData($dbHBar, chartData, [] /* $colorScale.byKey */));
+  let groups = $derived(formatData($chartSpec, chartData, [] /* $colorScale.byKey */));
   $effect(() => {
     const computed = max(groups, (d) => max(d.d, (dd) => max(dd.value, (ddd) => ddd.to)));
     if (
       typeof computed == "number" &&
       !Number.isNaN(computed) &&
-      computed != $dbHBar.scale.dataRange?.[1]
+      computed != $chartSpec.scale.dataRange?.[1]
     ) {
-      dbHBar.scale().setScaleTo(computed);
+      chartSpec.scale().setScaleTo(computed);
     }
   });
 
@@ -68,10 +70,15 @@
       .filter((k) => $colorScale.byKey.findIndex((c) => c.k == k) == -1),
   );
   let automateColorKeys = $derived(() => {
-    if (typeof $dbHBar.dataSet != "undefined" && typeof chartData[$dbHBar.dataSet] != "undefined") {
+    if (
+      typeof $chartSpec.dataSet != "undefined" &&
+      typeof chartData[$chartSpec.dataSet] != "undefined"
+    ) {
       const key =
-        typeof $dbHBar.subCategories != "undefined" ? $dbHBar.subCategories : $dbHBar.categories;
-      const dataSet = chartData[$dbHBar.dataSet];
+        typeof $chartSpec.subCategories != "undefined"
+          ? $chartSpec.subCategories
+          : $chartSpec.categories;
+      const dataSet = chartData[$chartSpec.dataSet];
       const groups = group(key, dataSet, (k) => k);
       groups.forEach((k) => {
         if (!$colorScale.byKey.find((d) => d.k == k)) {
@@ -88,15 +95,20 @@
       });
     }
   });
-  // $: if ($dbHBar.categories != "" && $dbHBar.subCategories != "") {
+  // $: if ($chartSpec.categories != "" && $chartSpec.subCategories != "") {
   //   automateColorKeys();
   // }
 
   let removeExtraColorKeys = $derived(() => {
-    if (typeof $dbHBar.dataSet != "undefined" && typeof chartData[$dbHBar.dataSet] != "undefined") {
+    if (
+      typeof $chartSpec.dataSet != "undefined" &&
+      typeof chartData[$chartSpec.dataSet] != "undefined"
+    ) {
       const key =
-        typeof $dbHBar.subCategories != "undefined" ? $dbHBar.subCategories : $dbHBar.categories;
-      const dataSet = chartData[$dbHBar.dataSet];
+        typeof $chartSpec.subCategories != "undefined"
+          ? $chartSpec.subCategories
+          : $chartSpec.categories;
+      const dataSet = chartData[$chartSpec.dataSet];
       const groups = group(key, dataSet, (k) => k);
       let removed = 0;
       $colorScale.byKey.forEach((c, keyIndex) => {
@@ -119,7 +131,10 @@
 <p>
   <label>
     Data set:
-    <select value={$dbHBar.dataSet} onchange={(e) => dbHBar.setDataSet(e.currentTarget.value)}>
+    <select
+      value={$chartSpec.dataSet}
+      onchange={(e) => chartSpec.setDataSet(e.currentTarget.value)}
+    >
       <option>{""}</option>
       {#each spec.data.sets as set}
         <option value={set.id}>{set.name}</option>
@@ -130,9 +145,9 @@
 <p>
   <label>
     Label width: <input
-      value={$dbHBar.labelWidth}
-      onkeyup={(e) => dbHBar.setLabelWidth(Number.parseInt(e.currentTarget.value))}
-      onchange={(e) => dbHBar.setLabelWidth(Number.parseInt(e.currentTarget.value))}
+      value={$chartSpec.labelWidth}
+      onkeyup={(e) => chartSpec.setLabelWidth(Number.parseInt(e.currentTarget.value))}
+      onchange={(e) => chartSpec.setLabelWidth(Number.parseInt(e.currentTarget.value))}
       type="number"
     />
   </label>
@@ -142,8 +157,8 @@
     <label>
       Categories from:
       <select
-        value={$dbHBar.categories}
-        onchange={(e) => dbHBar.setCategories(e.currentTarget.value)}
+        value={$chartSpec.categories}
+        onchange={(e) => chartSpec.setCategories(e.currentTarget.value)}
       >
         <option>{""}</option>
         {#each columns as column}
@@ -156,8 +171,8 @@
     <label>
       Sub categories from:
       <select
-        value={$dbHBar.subCategories}
-        onchange={(e) => dbHBar.setSubCategories(e.currentTarget.value)}
+        value={$chartSpec.subCategories}
+        onchange={(e) => chartSpec.setSubCategories(e.currentTarget.value)}
       >
         <option>{""}</option>
         {#each columns as column}
@@ -170,17 +185,17 @@
     <label>
       Stack sub categories:
       <input
-        checked={$dbHBar.stackSubCategories}
-        onchange={(e) => dbHBar.setStackSubCategories(e.currentTarget.checked)}
+        checked={$chartSpec.stackSubCategories}
+        onchange={(e) => chartSpec.setStackSubCategories(e.currentTarget.checked)}
         type="checkbox"
       />
     </label>
-    {#if $dbHBar.stackSubCategories}
+    {#if $chartSpec.stackSubCategories}
       <label>
         Total:
         <input
-          checked={$dbHBar.portionSubCategories}
-          onchange={(e) => dbHBar.setPortionSubCategories(e.currentTarget.checked)}
+          checked={$chartSpec.portionSubCategories}
+          onchange={(e) => chartSpec.setPortionSubCategories(e.currentTarget.checked)}
           type="checkbox"
         />
       </label>
@@ -189,7 +204,7 @@
   <p>
     <label>
       Values from:
-      <select value={$dbHBar.value} onchange={(e) => dbHBar.setValue(e.currentTarget.value)}>
+      <select value={$chartSpec.value} onchange={(e) => chartSpec.setValue(e.currentTarget.value)}>
         <option>{""}</option>
         {#each columns.filter((r) => r.type == "number") as row}
           <option>{row.key}</option>
@@ -309,8 +324,8 @@
     <label>
       Rectangle labels:
       <input
-        checked={$dbHBar.rectLabels}
-        onchange={(e) => dbHBar.setRectLabels(e.currentTarget.checked)}
+        checked={$chartSpec.rectLabels}
+        onchange={(e) => chartSpec.setRectLabels(e.currentTarget.checked)}
         type="checkbox"
       />
     </label>
@@ -319,8 +334,8 @@
     <label>
       Total labels:
       <select
-        value={$dbHBar.totalLabels}
-        onchange={(e) => dbHBar.setTotalLabels(e.currentTarget.value)}
+        value={$chartSpec.totalLabels}
+        onchange={(e) => chartSpec.setTotalLabels(e.currentTarget.value)}
       >
         {#each Object.values(HBarTotalLabelStyle) as location}
           <option>{location}</option>
@@ -331,7 +346,10 @@
   <p>
     <label
       >Repeat for each:
-      <select value={$dbHBar.repeat} onchange={(e) => dbHBar.setRepeat(e.currentTarget.value)}>
+      <select
+        value={$chartSpec.repeat}
+        onchange={(e) => chartSpec.setRepeat(e.currentTarget.value)}
+      >
         <option>{""}</option>
         {#each columns as row}
           <option>{row.key}</option>
@@ -342,7 +360,7 @@
 {/if}
 
 <b>Axis</b>
-<AxisEditor conf={dbHBar.axis()} showRepeatControl={$dbHBar.repeat != ""} />
+<AxisEditor conf={chartSpec.axis()} showRepeatControl={$chartSpec.repeat != ""} />
 
 <style>
   .color-control {

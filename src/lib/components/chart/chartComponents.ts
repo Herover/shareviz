@@ -5,12 +5,15 @@ import type { Root } from "$lib/chart";
 import HBar from "./HBar";
 import Line from "./Line";
 import ErrorText from "./ErrorText.svelte";
+import type { db } from "$lib/chartStore";
 
 interface ChartComponent {
   /** Human readable name of chart type */
   name: string;
   /** Unique key used to identify component */
   key: string;
+  /** Function to call when adding a new item */
+  add: (chart: ReturnType<typeof db.chart>, index: number) => void;
   /** Actual component displayed in chart */
   // FIXME: types are not correct
   component: () => Promise<
@@ -33,7 +36,7 @@ interface ChartComponent {
     >
   >;
   /** Component for editor */
-  editorComponent: Component<any>;
+  editorComponent: Component<any> | (() => Promise<Component<any>>);
 }
 
 const components: { [key: string]: ChartComponent } = {};
@@ -63,3 +66,15 @@ export const getComponent = async (key: string): Promise<any> => {
   }
   return ErrorText;
 };
+export const getEditorComponent = async (key: string): Promise<any> => {
+  if (key in components) {
+    return components[key].editorComponent;
+  }
+  return ErrorText;
+};
+export const getComponentList = () =>
+  Object.keys(components).map((key) => ({
+    add: components[key].add,
+    key,
+    label: components[key].name,
+  }));
