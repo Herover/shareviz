@@ -33,15 +33,21 @@
 
   // let perColumn = $derived(Math.ceil(Math.sqrt(charts.length)));
   let perColumn = $derived(componentSpec.repeat != "" ? componentSpec.repeatColumns : 1);
+
+  let legendKeys = $derived(
+    componentSpec.style.byKey
+      .filter(
+        (s) =>
+          s.label.text != "" &&
+          charts.findIndex((c) => c.d.findIndex((d) => d.key == s.k) != -1) != -1,
+      )
+      .map((d) => ({ color: d.color, legend: d.label.text })),
+  );
 </script>
 
 <!-- TODO: Should probably be a toggle setting -->
 {#if componentSpec.style.byKey.length != 0 && componentSpec.style.byKey[0].label.location == LabelLocation.None}
-  <Legend
-    keys={componentSpec.style.byKey
-      .filter((d) => d.label.text != "")
-      .map((d) => ({ color: d.color, legend: d.label.text }))}
-  />
+  <Legend keys={legendKeys} />
 {/if}
 
 <div class="line-charts">
