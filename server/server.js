@@ -728,6 +728,8 @@ export function startServer(server) {
       db.updateChart(ctx.id, { updated: Date.now() })
         .then(() => next())
         .catch((e) => next(e));
+    } else {
+      next();
     }
   });
 }
