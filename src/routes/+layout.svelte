@@ -86,6 +86,7 @@
     --text-secondary: #666666;
 
     --width-wide: 1200px;
+    --spacing: 1.5em;
   }
   :global(body.dark-mode) {
     --main-bg-color: #1a1a22;

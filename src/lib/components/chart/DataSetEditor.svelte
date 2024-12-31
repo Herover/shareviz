@@ -32,7 +32,6 @@
   };
 </script>
 
-<p><label>ID <input disabled value={$dataStore.id} /></label></p>
 <p>
   <label
     >Raw data <textarea
@@ -48,41 +47,50 @@ value3\tvalue4
     ></textarea></label
   >
 </p>
-<p>
-  <label
-    >Name
+<div class="box">
+  <div class="w-025 editor-explain-box p-top-1">
+    <span class="editor-column-label">Name</span>
+  </div>
+  <div class="w-075 p-top-1">
     <input
       value={$dataStore.name}
       onchange={(e) => dataStore.setName(e.currentTarget.value)}
       onkeyup={(e) => dataStore.setName(e.currentTarget.value)}
     />
-  </label>
-</p>
-<p>
-  <label
-    >Format
+  </div>
+</div>
+<div class="box">
+  <div class="w-025 editor-explain-box p-top-1">
+    <span class="editor-column-label">Format</span>
+  </div>
+  <div class="w-075 p-top-1">
     <select value={$dataStore.type} onchange={(e) => dataStore.setType(e.currentTarget.value)}>
       {#each ["tsv"] as row}
         <option>{row}</option>
       {/each}
     </select>
-  </label>
-</p>
+  </div>
+</div>
 
-<p>Columns to rows (transpose)</p>
-<ul>
-  {#each $dataStore.transpose as transpose, i}
-    <DataSetTransposeEditor {dataStore} {transpose} {i} />
-  {/each}
-</ul>
+<h4 class="editor-sub-section">Columns to rows (transpose)</h4>
+<p class="editor-sub-section-description">
+  You typically want your data in rows, not columns. If you want to plot ex. population changes over
+  years but your year numbers are columns, or population per city but city names are in columns,
+  then you need to turn them into rows first. Use transpose for this.
+</p>
+{#each $dataStore.transpose as transpose, i}
+  <DataSetTransposeEditor {dataStore} {transpose} {i} />
+{/each}
 
 <button onclick={() => dataStore.addTranspose($dataStore.transpose.length)}>Add transpose</button>
 
-<p>Columns:</p>
-<ul>
-  {#each $dataStore.rows as column, i}
-    <li>
+<h4 class="editor-sub-section">Columns</h4>
+{#each $dataStore.rows as column, i}
+  <div class="box">
+    <div class="w-05 editor-explain-box text-align-right">
       "{column.key}"
+    </div>
+    <div class="w-05">
       <select
         value={column.type}
         onchange={(e) => dataStore.setColumnType(i, e.currentTarget.value)}
@@ -91,13 +99,17 @@ value3\tvalue4
           <option>{type}</option>
         {/each}
       </select>
-    </li>
-  {/each}
-</ul>
+    </div>
+  </div>
+{/each}
 
 <style>
   textarea {
     resize: vertical;
+  }
+  textarea,
+  select,
+  input {
     width: 100%;
   }
   * {

@@ -1,0 +1,53 @@
+div.box {
+  display: flex;
+}
+div.box * {
+  box-sizing: border-box;
+}
+div.w-05 {
+  width: 50%;
+  box-sizing: border-box;
+}
+div.w-025 {
+  width: 25%;
+  box-sizing: border-box;
+}
+div.w-075 {
+  width: 75%;
+  box-sizing: border-box;
+}
+div.p-top-1 {
+  padding-top: var(--spacing);
+}
+.editor-column-label {
+  font-size: 1.1rem;
+}
+.editor h3,
+.editor h4,
+.editor h5,
+.editor h6 {
+  font-weight: normal;
+  margin-bottom: 0rem;
+  margin-top: 0rem;
+  padding-bottom: 0rem;
+  padding-top: 0rem;
+}
+.editor .editor-sub-section {
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  font-size: 1.25rem;
+}
+.editor-column-label-description,
+.editor-sub-section-description {
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+  display: block;
+}
+.text-align-right {
+  text-align: right;
+}
+.editor-explain-box {
+  padding-right: var(--spacing);
+  padding-right: calc(var(--spacing) * 0.5);
+}

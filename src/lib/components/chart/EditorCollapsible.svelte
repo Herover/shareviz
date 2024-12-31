@@ -27,7 +27,19 @@
 
 <div class="container">
   <div class="header-content">
-    <button class:header-open={open} onclick={() => (open = !open)} class="header">
+    <span
+      class:header-open={open}
+      onclick={() => (open = !open)}
+      onkeydown={(e) => {
+        if (e.key == "Enter" || e.key == " ") {
+          open = !open;
+          e.preventDefault();
+        }
+      }}
+      class="header"
+      role="button"
+      tabindex="0"
+    >
       <!-- h3 is technically not allowed inside a button, but appears like the most accessible solution if we want a
         clickable header -->
       {#if lvl == 1}
@@ -35,7 +47,7 @@
       {:else if lvl == 2}
         <h4>{open ? "-" : "+"} {label}</h4>
       {/if}
-    </button>
+    </span>
     {@render actions?.()}
   </div>
   <div class="content">
@@ -49,11 +61,14 @@
   .container {
     width: 100%;
   }
-  .header-content button {
+  .header-content [role="button"] {
     border: none;
     background-color: transparent;
     text-align: start;
     cursor: pointer;
+  }
+  .header-content [role="button"] * {
+    font-weight: bold;
   }
   .header {
     flex: 1 1 auto;
@@ -62,6 +77,9 @@
     display: flex;
     flex-direction: row;
     border-bottom: 1px solid black;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.25rem;
   }
   .content {
     width: 100%;
@@ -69,6 +87,9 @@
   h3,
   h4 {
     margin: 0px;
-    padding-top: 1em;
+    padding-top: 10px;
+  }
+  h3 {
+    font-size: 1.5rem;
   }
 </style>

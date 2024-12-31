@@ -78,7 +78,7 @@
 <div class="main">
   {#if chartSpec != null}
     <div class="chart-controls-pane">
-      <div class="chart-controls-primary chart-controls">
+      <div class="chart-controls-primary chart-controls editor">
         <input
           value={$db?.chartInfo?.name}
           onchange={(e) => db.updateInfo({ name: e.currentTarget.value })}
