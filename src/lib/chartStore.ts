@@ -559,7 +559,7 @@ export const db = (function createDB() {
         setSourceTextLeftLink: (value: string) =>
           doc.submitOp(["chart", "sourceTextLeftLink", { r: 0, i: value }]),
         setSourceTextRight: (value: string) =>
-          console.log(value) || doc.submitOp(["chart", "sourceTextRight", { r: 0, i: value }]),
+          doc.submitOp(["chart", "sourceTextRight", { r: 0, i: value }]),
         setSourceTextRightLink: (value: string) =>
           doc.submitOp(["chart", "sourceTextRightLink", { r: 0, i: value }]),
         setScaleFrom: (scaleIndex: number, value: number) =>

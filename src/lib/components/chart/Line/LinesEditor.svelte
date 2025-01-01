@@ -327,112 +327,136 @@
   {/each}
 </div>
 
-<div class="style-controls">
-  <p>
-    <label>
-      Label
-      <input
-        value={typeof mergedStyle.label.text == "undefined" ? "" : mergedStyle.label.text}
-        disabled={nonEditable && selectedIndexes.length != 1}
-        onchange={(e) => setLineLabel(e.currentTarget.value)}
-        onkeyup={(e) => setLineLabel(e.currentTarget.value)}
-      />
-    </label>
+<div class="box">
+  <div class="w-025 editor-explain-box p-top-1">
+    <span class="editor-column-label">Label</span>
+  </div>
+  <div class="w-075 p-top-1">
+    <input
+      value={typeof mergedStyle.label.text == "undefined" ? "" : mergedStyle.label.text}
+      disabled={nonEditable && selectedIndexes.length != 1}
+      onchange={(e) => setLineLabel(e.currentTarget.value)}
+      onkeyup={(e) => setLineLabel(e.currentTarget.value)}
+    />
     <button disabled={selectedIndexes.length == 0} onclick={() => setLabelToKey()}>Auto</button>
-  </p>
-  <p>
-    <span>
-      Line color
-      <ColorPicker
-        color={typeof mergedStyle.color == "undefined" ? "#ffffff" : mergedStyle.color}
-        {chartColors}
-        disabled={nonEditable}
-        onchange={(s) => setLineColor(s)}
-      />
-      text color
-      <ColorPicker
-        color={typeof mergedStyle.label.color == "undefined" ? "#ffffff" : mergedStyle.label.color}
-        {chartColors}
-        disabled={nonEditable}
-        onchange={(s) => setTextColor(s)}
-      />
-    </span>
-  </p>
-  <p>
-    <label>
-      Width
-      <input
-        value={typeof mergedStyle.width == "undefined" ? "" : mergedStyle.width}
-        disabled={nonEditable}
-        onchange={(e) => setWidth(Number.parseInt(e.currentTarget.value))}
-        type="number"
-        style="width: 80px"
-      />
-    </label>
-  </p>
-  <p>
-    <label>
-      Location
-      <select
-        value={typeof mergedStyle.label.location == "undefined" ? "" : mergedStyle.label.location}
-        disabled={nonEditable}
-        onchange={(e) => setLabelLocation(e.currentTarget.value)}
-      >
-        {#each Object.values(LabelLocation) as location}
-          <option>{location}</option>
-        {/each}
-      </select>
-    </label>
-    <label>
-      X value
-      <input
-        value={typeof mergedStyle.label.x == "undefined" ? "" : mergedStyle.label.x}
-        disabled={nonEditable || defaultSelected}
-        onchange={(e) => setLabelX(e.currentTarget.value)}
-        type="number"
-        style="width: 80px;"
-      />
-    </label>
-    <label>
-      Line
-      <input
-        checked={typeof mergedStyle.label.line == "undefined"
-          ? false
-          : mergedStyle.label.line == LabelStyleLine.Line}
-        onchange={(e) =>
-          setLabelLineStyle(e.currentTarget.checked ? LabelStyleLine.Line : LabelStyleLine.None)}
-        disabled={nonEditable || defaultSelected}
-        type="checkbox"
-      />
-    </label>
-  </p>
-  <p>
-    <label>
-      Symbols
-      <select
-        value={typeof mergedStyle.symbols == "undefined" ? "" : mergedStyle.symbols}
-        disabled={nonEditable}
-        onchange={(e) => setSymbols(e.currentTarget.value)}
-      >
-        {#each Object.values(LineSymbol) as symbol}
-          <option>{symbol}</option>
-        {/each}
-      </select>
-    </label>
+  </div>
+</div>
 
-    <label>
-      Missing data
-      <select
-        value={typeof mergedStyle.missingStyle == "undefined" ? "" : mergedStyle.missingStyle}
-        disabled={nonEditable}
-        onchange={(e) => setMissingStyle(e.currentTarget.value)}
-      >
-        {#each Object.values(LineMissingStyle) as style}
-          <option>{style}</option>
-        {/each}
-      </select>
-    </label>
-  </p>
+<div class="box">
+  <div class="w-025 editor-explain-box p-top-1">
+    <span class="editor-column-label">Line color</span>
+  </div>
+  <div class="w-025 p-top-1">
+    <ColorPicker
+      color={typeof mergedStyle.color == "undefined" ? "#ffffff" : mergedStyle.color}
+      {chartColors}
+      disabled={nonEditable}
+      onchange={(s) => setLineColor(s)}
+    />
+  </div>
+  <div class="w-025 p-top-1">Text color</div>
+  <div class="w-025 p-top-1">
+    <ColorPicker
+      color={typeof mergedStyle.label.color == "undefined" ? "#ffffff" : mergedStyle.label.color}
+      {chartColors}
+      disabled={nonEditable}
+      onchange={(s) => setTextColor(s)}
+    />
+  </div>
+</div>
+
+<div class="box">
+  <div class="w-025 editor-explain-box p-top-1">
+    <span class="editor-column-label">Width</span>
+  </div>
+  <div class="w-025 p-top-1">
+    <input
+      value={typeof mergedStyle.width == "undefined" ? "" : mergedStyle.width}
+      disabled={nonEditable}
+      onchange={(e) => setWidth(Number.parseInt(e.currentTarget.value))}
+      type="number"
+    />
+  </div>
+</div>
+
+<div class="box">
+  <div class="w-025 editor-explain-box p-top-1">
+    <span class="editor-column-label">Location</span>
+  </div>
+  <div class="w-075 p-top-1">
+    <select
+      value={typeof mergedStyle.label.location == "undefined" ? "" : mergedStyle.label.location}
+      disabled={nonEditable}
+      onchange={(e) => setLabelLocation(e.currentTarget.value)}
+    >
+      {#each Object.values(LabelLocation) as location}
+        <option>{location}</option>
+      {/each}
+    </select>
+    {#if mergedStyle.label.location == "float"}
+      <br />
+      <p>
+        <label
+          >X-value
+          <input
+            value={typeof mergedStyle.label.x == "undefined" ? "" : mergedStyle.label.x}
+            disabled={nonEditable || defaultSelected}
+            onchange={(e) => setLabelX(e.currentTarget.value)}
+            type="number"
+            style="width: 80px;"
+          />
+        </label>
+        <label>
+          Line
+          <input
+            checked={typeof mergedStyle.label.line == "undefined"
+              ? false
+              : mergedStyle.label.line == LabelStyleLine.Line}
+            onchange={(e) =>
+              setLabelLineStyle(
+                e.currentTarget.checked ? LabelStyleLine.Line : LabelStyleLine.None,
+              )}
+            disabled={nonEditable || defaultSelected}
+            type="checkbox"
+          />
+        </label>
+      </p>
+    {/if}
+  </div>
+</div>
+
+<div class="box">
+  <div class="w-025 editor-explain-box p-top-1">
+    <span class="editor-column-label">Symbols</span>
+  </div>
+  <div class="w-075 p-top-1">
+    <select
+      value={typeof mergedStyle.symbols == "undefined" ? "" : mergedStyle.symbols}
+      disabled={nonEditable}
+      onchange={(e) => setSymbols(e.currentTarget.value)}
+    >
+      {#each Object.values(LineSymbol) as symbol}
+        <option>{symbol}</option>
+      {/each}
+    </select>
+  </div>
+</div>
+
+<div class="box">
+  <div class="w-025 editor-explain-box p-top-1">
+    <span class="editor-column-label">Missing data</span>
+  </div>
+  <div class="w-075 p-top-1">
+    <select
+      value={typeof mergedStyle.missingStyle == "undefined" ? "" : mergedStyle.missingStyle}
+      disabled={nonEditable}
+      onchange={(e) => setMissingStyle(e.currentTarget.value)}
+    >
+      {#each Object.values(LineMissingStyle) as style}
+        <option>{style}</option>
+      {/each}
+    </select>
+  </div>
 </div>
 
 <style>

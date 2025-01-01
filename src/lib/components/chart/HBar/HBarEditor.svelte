@@ -18,13 +18,7 @@
     index: number;
   }
 
-  let {
-    spec,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    chart,
-    chartData,
-    index,
-  }: Props = $props();
+  let { spec, chart, chartData, index }: Props = $props();
 
   let chartSpec = chart.hBar(index);
 

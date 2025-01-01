@@ -102,17 +102,3 @@ value3\tvalue4
     </div>
   </div>
 {/each}
-
-<style>
-  textarea {
-    resize: vertical;
-  }
-  textarea,
-  select,
-  input {
-    width: 100%;
-  }
-  * {
-    box-sizing: border-box;
-  }
-</style>

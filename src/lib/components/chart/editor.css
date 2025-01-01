@@ -1,3 +1,16 @@
+.editor textarea {
+  resize: vertical;
+}
+.editor textarea,
+.editor select,
+.editor input[type="number"],
+.editor input[type="text"] {
+  width: 100%;
+}
+.editor * {
+  box-sizing: border-box;
+}
+
 div.box {
   display: flex;
 }

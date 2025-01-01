@@ -82,9 +82,11 @@
   };
 </script>
 
-<p>
-  <label>
-    Data set:
+<div class="box">
+  <div class="w-025 editor-explain-box p-top-1">
+    <span class="editor-column-label">Data set</span>
+  </div>
+  <div class="w-075 p-top-1">
     <select
       value={$chartSpec.dataSet}
       onchange={(e) => chartSpec.setDataSet(e.currentTarget.value)}
@@ -94,12 +96,12 @@
         <option value={set.id}>{set.name}</option>
       {/each}
     </select>
-  </label>
-</p>
+  </div>
+</div>
 
 {#if dataSet}
   <p>
-    <label>
+    <label class="editor-column-label">
       X values from:
       <select value={$chartSpec.x.key} onchange={(e) => chartSpec.setXKey(e.currentTarget.value)}>
         <option>{""}</option>
@@ -110,7 +112,7 @@
     </label>
   </p>
   <p>
-    <label>
+    <label class="editor-column-label">
       Y values from:
       <select value={$chartSpec.y.key} onchange={(e) => chartSpec.setYKey(e.currentTarget.value)}>
         <option>{""}</option>
@@ -121,7 +123,7 @@
     </label>
   </p>
   <p>
-    <label>
+    <label class="editor-column-label">
       Categories from:
       <select
         value={$chartSpec.categories}
@@ -134,8 +136,26 @@
       </select>
     </label>
   </p>
+  {#if $chartSpec.categories}
+    <div class="box">
+      <div class="w-025 editor-explain-box">
+        <span class="editor-column-label">Stack</span>
+      </div>
+      <div class="w-075">
+        <input
+          bind:checked={$chartSpec.stack}
+          onchange={(e) => chartSpec.setStack(e.currentTarget.checked)}
+          type="checkbox"
+        />
+      </div>
+    </div>
+    <br />
+
+    <span class="editor-column-label">Line style</span>
+    <LinesEditor {chartColors} {values} lineSpec={chartSpec} {index} />
+  {/if}
   <p>
-    <label>
+    <label class="editor-column-label">
       Repeat for every:
       <select
         value={$chartSpec.repeat}
@@ -147,44 +167,46 @@
         {/each}
       </select>
     </label>
-    {#if $chartSpec.repeat != ""}
-      <br />
-      <label>
-        Columns:
+  </p>
+  {#if $chartSpec.repeat != ""}
+    <div class="box">
+      <div class="w-025 editor-explain-box">
+        <span class="editor-column-label">Columns</span>
+      </div>
+      <div class="w-075">
         <input
           value={$chartSpec.repeatColumns}
           onchange={(e) => chartSpec.setRepeatColumns(Number.parseInt(e.currentTarget.value))}
           onkeyup={(e) => chartSpec.setRepeatColumns(Number.parseInt(e.currentTarget.value))}
           type="number"
-          style="width: 90px"
+        />
+      </div>
+    </div>
+
+    {#snippet repeatTitle(d: LineRepeatSettingsKey)}
+      {d.k}
+    {/snippet}
+    <CategoryList
+      values={($chartSpec.repeatSettings?.byKey || []).map((e) => ({ k: e.k, d: e }))}
+      onSelectedChanged={(selected, indexes) => (selectedIndexes = indexes)}
+      searchFn={(str, d) => d.k.toLocaleLowerCase().includes(str.toLocaleLowerCase())}
+      title={repeatTitle}
+      moveUp={(_k, i) => chartSpec.moveRepeatUp(i)}
+      moveDown={(_k, i) => chartSpec.moveRepeatDown(i)}
+    />
+    {#if selectedIndexes.length != 0}
+      <label>
+        Label
+        <input
+          value={selectedIndexes.length == 1
+            ? $chartSpec.repeatSettings.byKey[selectedIndexes[0]].title ||
+              $chartSpec.repeatSettings.byKey[selectedIndexes[0]].k
+            : ""}
+          onkeyup={(e) => setRepeatedLabel(e.currentTarget.value)}
         />
       </label>
-
-      {#snippet repeatTitle(d: LineRepeatSettingsKey)}
-        {d.k}
-      {/snippet}
-      <CategoryList
-        values={($chartSpec.repeatSettings?.byKey || []).map((e) => ({ k: e.k, d: e }))}
-        onSelectedChanged={(selected, indexes) => (selectedIndexes = indexes)}
-        searchFn={(str, d) => d.k.toLocaleLowerCase().includes(str.toLocaleLowerCase())}
-        title={repeatTitle}
-        moveUp={(_k, i) => chartSpec.moveRepeatUp(i)}
-        moveDown={(_k, i) => chartSpec.moveRepeatDown(i)}
-      />
-      {#if selectedIndexes.length != 0}
-        <label>
-          Label
-          <input
-            value={selectedIndexes.length == 1
-              ? $chartSpec.repeatSettings.byKey[selectedIndexes[0]].title ||
-                $chartSpec.repeatSettings.byKey[selectedIndexes[0]].k
-              : ""}
-            onkeyup={(e) => setRepeatedLabel(e.currentTarget.value)}
-          />
-        </label>
-      {/if}
     {/if}
-  </p>
+  {/if}
 {/if}
 <p>
   {#if xScale.dataRange}
@@ -246,16 +268,6 @@
 </p>
 <p>
   <label>
-    Stack:
-    <input
-      bind:checked={$chartSpec.stack}
-      onchange={(e) => chartSpec.setStack(e.currentTarget.checked)}
-      type="checkbox"
-    />
-  </label>
-</p>
-<p>
-  <label>
     Height is
     <input
       value={$chartSpec.heightRatio * 100}
@@ -266,10 +278,6 @@
     % of width
   </label>
 </p>
-
-<p>Line style</p>
-<LinesEditor {chartColors} {values} lineSpec={chartSpec} {index} />
-<br />
 
 <b>X axis</b>
 <AxisEditor conf={chartSpec.xAxis} />
