@@ -105,7 +105,7 @@
           .map((e, i, arr) => ({
             ...e,
             textAnchor:
-              arr.length <= 2 &&
+              arr.filter((e) => e.l != "").length <= 2 &&
               ((e.n instanceof Date &&
                 scale.domain()[0] instanceof Date &&
                 // @ts-expect-error: if e.n is a date, then scale.domain will also return dates
