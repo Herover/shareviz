@@ -15,8 +15,9 @@ There's currently no hosted version, but there might be in the future.
 These environvent variables should be defined in both dev and prod settings:
 
 ```
-ORIGIN="http://localhost:5173" # Only required in prod
-AUTH_TRUST_HOST=true # Only required in prod
+PUBLIC_ORIGIN="http://localhost:5173"
+ORIGIN="http://localhost:5173" # Required in prod to get working auth
+AUTH_TRUST_HOST=true # Required in prod for auth
 AUTH_SECRET="X"
 AUTH_GITHUB_ID=Y
 AUTH_GITHUB_SECRET=Z

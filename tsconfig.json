@@ -11,7 +11,13 @@
     "strict": true,
     "moduleResolution": "Bundler"
   },
-  "include": ["src/**/*", "src/node_modules/**/*", "drizze.config.ts"],
+  "include": [
+    "src/**/*",
+    "src/node_modules/**/*",
+    "drizze.config.ts",
+    // Fix issue where importing from '$env/dynamic/public' is reported as a error
+    ".svelte-kit/ambient.d.ts"
+  ],
   "exclude": ["node_modules/*", "__sapper__/*", "static/*"]
   // Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
   //

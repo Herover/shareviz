@@ -2,7 +2,6 @@
   import { db, localPrefix } from "$lib/chartStore";
   import type { Root } from "$lib/chart.d.ts";
   import ChartEditor from "$lib/components/chart/ChartEditor.svelte";
-  import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
   import DataSetEditor from "$lib/components/chart/DataSetsEditor.svelte";
   import EditorCollapsible from "$lib/components/chart/EditorCollapsible.svelte";
   import { onDestroy, onMount } from "svelte";
@@ -10,12 +9,40 @@
   import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
   import { computeData } from "$lib/data.js";
   import type { DSVParsedArray } from "d3-dsv";
+  import type { EditorChartData, ViewerMessage } from "$lib/viewerData.js";
 
   let { data } = $props();
 
+  let viewerFrame: HTMLIFrameElement | undefined = $state();
+
   let viewScale = $state(100);
+  let height = $state(100);
 
   let disconnect: undefined | (() => void);
+
+  $effect(() => {
+    if ($db.doc != null) {
+      viewerFrame?.contentWindow?.postMessage({
+        type: "CHART_DATA",
+        data: {
+          chart: $db.doc,
+        },
+      } as EditorChartData);
+    }
+  });
+  const onMessage = (event: MessageEvent<ViewerMessage>) => {
+    if (event.data.type == "CHART_UPDATED") {
+      height = event.data.data.height;
+    } else if (event.data.type == "CHART_EDIT") {
+      edit(event.data.data.edit);
+    }
+  };
+
+  $effect(() => {
+    if (viewerFrame && viewerFrame.contentWindow) {
+      viewerFrame.contentWindow.addEventListener("message", onMessage, false);
+    }
+  });
 
   onMount(() => {
     disconnect = db.connect();
@@ -129,7 +156,19 @@
       </div>
       <div class="chart-view">
         <div style:scale={viewScale / 100}>
-          <ChartViewer {chartSpec} data={chartData} editor={true} onedit={(e) => edit(e)} />
+          <!--
+            We could use the ChartViewer component directly, but to get a clean window that
+            behaves like readers will see it (without our CSS and JS) in embeds, use a iframe.
+          -->
+          <iframe
+            bind:this={viewerFrame}
+            src={"/view/chart/" + data.id + "?editor"}
+            width={chartSpec.chart.width}
+            {height}
+            title="Chart preview"
+          >
+            Viewer content...
+          </iframe>
         </div>
       </div>
     </div>
@@ -214,5 +253,8 @@
   }
   .view-controls div {
     margin: 0.25em;
+  }
+  iframe {
+    border: none;
   }
 </style>
