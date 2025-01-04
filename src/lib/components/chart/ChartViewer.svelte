@@ -89,18 +89,26 @@
     {/if}
   </p>
   {#each chartSpec.chart.elements as element, i}
-    {#await getComponent(element.type) then component}
-      {@const SvelteComponent = component}
-      <SvelteComponent
-        componentSpec={element.d}
-        {chartSpec}
-        {data}
-        {chartWidth}
-        {editor}
-        index={i}
-        on:edit={mkEditElement(i)}
-      />
-    {/await}
+    <svelte:boundary>
+      {#await getComponent(element.type) then component}
+        {@const SvelteComponent = component}
+        <SvelteComponent
+          componentSpec={element.d}
+          {chartSpec}
+          {data}
+          {chartWidth}
+          {editor}
+          index={i}
+          on:edit={mkEditElement(i)}
+        />
+      {/await}
+
+      {#snippet failed(error, reset)}
+        <button onclick={reset}>A error happened in the {element.type} chart, click to reset</button
+        >
+        <pre>{error ? error : ""}</pre>
+      {/snippet}
+    </svelte:boundary>
   {/each}
   <div class="source">
     <p class="source-left" dir="auto">

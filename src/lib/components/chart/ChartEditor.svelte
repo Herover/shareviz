@@ -135,31 +135,41 @@
   </p>
 
   {#each $chartScope.elements as element, i}
-    <EditorCollapsible
-      group="element-controls"
-      key={"element-" + i}
-      label={`#${i + 1}`}
-      startOpen={true}
-      lvl={2}
-    >
-      {#await getEditorComponent(element.type)}
-        <p><i>Loading {element.type} editor...</i></p>
-      {:then component}
-        {@const EditorComponent = component}
-        <EditorComponent {spec} chart={chartScope} {chartData} index={i} />
-      {:catch e}
-        <p>Unable to load {element.type} editor: {e.message}</p>
-      {/await}
-      {#snippet actions()}
-        <div>
-          <button onclick={() => removeElement(i)}>Delete</button>
-          <button disabled={i == 0} onclick={() => moveElementUp(i)}>Move up</button>
-          <button disabled={i == $chartScope.elements.length - 1} onclick={() => moveElementDown(i)}
-            >Move down</button
-          >
-        </div>
+    <svelte:boundary>
+      <EditorCollapsible
+        group="element-controls"
+        key={"element-" + i}
+        label={`#${i + 1}`}
+        startOpen={true}
+        lvl={2}
+      >
+        {#await getEditorComponent(element.type)}
+          <p><i>Loading {element.type} editor...</i></p>
+        {:then component}
+          {@const EditorComponent = component}
+          <EditorComponent {spec} chart={chartScope} {chartData} index={i} />
+        {:catch e}
+          <p>Unable to load {element.type} editor: {e.message}</p>
+        {/await}
+        {#snippet actions()}
+          <div>
+            <button onclick={() => removeElement(i)}>Delete</button>
+            <button disabled={i == 0} onclick={() => moveElementUp(i)}>Move up</button>
+            <button
+              disabled={i == $chartScope.elements.length - 1}
+              onclick={() => moveElementDown(i)}>Move down</button
+            >
+          </div>
+        {/snippet}
+      </EditorCollapsible>
+
+      {#snippet failed(error, reset)}
+        <button onclick={reset}
+          >A error happened in the {element.type} chart editor, click to reset</button
+        >
+        <pre>{error ? error : ""}</pre>
       {/snippet}
-    </EditorCollapsible>
+    </svelte:boundary>
   {/each}
 
   {#each getComponentList() as { add, label }}
