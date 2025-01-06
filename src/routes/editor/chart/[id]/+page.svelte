@@ -18,6 +18,8 @@
   let viewScale = $state(100);
   let height = $state(100);
 
+  let visibleSection = $state(1);
+
   let disconnect: undefined | (() => void);
 
   $effect(() => {
@@ -104,6 +106,52 @@
 
 <div class="main">
   {#if chartSpec != null}
+    <header>
+      <div class="parts-holder">
+        <div class="parts-bottom">
+          <div
+            class:part-item-selected={visibleSection == 1}
+            onclick={() => (visibleSection = 1)}
+            onkeydown={(e) => (e.key == " " || e.key == "Enter") && (visibleSection = 1)}
+            class="part-item"
+            role="button"
+            tabindex="0"
+          >
+            Data
+          </div>
+          <div
+            class:part-item-selected={visibleSection == 2}
+            onclick={() => (visibleSection = 2)}
+            onkeydown={(e) => (e.key == " " || e.key == "Enter") && (visibleSection = 2)}
+            class="part-item"
+            role="button"
+            tabindex="0"
+          >
+            Layout
+          </div>
+          <div
+            class:part-item-selected={visibleSection == 3}
+            onclick={() => (visibleSection = 3)}
+            onkeydown={(e) => (e.key == " " || e.key == "Enter") && (visibleSection = 3)}
+            class="part-item"
+            role="button"
+            tabindex="0"
+          >
+            Charts
+          </div>
+          <div
+            class:part-item-selected={visibleSection == 4}
+            onclick={() => (visibleSection = 4)}
+            onkeydown={(e) => (e.key == " " || e.key == "Enter") && (visibleSection = 4)}
+            class="part-item"
+            role="button"
+            tabindex="0"
+          >
+            Publish
+          </div>
+        </div>
+      </div>
+    </header>
     <div class="chart-controls-pane">
       <div class="chart-controls-primary chart-controls editor">
         <input
@@ -200,9 +248,11 @@
     align-content: space-between;
     flex-wrap: wrap;
     background-color: #eeeeee;
+
+    --editor-header-height: 4em;
   }
   .chart-controls-pane {
-    height: 100vh;
+    height: calc(100vh - var(--editor-header-height));
     width: fit-content;
   }
 
@@ -227,13 +277,13 @@
   }
 
   .chart-viewer {
-    height: 100vh;
+    height: calc(100vh - var(--editor-header-height));
     overflow-y: scroll;
     align-self: stretch;
     flex: 1 1 auto;
   }
   .chart-view {
-    height: 100vh;
+    height: calc(100vh - var(--editor-header-height));
     display: flex;
     justify-content: center;
     align-items: start;
@@ -256,5 +306,36 @@
   }
   iframe {
     border: none;
+  }
+  header {
+    width: 100%;
+    height: var(--editor-header-height);
+    border-bottom: 1px solid black;
+    background-color: white;
+  }
+  .parts-holder {
+    position: relative;
+    height: var(--editor-header-height);
+  }
+  .parts-bottom {
+    display: flex;
+    position: absolute;
+    bottom: 0px;
+  }
+  .part-item {
+    margin-left: 0.2em;
+    margin-right: 0.2em;
+    padding: 0.2em;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    z-index: 1;
+    position: relative;
+    top: 1px;
+    font-size: 1.1em;
+  }
+  .part-item-selected {
+    border-bottom: 1px solid white;
   }
 </style>
