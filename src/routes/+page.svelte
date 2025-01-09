@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { SignIn, SignOut } from "@auth/sveltekit/components";
+  import { SignIn } from "@auth/sveltekit/components";
   import { page } from "$app/state";
-  import { redirect } from "@sveltejs/kit";
+  import { goto } from "$app/navigation";
 
   if (page.data.session?.user) {
-    redirect(302, "/org");
+    goto("/org");
   }
 </script>
 
