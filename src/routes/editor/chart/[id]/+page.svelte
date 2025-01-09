@@ -3,7 +3,6 @@
   import type { Root } from "$lib/chart.d.ts";
   import ChartEditor from "$lib/components/chart/ChartEditor.svelte";
   import DataSetEditor from "$lib/components/chart/DataSetsEditor.svelte";
-  import EditorCollapsible from "$lib/components/chart/EditorCollapsible.svelte";
   import { onDestroy, onMount } from "svelte";
   import { page } from "$app/stores";
   import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
@@ -154,32 +153,26 @@
     </header>
     <div class="chart-controls-pane">
       <div class="chart-controls-primary chart-controls editor">
-        <input
-          value={$db?.chartInfo?.name}
-          onchange={(e) => db.updateInfo({ name: e.currentTarget.value })}
-          disabled={!canEdit || $db.chartInfo == null}
-        />
         {#if canEdit}
-          <EditorCollapsible
-            group="controls"
-            key="data"
-            label="Data sets"
-            startOpen={chartSpec.data.sets.length == 0}
-          >
+          {#if visibleSection == 1}
+            <div class="box">
+              <div class="w-025 editor-explain-box p-top-1">
+                <span class="editor-column-label">Internal chart name</span>
+              </div>
+              <div class="w-075 p-top-1">
+                <input
+                  value={$db?.chartInfo?.name}
+                  onchange={(e) => db.updateInfo({ name: e.currentTarget.value })}
+                  disabled={!canEdit || $db.chartInfo == null}
+                />
+              </div>
+            </div>
             <DataSetEditor chartData={chartSpec.data} store={db} />
-          </EditorCollapsible>
-          <EditorCollapsible group="controls" key="style" label="Style">
+          {:else if visibleSection == 2}
             <StyleEditor style={db.style()} />
-          </EditorCollapsible>
-          <EditorCollapsible
-            group="controls"
-            key="main"
-            label="Chart settings"
-            startOpen={chartSpec.data.sets.length != 0}
-          >
+          {:else if visibleSection == 3}
             <ChartEditor spec={chartSpec} chartScope={db.chart()} {chartData} />
-          </EditorCollapsible>
-          <EditorCollapsible group="controls" key="main" label="Export">
+          {:else if visibleSection == 4}
             <a href="/view/chart/{data.id}">Embed link</a>
             <input
               value={window.location.protocol +
@@ -188,7 +181,7 @@
                 "/view/chart/" +
                 data.id}
             />
-          </EditorCollapsible>
+          {/if}
         {:else}
           <p>You do not have editor access to this chart.</p>
         {/if}
@@ -247,9 +240,10 @@
     flex-direction: row;
     align-content: space-between;
     flex-wrap: wrap;
-    background-color: #eeeeee;
+    background-color: var(--editor-background-color);
 
     --editor-header-height: 4em;
+    --editor-background-color: #f0f0f0;
   }
   .chart-controls-pane {
     height: calc(100vh - var(--editor-header-height));
@@ -264,9 +258,9 @@
     overflow-y: scroll;
   }
   .chart-controls-primary {
-    width: 400px;
-    border-right: 1px solid black;
-    background-color: white;
+    width: 500px;
+    padding-left: 50px;
+    padding-right: 50px;
   }
   .chart-controls-secondary {
     right: 0px;
@@ -291,7 +285,7 @@
   }
   .view-controls {
     height: 2em;
-    width: calc(100% - 400px);
+    width: calc(100% - 500px);
     z-index: 10;
     position: absolute;
     top: 0px;
@@ -316,6 +310,7 @@
   .parts-holder {
     position: relative;
     height: var(--editor-header-height);
+    padding-left: 50px;
   }
   .parts-bottom {
     display: flex;
@@ -334,8 +329,12 @@
     position: relative;
     top: 1px;
     font-size: 1.1em;
+    background-color: var(--editor-background-color);
   }
   .part-item-selected {
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid var(--editor-background-color);
+  }
+  input {
+    width: 100%;
   }
 </style>
