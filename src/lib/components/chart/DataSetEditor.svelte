@@ -32,6 +32,19 @@
   };
 </script>
 
+<h3 class="editor-sub-section">Dataset</h3>
+<div class="box">
+  <div class="w-025 editor-explain-box">
+    <span class="editor-column-label">Name</span>
+  </div>
+  <div class="w-075">
+    <input
+      value={$dataStore.name}
+      onchange={(e) => dataStore.setName(e.currentTarget.value)}
+      onkeyup={(e) => dataStore.setName(e.currentTarget.value)}
+    />
+  </div>
+</div>
 <p>
   <label
     >Raw data <textarea
@@ -48,22 +61,10 @@ value3\tvalue4
   >
 </p>
 <div class="box">
-  <div class="w-025 editor-explain-box p-top-1">
-    <span class="editor-column-label">Name</span>
-  </div>
-  <div class="w-075 p-top-1">
-    <input
-      value={$dataStore.name}
-      onchange={(e) => dataStore.setName(e.currentTarget.value)}
-      onkeyup={(e) => dataStore.setName(e.currentTarget.value)}
-    />
-  </div>
-</div>
-<div class="box">
-  <div class="w-025 editor-explain-box p-top-1">
+  <div class="w-025 editor-explain-box">
     <span class="editor-column-label">Format</span>
   </div>
-  <div class="w-075 p-top-1">
+  <div class="w-075">
     <select value={$dataStore.type} onchange={(e) => dataStore.setType(e.currentTarget.value)}>
       {#each ["tsv"] as row}
         <option>{row}</option>

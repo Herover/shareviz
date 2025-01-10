@@ -4,11 +4,120 @@
 
   interface Props {
     style: ReturnType<typeof db.style>;
+    chartScope: ReturnType<typeof db.chart>;
   }
 
-  let { style }: Props = $props();
+  let { style, chartScope }: Props = $props();
 </script>
 
+<h3 class="editor-sub-section">Labels</h3>
+<div class="box">
+  <div class="w-025 editor-column-label"><label for="editor-title">Title: </label></div>
+  <div class="w-075">
+    <textarea
+      id="editor-title"
+      value={$chartScope.title}
+      onkeyup={(e) => chartScope.setConfigTitle(e.currentTarget.value)}
+      class="control"
+      style:height="60px"
+    ></textarea>
+  </div>
+</div>
+<div class="box">
+  <div class="w-025 editor-column-label p-top-1">
+    <label for="editor-subtitle"> Sub title: </label>
+  </div>
+  <div class="w-075 p-top-1">
+    <textarea
+      id="editor-subtitle"
+      value={$chartScope.subTitle}
+      onkeyup={(e) => chartScope.setConfigSubTitle(e.currentTarget.value)}
+      class="control"
+      style:height="60px"
+    ></textarea>
+  </div>
+</div>
+
+<div class="box">
+  <div class="w-025 editor-column-label p-top-1">
+    <label for="editor-source-text-left"> Source text (left):</label>
+  </div>
+  <div class="w-075 p-top-1">
+    <input
+      id="editor-source-text-left"
+      value={$chartScope.sourceTextLeft}
+      onkeyup={(e) => chartScope.setSourceTextLeft(e.currentTarget.value)}
+      class="control"
+    />
+  </div>
+</div>
+
+<div class="box">
+  <div class="w-025 editor-column-label p-top-1">
+    <label for="editor-source-link-left"> Source link (left):</label>
+  </div>
+  <div class="w-075 p-top-1">
+    <input
+      id="editor-source-link-left"
+      value={$chartScope.sourceTextLeftLink}
+      onkeyup={(e) => chartScope.setSourceTextLeftLink(e.currentTarget.value)}
+      class="control"
+    />
+  </div>
+</div>
+
+<div class="box">
+  <div class="w-025 editor-column-label p-top-1">
+    <label for="editor-source-text-right"> Source text (right):</label>
+  </div>
+  <div class="w-075 p-top-1">
+    <input
+      id="editor-source-text-lerightft"
+      value={$chartScope.sourceTextRight}
+      onkeyup={(e) => chartScope.setSourceTextRight(e.currentTarget.value)}
+      class="control"
+    />
+  </div>
+</div>
+
+<div class="box">
+  <div class="w-025 editor-column-label p-top-1">
+    <label for="editor-source-text-right"> Source link (right):</label>
+  </div>
+  <div class="w-075 p-top-1">
+    <input
+      id="editor-source-text-right"
+      value={$chartScope.sourceTextRightLink}
+      onkeyup={(e) => chartScope.setSourceTextRightLink(e.currentTarget.value)}
+      class="control"
+    />
+  </div>
+</div>
+
+<p>
+  <label>
+    Height: <input
+      value={$chartScope.height}
+      onkeyup={(e) => chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
+      onchange={(e) => chartScope.setConfigHeight(Number.parseInt(e.currentTarget.value))}
+      type="number"
+      class="control"
+    />
+  </label>
+</p>
+<p>
+  <label>
+    Width: <input
+      value={$chartScope.width}
+      onkeyup={(e) => chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
+      onchange={(e) => chartScope.setConfigWidth(Number.parseInt(e.currentTarget.value))}
+      type="number"
+      class="control"
+    />
+  </label>
+</p>
+
+<h3 class="editor-sub-section">Style</h3>
 <p>
   <label>
     Title text size (em)
@@ -114,5 +223,8 @@
   .control {
     width: 100%;
     box-sizing: border-box;
+  }
+  textarea {
+    resize: vertical;
   }
 </style>

@@ -48,6 +48,11 @@ div.p-top-1 {
 .editor .editor-sub-section {
   margin-bottom: 1rem;
   margin-top: 1rem;
+}
+.editor h3.editor-sub-section {
+  font-size: 1.45rem;
+}
+.editor h4.editor-sub-section {
   font-size: 1.25rem;
 }
 .editor-column-label-description,

@@ -169,7 +169,7 @@
             </div>
             <DataSetEditor chartData={chartSpec.data} store={db} />
           {:else if visibleSection == 2}
-            <StyleEditor style={db.style()} />
+            <StyleEditor style={db.style()} chartScope={db.chart()} />
           {:else if visibleSection == 3}
             <ChartEditor spec={chartSpec} chartScope={db.chart()} {chartData} />
           {:else if visibleSection == 4}
