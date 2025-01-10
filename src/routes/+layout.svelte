@@ -104,4 +104,7 @@
   :global(a, a:link, a:visited, a:hover, a:active) {
     color: var(--link);
   }
+  :global(*) {
+    box-sizing: border-box;
+  }
 </style>
