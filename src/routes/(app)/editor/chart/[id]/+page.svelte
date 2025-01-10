@@ -329,7 +329,7 @@
     border-bottom: 1px solid black;
     z-index: 1;
     position: relative;
-    top: 1px;
+    top: 0px;
     font-size: 1.1em;
     background-color: var(--editor-background-color);
   }
