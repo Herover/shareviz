@@ -21,6 +21,26 @@
 
   let disconnect: undefined | (() => void);
 
+  const updateViewer = () => {
+    viewerFrame?.contentWindow?.postMessage({
+      type: "CHART_DATA",
+      data: {
+        chart: $db.doc,
+      },
+    } as EditorChartData);
+  };
+
+  $effect(() => {
+    if (viewerFrame?.contentWindow != null) {
+      // Make sure to send chart data the moment the viewer has loaded
+      viewerFrame?.contentWindow?.addEventListener("load", updateViewer);
+
+      // Viewer can sends events regarding chart height and editor events
+      viewerFrame.contentWindow.addEventListener("message", onMessage, false);
+    }
+  });
+
+  // Send chart data whenever it changes
   $effect(() => {
     if ($db.doc != null) {
       viewerFrame?.contentWindow?.postMessage({
@@ -31,6 +51,7 @@
       } as EditorChartData);
     }
   });
+
   const onMessage = (event: MessageEvent<ViewerMessage>) => {
     if (event.data.type == "CHART_UPDATED") {
       height = event.data.data.height;
@@ -39,12 +60,6 @@
     }
   };
 
-  $effect(() => {
-    if (viewerFrame && viewerFrame.contentWindow) {
-      viewerFrame.contentWindow.addEventListener("message", onMessage, false);
-    }
-  });
-
   onMount(() => {
     disconnect = db.connect();
     db.load(data.id, data.id.includes(localPrefix) == false);
@@ -52,6 +67,7 @@
 
   onDestroy(() => {
     if (disconnect) disconnect();
+    viewerFrame?.contentWindow?.removeEventListener("load", updateViewer);
   });
 
   let chartSpec = $derived($db.doc as Root);

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { db } from "$lib/chartStore";
+  import { db, localPrefix } from "$lib/chartStore";
   import type { Root } from "$lib/chart.d.ts";
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
   import { onDestroy } from "svelte";
@@ -50,10 +50,12 @@
     if ($db.doc) chartSpec = $db.doc as Root;
   });
   $effect(() => {
-    fetch("/api/chart/" + data.id + "/data")
-      .then((resp) => resp.json())
-      .then((data) => (chartSpec = data.chart))
-      .catch((err) => console.error(err));
+    if (data.id && !data.id.startsWith(localPrefix)) {
+      fetch("/api/chart/" + data.id + "/data")
+        .then((resp) => resp.json())
+        .then((data) => (chartSpec = data.chart))
+        .catch((err) => console.error(err));
+    }
   });
 </script>
 
