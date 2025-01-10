@@ -243,10 +243,10 @@
     background-color: var(--editor-background-color);
 
     --editor-header-height: 4em;
+    --editor-primary-controls-width: 500px;
     --editor-background-color: #f0f0f0;
   }
   .chart-controls-pane {
-    height: calc(100vh - var(--editor-header-height));
     width: fit-content;
   }
 
@@ -254,11 +254,9 @@
     box-sizing: border-box;
     padding: 10px;
     z-index: 10;
-    height: 100%;
-    overflow-y: scroll;
   }
   .chart-controls-primary {
-    width: 500px;
+    width: var(--editor-primary-controls-width);
     padding-left: 50px;
     padding-right: 50px;
   }
@@ -275,9 +273,10 @@
     overflow-y: scroll;
     align-self: stretch;
     flex: 1 1 auto;
+    position: sticky;
+    top: var(--editor-header-height);
   }
   .chart-view {
-    height: calc(100vh - var(--editor-header-height));
     display: flex;
     justify-content: center;
     align-items: start;
@@ -285,10 +284,11 @@
   }
   .view-controls {
     height: 2em;
-    width: calc(100% - 500px);
+    width: calc(100% - var(--editor-primary-controls-width));
     z-index: 10;
     position: absolute;
     top: 0px;
+    right: 0px;
     display: flex;
     flex-direction: row;
     justify-content: right;
@@ -306,6 +306,8 @@
     height: var(--editor-header-height);
     border-bottom: 1px solid black;
     background-color: white;
+    position: sticky;
+    top: 0px;
   }
   .parts-holder {
     position: relative;
