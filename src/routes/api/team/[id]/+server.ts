@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { db } from "../../../../../server_lib/sqlite";
+import { db } from "$lib/../../server_lib/sqlite";
 
 export type TeamResponse = {
   charts: Awaited<ReturnType<typeof db.getTeamCharts>>;

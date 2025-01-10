@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { db, TEAM_ROLES } from "../../../../../../server_lib/sqlite";
+import { db, TEAM_ROLES } from "$lib/../../server_lib/sqlite";
 
 export async function POST({ request, locals, params }) {
   const session = await locals.auth();

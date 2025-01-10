@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { db } from "../../../server_lib/sqlite.js";
+import { db } from "$lib/../../server_lib/sqlite.js";
 
 export async function load({ locals }) {
   const session = await locals.auth();

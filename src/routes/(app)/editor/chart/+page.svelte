@@ -8,7 +8,7 @@
   import { db } from "$lib/chartStore";
   import { onDestroy } from "svelte";
   import { notifications } from "$lib/notificationStore";
-  import type { ChartInfo } from "./../../../../server_lib/user";
+  import type { ChartInfo } from "$lib/../../server_lib/user";
   import { group, orDefault } from "$lib/utils";
 
   let charts = $state<ChartInfo[] | null>(null);

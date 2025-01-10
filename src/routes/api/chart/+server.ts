@@ -1,7 +1,7 @@
 import { json } from "@sveltejs/kit";
 import * as json1 from "ot-json1";
-import { db } from "../../../../server_lib/user.js";
-import { connection } from "../../../../server_lib/sharedb";
+import { db } from ".$lib/../../server_lib/user.js";
+import { connection } from "$lib/../../server_lib/sharedb";
 import { defDoc } from "$lib/initialDoc.js";
 
 export async function GET({ locals }) {

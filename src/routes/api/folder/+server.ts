@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { db } from "../../../../server_lib/user";
+import { db } from "$lib/../../server_lib/user";
 
 export async function POST({ request, locals }) {
   const session = await locals.auth();

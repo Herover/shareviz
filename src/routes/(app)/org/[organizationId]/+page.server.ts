@@ -1,4 +1,4 @@
-import { db } from "../../../../server_lib/sqlite.js";
+import { db } from "$lib/../../server_lib/sqlite.js";
 
 export async function load({ params, parent }) {
   const data = await parent();

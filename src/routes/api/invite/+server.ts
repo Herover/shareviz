@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { db } from "../../../../server_lib/sqlite";
+import { db } from "$lib/../../server_lib/sqlite";
 
 export async function PUT({ request, locals }) {
   const session = await locals.auth();

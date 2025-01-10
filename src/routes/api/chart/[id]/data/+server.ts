@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { connection } from "../../../../../../server_lib/sharedb";
+import { connection } from "$lib/../../server_lib/sharedb";
 
 export async function GET({ params }) {
   return new Promise((resolve) => {

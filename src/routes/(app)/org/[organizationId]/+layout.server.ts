@@ -1,5 +1,5 @@
 import { error, redirect } from "@sveltejs/kit";
-import { db } from "../../../../server_lib/sqlite.js";
+import { db } from "$lib/../../server_lib/sqlite.js";
 import { ORGANIZATION_ROLES } from "$lib/consts.js";
 
 /** @type {import('./$types').PageServerLoad} */
