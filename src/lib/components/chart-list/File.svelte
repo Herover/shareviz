@@ -92,7 +92,7 @@
   }
   tr:hover,
   .selected {
-    background-color: #deeefc;
+    background-color: var(--hover-bg-color);
   }
   .drag-target {
     border: 2px var(--text-primary);

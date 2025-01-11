@@ -256,11 +256,10 @@
     flex-direction: row;
     align-content: space-between;
     flex-wrap: wrap;
-    background-color: var(--editor-background-color);
+    background-color: var(--accent-bg-color);
 
     --editor-header-height: 4em;
     --editor-primary-controls-width: 500px;
-    --editor-background-color: #f0f0f0;
   }
   .chart-controls-pane {
     width: fit-content;
@@ -321,8 +320,8 @@
   header {
     width: 100%;
     height: var(--editor-header-height);
-    border-bottom: 1px solid black;
-    background-color: white;
+    border-bottom: 1px solid var(--text-primary);
+    background-color: var(--main-bg-color);
     position: sticky;
     top: 0px;
   }
@@ -340,18 +339,18 @@
     margin-left: 0.2em;
     margin-right: 0.2em;
     padding: 0.2em;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
+    border-left: 1px solid var(--text-primary);
+    border-right: 1px solid var(--text-primary);
+    border-top: 1px solid var(--text-primary);
+    border-bottom: 1px solid var(--text-primary);
     z-index: 1;
     position: relative;
     top: 0px;
     font-size: 1.1em;
-    background-color: var(--editor-background-color);
+    background-color: var(--accent-bg-color);
   }
   .part-item-selected {
-    border-bottom: 1px solid var(--editor-background-color);
+    border-bottom: 1px solid var(--accent-bg-color);
   }
   input {
     width: 100%;

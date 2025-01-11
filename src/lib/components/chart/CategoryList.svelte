@@ -162,8 +162,9 @@
     width: 100%;
     height: 300px;
     overflow-y: scroll;
-    border: 1px solid black;
+    border: 1px solid var(--text-primary);
     box-sizing: border-box;
+    background-color: var(--main-bg-color);
   }
   .line-search {
     width: 100%;
@@ -181,7 +182,7 @@
     background-color: #dddddd;
   }
   .line-unselected:hover {
-    background-color: #eeeeee;
+    background-color: var(--hover-bg-color);
   }
   .line-text {
   }

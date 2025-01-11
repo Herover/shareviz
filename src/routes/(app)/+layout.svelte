@@ -80,7 +80,8 @@
 
   :global(body) {
     --main-bg-color: #ffffff;
-    --accent-bg-color: #eeeeee;
+    --accent-bg-color: #f0f0f0;
+    --hover-bg-color: #deeefc;
     --detail-color: #aaaaaa;
     --text-primary: #000000;
     --text-secondary: #666666;
@@ -89,8 +90,9 @@
     --spacing: 1.5em;
   }
   :global(body.dark-mode) {
-    --main-bg-color: #1a1a22;
-    --accent-bg-color: #0c0b0f;
+    --main-bg-color: #040406;
+    --accent-bg-color: #201e29;
+    --hover-bg-color: #1f3447;
     --detail-color: #b7b7b7;
     --text-primary: #c2c2c2;
     --text-secondary: #949494;
