@@ -293,6 +293,7 @@
     top: var(--editor-header-height);
   }
   .chart-view {
+    min-height: calc(100vh - var(--editor-header-height));
     display: flex;
     justify-content: center;
     align-items: start;
