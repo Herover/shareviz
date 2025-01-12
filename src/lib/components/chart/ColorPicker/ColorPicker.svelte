@@ -265,13 +265,11 @@
     width: 100%;
   }
   .holder {
-    position: relative;
     width: 1em;
     height: 1em;
     display: inline-block;
     box-sizing: border-box;
     border: 1px solid;
-    top: 0.2em;
   }
   .color-display {
     width: 100%;

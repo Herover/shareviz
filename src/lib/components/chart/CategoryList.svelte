@@ -4,9 +4,9 @@
   interface Props {
     values: { k: string; d: unknown }[];
     title: (d: any) => ReturnType<import("svelte").Snippet>;
-    onfocus?: (k: string, i: number, d: (typeof values)[number]["d"]) => void;
-    onblur?: (k: string, i: number, d: (typeof values)[number]["d"]) => void;
-    searchFn: (str: string, d: (typeof values)[number]) => boolean;
+    onfocus?: (k: string, i: number, d: unknown) => void;
+    onblur?: (k: string, i: number, d: unknown) => void;
+    searchFn: (str: string, d: { k: string; d: unknown }) => boolean;
     moveUp: (k: string, i: number) => void;
     moveDown: (k: string, i: number) => void;
     onSelectedChanged: (values: { [key: string]: boolean }, indexes: number[]) => void;
