@@ -30,9 +30,12 @@ export async function load({ locals, params }) {
   const userIsOrgAdmin =
     orgUsers.findIndex((e) => e.id == user.id && e.role == ORGANIZATION_ROLES.ADMIN) != -1;
 
+  const teams = await db.getUserTeams(user.id);
+
   return {
     organization,
     orgUsers,
     userIsOrgAdmin,
+    teams,
   };
 }
