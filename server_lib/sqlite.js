@@ -1,5 +1,6 @@
 import { and, eq, isNull } from "drizzle-orm";
 import {
+  accounts,
   charts,
   db as drizzledb,
   folders,
@@ -28,6 +29,16 @@ export const db = {
       .select()
       .from(users)
       .where(username ? eq(users.email, username) : id ? eq(users.id, id) : undefined);
+  },
+  getUserAccounts: async (/** @type {string} */ userId) => {
+    return drizzledb
+      .select({
+        id: accounts.providerAccountId,
+        provider: accounts.provider,
+        expiresAt: accounts.expires_at,
+      })
+      .from(accounts)
+      .where(eq(accounts.userId, userId));
   },
   getUserTeams: async (/** @type {string} */ userId) => {
     // return new Promise((resolve, reject) => {

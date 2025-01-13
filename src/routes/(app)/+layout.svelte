@@ -1,6 +1,7 @@
 <script lang="ts">
   import { run } from "svelte/legacy";
 
+  import "$lib/common.css";
   import { page } from "$app/stores";
   import { NotificationLevel, notifications } from "$lib/notificationStore";
   import { user } from "$lib/userStore";

@@ -1,0 +1,25 @@
+.editor * {
+  box-sizing: border-box;
+}
+
+div.box {
+  display: flex;
+}
+div.box * {
+  box-sizing: border-box;
+}
+div.w-05 {
+  width: 50%;
+  box-sizing: border-box;
+}
+div.w-025 {
+  width: 25%;
+  box-sizing: border-box;
+}
+div.w-075 {
+  width: 75%;
+  box-sizing: border-box;
+}
+div.p-top-1 {
+  padding-top: var(--spacing);
+}
