@@ -109,7 +109,7 @@
 </script>
 
 <div class="holder">
-  <h3>{page.data.team.teams.name}</h3>
+  <h3>{page.data.team?.teams?.name || "Your charts"}</h3>
   <ChartList
     contents={directory}
     onCreateFolder={(parentId) => teamId && onAddFolder("New folder", teamId, parentId)}
