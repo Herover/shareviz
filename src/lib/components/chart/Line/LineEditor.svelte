@@ -63,16 +63,17 @@
         undefined,
       );
     } else {
-      values
-        .map((e) => e.k)
-        .filter((k) => $chartSpec.repeatSettings.byKey.findIndex((e) => e.k == k) == -1)
-        .forEach((k) => chartSpec.addRepeatSetting($chartSpec.repeatSettings.byKey.length, k));
-      chartSpec.removeRepeatSettings(
-        $chartSpec.repeatSettings.byKey
-          .map((e, i) => ({ i, e }))
-          .filter((e) => values.findIndex((v) => v.k == e.e.k) == -1)
-          .map((e) => e.i),
-      );
+      // FIXME
+      // values
+      //   .map((e) => e.k)
+      //   .filter((k) => $chartSpec.repeatSettings.byKey.findIndex((e) => e.k == k) == -1)
+      //   .forEach((k) => chartSpec.addRepeatSetting($chartSpec.repeatSettings.byKey.length, k));
+      // chartSpec.removeRepeatSettings(
+      //   $chartSpec.repeatSettings.byKey
+      //     .map((e, i) => ({ i, e }))
+      //     .filter((e) => values.findIndex((v) => v.k == e.e.k) == -1)
+      //     .map((e) => e.i),
+      // );
     }
   });
 
