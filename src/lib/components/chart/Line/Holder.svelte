@@ -4,7 +4,7 @@
   import Line from "./Line.svelte";
   import { formatData } from "./data";
   import Legend from "../Legend.svelte";
-  import { negativeOneToInf } from "$lib/utils";
+  import { createDebouncer, negativeOneToInf } from "$lib/utils";
 
   interface Props {
     chartSpec: Root;
@@ -19,13 +19,18 @@
 
   let { chartSpec, componentSpec, data, chartWidth, editor = false, index }: Props = $props();
 
-  let charts = $derived(
-    formatData(componentSpec, data).sort(
-      (a, b) =>
-        negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == a.k)) -
-        negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == b.k)),
-    ),
+  let charts: ReturnType<typeof formatData> = $state([]);
+  let chartDebouncer = createDebouncer(250);
+  $effect(() =>
+    chartDebouncer(() => {
+      charts = formatData(componentSpec, data).sort(
+        (a, b) =>
+          negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == a.k)) -
+          negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == b.k)),
+      );
+    }),
   );
+
   let maxY = $derived(max(charts, (d) => max(d.d, (dd) => max(dd.value, (ddd) => ddd.y))) ?? 1);
   let minY = $derived(min(charts, (d) => min(d.d, (dd) => min(dd.value, (ddd) => ddd.y))) ?? 0);
   let maxX = $derived(max(charts, (d) => max(d.d, (dd) => max(dd.value, (ddd) => ddd.x))) ?? 1);

@@ -167,3 +167,26 @@ export const formatDate = (date: number): string => {
   const d = new Date(date);
   return `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
 };
+
+export const createDebouncer = (debounceTime: number) => {
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  let debounceLastTime = 0;
+  return (fn: () => any) => {
+    const t = Date.now();
+    debounceLastTime = t;
+    if (debounceLastTime + debounceTime < t) {
+      fn();
+    } else {
+      if (debounceTimer != null) {
+        clearTimeout(debounceTimer);
+      }
+      debounceTimer = setTimeout(
+        () => {
+          debounceTimer = null;
+          fn();
+        },
+        t - (debounceLastTime + debounceTime),
+      );
+    }
+  };
+};
