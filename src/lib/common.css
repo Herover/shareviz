@@ -23,3 +23,10 @@ div.w-075 {
 div.p-top-1 {
   padding-top: var(--spacing);
 }
+div.hline {
+  width: 100%;
+  display: block;
+  border-top: 1px solid var(--detail-color);
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}

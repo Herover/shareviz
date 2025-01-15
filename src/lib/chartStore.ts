@@ -31,6 +31,7 @@ import {
 import { notifications } from "./notificationStore";
 import { orDefault } from "./utils";
 import { editChartInfo } from "./api";
+import { defDoc } from "./initialDoc";
 // import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
 
@@ -67,7 +68,9 @@ export const db = (function createDB() {
     doc.create = (data: any, type: any, cb: (error?: Error) => any) => {
       doc.data = json1.type.create(data);
       localStorage.setItem(collection + "-" + id, JSON.stringify(doc.data));
-      cb();
+      if (typeof cb == "function") {
+        cb();
+      }
     };
     doc.submitOp = (op: any) => {
       try {
@@ -76,6 +79,7 @@ export const db = (function createDB() {
         onOp();
       } catch (error) {
         onOp(error);
+        console.error(error, op);
       }
     };
     doc.on = (ev: string, listener: (a?: any) => any) => {
@@ -257,8 +261,7 @@ export const db = (function createDB() {
           const docId = (synced ? "" : localPrefix) + crypto.randomUUID();
           doc = synced ? connection.get("examples", docId) : getLocalDoc("examples", docId);
           doc.on("error", (e: Error) => console.warn("doc error", e));
-          doc.create();
-          resolve(docId);
+          doc.create(defDoc, json1.type.uri, () => resolve(docId));
         }
       });
     },
@@ -278,6 +281,8 @@ export const db = (function createDB() {
         );
       });
     },
+
+    getLocal: getLocalDocs,
 
     updateInfo: async (info: { name: string }) => {
       if (typeof id == "undefined") return;
