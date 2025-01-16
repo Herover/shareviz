@@ -63,11 +63,11 @@
         undefined,
       );
     } else {
+      values
+        .map((e) => e.k)
+        .filter((k) => $chartSpec.repeatSettings.byKey.findIndex((e) => e.k == k) == -1)
+        .forEach((k) => chartSpec.addRepeatSetting($chartSpec.repeatSettings.byKey.length, k));
       // FIXME
-      // values
-      //   .map((e) => e.k)
-      //   .filter((k) => $chartSpec.repeatSettings.byKey.findIndex((e) => e.k == k) == -1)
-      //   .forEach((k) => chartSpec.addRepeatSetting($chartSpec.repeatSettings.byKey.length, k));
       // chartSpec.removeRepeatSettings(
       //   $chartSpec.repeatSettings.byKey
       //     .map((e, i) => ({ i, e }))
