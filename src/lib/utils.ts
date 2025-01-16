@@ -171,7 +171,7 @@ export const formatDate = (date: number): string => {
 export const createDebouncer = (debounceTime: number) => {
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let debounceLastTime = 0;
-  return (fn: () => any) => {
+  return (watch: any[], fn: () => any) => {
     const t = Date.now();
     debounceLastTime = t;
     if (debounceLastTime + debounceTime < t) {

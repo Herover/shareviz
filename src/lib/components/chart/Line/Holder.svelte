@@ -22,7 +22,7 @@
   let charts: ReturnType<typeof formatData> = $state([]);
   let chartDebouncer = createDebouncer(250);
   $effect(() =>
-    chartDebouncer(() => {
+    chartDebouncer([componentSpec, data], () => {
       charts = formatData(componentSpec, data).sort(
         (a, b) =>
           negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == a.k)) -
