@@ -222,6 +222,10 @@ export const db = {
     // });
   },
 
+  getAllCharts: async () => {
+    return drizzledb.select().from(charts);
+  },
+
   addOrganization: async (/** @type {string} */ name, /** @type {Date|null} */ expires = null) => {
     const expireVal = expires == null ? null : expires.toISOString();
     const resOrg = await drizzledb

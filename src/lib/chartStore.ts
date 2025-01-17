@@ -32,6 +32,7 @@ import { notifications } from "./notificationStore";
 import { orDefault } from "./utils";
 import { editChartInfo } from "./api";
 import { defDoc } from "./initialDoc";
+import { migrate } from "./chartMigrate";
 // import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
 
@@ -54,7 +55,7 @@ export const db = (function createDB() {
 
   const getLocalDoc = (collection: string, id: string) => {
     const initial = localStorage.getItem(collection + "-" + id);
-    let onOp: any;
+    let onOp: (error?: Error) => any = () => {};
     const doc = {
       data: initial == null ? initial : JSON.parse(initial),
     } as {
@@ -78,7 +79,7 @@ export const db = (function createDB() {
         localStorage.setItem(collection + "-" + id, JSON.stringify(doc.data));
         onOp();
       } catch (error) {
-        onOp(error);
+        onOp(error as Error);
         console.error(error, op);
       }
     };
@@ -170,6 +171,10 @@ export const db = (function createDB() {
       }));
       doc = synced ? connection.get("examples", docId) : getLocalDoc("examples", docId);
       doc.on("error", (e: Error) => notifications.addError(e.message));
+
+      if (!synced) {
+        migrate(doc);
+      }
 
       presence = connection.getPresence("x-" + docId);
       presence.subscribe((e: any) => console.log("presence subscribe callback", e));

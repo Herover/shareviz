@@ -1,13 +1,13 @@
 export interface Root {
-  meta: Meta;
+  m: Meta;
   data: Data;
   chart: Chart;
   style: Style;
 }
 
 export interface Meta {
-  publicRead: boolean;
-  access: AccessItem[];
+  // File format number
+  v: number;
 }
 
 export interface AccessItem {

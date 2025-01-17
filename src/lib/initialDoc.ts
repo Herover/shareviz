@@ -1,9 +1,10 @@
 import type { Root } from "./chart";
 
+export const formatVersion = 0;
+
 export const defDoc: Root = {
-  meta: {
-    publicRead: false,
-    access: [],
+  m: {
+    v: formatVersion,
   },
   data: { sets: [] },
   chart: {

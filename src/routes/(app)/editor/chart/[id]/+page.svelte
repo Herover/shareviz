@@ -4,7 +4,6 @@
   import ChartEditor from "$lib/components/chart/ChartEditor.svelte";
   import DataSetEditor from "$lib/components/chart/DataSetsEditor.svelte";
   import { onDestroy, onMount } from "svelte";
-  import { page } from "$app/stores";
   import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
   import { computeData } from "$lib/data.js";
   import type { DSVParsedArray } from "d3-dsv";
@@ -74,13 +73,7 @@
 
   let chartData = $derived(computeData(chartSpec) as { [key: string]: DSVParsedArray<any> });
 
-  let canEdit = $derived(
-    chartSpec == null
-      ? false
-      : $db.mode == "local" ||
-          typeof chartSpec.meta.access.find((a) => a.userId == $page.data.session?.user?.id) !=
-            "undefined",
-  );
+  let canEdit = $derived(chartSpec != null);
 
   let edit = $derived((e: { k: string; v: any }) => {
     switch (e.k) {
