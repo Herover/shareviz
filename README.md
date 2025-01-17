@@ -27,7 +27,7 @@ AUTH_GITHUB_SECRET=Z
 
 - First install everything `npm install`.
 
-- Then run any new database migrations `npx drizzle-kit migrate --config drizze.config.ts`.
+- Then run any new database migrations `npx drizzle-kit migrate`.
 
 - Run the dev server `npm run dev`, or `npm run dev -- --host` if you want to test with a external device.
 
@@ -37,6 +37,14 @@ AUTH_GITHUB_SECRET=Z
 
 - Build the server `npm run build`.
 
-- Then run any new database migrations `npx drizzle-kit migrate --config drizze.config.ts`.
+- Then run any new database migrations `npx drizzle-kit migrate`.
 
 - Run the server `node server/prod.js`.
+
+## Upgrading
+
+In general, if you are using the application in a production environment and want to avoid dataloss, make a backup of the database and chart data before updating the code.
+
+When running the application, charts will get migrated to new formats when required on startup (except local charts that are migrated when opened). Database migrations are run manually using `npx drizzle-kit migrate`.
+
+New code is only merged to main if it's in a state where the application can be build and run correctly, but individual commits without release tags might not be stable.

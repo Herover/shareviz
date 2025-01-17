@@ -14,7 +14,7 @@
   "include": [
     "src/**/*",
     "src/node_modules/**/*",
-    "drizze.config.ts",
+    "drizzle.config.ts",
     // Fix issue where importing from '$env/dynamic/public' is reported as a error
     ".svelte-kit/ambient.d.ts"
   ],
