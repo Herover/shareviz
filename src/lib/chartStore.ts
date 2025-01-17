@@ -439,8 +439,8 @@ export const db = (function createDB() {
                 ...hbarScope.path.slice(1),
                 "repeatSettings",
                 "byKey",
-                [i, { p: 0 }],
                 [i - 1, { d: 0 }],
+                [i, { p: 0 }],
               ]),
             moveRepeatDown: (i: number) =>
               doc.submitOp([
@@ -625,8 +625,8 @@ export const db = (function createDB() {
             scaleIndex,
             "colors",
             "byKey",
-            [colorIndex, { p: 0 }],
             [colorIndex - 1, { d: 0 }],
+            [colorIndex, { p: 0 }],
           ]),
         moveColorDown: (scaleIndex: number, colorIndex: number) =>
           doc.submitOp([
@@ -846,8 +846,8 @@ export const db = (function createDB() {
           doc.submitOp([
             "chart",
             "elements",
-            [elementIndex, { p: 0 }],
             [elementIndex - 1, { d: 0 }],
+            [elementIndex, { p: 0 }],
           ]),
         moveElementDown: (elementIndex: number) =>
           doc.submitOp([
@@ -1177,8 +1177,8 @@ export const colors = (
       doc.submitOp([
         ...scaleScope.path.slice(1),
         "byKey",
-        [colorIndex, { p: 0 }],
         [colorIndex - 1, { d: 0 }],
+        [colorIndex, { p: 0 }],
       ]),
     moveColorDown: (colorIndex: number) =>
       doc.submitOp([
