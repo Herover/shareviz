@@ -12,7 +12,7 @@ export const formatData = (
       d: group(componentSpec.categories, d, (k, g) => {
         let last = 0;
         const subGroups = group(componentSpec.subCategories, g, (kk, gg) => {
-          const value = gg.reduce((acc, d) => acc + d[componentSpec.value], 0);
+          const value = gg.reduce((acc, d) => acc + (d[componentSpec.value] || 0), 0);
           return {
             label: kk,
             value,
@@ -21,7 +21,7 @@ export const formatData = (
           };
         });
         const sum = componentSpec.portionSubCategories
-          ? subGroups.reduce((acc, dd) => acc + dd.value, 0) / 100
+          ? subGroups.reduce((acc, dd) => acc + (dd.value || 0), 0) / 100
           : 1;
         let sorted = subGroups
           .map((d) => d)
