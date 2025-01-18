@@ -28,7 +28,7 @@
 </script>
 
 <div>
-  {#each $chartScope.elements as element, i}
+  {#each $chartScope.elements as element, i (element.id)}
     <svelte:boundary>
       <EditorCollapsible
         group="element-controls"
@@ -39,9 +39,8 @@
       >
         {#await getEditorComponent(element.type)}
           <p><i>Loading {element.type} editor...</i></p>
-        {:then component}
-          {@const EditorComponent = component}
-          <EditorComponent {spec} chart={chartScope} {chartData} index={i} />
+        {:then Component}
+          <Component {spec} chart={chartScope} {chartData} index={i} />
         {:catch e}
           <p>Unable to load {element.type} editor: {e.message}</p>
         {/await}

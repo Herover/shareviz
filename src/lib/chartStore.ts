@@ -651,6 +651,7 @@ export const db = (function createDB() {
             {
               i: {
                 type: "hBar",
+                id: crypto.randomUUID(),
                 d: {
                   dataSet: "",
                   categories: "",
@@ -722,6 +723,7 @@ export const db = (function createDB() {
             {
               i: {
                 type: "line",
+                id: crypto.randomUUID(),
                 d: {
                   dataSet: "",
                   x: {

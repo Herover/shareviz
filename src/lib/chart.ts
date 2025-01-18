@@ -82,6 +82,8 @@ export interface ByKey {
 
 export interface Element {
   type: string;
+  // Unique identifier
+  id: string;
   d: HBar | Line;
 }
 
