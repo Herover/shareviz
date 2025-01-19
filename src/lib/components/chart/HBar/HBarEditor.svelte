@@ -120,6 +120,9 @@
   let moveColorKeyDown = $derived((i: number) => {
     colorScale.moveColorDown(i);
   });
+
+  let totalLabel = $state($chartSpec.totalLabels);
+  $effect(() => totalLabel != $chartSpec.totalLabels && chartSpec.setTotalLabels(totalLabel));
 </script>
 
 <p>
@@ -314,29 +317,34 @@
     <button onclick={automateColorKeys}>Add missing data keys</button>
     <button onclick={removeExtraColorKeys}>Remove extra data keys</button>
   {/if}
-  <p>
-    <label>
-      Rectangle labels:
+
+  <div class="box p-top-1">
+    <div class="w-05 editor-explain-box">
+      <span class="editor-column-label">Rectangle labels</span>
+    </div>
+    <div class="w-05">
       <input
         checked={$chartSpec.rectLabels}
         onchange={(e) => chartSpec.setRectLabels(e.currentTarget.checked)}
         type="checkbox"
       />
-    </label>
-  </p>
-  <p>
-    <label>
-      Total labels:
-      <select
-        value={$chartSpec.totalLabels}
-        onchange={(e) => chartSpec.setTotalLabels(e.currentTarget.value)}
-      >
-        {#each Object.values(HBarTotalLabelStyle) as location}
-          <option>{location}</option>
-        {/each}
-      </select>
-    </label>
-  </p>
+    </div>
+  </div>
+
+  <div class="box p-top-1">
+    <div class="w-05 editor-explain-box">
+      <span class="editor-column-label">Total labels</span>
+    </div>
+    <div class="w-05">
+      {#each Object.values(HBarTotalLabelStyle) as location}
+        <label>
+          <input type="radio" value={location} bind:group={totalLabel} />
+          {location}
+        </label><br />
+      {/each}
+    </div>
+  </div>
+
   <p>
     <label
       >Repeat for each:
