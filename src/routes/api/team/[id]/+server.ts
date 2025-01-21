@@ -1,5 +1,6 @@
 import { json } from "@sveltejs/kit";
 import { db } from "$lib/../../server_lib/sqlite";
+import { TEAM_ROLES } from "$lib/consts";
 
 export type TeamResponse = {
   charts: Awaited<ReturnType<typeof db.getTeamCharts>>;
@@ -42,4 +43,33 @@ export async function GET({ params, locals }) {
     } satisfies TeamResponse,
     { status: 200 },
   );
+}
+
+export async function PUT({ request, locals, params }) {
+  const session = await locals.auth();
+
+  const user = session?.user;
+  if (session == null || typeof user == "undefined" || typeof user.id != "string") {
+    return json({ message: "invalid token" }, { status: 400 });
+  }
+
+  const isTeamAdmin =
+    (await db.getTeamMembers(params.id)).findIndex(
+      (u) => u.user.id == user.id && u.usersTeams.role == TEAM_ROLES.ADMIN,
+    ) != -1;
+
+  if (!isTeamAdmin) {
+    return json({ message: "unauthorized" }, { status: 403 });
+  }
+
+  const { name } = await request.json();
+  if (typeof name != "string" || name.length == 0) {
+    return json({ message: "invalid name" }, { status: 400 });
+  }
+
+  await db.updateTeam(params.id, { name });
+
+  return json({
+    message: "ok",
+  });
 }

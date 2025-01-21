@@ -58,6 +58,17 @@ export async function removeTeamMember(userId: string, teamId: string): Promise<
   }
 }
 
+export async function updateTeam(teamId: string, details: { name: string }): Promise<void> {
+  const res = await fetch(`/api/team/${teamId}`, {
+    method: "PUT",
+    body: JSON.stringify({ name: details.name }),
+  });
+  if (res.status != 200) {
+    const data = await res.json();
+    throw new Error(data.message);
+  }
+}
+
 export async function addFolder(name: string, teamId: string, parentId?: string): Promise<string> {
   const res = await fetch(`/api/folder`, {
     method: "POST",

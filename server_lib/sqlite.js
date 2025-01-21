@@ -281,6 +281,10 @@ export const db = {
     return res[0];
   },
 
+  updateTeam: async (/** @type {string} */ teamId, /** @type {{ name: string }} */ details) => {
+    return drizzledb.update(teams).set(details).where(eq(teams.id, teamId));
+  },
+
   getTeamCharts: async (/** @type {string} */ id) => {
     const res = await drizzledb
       .select({

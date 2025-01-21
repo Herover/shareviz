@@ -1,9 +1,10 @@
 <script lang="ts">
   import type { PageData } from "./$types";
   import { TEAM_ROLES } from "$lib/consts";
-  import { addTeamMember, getTeam, removeTeamMember } from "$lib/api";
+  import { addTeamMember, getTeam, removeTeamMember, updateTeam } from "$lib/api";
   import { notifications } from "$lib/notificationStore";
   import { page } from "$app/state";
+  import { invalidateAll } from "$app/navigation";
 
   let { data }: { data: PageData } = $props();
 
@@ -40,12 +41,26 @@
       notifications.addError((err as Error).message);
     }
   };
+
+  const update = async (details: { name: string }) => {
+    await updateTeam(page.params.teamId, details);
+    if (details.name && team) team.name = details.name;
+    invalidateAll();
+  };
 </script>
 
 <div class="side">
   <h3>{page.data.team.teams.name}</h3>
 
   {#if team}
+    <p>
+      <label
+        >Name: <input
+          value={team.name}
+          onblur={(e) => update({ name: e.currentTarget.value })}
+        /></label
+      >
+    </p>
     <p>Team <b>{team.name}</b> members:</p>
     <ul>
       {#each team.members as member}
