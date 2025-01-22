@@ -13,9 +13,13 @@ export const init: ServerInit = async () => {
       const doc = connection.get("examples", charts[i].chartRef);
       const onLoad = () => {
         migrate(doc);
+
         doc.unsubscribe();
         doc.off("load", onLoad);
         doc.off("error", reject);
+        // Disconnect doc from connection
+        doc.destroy();
+
         resolve();
       };
       doc.on("load", onLoad);
