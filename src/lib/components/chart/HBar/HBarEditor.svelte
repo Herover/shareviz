@@ -106,7 +106,7 @@
       const groups = group(key, dataSet, (k) => k);
       let removed = 0;
       $colorScale.byKey.forEach((c, keyIndex) => {
-        if (typeof groups.find((k) => c.k == k) != "undefined") {
+        if (typeof groups.find((k) => c.k == k) == "undefined") {
           colorScale.removeColorScaleColor(keyIndex - removed);
           removed++;
         }
