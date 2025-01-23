@@ -3,6 +3,7 @@
   import type { db } from "$lib/chartStore";
   import { orDefault, valueParsers } from "$lib/utils";
   import DataSetTransposeEditor from "./DataSetTransposeEditor.svelte";
+  import DateParserInput from "./DateParser/DateParserInput.svelte";
 
   interface Props {
     dataStore: ReturnType<typeof db.dataSet>;
@@ -17,6 +18,7 @@
       names.map((key) => ({
         key,
         type: orDefault($dataStore.rows.find((e) => e.key === key)?.type, "text"),
+        dateFormat: "",
       })),
     );
   };
@@ -100,6 +102,12 @@ value3\tvalue4
           <option>{type}</option>
         {/each}
       </select>
+      {#if column.type == "date"}
+        <DateParserInput
+          value={column.dateFormat}
+          onchange={(val) => dataStore.setColumnDateFormat(i, val)}
+        />
+      {/if}
     </div>
   </div>
 {/each}

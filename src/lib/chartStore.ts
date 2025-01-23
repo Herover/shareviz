@@ -899,11 +899,20 @@ export const db = (function createDB() {
 
         setColumnType: (colIndex: number, value: string) =>
           doc.submitOp(["data", "sets", index, "rows", colIndex, "type", { r: 0, i: value }]),
+        setColumnDateFormat: (colIndex: number, value: string) =>
+          doc.submitOp(["data", "sets", index, "rows", colIndex, "dateFormat", { r: 0, i: value }]),
         addColumn: (colIndex: number, key: string, type: string) =>
-          doc.submitOp(["data", "sets", index, "rows", colIndex, { i: { key, type } }]),
+          doc.submitOp([
+            "data",
+            "sets",
+            index,
+            "rows",
+            colIndex,
+            { i: { key, type, dateFormat: "" } },
+          ]),
         removeColumn: (colIndex: number) =>
           doc.submitOp(["data", "sets", index, "rows", colIndex, { r: true }]),
-        setColumns: (value: { key: string; type: string }[]) =>
+        setColumns: (value: { key: string; type: string; dateFormat: string }[]) =>
           doc.submitOp(["data", "sets", index, "rows", { r: 0, i: value }]),
 
         addTranspose: (transposeIndex: number) =>

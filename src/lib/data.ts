@@ -16,7 +16,7 @@ export const computeData = (chartSpec?: Root) =>
                 acc[rowInfo.key] = row[rowInfo.key];
                 return acc;
               }
-              acc[rowInfo.key] = parser.fn(row[rowInfo.key]);
+              acc[rowInfo.key] = parser.fn(row[rowInfo.key], { dateFormat: rowInfo.dateFormat });
 
               return acc;
             }, {} as any);
@@ -33,8 +33,8 @@ export const computeData = (chartSpec?: Root) =>
                 set.forEach((row) => {
                   const row2 = {
                     ...row,
-                    [transpose.toValue]: valueParser.fn(row[key]),
-                    [transpose.toKey]: keyParser.fn(key),
+                    [transpose.toValue]: valueParser.fn(row[key], {}),
+                    [transpose.toKey]: keyParser.fn(key, {}),
                   };
                   set2.push(row2);
                 });

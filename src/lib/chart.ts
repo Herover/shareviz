@@ -45,6 +45,7 @@ export interface TransposedColumn {
 export interface Row {
   key: string;
   type: string;
+  dateFormat?: string;
 }
 
 export interface Chart {

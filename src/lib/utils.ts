@@ -1,3 +1,8 @@
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(customParseFormat);
+
 enum Divide {
   None = 1,
   Thousands = 1000,
@@ -76,7 +81,7 @@ export enum valueKinds {
   DATE = "date",
 }
 export const valueParsers: {
-  [name: string]: { fn: (s: string) => any; type: valueKinds };
+  [name: string]: { fn: (s: string, opts: { dateFormat?: string }) => any; type: valueKinds };
 } = {
   number: {
     fn: (d: string) => Number.parseFloat(d),
@@ -116,6 +121,10 @@ export const valueParsers: {
       }
       return null;
     },
+    type: valueKinds.DATE,
+  },
+  date: {
+    fn: (d: string, opts) => dayjs(d, opts.dateFormat).toDate(),
     type: valueKinds.DATE,
   },
 };
