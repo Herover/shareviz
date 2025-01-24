@@ -1,12 +1,13 @@
 import type { Root } from "./chart";
 import type { Doc } from "sharedb/lib/client";
+import * as json1 from "ot-json1";
 
 /**
  * Applies operations requred to upgrade a chart specification.
  *
  * Should be able to handle migrating multiple versions, but not downgrade.
  */
-export const migrate = (doc: Doc) => {
+export const migrate = (doc: /* { submitOp: (op: any) => void, data: any } */ Doc) => {
   if (typeof doc.data.m == "undefined") {
     console.log("migrate: initial meta");
 
@@ -27,6 +28,7 @@ export const migrate = (doc: Doc) => {
       ],
     ]);
   }
+
   if (doc.data.m.v == 0) {
     const op = [
       [
@@ -51,6 +53,39 @@ export const migrate = (doc: Doc) => {
         },
       ],
     ];
+    doc.submitOp(op);
+  }
+
+  if (doc.data.m.v == 1) {
+    const op = (doc.data as Root).data.sets
+      .map((e, i) => {
+        return e.rows
+          .filter((ee) => typeof ee.dateFormat != "string")
+          .map((ee, ii) => {
+            // Compute individual ops to upgrade doc
+            return [
+              "data",
+              "sets",
+              i,
+              "rows",
+              ii,
+              "dateFormat",
+              {
+                i: "",
+              },
+            ];
+          });
+      })
+      .flat()
+      // Merge ops into a single valid op, with a op that sets the version number
+      .reduce((acc, op) => json1.type.compose(acc, op), [
+        "m",
+        "v",
+        {
+          r: 0,
+          i: 2,
+        },
+      ] as any);
     doc.submitOp(op);
   }
 };

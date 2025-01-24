@@ -33,7 +33,7 @@ import { orDefault } from "./utils";
 import { editChartInfo } from "./api";
 import { defDoc } from "./initialDoc";
 import { migrate } from "./chartMigrate";
-// import { type Doc } from "sharedb";
+import { type Doc } from "sharedb";
 // import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
 
 export const localPrefix = "local-";
@@ -42,6 +42,73 @@ interface PresenceData {
   selected: string;
   color: string;
 }
+
+export const createLocalDoc = (
+  collection: string,
+  id: string,
+  opts: { initial?: any; noStorage?: boolean } = {},
+): Doc => {
+  let onOp: (error?: Error) => any = () => {};
+  const doc = {
+    data: opts.initial,
+  } as {
+    data: any;
+    create: (data: any, type: any, cb: (error: Error | undefined) => any) => any;
+    submitOp: (op: any) => any;
+    on: (ev: string, listener: (a: any) => any) => any;
+    subscribe: (listener: (d: any) => any) => any;
+    kind: "local" | "synced";
+  };
+  doc.create = (data: any, type: any, cb: (error?: Error) => any) => {
+    doc.data = json1.type.create(data);
+    if (!opts.noStorage) {
+      localStorage.setItem(collection + "-" + id, JSON.stringify(doc.data));
+    }
+    if (typeof cb == "function") {
+      cb();
+    }
+  };
+  doc.submitOp = (op: any) => {
+    try {
+      doc.data = json1.type.apply(doc.data, op);
+      if (!opts.noStorage) {
+        localStorage.setItem(collection + "-" + id, JSON.stringify(doc.data));
+      }
+      onOp();
+    } catch (error) {
+      onOp(error as Error);
+      console.error(error, op);
+    }
+  };
+  doc.on = (ev: string, listener: (a?: any) => any) => {
+    switch (ev) {
+      case "op":
+        onOp = listener;
+        break;
+
+      default:
+        break;
+    }
+  };
+  doc.subscribe = (listener: (e?: Error) => any) => listener();
+  doc.kind = "local";
+
+  return doc as any as Doc;
+};
+
+export const getLocalDoc = (collection: string, id: string): Doc => {
+  const initial = localStorage.getItem(collection + "-" + id);
+  return createLocalDoc(collection, id, {
+    initial: initial == null ? null : JSON.parse(initial),
+  });
+};
+
+export const getLocalDocs = () => {
+  return Object.keys(localStorage).map((id) => ({
+    id: id.substring("examples-".length),
+    data: JSON.parse(localStorage[id]),
+  }));
+};
 
 export const db = (function createDB() {
   let doc: any; // Doc;
@@ -52,59 +119,6 @@ export const db = (function createDB() {
   //let localPresence: any; // LocalPresence<PresenceData>;
 
   let connected = false;
-
-  const getLocalDoc = (collection: string, id: string) => {
-    const initial = localStorage.getItem(collection + "-" + id);
-    let onOp: (error?: Error) => any = () => {};
-    const doc = {
-      data: initial == null ? initial : JSON.parse(initial),
-    } as {
-      data: any;
-      create: (data: any, type: any, cb: (error: Error | undefined) => any) => any;
-      submitOp: (op: any) => any;
-      on: (ev: string, listener: (a: any) => any) => any;
-      subscribe: (listener: (d: any) => any) => any;
-      kind: "local" | "synced";
-    };
-    doc.create = (data: any, type: any, cb: (error?: Error) => any) => {
-      doc.data = json1.type.create(data);
-      localStorage.setItem(collection + "-" + id, JSON.stringify(doc.data));
-      if (typeof cb == "function") {
-        cb();
-      }
-    };
-    doc.submitOp = (op: any) => {
-      try {
-        doc.data = json1.type.apply(doc.data, op);
-        localStorage.setItem(collection + "-" + id, JSON.stringify(doc.data));
-        onOp();
-      } catch (error) {
-        onOp(error as Error);
-        console.error(error, op);
-      }
-    };
-    doc.on = (ev: string, listener: (a?: any) => any) => {
-      switch (ev) {
-        case "op":
-          onOp = listener;
-          break;
-
-        default:
-          break;
-      }
-    };
-    doc.subscribe = (listener: (e?: Error) => any) => listener();
-    doc.kind = "local";
-
-    return doc;
-  };
-
-  const getLocalDocs = () => {
-    return Object.keys(localStorage).map((id) => ({
-      id: id.substring("examples-".length),
-      data: JSON.parse(localStorage[id]),
-    }));
-  };
 
   //let myColor = `hsl(${Math.random() * 360} 100% 50%)`;
 
