@@ -8,6 +8,7 @@
   import { computeData } from "$lib/data.js";
   import type { DSVParsedArray } from "d3-dsv";
   import type { EditorChartData, ViewerMessage } from "$lib/viewerData.js";
+  import { ChartStore, ShareDBConnection } from "$lib/chart.svelte.js";
 
   let { data } = $props();
 
@@ -19,6 +20,14 @@
   let visibleSection = $state(1);
 
   let disconnect: undefined | (() => void);
+
+  let store = new ShareDBConnection();
+  let chartStore = new ChartStore(store);
+
+  $effect(() => console.log("STORE", store, $state.snapshot(store.data)));
+  $effect(() => console.log("CHART STORE", chartStore, $state.snapshot(chartStore.data)));
+  let x = $derived(chartStore.data);
+  $inspect(x);
 
   const updateViewer = () => {
     viewerFrame?.contentWindow?.postMessage({
@@ -62,11 +71,16 @@
   onMount(() => {
     disconnect = db.connect();
     db.load(data.id, data.id.includes(localPrefix) == false);
+
+    store.connect();
+    store.load(data.id, data.id.includes(localPrefix) == false);
   });
 
   onDestroy(() => {
     if (disconnect) disconnect();
     viewerFrame?.contentWindow?.removeEventListener("load", updateViewer);
+
+    store.disconnect();
   });
 
   let chartSpec = $derived($db.doc as Root);

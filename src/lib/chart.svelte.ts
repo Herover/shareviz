@@ -6,15 +6,15 @@ import { notifications } from "./notificationStore";
 import { migrate } from "./chartMigrate";
 import { getLocalDoc, localPrefix } from "./chartStore";
 import { defDoc } from "./initialDoc";
-import type { Root } from "./chart";
+import type { Chart, Root } from "./chart";
 
 export class ShareDBConnection {
   id: undefined | string;
   connected = $state(false);
   chartInfo: null | { name: string } = $state(null);
 
-  #doc?: ShareDB.Doc = $state(undefined); // Doc;
-  #data: Root | null = $state(null);
+  #doc: ShareDB.Doc = $state(new ShareDB.Doc()); // Doc;
+  #data?: Root = $state();
   #connection?: ShareDB.Connection;
   #socket?: ReconnectingWebSocket;
 
@@ -74,7 +74,6 @@ export class ShareDBConnection {
     }
 
     this.id = docId;
-    this.#doc = undefined;
     const doc = synced ? this.#connection.get("examples", docId) : getLocalDoc("examples", docId);
     doc.on("error", (e: ShareDB.Error) => notifications.addError(e.message));
 
@@ -123,7 +122,7 @@ export class ShareDBConnection {
 
     const onData = (e: any) => {
       if (e && typeof e.message == "string") notifications.addError(e.message);
-      console.log("doc", doc.data);
+      console.log("got doc", doc.data);
       this.#data = doc.data;
     };
 
@@ -171,7 +170,30 @@ export class ShareDBConnection {
     });
   }
 
-  get data(): Root | null {
+  get data(): Root | undefined {
     return this.#data;
+  }
+
+  get doc(): ShareDB.Doc {
+    return this.#doc;
+  }
+}
+
+export class ChartStore {
+  #doc: ShareDB.Doc = $state(new ShareDB.Doc());
+  #connection?: ShareDBConnection;
+  #data?: Chart = $derived(this.#connection?.data?.chart);
+
+  constructor(connection: ShareDBConnection) {
+    this.#doc = connection.doc;
+    this.#connection = connection;
+  }
+
+  setTitle(value: string) {
+    this.#doc.submitOp(["chart", "title", { r: 0, i: value }]);
+  }
+
+  get data(): Chart | undefined {
+    return this.#data
   }
 }
