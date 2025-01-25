@@ -30,8 +30,9 @@ export const migrate = (doc: /* { submitOp: (op: any) => void, data: any } */ Do
   }
 
   if (doc.data.m.v == 0) {
-    const op = [
-      [
+    const op = [];
+    if ((doc.data as Root).chart.elements.length != 0) {
+      op.push([
         "chart",
         "elements",
         ...(doc.data as Root).chart.elements.map((_e, i) => {
@@ -43,17 +44,18 @@ export const migrate = (doc: /* { submitOp: (op: any) => void, data: any } */ Do
             },
           ];
         }),
-      ],
-      [
-        "m",
-        "v",
-        {
-          r: 0,
-          i: 1,
-        },
-      ],
-    ];
-    doc.submitOp(op);
+      ]);
+    }
+    op.push([
+      "m",
+      "v",
+      {
+        r: 0,
+        i: 1,
+      },
+    ]);
+
+    doc.submitOp(op.length == 1 ? op[0] : op);
   }
 
   if (doc.data.m.v == 1) {
