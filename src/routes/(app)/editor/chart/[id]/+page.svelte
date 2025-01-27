@@ -17,7 +17,8 @@
   let viewScale = $state(100);
   let height = $state(100);
 
-  let visibleSection = $state(1);
+  type section = "data" | "layout" | "charts" | "publish";
+  let visibleSection: section = $state("data");
 
   let disconnect: undefined | (() => void);
 
@@ -132,9 +133,9 @@
       <div class="parts-holder">
         <div class="parts-bottom">
           <div
-            class:part-item-selected={visibleSection == 1}
-            onclick={() => (visibleSection = 1)}
-            onkeydown={(e) => (e.key == " " || e.key == "Enter") && (visibleSection = 1)}
+            class:part-item-selected={visibleSection == "data"}
+            onclick={() => (visibleSection = "data")}
+            onkeydown={(e) => (e.key == " " || e.key == "Enter") && (visibleSection = "data")}
             class="part-item"
             role="button"
             tabindex="0"
@@ -142,9 +143,9 @@
             Data
           </div>
           <div
-            class:part-item-selected={visibleSection == 2}
-            onclick={() => (visibleSection = 2)}
-            onkeydown={(e) => (e.key == " " || e.key == "Enter") && (visibleSection = 2)}
+            class:part-item-selected={visibleSection == "layout"}
+            onclick={() => (visibleSection = "layout")}
+            onkeydown={(e) => (e.key == " " || e.key == "Enter") && (visibleSection = "layout")}
             class="part-item"
             role="button"
             tabindex="0"
@@ -152,9 +153,9 @@
             Layout
           </div>
           <div
-            class:part-item-selected={visibleSection == 3}
-            onclick={() => (visibleSection = 3)}
-            onkeydown={(e) => (e.key == " " || e.key == "Enter") && (visibleSection = 3)}
+            class:part-item-selected={visibleSection == "charts"}
+            onclick={() => (visibleSection = "charts")}
+            onkeydown={(e) => (e.key == " " || e.key == "Enter") && (visibleSection = "charts")}
             class="part-item"
             role="button"
             tabindex="0"
@@ -162,9 +163,9 @@
             Charts
           </div>
           <div
-            class:part-item-selected={visibleSection == 4}
-            onclick={() => (visibleSection = 4)}
-            onkeydown={(e) => (e.key == " " || e.key == "Enter") && (visibleSection = 4)}
+            class:part-item-selected={visibleSection == "publish"}
+            onclick={() => (visibleSection = "publish")}
+            onkeydown={(e) => (e.key == " " || e.key == "Enter") && (visibleSection = "publish")}
             class="part-item"
             role="button"
             tabindex="0"
@@ -177,7 +178,7 @@
     <div class="chart-controls-pane">
       <div class="chart-controls-primary chart-controls editor">
         {#if canEdit}
-          {#if visibleSection == 1}
+          {#if visibleSection == "data"}
             <div class="box">
               <div class="w-025 editor-explain-box p-top-1">
                 <span class="editor-column-label">Internal chart name</span>
@@ -191,11 +192,11 @@
               </div>
             </div>
             <DataSetEditor chartData={chartSpec.data} store={db} />
-          {:else if visibleSection == 2}
+          {:else if visibleSection == "layout"}
             <StyleEditor style={db.style()} chartScope={db.chart()} />
-          {:else if visibleSection == 3}
+          {:else if visibleSection == "charts"}
             <ChartEditor spec={chartSpec} chartScope={db.chart()} {chartData} />
-          {:else if visibleSection == 4}
+          {:else if visibleSection == "publish"}
             <a href="/view/chart/{data.id}">Embed link</a>
             <input
               value={window.location.protocol +
