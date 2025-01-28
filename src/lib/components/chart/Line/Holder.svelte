@@ -31,7 +31,19 @@
     }),
   );
 
-  let maxY = $derived(max(charts, (d) => max(d.d, (dd) => max(dd.value, (ddd) => ddd.y))) ?? 1);
+  let maxY = $derived(
+    // Use the largest value across charts
+    max(
+      charts,
+      // Use the largest value accross lines
+      (d) =>
+        max(
+          d.d,
+          // If we stack, use the visually highest point on the line, otherwise the largest value
+          (dd) => max(dd.value, (ddd) => (componentSpec.stack ? ddd.to : ddd.y)) ?? 1,
+        ),
+    ) ?? 1,
+  );
   let minY = $derived(min(charts, (d) => min(d.d, (dd) => min(dd.value, (ddd) => ddd.y))) ?? 0);
   let maxX = $derived(max(charts, (d) => max(d.d, (dd) => max(dd.value, (ddd) => ddd.x))) ?? 1);
   let minX = $derived(min(charts, (d) => min(d.d, (dd) => min(dd.value, (ddd) => ddd.x))) ?? 0);
