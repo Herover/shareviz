@@ -73,7 +73,7 @@
       <a href={link}>{item.name}</a>
     {/if}
   </td>
-  <td onclick={(e) => clickRow(e)}>{formatRelativeTime(item.updated)}</td>
+  <td onclick={(e) => clickRow(e)}>{item.updated == 0 ? "" : formatRelativeTime(item.updated)}</td>
   <td onclick={(e) => clickRow(e)}>{formatDate(item.created)}</td>
 </tr>
 
