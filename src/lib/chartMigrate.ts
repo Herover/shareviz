@@ -7,7 +7,10 @@ import * as json1 from "ot-json1";
  *
  * Should be able to handle migrating multiple versions, but not downgrade.
  */
-export const migrate = (doc: /* { submitOp: (op: any) => void, data: any } */ Doc) => {
+export const migrate = (
+  doc: /* { submitOp: (op: any) => void, data: any } */ Doc,
+  toVersion: number = formatVersion,
+) => {
   if (typeof doc.data.m == "undefined") {
     console.log("migrate: initial meta");
 
@@ -29,7 +32,7 @@ export const migrate = (doc: /* { submitOp: (op: any) => void, data: any } */ Do
     ]);
   }
 
-  if (doc.data.m.v == 0) {
+  if (doc.data.m.v == 0 && doc.data.m.v < toVersion) {
     const op = [];
     if ((doc.data as Root).chart.elements.length != 0) {
       op.push([
@@ -58,7 +61,7 @@ export const migrate = (doc: /* { submitOp: (op: any) => void, data: any } */ Do
     doc.submitOp(op.length == 1 ? op[0] : op);
   }
 
-  if (doc.data.m.v == 1) {
+  if (doc.data.m.v == 1 && doc.data.m.v < toVersion) {
     const op = (doc.data as Root).data.sets
       .map((e, i) => {
         return e.rows

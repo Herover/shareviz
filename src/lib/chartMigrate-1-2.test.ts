@@ -15,7 +15,7 @@ test("0 datasets", () => {
     noStorage: true,
   });
 
-  migrate(doc);
+  migrate(doc, 2);
 
   expect(doc.data).toEqual({
     data: {
@@ -44,7 +44,7 @@ test("1 dataset with 1 column", () => {
     noStorage: true,
   });
 
-  migrate(doc);
+  migrate(doc, 2);
 
   expect(doc.data).toEqual({
     data: {
@@ -80,7 +80,7 @@ test("2 datasets with 2 columns", () => {
     noStorage: true,
   });
 
-  migrate(doc);
+  migrate(doc, 2);
 
   expect(doc.data).toEqual({
     data: {
@@ -116,7 +116,7 @@ test("1 dataset with 1 column that is already migrated", () => {
     noStorage: true,
   });
 
-  migrate(doc);
+  migrate(doc, 2);
 
   expect(doc.data).toEqual({
     data: {
