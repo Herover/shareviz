@@ -3,6 +3,7 @@ import type { ServerInit } from "@sveltejs/kit";
 import { db } from "../server_lib/user";
 import { connection } from "$lib/../../server_lib/sharedb";
 import { migrate } from "$lib/chartMigrate";
+import { formatVersion } from "$lib/initialDoc";
 
 export const init: ServerInit = async () => {
   console.log("migrate...");
@@ -13,6 +14,10 @@ export const init: ServerInit = async () => {
       const doc = connection.get("examples", charts[i].chartRef);
       const onLoad = () => {
         migrate(doc);
+
+        if (doc.data?.m?.v != formatVersion) {
+          console.error("Failed migration for", doc.id);
+        }
 
         doc.unsubscribe();
         doc.off("load", onLoad);
