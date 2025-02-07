@@ -482,6 +482,8 @@ export const db = (function createDB() {
                   i: {
                     k,
                     title: "",
+                    allCharts: false,
+                    ownChart: true,
                   } as LineRepeatSettingsKey,
                 },
               ]),
@@ -832,6 +834,7 @@ export const db = (function createDB() {
                     default: {
                       k: "",
                       color: "#000",
+                      contextColor: "#000",
                       width: 1,
                       label: {
                         text: "",
@@ -854,6 +857,8 @@ export const db = (function createDB() {
                     default: {
                       k: "",
                       title: "",
+                      allCharts: false,
+                      ownChart: false,
                     },
                     byKey: [],
                   },
@@ -1126,6 +1131,8 @@ export const lineStyle = (
       doc.submitOp([...styleScope.path.slice(1), "color", { r: 0, i: value }]),
     setLabelColor: (value: string) =>
       doc.submitOp([...styleScope.path.slice(1), "label", "color", { r: 0, i: value }]),
+    seContextColor: (value: string) =>
+      doc.submitOp([...styleScope.path.slice(1), "contextColor", { r: 0, i: value }]),
     setwidth: (value: number) =>
       doc.submitOp([...styleScope.path.slice(1), "width", { r: 0, i: value }]),
     setSymbols: (value: string) =>
@@ -1157,6 +1164,10 @@ export const repeatSettings = (
     ...settingsScope,
     setLabel: (value: string) =>
       doc.submitOp([...settingsScope.path.slice(1), "title", { r: 0, i: value }]),
+    setOwnChart: (value: boolean) =>
+      doc.submitOp([...settingsScope.path.slice(1), "ownChart", { r: 0, i: value }]),
+    setAllCharts: (value: boolean) =>
+      doc.submitOp([...settingsScope.path.slice(1), "allCharts", { r: 0, i: value }]),
   };
 };
 

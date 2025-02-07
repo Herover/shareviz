@@ -198,6 +198,7 @@ export enum LineMissingStyle {
 export interface LineStyleKey {
   k: string;
   color: string;
+  contextColor: string;
   width: number;
   label: LabelStyle;
   symbols: LineSymbol;
@@ -212,6 +213,10 @@ export interface LineStyle {
 export interface LineRepeatSettingsKey {
   k: string;
   title: string;
+  /** Has own line chart */
+  ownChart: boolean;
+  /** Is shown on other line charts */
+  allCharts: boolean;
 }
 
 export interface LineRepeatSettings {

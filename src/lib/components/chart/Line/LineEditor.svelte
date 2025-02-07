@@ -81,6 +81,12 @@
   const setRepeatedLabel = (value: string) => {
     selectedIndexes.forEach((i) => chartSpec.repeatSettings(i).setLabel(value));
   };
+  const setRepeatedOwnChart = (value: boolean) => {
+    selectedIndexes.forEach((i) => chartSpec.repeatSettings(i).setOwnChart(value));
+  };
+  const setRepeatedAllCharts = (value: boolean) => {
+    selectedIndexes.forEach((i) => chartSpec.repeatSettings(i).setAllCharts(value));
+  };
 </script>
 
 <div class="box">
@@ -196,16 +202,44 @@
       moveDown={(_k, i) => chartSpec.moveRepeatDown(i)}
     />
     {#if selectedIndexes.length != 0}
-      <label>
-        Label
-        <input
-          value={selectedIndexes.length == 1
-            ? $chartSpec.repeatSettings.byKey[selectedIndexes[0]].title ||
-              $chartSpec.repeatSettings.byKey[selectedIndexes[0]].k
-            : ""}
-          onkeyup={(e) => setRepeatedLabel(e.currentTarget.value)}
-        />
-      </label>
+      <div class="box">
+        <div class="w-025 p-top-1">Label</div>
+        <div class="w-075 p-top-1">
+          <input
+            value={selectedIndexes.length == 1
+              ? $chartSpec.repeatSettings.byKey[selectedIndexes[0]].title ||
+                $chartSpec.repeatSettings.byKey[selectedIndexes[0]].k
+              : ""}
+            onkeyup={(e) => setRepeatedLabel(e.currentTarget.value)}
+          />
+        </div>
+      </div>
+      <div class="box">
+        <div class="w-025 p-top-1">Display</div>
+        <div class="w-075 p-top-1">
+          <label>
+            <input
+              type="checkbox"
+              checked={selectedIndexes.length == 1
+                ? $chartSpec.repeatSettings.byKey[selectedIndexes[0]].ownChart
+                : false}
+              onchange={(e) => setRepeatedOwnChart(e.currentTarget.checked)}
+            />
+            Has own chart
+          </label>
+          <br />
+          <label>
+            <input
+              type="checkbox"
+              checked={selectedIndexes.length == 1
+                ? $chartSpec.repeatSettings.byKey[selectedIndexes[0]].allCharts
+                : false}
+              onchange={(e) => setRepeatedAllCharts(e.currentTarget.checked)}
+            />
+            Show on all charts
+          </label>
+        </div>
+      </div>
     {/if}
   {/if}
 {/if}

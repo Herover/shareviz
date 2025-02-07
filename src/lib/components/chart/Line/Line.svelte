@@ -22,8 +22,9 @@
       label: string;
       key: string;
       type: "missing" | "line";
+      isContext?: boolean;
       value: {
-        x: number;
+        x: number | Date;
         y: number;
         to: number;
         from: number;
@@ -36,8 +37,8 @@
     editor?: boolean;
     maxY: number;
     minY: number;
-    maxX: number;
-    minX: number;
+    maxX: number | Date;
+    minX: number | Date;
     index: number;
   }
 
@@ -156,7 +157,7 @@
   );
 
   let draw = $derived(
-    line<{ x: number; y: number }>()
+    line<{ x: number | Date; y: number }>()
       .x((d) => xScale(d.x))
       .y((d) => yScale(d.y)),
   );
@@ -212,20 +213,20 @@
               .map((e) => ({ x: e.x, y: e.to }))
               .concat(
                 orDefault(values[i - 1]?.value, [
-                  { x: xScale.domain()[0], to: 0 },
-                  { x: xScale.domain()[1], to: 0 },
+                  { x: xScale.domain()[0], to: 0, y: 0, from: 0 },
+                  { x: xScale.domain()[1], to: 0, y: 0, from: 0 },
                 ])
                   .map((e) => ({ x: e.x, y: e.to }))
                   .reverse(),
               ),
           )}
-          fill={getStyle(d.key).color}
+          fill={d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color}
         />
       {/each}
       {#each values as d}
         <path
           d={draw(d.value.map((e) => ({ x: e.x, y: e.to })))}
-          stroke={getStyle(d.key).color}
+          stroke={d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color}
           stroke-width={getStyle(d.key).width}
           fill="none"
         />
@@ -240,7 +241,7 @@
                 { ...d.value[0], y: 0 },
               ]),
             )}
-            fill={getStyle(d.key).color}
+            fill={d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color}
           />
         {/each}
       {/if}
@@ -249,7 +250,9 @@
           d={draw(d.value)}
           stroke={d.type == "missing" && getStyle(d.key).missingStyle == LineMissingStyle.NONE
             ? "none"
-            : getStyle(d.key).color}
+            : d.isContext
+              ? getStyle(d.key).contextColor
+              : getStyle(d.key).color}
           stroke-width={higlight === d.key ? getStyle(d.key).width + 2 : getStyle(d.key).width}
           fill="none"
           stroke-dasharray={d.type == "line" ||

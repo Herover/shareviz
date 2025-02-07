@@ -1,6 +1,7 @@
 import type { Root } from "./chart";
 import type { Doc } from "sharedb/lib/client";
 import * as json1 from "ot-json1";
+import { formatVersion } from "./initialDoc";
 
 /**
  * Applies operations requred to upgrade a chart specification.
@@ -91,6 +92,84 @@ export const migrate = (
           i: 2,
         },
       ] as any);
+    doc.submitOp(op);
+  }
+
+  if (doc.data.m.v == 2 && doc.data.m.v < toVersion) {
+    const op = (doc.data as Root).chart.elements
+      .reduce((acc, e, ei) => {
+        if (e.type != "line") {
+          return acc;
+        }
+        (e.d as any).repeatSettings.byKey.forEach((r: any, ri: number) => {
+          acc.push([
+            "chart",
+            "elements",
+            ei,
+            "d",
+            "repeatSettings",
+            "byKey",
+            ri,
+            "allCharts",
+            {
+              i: false,
+            },
+          ]);
+          acc.push([
+            "chart",
+            "elements",
+            ei,
+            "d",
+            "repeatSettings",
+            "byKey",
+            ri,
+            "ownChart",
+            {
+              i: true,
+            },
+          ]);
+        });
+
+        (e.d as any).style.byKey.forEach((s: any, si: number) => {
+          acc.push([
+            "chart",
+            "elements",
+            ei,
+            "d",
+            "style",
+            "byKey",
+            si,
+            "contextColor",
+            {
+              i: "#000",
+            },
+          ]);
+        });
+        acc.push([
+          "chart",
+          "elements",
+          ei,
+          "d",
+          "style",
+          "default",
+          "contextColor",
+          {
+            i: "#000",
+          },
+        ]);
+
+        return acc;
+      }, [] as any[])
+      // Merge ops into a single valid op, with a op that sets the version number
+      .reduce((acc, op) => json1.type.compose(acc, op), [
+        "m",
+        "v",
+        {
+          r: 0,
+          i: 3,
+        },
+      ] as any);
+    console.log(op);
     doc.submitOp(op);
   }
 };

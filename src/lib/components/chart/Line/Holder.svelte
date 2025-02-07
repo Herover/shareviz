@@ -23,11 +23,23 @@
   let chartDebouncer = createDebouncer(250);
   $effect(() =>
     chartDebouncer([componentSpec, data], () => {
-      charts = formatData(componentSpec, data).sort(
-        (a, b) =>
-          negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == a.k)) -
-          negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == b.k)),
-      );
+      charts = formatData(componentSpec, data)
+        .filter((c) => c.settings?.ownChart || c.settings?.allCharts)
+        .sort(
+          (a, b) =>
+            negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == a.k)) -
+            negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == b.k)),
+        );
+      charts.forEach((chart) => {
+        let d2: typeof chart.d = [];
+        charts.forEach((chart2) => {
+          if (chart.k != chart2.k && chart2.settings?.allCharts && chart.settings?.ownChart) {
+            d2 = d2.concat(chart2.d.map((dd) => ({ ...dd, isContext: true })));
+          }
+        });
+        chart.d = d2.concat(chart.d);
+      });
+      charts = charts.filter((chart) => chart.settings?.ownChart);
     }),
   );
 
@@ -74,7 +86,7 @@
       style:width="{(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight) /
         perColumn}px"
     >
-      <div class="line-chart-title"><span>{chart.label}</span></div>
+      <div class="line-chart-title"><span>{chart.settings?.title || chart.k}</span></div>
       <div class="line-chart-item">
         <Line
           {chartSpec}

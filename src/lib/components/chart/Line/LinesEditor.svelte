@@ -46,6 +46,7 @@
           if (typeof next == "undefined") return merged;
 
           merged.color = chooseSelectedStyle(merged.color, next.color);
+          merged.contextColor = chooseSelectedStyle(merged.contextColor, next.contextColor);
           merged.width = chooseSelectedStyle(merged.width, next.width);
           merged.label.color = chooseSelectedStyle(merged.label.color, next.label.color);
           merged.label.location = chooseSelectedStyle(merged.label.location, next.label.location);
@@ -61,6 +62,7 @@
           ? // Manual deep copy, `{ ...$defaultStyle }` copies some reactivity-stuff we do not want to copy!
             {
               color: $defaultStyle.color,
+              contextColor: $defaultStyle.contextColor,
               width: $defaultStyle.width,
               label: {
                 color: $defaultStyle.label.color,
@@ -74,6 +76,7 @@
             }
           : ({ label: {} } as {
               color: string | undefined;
+              contextColor: string | undefined;
               width: number | undefined;
               label: {
                 color: string | undefined;
@@ -239,6 +242,15 @@
       lineSpec.defaultLineStyle().setLabelColor(color);
     }
   });
+  let setContextColor = $derived((color: string) => {
+    selectedIndexes.forEach((d) => {
+      d.style.seContextColor(color);
+    });
+
+    if (defaultSelected) {
+      lineSpec.defaultLineStyle().seContextColor(color);
+    }
+  });
   let setWidth = $derived((width: number) => {
     selectedIndexes.forEach((d) => {
       d.style.setwidth(width);
@@ -361,6 +373,15 @@
       {chartColors}
       disabled={nonEditable}
       onchange={(s) => setTextColor(s)}
+    />
+  </div>
+  <div class="w-025 p-top-1">Context color</div>
+  <div class="w-025 p-top-1">
+    <ColorPicker
+      color={typeof mergedStyle.contextColor == "undefined" ? "#ffffff" : mergedStyle.contextColor}
+      {chartColors}
+      disabled={nonEditable}
+      onchange={(s) => setContextColor(s)}
     />
   </div>
 </div>
