@@ -6,7 +6,13 @@ export interface EditorChartData {
     chart: Root;
   };
 }
-export type EditorMessage = EditorChartData;
+export interface EditorChartScreenshot {
+  type: "CHART_SCREENSHOT";
+  data: {
+    format: "png";
+  };
+}
+export type EditorMessage = EditorChartData | EditorChartScreenshot;
 
 export interface ViewerChartUpdated {
   type: "CHART_UPDATED";

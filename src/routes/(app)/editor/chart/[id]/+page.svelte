@@ -7,7 +7,7 @@
   import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
   import { computeData } from "$lib/data.js";
   import type { DSVParsedArray } from "d3-dsv";
-  import type { EditorChartData, ViewerMessage } from "$lib/viewerData.js";
+  import type { EditorChartData, EditorChartScreenshot, ViewerMessage } from "$lib/viewerData.js";
   import { ChartStore, ShareDBConnection } from "$lib/chart.svelte.js";
 
   let { data } = $props();
@@ -125,6 +125,15 @@
         break;
     }
   });
+
+  const chartToPNG = () => {
+    viewerFrame?.contentWindow?.postMessage({
+      type: "CHART_SCREENSHOT",
+      data: {
+        format: "png",
+      },
+    } as EditorChartScreenshot);
+  };
 </script>
 
 <div class="main">
@@ -205,6 +214,7 @@
                 "/view/chart/" +
                 data.id}
             />
+            <button onclick={() => chartToPNG()}>Generate PNG</button>
           {/if}
         {:else}
           <p>You do not have editor access to this chart.</p>

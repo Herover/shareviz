@@ -7,6 +7,7 @@
 
   import { env } from "$env/dynamic/public";
   import type { EditorMessage, ViewerChartEdit, ViewerChartUpdated } from "$lib/viewerData.js";
+  import html2canvas from "html2canvas";
 
   let { data } = $props();
 
@@ -15,13 +16,29 @@
 
   let height = $state(0);
   let width = $state(0);
+  let mainView: HTMLDivElement | undefined = $state();
 
-  const onMessage = (event: MessageEvent<EditorMessage>) => {
+  const onMessage = async (event: MessageEvent<EditorMessage>) => {
     // For now only allow rendering data from our own server
     if (event.origin !== env.PUBLIC_ORIGIN) return;
 
     if (event.data.type == "CHART_DATA") {
       chartSpec = event.data.data.chart;
+    }
+
+    if (event.data.type == "CHART_SCREENSHOT") {
+      try {
+        if (typeof mainView == "undefined") {
+          return;
+        }
+        const canvas = await html2canvas(mainView);
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = (chartSpec?.chart.title || data.id || "chart") + ".png";
+        link.click();
+      } catch (err) {
+        console.error("Error: " + err);
+      }
     }
   };
 
@@ -60,7 +77,7 @@
 </script>
 
 {#if chartSpec && chartData}
-  <div class="main" bind:clientWidth={width} bind:clientHeight={height}>
+  <div class="main" bind:clientWidth={width} bind:clientHeight={height} bind:this={mainView}>
     <ChartViewer {chartSpec} data={chartData} {width} editor={data.editor} onedit={onEdit} />
   </div>
 {/if}
