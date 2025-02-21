@@ -2,11 +2,11 @@ import ReconnectingWebSocket from "reconnecting-websocket";
 import * as json1 from "ot-json1";
 import ShareDB from "sharedb/lib/client";
 import { WebSocket } from "ws";
-import { notifications } from "./notificationStore";
-import { migrate } from "./chartMigrate";
-import { getLocalDoc, localPrefix } from "./chartStore";
-import { defDoc } from "./initialDoc";
-import type { Chart, Root } from "./chart";
+import { notifications } from "../notificationStore";
+import { migrate } from "../chartMigrate";
+import { getLocalDoc, localPrefix } from "../chartStore";
+import { defDoc } from "../initialDoc";
+import type { Chart, Root } from "../chart";
 
 export class ShareDBConnection {
   id: undefined | string;
@@ -194,6 +194,6 @@ export class ChartStore {
   }
 
   get data(): Chart | undefined {
-    return this.#data
+    return this.#data;
   }
 }

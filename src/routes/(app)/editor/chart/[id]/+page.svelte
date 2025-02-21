@@ -8,7 +8,7 @@
   import { computeData } from "$lib/data.js";
   import type { DSVParsedArray } from "d3-dsv";
   import type { EditorChartData, EditorChartScreenshot, ViewerMessage } from "$lib/viewerData.js";
-  import { ChartStore, ShareDBConnection } from "$lib/chart.svelte.js";
+  import { ChartStore, ShareDBConnection } from "$lib/chartStores/chart.svelte.js";
 
   let { data } = $props();
 
@@ -200,7 +200,7 @@
                 />
               </div>
             </div>
-            <DataSetEditor chartData={chartSpec.data} store={db} />
+            <DataSetEditor chartData={chartSpec.data} connection={store} />
           {:else if visibleSection == "layout"}
             <StyleEditor style={db.style()} chartScope={db.chart()} />
           {:else if visibleSection == "charts"}

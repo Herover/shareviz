@@ -1,13 +1,13 @@
 <script lang="ts">
   import type { TransposedColumn } from "$lib/chart";
   // import type { Row } from "$lib/chart";
-  import type { db } from "$lib/chartStore";
+  import type { DataSetStore } from "$lib/chartStores/dataSet.svelte";
   import { valueParsers } from "$lib/utils";
   import equal from "fast-deep-equal";
 
   interface Props {
     // export let columns: Row[];
-    dataStore: ReturnType<typeof db.dataSet>;
+    dataStore: DataSetStore;
     transpose: TransposedColumn;
     i: number;
   }
@@ -16,11 +16,11 @@
 
   let transposedKeys = $state(transpose.from);
 
-  $effect(() => {
+  const updateTransposed = () => {
     if (!equal(transposedKeys, transpose.from)) {
       dataStore.setTransposeFromArray(i, transposedKeys);
     }
-  });
+  };
 </script>
 
 <div class="box">
@@ -30,8 +30,8 @@
     <span class="editor-column-label-description">Columns to turn into rows.</span>
   </div>
   <div class="w-05 p-top-1">
-    <select bind:value={transposedKeys} multiple>
-      {#each $dataStore.rows as col}
+    <select bind:value={transposedKeys} multiple onchange={() => updateTransposed()}>
+      {#each (typeof dataStore.data != "undefined" ? dataStore.data : { rows: [] }).rows as col}
         <option selected={transpose.from.includes(col.key) ? true : null}>{col.key}</option>
       {/each}
     </select>

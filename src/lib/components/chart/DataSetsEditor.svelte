@@ -1,25 +1,28 @@
 <script lang="ts">
   import type { Data } from "$lib/chart";
-  import type { db } from "$lib/chartStore";
+  import { type ShareDBConnection } from "$lib/chartStores/chart.svelte";
+  import { DataSetsStore, DataSetStore } from "$lib/chartStores/dataSet.svelte";
   import DataSetEditor from "./DataSetEditor.svelte";
 
   interface Props {
     chartData: Data;
-    store: typeof db;
+    connection: ShareDBConnection;
   }
 
-  let { chartData, store }: Props = $props();
+  let { chartData, connection }: Props = $props();
+
+  let dataSetStore = new DataSetsStore(connection);
 
   const addDataSet = () => {
-    store.addDataSet(chartData.sets.length);
+    dataSetStore.addDataSet(chartData.sets.length);
   };
 </script>
 
-{#each chartData.sets as _dataSet, i}
+{#each chartData.sets as dataSet, i (dataSet.id)}
   {#if i != 0}
     <br />
   {/if}
-  <DataSetEditor dataStore={store.dataSet(i)} />
+  <DataSetEditor dataStore={new DataSetStore(connection, i)} />
 {/each}
 
 <button onclick={() => addDataSet()}>+ Data set</button>
