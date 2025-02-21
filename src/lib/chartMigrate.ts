@@ -13,8 +13,6 @@ export const migrate = (
   toVersion: number = formatVersion,
 ) => {
   if (typeof doc.data.m == "undefined") {
-    console.log("migrate: initial meta");
-
     doc.submitOp([
       [
         "m",
@@ -169,7 +167,6 @@ export const migrate = (
           i: 3,
         },
       ] as any);
-    console.log(op);
     doc.submitOp(op);
   }
 };

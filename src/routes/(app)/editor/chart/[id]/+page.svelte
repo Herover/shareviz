@@ -25,8 +25,6 @@
   let store = new ShareDBConnection();
   let chartStore = new ChartStore(store);
 
-  $effect(() => console.log("STORE", store, $state.snapshot(store.data)));
-  $effect(() => console.log("CHART STORE", chartStore, $state.snapshot(chartStore.data)));
   let x = $derived(chartStore.data);
   $inspect(x);
 

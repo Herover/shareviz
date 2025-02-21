@@ -10,7 +10,6 @@ export async function load({ url, locals }) {
       try {
         const org = await db.getOrganizationInvite(code);
         const joinedOrgs = await db.getUserOrganizations(session.user.id);
-        console.log(joinedOrgs);
         return {
           organizationName: org.organizations.name,
           alreadyJoined: joinedOrgs.some((e) => e.organizations.id == org.organizations.id),
