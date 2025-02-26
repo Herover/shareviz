@@ -5,7 +5,7 @@ import type { Root } from "$lib/chart";
 import HBar from "./HBar";
 import Line from "./Line";
 import ErrorText from "./ErrorText.svelte";
-import type { db } from "$lib/chartStore";
+import type { ChartStore } from "$lib/chartStores/chart.svelte";
 
 interface ChartComponent {
   /** Human readable name of chart type */
@@ -13,7 +13,7 @@ interface ChartComponent {
   /** Unique key used to identify component */
   key: string;
   /** Function to call when adding a new item */
-  add: (chart: ReturnType<typeof db.chart>, index: number) => void;
+  add: (chart: ChartStore, index: number) => void;
   /** Actual component displayed in chart */
   // FIXME: types are not correct
   component: () => Promise<

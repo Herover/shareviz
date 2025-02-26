@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Data } from "$lib/chart";
-  import { type ShareDBConnection } from "$lib/chartStores/chart.svelte";
+  import { type ShareDBConnection } from "$lib/chartStores/data.svelte";
   import { DataSetsStore, DataSetStore } from "$lib/chartStores/dataSet.svelte";
   import DataSetEditor from "./DataSetEditor.svelte";
 

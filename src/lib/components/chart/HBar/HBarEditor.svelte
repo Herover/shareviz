@@ -47,12 +47,14 @@
   };
 
   let groups = $derived(formatData($chartSpec, chartData, [] /* $colorScale.byKey */));
+  // FIXME: Having this as a $effect here means changes to data wont get detected, and it might
+  // cause issues when there's multiple clients watching at the same time.
   $effect(() => {
     const computed = max(groups, (d) => max(d.d, (dd) => max(dd.value, (ddd) => ddd.to)));
     if (
       typeof computed == "number" &&
       !Number.isNaN(computed) &&
-      computed != $chartSpec.scale.dataRange?.[1]
+      computed != $scale.dataRange?.[1]
     ) {
       chartSpec.scale().setScaleTo(computed);
     }

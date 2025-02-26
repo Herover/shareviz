@@ -1,5 +1,5 @@
 import ShareDB from "sharedb/lib/client";
-import type { ShareDBConnection } from "./chart.svelte";
+import type { ShareDBConnection } from "./data.svelte";
 import type { Data, Set } from "$lib/chart";
 
 export class DataSetsStore {

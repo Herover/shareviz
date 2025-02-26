@@ -1,10 +1,10 @@
-import type { db } from "$lib/chartStore";
+import type { ChartStore } from "$lib/chartStores/chart.svelte";
 import HBarEditor from "./HBarEditor.svelte";
 
 export default {
   name: "Horizontal bars",
   key: "hBar",
-  add: (chart: ReturnType<typeof db.chart>, index: number) => chart.addBarChart(index),
+  add: (chart: ChartStore, index: number) => chart.addBarChart(index),
   component: () => import("./Holder.svelte").then((mod) => mod.default),
   editorComponent: HBarEditor,
 };

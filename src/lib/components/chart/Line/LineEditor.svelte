@@ -36,24 +36,6 @@
     ...orDefault(dataSet?.rows, []),
   ]);
 
-  let xScaleIndex = $derived(spec.chart.scales.findIndex((s) => s.name == $chartSpec.x.scale));
-  let xScale = $derived(
-    orDefault(spec.chart.scales[xScaleIndex], {
-      dataRange: [0, 1],
-      name: "",
-      dataKey: "",
-      type: "",
-    }),
-  );
-  let yScaleIndex = $derived(spec.chart.scales.findIndex((s) => s.name == $chartSpec.y.scale));
-  let yScale = $derived(
-    orDefault(spec.chart.scales[yScaleIndex], {
-      dataRange: [0, 1],
-      name: "",
-      dataKey: "",
-      type: "",
-    }),
-  );
   let chartColors = $derived($chartSpec.style.byKey.map((s) => s.color));
 
   $effect(() => {
@@ -243,54 +225,6 @@
     {/if}
   {/if}
 {/if}
-<p>
-  {#if xScale.dataRange}
-    <label
-      >X scale from:
-      <input
-        value={xScale.dataRange[0]}
-        onkeyup={(e) => chart.setScaleFrom(xScaleIndex, Number.parseInt(e.currentTarget.value))}
-        onchange={(e) => chart.setScaleFrom(xScaleIndex, Number.parseInt(e.currentTarget.value))}
-        type="number"
-        style="width: 90px"
-      />
-    </label>
-    <label>
-      to
-      <input
-        value={xScale.dataRange[1]}
-        onkeyup={(e) => chart.setScaleTo(xScaleIndex, Number.parseInt(e.currentTarget.value))}
-        onchange={(e) => chart.setScaleTo(xScaleIndex, Number.parseInt(e.currentTarget.value))}
-        type="number"
-        style="width: 90px"
-      />
-    </label>
-  {/if}
-</p>
-<p>
-  {#if yScale.dataRange}
-    <label
-      >Y scale from:
-      <input
-        value={yScale.dataRange[0]}
-        onkeyup={(e) => chart.setScaleFrom(yScaleIndex, Number.parseInt(e.currentTarget.value))}
-        onchange={(e) => chart.setScaleFrom(yScaleIndex, Number.parseInt(e.currentTarget.value))}
-        type="number"
-        style="width: 90px"
-      />
-    </label>
-    <label>
-      to
-      <input
-        value={yScale.dataRange[1]}
-        onkeyup={(e) => chart.setScaleTo(yScaleIndex, Number.parseInt(e.currentTarget.value))}
-        onchange={(e) => chart.setScaleTo(yScaleIndex, Number.parseInt(e.currentTarget.value))}
-        type="number"
-        style="width: 90px"
-      />
-    </label>
-  {/if}
-</p>
 <p>
   <label>
     Fill:

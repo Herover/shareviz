@@ -5,6 +5,8 @@
   import EditorCollapsible from "./EditorCollapsible.svelte";
   import { getComponentList, getEditorComponent } from "./chartComponents";
   import "./editor.css";
+  import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
+  import { ChartStore } from "$lib/chartStores/chart.svelte";
 
   interface Props {
     chartScope: ReturnType<typeof db.chart>;
@@ -12,23 +14,26 @@
     chartData: {
       [key: string]: DSVParsedArray<any>;
     };
+    connection: ShareDBConnection;
   }
 
-  let { chartScope, spec, chartData }: Props = $props();
+  let { chartScope, spec, chartData, connection }: Props = $props();
+
+  let chartStore = new ChartStore(connection);
 
   const removeElement = (i: number) => {
-    chartScope.removeChartElement(i);
+    chartStore.removeChartElement(i);
   };
   const moveElementUp = (i: number) => {
-    chartScope.moveElementUp(i);
+    chartStore.moveElementUp(i);
   };
   const moveElementDown = (i: number) => {
-    chartScope.moveElementDown(i);
+    chartStore.moveElementDown(i);
   };
 </script>
 
 <div>
-  {#each $chartScope.elements as element, i (element.id)}
+  {#each chartStore.data?.elements ?? [] as element, i (element.id)}
     <svelte:boundary>
       <EditorCollapsible
         group="element-controls"
@@ -49,7 +54,7 @@
             <button onclick={() => removeElement(i)}>Delete</button>
             <button disabled={i == 0} onclick={() => moveElementUp(i)}>Move up</button>
             <button
-              disabled={i == $chartScope.elements.length - 1}
+              disabled={i == (chartStore.data?.elements ?? []).length - 1}
               onclick={() => moveElementDown(i)}>Move down</button
             >
           </div>
@@ -66,7 +71,7 @@
   {/each}
 
   {#each getComponentList() as { add, label }}
-    <button onclick={() => add(chartScope, $chartScope.elements.length)}>
+    <button onclick={() => add(chartStore, $chartScope.elements.length)}>
       + {label}
     </button>
     &nbsp;

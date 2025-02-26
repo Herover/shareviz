@@ -8,7 +8,8 @@
   import { computeData } from "$lib/data.js";
   import type { DSVParsedArray } from "d3-dsv";
   import type { EditorChartData, EditorChartScreenshot, ViewerMessage } from "$lib/viewerData.js";
-  import { ChartStore, ShareDBConnection } from "$lib/chartStores/chart.svelte.js";
+  import { ShareDBConnection } from "$lib/chartStores/data.svelte.js";
+  import { ChartStore } from "$lib/chartStores/chart.svelte.js";
 
   let { data } = $props();
 
@@ -23,10 +24,7 @@
   let disconnect: undefined | (() => void);
 
   let store = new ShareDBConnection();
-  let chartStore = new ChartStore(store);
-
-  let x = $derived(chartStore.data);
-  $inspect(x);
+  let chartStore: ChartStore;
 
   const updateViewer = () => {
     viewerFrame?.contentWindow?.postMessage({
@@ -73,6 +71,7 @@
 
     store.connect();
     store.load(data.id, data.id.includes(localPrefix) == false);
+    chartStore = new ChartStore(store);
   });
 
   onDestroy(() => {
@@ -91,19 +90,19 @@
   let edit = $derived((e: { k: string; v: any }) => {
     switch (e.k) {
       case "title":
-        db.chart().setConfigTitle(e.v);
+        chartStore.setConfigTitle(e.v);
         break;
 
       case "subTitle":
-        db.chart().setConfigSubTitle(e.v);
+        chartStore.setConfigSubTitle(e.v);
         break;
 
       case "sourceLeft":
-        db.chart().setSourceTextLeft(e.v);
+        chartStore.setSourceTextLeft(e.v);
         break;
 
       case "sourceRight":
-        db.chart().setSourceTextRight(e.v);
+        chartStore.setSourceTextRight(e.v);
         break;
 
       case "line": {
@@ -200,9 +199,9 @@
             </div>
             <DataSetEditor chartData={chartSpec.data} connection={store} />
           {:else if visibleSection == "layout"}
-            <StyleEditor style={db.style()} chartScope={db.chart()} />
+            <StyleEditor connection={store} />
           {:else if visibleSection == "charts"}
-            <ChartEditor spec={chartSpec} chartScope={db.chart()} {chartData} />
+            <ChartEditor spec={chartSpec} chartScope={db.chart()} {chartData} connection={store} />
           {:else if visibleSection == "publish"}
             <a href="/view/chart/{data.id}">Embed link</a>
             <input

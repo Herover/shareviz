@@ -1,10 +1,10 @@
-import type { db } from "$lib/chartStore";
+import type { ChartStore } from "$lib/chartStores/chart.svelte";
 import LineEditor from "./LineEditor.svelte";
 
 export default {
   name: "Line",
   key: "line",
-  add: (chart: ReturnType<typeof db.chart>, index: number) => chart.addLineChart(index),
+  add: (chart: ChartStore, index: number) => chart.addLineChart(index),
   component: () => import("./Holder.svelte").then((mod) => mod.default),
   editorComponent: LineEditor,
 };

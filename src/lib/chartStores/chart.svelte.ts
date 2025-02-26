@@ -1,183 +1,17 @@
-import ReconnectingWebSocket from "reconnecting-websocket";
-import * as json1 from "ot-json1";
+import {
+  AxisLocation,
+  AxisOrientation,
+  AxisRepeatMode,
+  HBarTotalLabelStyle,
+  LabelLocation,
+  LabelStyleLine,
+  LineMissingStyle,
+  LineSymbol,
+  type Chart,
+  type Line,
+} from "$lib/chart";
 import ShareDB from "sharedb/lib/client";
-import { WebSocket } from "ws";
-import { notifications } from "../notificationStore";
-import { migrate } from "../chartMigrate";
-import { getLocalDoc, localPrefix } from "../chartStore";
-import { defDoc } from "../initialDoc";
-import type { Chart, Root } from "../chart";
-
-export class ShareDBConnection {
-  id: undefined | string;
-  connected = $state(false);
-  chartInfo: null | { name: string } = $state(null);
-
-  #doc: ShareDB.Doc = $state(new ShareDB.Doc()); // Doc;
-  #data?: Root = $state();
-  #connection?: ShareDB.Connection;
-  #socket?: ReconnectingWebSocket;
-
-  missing = $derived(typeof this.#doc?.data == "undefined");
-  mode: "synced" | "local" | "invalid" = "invalid";
-
-  constructor() {}
-
-  connect() {
-    const socket = new ReconnectingWebSocket(`//${window.location.host}/sharedb`, ["ws"], {
-      // ShareDB handles dropped messages, and buffering them while the socket
-      // is closed has undefined behavior
-      maxEnqueuedMessages: 0,
-      WebSocket: WebSocket,
-    });
-
-    socket.addEventListener("error", this.#onSocketError.bind(this));
-    socket.addEventListener("open", this.#onSocketOpen.bind(this));
-    socket.addEventListener("close", this.#onSocketClose.bind(this));
-
-    ShareDB.types.register(json1.type);
-
-    this.#connection = new ShareDB.Connection(socket as any);
-    this.#socket = socket;
-  }
-
-  disconnect() {
-    if (!this.#connection) {
-      throw new Error("connect() has not been called yet");
-    }
-    if (this.#socket) {
-      this.#socket.removeEventListener("error", this.#onSocketError);
-      this.#socket.removeEventListener("open", this.#onSocketOpen);
-      this.#socket.removeEventListener("close", this.#onSocketClose);
-      this.#connection.close();
-      this.#socket.close();
-
-      // Cannot `delete` private identifiers
-      this.#connection = undefined;
-      this.#socket = undefined;
-    }
-  }
-
-  #onSocketError(e: any) {
-    console.warn(e.message, e);
-  }
-  #onSocketOpen() {
-    this.connected = true;
-  }
-  #onSocketClose() {
-    this.connected = false;
-  }
-
-  load(docId: string, synced: boolean) {
-    if (!this.#connection) {
-      throw new Error("connect() has not been called yet");
-    }
-
-    this.id = docId;
-    const doc = synced ? this.#connection.get("examples", docId) : getLocalDoc("examples", docId);
-    doc.on("error", (e: ShareDB.Error) => notifications.addError(e.message));
-
-    if (!synced) {
-      migrate(doc);
-    }
-
-    /*
-    presence = connection.getPresence("x-" + docId);
-    presence.subscribe((e: any) => console.log("presence subscribe callback", e));
-    const presences: { [key: string]: PresenceData } = {};
-    const presenceTargets: { [key: string]: string } = {};
-    presence.on("receive", (presenceId: string, data: any) => {
-      if (data === null) {
-        delete presenceTargets[presences[presenceId].selected];
-        delete presences[presenceId];
-        update((d) => {
-          d.presences = presences;
-          d.presenceTargets = presenceTargets;
-          return d;
-        });
-      } else {
-        if (
-          typeof presences[presenceId] != "undefined" &&
-          typeof presenceTargets[presences[presenceId].selected] != "undefined"
-        ) {
-          delete presenceTargets[presences[presenceId].selected];
-        }
-        presences[presenceId] = {
-          selected: data.selected,
-          color: data.color,
-        };
-        presenceTargets[data.selected] = presenceId;
-        update((d) => {
-          d.presences = presences;
-          d.presenceTargets = presenceTargets;
-          return d;
-        });
-      }
-    });
-    presence.on("error", (e: any) => {
-      console.log("presence error", e);
-    });
-    // localPresence = presence.create();
-    */
-
-    const onData = (e: any) => {
-      if (e && typeof e.message == "string") notifications.addError(e.message);
-      console.log("got doc", doc.data);
-      this.#data = doc.data;
-    };
-
-    // Get initial value of document and subscribe to changes
-    doc.subscribe(onData);
-    doc.on("op", onData);
-
-    if (synced) {
-      fetch("/api/chart/" + docId)
-        .then((res) => res.json())
-        .then((data) => (this.chartInfo = data.chart));
-    }
-
-    this.#doc = doc;
-  }
-
-  create(synced: boolean, teamId?: string, folderId?: string) {
-    return new Promise<string>((resolve, reject) => {
-      if (!this.#connection) {
-        reject("connect() has not been called yet");
-        return;
-      }
-      if (synced) {
-        fetch("/api/chart", {
-          method: "POST",
-          body: JSON.stringify({ teamId, folderId }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (typeof data.ref == "string") {
-              resolve(data.ref);
-            } else {
-              reject(new Error(data.message));
-            }
-          })
-          .catch((err) => reject(err));
-      } else {
-        const docId = (synced ? "" : localPrefix) + crypto.randomUUID();
-        const doc = synced
-          ? this.#connection.get("examples", docId)
-          : getLocalDoc("examples", docId);
-        doc.on("error", (e: ShareDB.Error) => console.warn("doc error", e));
-        doc.create(defDoc, json1.type.uri, () => resolve(docId));
-      }
-    });
-  }
-
-  get data(): Root | undefined {
-    return this.#data;
-  }
-
-  get doc(): ShareDB.Doc {
-    return this.#doc;
-  }
-}
+import type { ShareDBConnection } from "./data.svelte";
 
 export class ChartStore {
   #doc: ShareDB.Doc = $state(new ShareDB.Doc());
@@ -189,11 +23,342 @@ export class ChartStore {
     this.#connection = connection;
   }
 
-  setTitle(value: string) {
-    this.#doc.submitOp(["chart", "title", { r: 0, i: value }]);
-  }
-
   get data(): Chart | undefined {
     return this.#data;
+  }
+
+  setConfigTitle(value: string) {
+    this.#doc.submitOp(["chart", "title", { r: 0, i: value }]);
+  }
+  setConfigSubTitle(value: string) {
+    this.#doc.submitOp(["chart", "subTitle", { r: 0, i: value }]);
+  }
+  setConfigHeight(value: number) {
+    this.#doc.submitOp(["chart", "height", { r: 0, i: value }]);
+  }
+  setConfigWidth(value: number) {
+    this.#doc.submitOp(["chart", "width", { r: 0, i: value }]);
+  }
+  setSourceTextLeft(value: string) {
+    this.#doc.submitOp(["chart", "sourceTextLeft", { r: 0, i: value }]);
+  }
+  setSourceTextLeftLink(value: string) {
+    this.#doc.submitOp(["chart", "sourceTextLeftLink", { r: 0, i: value }]);
+  }
+  setSourceTextRight(value: string) {
+    this.#doc.submitOp(["chart", "sourceTextRight", { r: 0, i: value }]);
+  }
+  setSourceTextRightLink(value: string) {
+    this.#doc.submitOp(["chart", "sourceTextRightLink", { r: 0, i: value }]);
+  }
+  setScaleFrom(scaleIndex: number, value: number) {
+    this.#doc.submitOp(["chart", "scales", scaleIndex, "dataRange", 0, { r: 0, i: value }]);
+  }
+  setScaleTo(scaleIndex: number, value: number) {
+    this.#doc.submitOp(["chart", "scales", scaleIndex, "dataRange", 1, { r: 0, i: value }]);
+  }
+  setColorScaleKey(scaleIndex: number, colorIndex: number, value: string) {
+    this.#doc.submitOp([
+      "chart",
+      "scales",
+      scaleIndex,
+      "colors",
+      "byKey",
+      colorIndex,
+      "k",
+      { r: 0, i: value },
+    ]);
+  }
+  setColorScaleColor(scaleIndex: number, colorIndex: number, value: string) {
+    this.#doc.submitOp([
+      "chart",
+      "scales",
+      scaleIndex,
+      "colors",
+      "byKey",
+      colorIndex,
+      "c",
+      { r: 0, i: value },
+    ]);
+  }
+  setColorScaleLegend(scaleIndex: number, colorIndex: number, value: string) {
+    this.#doc.submitOp([
+      "chart",
+      "scales",
+      scaleIndex,
+      "colors",
+      "byKey",
+      colorIndex,
+      "legend",
+      { r: 0, i: value },
+    ]);
+  }
+  addColorScaleColor(scaleIndex: number, colorIndex: number, k = "", c = "", legend = "") {
+    this.#doc.submitOp([
+      "chart",
+      "scales",
+      scaleIndex,
+      "colors",
+      "byKey",
+      colorIndex,
+      { i: { c, k, legend } },
+    ]);
+  }
+  removeColorScaleColor(scaleIndex: number, colorIndex: number) {
+    this.#doc.submitOp(["chart", "scales", scaleIndex, "colors", "byKey", colorIndex, { r: 0 }]);
+  }
+  setColorScaleDefaultColor(scaleIndex: number, value: string) {
+    this.#doc.submitOp(["chart", "scales", scaleIndex, "colors", "default", { r: 0, i: value }]);
+  }
+  moveColorUp(scaleIndex: number, colorIndex: number) {
+    this.#doc.submitOp([
+      "chart",
+      "scales",
+      scaleIndex,
+      "colors",
+      "byKey",
+      [colorIndex - 1, { d: 0 }],
+      [colorIndex, { p: 0 }],
+    ]);
+  }
+  moveColorDown(scaleIndex: number, colorIndex: number) {
+    this.#doc.submitOp([
+      "chart",
+      "scales",
+      scaleIndex,
+      "colors",
+      "byKey",
+      [colorIndex, { p: 0 }],
+      [colorIndex + 1, { d: 0 }],
+    ]);
+  }
+  removeChartElement(elementIndex: number) {
+    this.#doc.submitOp(["chart", "elements", elementIndex, { r: 0 }]);
+  }
+  moveElementUp(elementIndex: number) {
+    this.#doc.submitOp([
+      "chart",
+      "elements",
+      [elementIndex - 1, { d: 0 }],
+      [elementIndex, { p: 0 }],
+    ]);
+  }
+  moveElementDown(elementIndex: number) {
+    this.#doc.submitOp([
+      "chart",
+      "elements",
+      [elementIndex, { p: 0 }],
+      [elementIndex + 1, { d: 0 }],
+    ]);
+  }
+
+  addBarChart(elementIndex: number) {
+    this.#doc.submitOp([
+      "chart",
+      "elements",
+      elementIndex,
+      {
+        i: {
+          type: "hBar",
+          id: crypto.randomUUID(),
+          d: {
+            dataSet: "",
+            categories: "",
+            subCategories: "",
+            stackSubCategories: true,
+            portionSubCategories: false,
+            value: "",
+            labelWidth: 170,
+            repeat: "",
+            scale: {
+              name: "x",
+              dataKey: "antal",
+              type: "linear",
+              dataRange: [0, 1],
+            },
+            colors: {
+              default: "#888888",
+              byKey: [],
+            },
+            rectLabels: false,
+            totalLabels: HBarTotalLabelStyle.NONE,
+            axis: {
+              location: AxisLocation.START,
+              labelSpace: 0,
+              orientation: AxisOrientation.HORIZONTAL,
+              repeat: AxisRepeatMode.FIRST,
+              major: {
+                grid: true,
+                enabled: true,
+                tickSize: 8,
+                tickWidth: 1,
+                color: "#aaaaaa",
+                labelDivide: 1000000,
+                labelThousands: ",",
+                afterLabel: " mio.",
+                auto: {
+                  from: 0,
+                  each: 5000000,
+                  labels: true,
+                },
+                ticks: [],
+              },
+              minor: {
+                grid: false,
+                enabled: false,
+                tickSize: 8,
+                tickWidth: 1,
+                color: "#aaaaaa",
+                labelDivide: 1000000,
+                labelThousands: ",",
+                afterLabel: " mio.",
+                auto: {
+                  from: 0,
+                  each: 1000000,
+                  labels: false,
+                },
+                ticks: [],
+              },
+            },
+          },
+        },
+      },
+    ]);
+  }
+  addLineChart(elementIndex: number) {
+    this.#doc.submitOp([
+      "chart",
+      "elements",
+      elementIndex,
+      {
+        i: {
+          type: "line",
+          id: crypto.randomUUID(),
+          d: {
+            dataSet: "",
+            x: {
+              key: "",
+              scale: "lineX",
+              axis: {
+                location: AxisLocation.END,
+                labelSpace: 8,
+                orientation: AxisOrientation.HORIZONTAL,
+                repeat: AxisRepeatMode.FIRST,
+                major: {
+                  grid: false,
+                  enabled: true,
+                  tickSize: 8,
+                  tickWidth: 1,
+                  color: "#aaaaaa",
+                  labelDivide: 1,
+                  labelThousands: "",
+                  afterLabel: "",
+                  auto: {
+                    from: 0,
+                    each: 10,
+                    labels: true,
+                  },
+                  ticks: [],
+                },
+                minor: {
+                  grid: false,
+                  enabled: true,
+                  tickSize: 4,
+                  tickWidth: 1,
+                  color: "#aaaaaa",
+                  labelDivide: 1,
+                  labelThousands: "",
+                  afterLabel: "",
+                  auto: {
+                    from: 0,
+                    each: 1,
+                    labels: false,
+                  },
+                  ticks: [],
+                },
+              },
+            },
+            y: {
+              key: "",
+              scale: "lineY",
+              axis: {
+                location: AxisLocation.END,
+                labelSpace: 8,
+                orientation: AxisOrientation.VERTICAL,
+                repeat: AxisRepeatMode.FIRST,
+                major: {
+                  grid: true,
+                  enabled: true,
+                  tickSize: 8,
+                  tickWidth: 1,
+                  color: "#aaaaaa",
+                  labelDivide: 1,
+                  labelThousands: ",",
+                  afterLabel: "",
+                  auto: {
+                    from: 0,
+                    each: 10,
+                    labels: true,
+                  },
+                  ticks: [],
+                },
+                minor: {
+                  grid: false,
+                  enabled: false,
+                  tickSize: 8,
+                  tickWidth: 1,
+                  color: "#aaaaaa",
+                  labelDivide: 1,
+                  labelThousands: "",
+                  afterLabel: "",
+                  auto: {
+                    from: 0,
+                    each: 1,
+                    labels: false,
+                  },
+                  ticks: [],
+                },
+              },
+            },
+            categories: "",
+            fill: false,
+            stack: false,
+            heightRatio: 0.9,
+            style: {
+              default: {
+                k: "",
+                color: "#000",
+                contextColor: "#000",
+                width: 1,
+                label: {
+                  text: "",
+                  location: LabelLocation.Right,
+                  color: "#000",
+                  x: 0,
+                  y: 0,
+                  rx: 0,
+                  ry: 0,
+                  line: LabelStyleLine.None,
+                },
+                symbols: LineSymbol.NONE,
+                missingStyle: LineMissingStyle.DASHED,
+              },
+              byKey: [],
+            },
+            repeat: "",
+            repeatColumns: 4,
+            repeatSettings: {
+              default: {
+                k: "",
+                title: "",
+                allCharts: false,
+                ownChart: false,
+              },
+              byKey: [],
+            },
+          } as Line,
+        },
+      },
+    ]);
   }
 }
