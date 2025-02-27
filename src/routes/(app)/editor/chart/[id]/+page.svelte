@@ -183,7 +183,7 @@
     </header>
     <div class="chart-controls-pane">
       <div class="chart-controls-primary chart-controls editor">
-        {#if canEdit}
+        {#if canEdit && store.data}
           {#if visibleSection == "data"}
             <div class="box">
               <div class="w-025 editor-explain-box p-top-1">

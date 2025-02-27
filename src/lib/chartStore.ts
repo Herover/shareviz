@@ -16,15 +16,9 @@ import {
   type LineStyleKey,
   type Scale,
   type Colors,
-  LabelLocation,
-  LabelStyleLine,
-  LineSymbol,
-  LineMissingStyle,
   type LineRepeatSettingsKey,
-  type LineRepeatSettings,
 } from "./chart";
 import { notifications } from "./notificationStore";
-import { orDefault } from "./utils";
 import { editChartInfo } from "./api";
 import { defDoc } from "./initialDoc";
 import { migrate } from "./chartMigrate";
@@ -404,170 +398,12 @@ export const db = (function createDB() {
 
           return {
             ...hbarScope,
-            setDataSet: (value: string) =>
-              doc.submitOp(["chart", "elements", elementIndex, "d", "dataSet", { r: 0, i: value }]),
-            setXKey: (value: string) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "x",
-                "key",
-                { r: 0, i: value },
-              ]),
-            setYKey: (value: string) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "y",
-                "key",
-                { r: 0, i: value },
-              ]),
-            setCategoriesKey: (value: string) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "categories",
-                { r: 0, i: value },
-              ]),
-            setRepeatKey: (value: string) =>
-              doc.submitOp(["chart", "elements", elementIndex, "d", "repeat", { r: 0, i: value }]),
-            setRepeatColumns: (value: number) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "repeatColumns",
-                { r: 0, i: value },
-              ]),
             repeatSettings: (i: number) =>
               repeatSettings(hbarScope, ["repeatSettings", "byKey", i], doc),
-            moveRepeatUp: (i: number) =>
-              doc.submitOp([
-                ...hbarScope.path.slice(1),
-                "repeatSettings",
-                "byKey",
-                [i - 1, { d: 0 }],
-                [i, { p: 0 }],
-              ]),
-            moveRepeatDown: (i: number) =>
-              doc.submitOp([
-                ...hbarScope.path.slice(1),
-                "repeatSettings",
-                "byKey",
-                [i, { p: 0 }],
-                [i + 1, { d: 0 }],
-              ]),
-            addRepeatSetting: (i: number, k: string) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "repeatSettings",
-                "byKey",
-                i,
-                {
-                  i: {
-                    k,
-                    title: "",
-                    allCharts: false,
-                    ownChart: true,
-                  } as LineRepeatSettingsKey,
-                },
-              ]),
-            removeRepeatSettings: (indexes: number[]) =>
-              doc.submitOp(
-                indexes.map((i) => [
-                  ...hbarScope.path.slice(1),
-                  "repeatSettings",
-                  "byKey",
-                  i,
-                  { r: 0 },
-                ]),
-              ),
-            // TODO: remove after figuring out a better upgrade strategy
-            updateRepeatSettings: (keys: string[], r: 0 | undefined) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "repeatSettings",
-                {
-                  i: {
-                    default: {
-                      k: "",
-                      title: "",
-                    },
-                    byKey: keys.map((k) => ({
-                      k,
-                      title: "",
-                    })),
-                  } as LineRepeatSettings,
-                  r,
-                },
-              ]),
-            setFill: (value: boolean) =>
-              doc.submitOp(["chart", "elements", elementIndex, "d", "fill", { r: 0, i: value }]),
-            setStack: (value: boolean) =>
-              doc.submitOp(["chart", "elements", elementIndex, "d", "stack", { r: 0, i: value }]),
-            setHeightRatio: (value: number) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "heightRatio",
-                { r: 0, i: value },
-              ]),
             xAxis: axis(hbarScope, ["x", "axis"], doc),
             yAxis: axis(hbarScope, ["y", "axis"], doc),
             defaultLineStyle: () => lineStyle(hbarScope, ["style", "default"], doc),
             lineStyle: (i: number) => lineStyle(hbarScope, ["style", "byKey", i], doc),
-            addLineStyle: (
-              i: number,
-              d: {
-                key?: string;
-                color?: string;
-                labelColor?: string;
-                labelText?: string;
-              } = {},
-            ) =>
-              doc.submitOp([
-                "chart",
-                "elements",
-                elementIndex,
-                "d",
-                "style",
-                "byKey",
-                i,
-                {
-                  i: {
-                    k: orDefault(d.key, ""),
-                    color: orDefault(d.color, "#000000"),
-                    width: 1,
-                    label: {
-                      text: orDefault(d.labelText, ""),
-                      location: LabelLocation.Right,
-                      color: orDefault(d.labelColor, "#000000"),
-                      x: 0,
-                      y: 0,
-                      rx: 0,
-                      ry: -32,
-                      line: LabelStyleLine.Line,
-                    },
-                    missingStyle: LineMissingStyle.DASHED,
-                    symbols: LineSymbol.NONE,
-                  } as LineStyleKey,
-                },
-              ]),
           };
         },
       };

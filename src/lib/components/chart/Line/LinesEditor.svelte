@@ -6,15 +6,17 @@
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import type { formatData } from "./data";
   import LinesEditorLine from "./LinesEditorLine.svelte";
+  import type { LineStore } from "$lib/chartStores/line.svelte";
 
   interface Props {
     chartColors: string[];
     values: ReturnType<typeof formatData>;
     lineSpec: ReturnType<ReturnType<typeof db.chart>["line"]>;
     index: number;
+    lineStore: LineStore;
   }
 
-  let { chartColors, values, lineSpec, index }: Props = $props();
+  let { chartColors, values, lineSpec, index, lineStore }: Props = $props();
 
   let selected: { [key: string]: boolean } = $state({});
   let defaultSelected = $state(false);
@@ -187,7 +189,7 @@
   let setLabelToKey = $derived(() => {
     selectedIndexes.forEach((d) => {
       if (d.i == -1) {
-        lineSpec.addLineStyle($lineSpec.style.byKey.length, {
+        lineStore.addLineStyle($lineSpec.style.byKey.length, {
           key: d.k,
           labelText: d.k,
         });
@@ -203,7 +205,7 @@
   let setLineLabel = $derived((label: string) => {
     selectedIndexes.forEach((d) => {
       if (d.i == -1) {
-        lineSpec.addLineStyle($lineSpec.style.byKey.length, {
+        lineStore.addLineStyle($lineSpec.style.byKey.length, {
           key: d.k,
           labelText: label,
         });
