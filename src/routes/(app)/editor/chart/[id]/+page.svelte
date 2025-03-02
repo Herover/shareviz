@@ -10,6 +10,7 @@
   import type { EditorChartData, EditorChartScreenshot, ViewerMessage } from "$lib/viewerData.js";
   import { ShareDBConnection } from "$lib/chartStores/data.svelte.js";
   import { ChartStore } from "$lib/chartStores/chart.svelte.js";
+  import { env } from "$env/dynamic/public";
 
   let { data } = $props();
 
@@ -27,37 +28,46 @@
   let chartStore: ChartStore;
 
   const updateViewer = () => {
-    viewerFrame?.contentWindow?.postMessage({
-      type: "CHART_DATA",
-      data: {
-        chart: $db.doc,
-      },
-    } as EditorChartData);
+    viewerFrame?.contentWindow?.window.postMessage(
+      {
+        type: "CHART_DATA",
+        data: {
+          chart: $db.doc,
+        },
+      } as EditorChartData,
+      env.PUBLIC_VIEWER_ORIGIN,
+    );
   };
 
   $effect(() => {
     if (viewerFrame?.contentWindow != null) {
       // Make sure to send chart data the moment the viewer has loaded
-      viewerFrame?.contentWindow?.addEventListener("load", updateViewer);
+      viewerFrame?.addEventListener("load", updateViewer);
 
       // Viewer can sends events regarding chart height and editor events
-      viewerFrame.contentWindow.addEventListener("message", onMessage, false);
+      window.addEventListener("message", onMessage);
     }
   });
 
   // Send chart data whenever it changes
   $effect(() => {
     if ($db.doc != null) {
-      viewerFrame?.contentWindow?.postMessage({
-        type: "CHART_DATA",
-        data: {
-          chart: $db.doc,
-        },
-      } as EditorChartData);
+      viewerFrame?.contentWindow?.window.postMessage(
+        {
+          type: "CHART_DATA",
+          data: {
+            chart: $db.doc,
+          },
+        } as EditorChartData,
+        env.PUBLIC_VIEWER_ORIGIN,
+      );
     }
   });
 
   const onMessage = (event: MessageEvent<ViewerMessage>) => {
+    if (event.origin != env.PUBLIC_VIEWER_ORIGIN) {
+      return;
+    }
     if (event.data.type == "CHART_UPDATED") {
       height = event.data.data.height;
     } else if (event.data.type == "CHART_EDIT") {
@@ -124,12 +134,15 @@
   });
 
   const chartToPNG = () => {
-    viewerFrame?.contentWindow?.postMessage({
-      type: "CHART_SCREENSHOT",
-      data: {
-        format: "png",
-      },
-    } as EditorChartScreenshot);
+    viewerFrame?.contentWindow?.window.postMessage(
+      {
+        type: "CHART_SCREENSHOT",
+        data: {
+          format: "png",
+        },
+      } as EditorChartScreenshot,
+      env.PUBLIC_VIEWER_ORIGIN,
+    );
   };
 </script>
 
@@ -234,7 +247,7 @@
           -->
           <iframe
             bind:this={viewerFrame}
-            src={"/view/chart/" + data.id + "?editor"}
+            src={env.PUBLIC_VIEWER_ORIGIN + "/view/chart/" + data.id + "?editor"}
             width={chartSpec.chart.width}
             {height}
             title="Chart preview"

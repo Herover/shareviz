@@ -16,6 +16,7 @@ These environvent variables should be defined in both dev and prod settings:
 
 ```
 PUBLIC_ORIGIN="http://localhost:5173"
+PUBLIC_VIEWER_ORIGIN="http://view.localhost:5173"
 ORIGIN="http://localhost:5173" # Required in prod to get working auth
 AUTH_TRUST_HOST=true # Required in prod for auth
 AUTH_SECRET="X"

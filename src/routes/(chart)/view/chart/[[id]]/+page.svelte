@@ -47,27 +47,33 @@
     window.removeEventListener("message", onMessage, false);
   });
   $effect(() => {
-    window.postMessage({
-      type: "CHART_UPDATED",
-      data: {
-        height: height,
-      },
-    } as ViewerChartUpdated);
+    window.parent.postMessage(
+      {
+        type: "CHART_UPDATED",
+        data: {
+          height: height,
+        },
+      } as ViewerChartUpdated,
+      env.PUBLIC_ORIGIN,
+    );
   });
   const onEdit = (d: { k: string; v: any }) => {
-    window.postMessage({
-      type: "CHART_EDIT",
-      data: {
-        edit: d,
-      },
-    } as ViewerChartEdit);
+    window.parent.postMessage(
+      {
+        type: "CHART_EDIT",
+        data: {
+          edit: d,
+        },
+      } as ViewerChartEdit,
+      env.PUBLIC_ORIGIN,
+    );
   };
 
   $effect(() => {
     if ($db.doc) chartSpec = $db.doc as Root;
   });
   $effect(() => {
-    if (data.id && !data.id.startsWith(localPrefix)) {
+    if (data.id && !data.id.startsWith(localPrefix) && !data.editor) {
       fetch("/api/chart/" + data.id + "/data")
         .then((resp) => resp.json())
         .then((data) => (chartSpec = data.chart))
