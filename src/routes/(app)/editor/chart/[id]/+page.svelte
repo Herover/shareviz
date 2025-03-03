@@ -217,13 +217,7 @@
             <ChartEditor spec={chartSpec} chartScope={db.chart()} {chartData} connection={store} />
           {:else if visibleSection == "publish"}
             <a href="/view/chart/{data.id}">Embed link</a>
-            <input
-              value={window.location.protocol +
-                "//" +
-                window.location.host +
-                "/view/chart/" +
-                data.id}
-            />
+            <input value={env.PUBLIC_VIEWER_ORIGIN + "/view/chart/" + data.id} />
             <button onclick={() => chartToPNG()}>Generate PNG</button>
           {/if}
         {:else}
