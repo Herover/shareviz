@@ -23,7 +23,6 @@
   let { spec, chart, chartData, index, connection }: Props = $props();
 
   let lineStore = new LineStore(connection, index);
-  $inspect(lineStore.d);
 
   let chartSpec = chart.line(index);
 

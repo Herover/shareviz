@@ -8,6 +8,8 @@
   import { formatData } from "./data";
   import { max } from "d3-array";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
+  import { HBarStore } from "$lib/chartStores/hbar.svelte";
+  import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
 
   interface Props {
     spec: Root;
@@ -16,13 +18,16 @@
       [key: string]: DSVParsedArray<any>;
     };
     index: number;
+    connection: ShareDBConnection;
   }
 
-  let { spec, chart, chartData, index }: Props = $props();
+  let { spec, chart, chartData, index, connection }: Props = $props();
+
+  let hbarStore = new HBarStore(connection, index);
 
   let chartSpec = chart.hBar(index);
 
-  let dataSet = $derived(spec.data.sets.find((set) => set.id == $chartSpec.dataSet));
+  let dataSet = $derived(spec.data.sets.find((set) => set.id == hbarStore.data.dataSet));
 
   let columns = $derived([
     ...orDefault(
@@ -46,7 +51,7 @@
     colorScale.addColorScaleColor(ci);
   };
 
-  let groups = $derived(formatData($chartSpec, chartData, [] /* $colorScale.byKey */));
+  let groups = $derived(formatData(hbarStore.data, chartData, [] /* $colorScale.byKey */));
   // FIXME: Having this as a $effect here means changes to data wont get detected, and it might
   // cause issues when there's multiple clients watching at the same time.
   $effect(() => {
@@ -67,14 +72,14 @@
   );
   let automateColorKeys = $derived(() => {
     if (
-      typeof $chartSpec.dataSet != "undefined" &&
-      typeof chartData[$chartSpec.dataSet] != "undefined"
+      typeof hbarStore.data.dataSet != "undefined" &&
+      typeof chartData[hbarStore.data.dataSet] != "undefined"
     ) {
       const key =
-        typeof $chartSpec.subCategories != "undefined"
-          ? $chartSpec.subCategories
-          : $chartSpec.categories;
-      const dataSet = chartData[$chartSpec.dataSet];
+        typeof hbarStore.data.subCategories != "undefined"
+          ? hbarStore.data.subCategories
+          : hbarStore.data.categories;
+      const dataSet = chartData[hbarStore.data.dataSet];
       const groups = group(key, dataSet, (k) => k);
       groups.forEach((k) => {
         if (!$colorScale.byKey.find((d) => d.k == k)) {
@@ -91,20 +96,20 @@
       });
     }
   });
-  // $: if ($chartSpec.categories != "" && $chartSpec.subCategories != "") {
+  // $: if (hbarStore.data.categories != "" && hbarStore.data.subCategories != "") {
   //   automateColorKeys();
   // }
 
   let removeExtraColorKeys = $derived(() => {
     if (
-      typeof $chartSpec.dataSet != "undefined" &&
-      typeof chartData[$chartSpec.dataSet] != "undefined"
+      typeof hbarStore.data.dataSet != "undefined" &&
+      typeof chartData[hbarStore.data.dataSet] != "undefined"
     ) {
       const key =
-        typeof $chartSpec.subCategories != "undefined"
-          ? $chartSpec.subCategories
-          : $chartSpec.categories;
-      const dataSet = chartData[$chartSpec.dataSet];
+        typeof hbarStore.data.subCategories != "undefined"
+          ? hbarStore.data.subCategories
+          : hbarStore.data.categories;
+      const dataSet = chartData[hbarStore.data.dataSet];
       const groups = group(key, dataSet, (k) => k);
       let removed = 0;
       $colorScale.byKey.forEach((c, keyIndex) => {
@@ -123,16 +128,15 @@
     colorScale.moveColorDown(i);
   });
 
-  let totalLabel = $state($chartSpec.totalLabels);
-  $effect(() => totalLabel != $chartSpec.totalLabels && chartSpec.setTotalLabels(totalLabel));
+  let totalLabel = $state(hbarStore.data.totalLabels);
 </script>
 
 <p>
   <label>
     Data set:
     <select
-      value={$chartSpec.dataSet}
-      onchange={(e) => chartSpec.setDataSet(e.currentTarget.value)}
+      value={hbarStore.data.dataSet}
+      onchange={(e) => hbarStore.setDataSet(e.currentTarget.value)}
     >
       <option>{""}</option>
       {#each spec.data.sets as set}
@@ -144,9 +148,9 @@
 <p>
   <label>
     Label width: <input
-      value={$chartSpec.labelWidth}
-      onkeyup={(e) => chartSpec.setLabelWidth(Number.parseInt(e.currentTarget.value))}
-      onchange={(e) => chartSpec.setLabelWidth(Number.parseInt(e.currentTarget.value))}
+      value={hbarStore.data.labelWidth}
+      onkeyup={(e) => hbarStore.setLabelWidth(Number.parseInt(e.currentTarget.value))}
+      onchange={(e) => hbarStore.setLabelWidth(Number.parseInt(e.currentTarget.value))}
       type="number"
     />
   </label>
@@ -156,8 +160,8 @@
     <label>
       Categories from:
       <select
-        value={$chartSpec.categories}
-        onchange={(e) => chartSpec.setCategories(e.currentTarget.value)}
+        value={hbarStore.data.categories}
+        onchange={(e) => hbarStore.setCategories(e.currentTarget.value)}
       >
         <option>{""}</option>
         {#each columns as column}
@@ -170,8 +174,8 @@
     <label>
       Sub categories from:
       <select
-        value={$chartSpec.subCategories}
-        onchange={(e) => chartSpec.setSubCategories(e.currentTarget.value)}
+        value={hbarStore.data.subCategories}
+        onchange={(e) => hbarStore.setSubCategories(e.currentTarget.value)}
       >
         <option>{""}</option>
         {#each columns as column}
@@ -184,17 +188,17 @@
     <label>
       Stack sub categories:
       <input
-        checked={$chartSpec.stackSubCategories}
-        onchange={(e) => chartSpec.setStackSubCategories(e.currentTarget.checked)}
+        checked={hbarStore.data.stackSubCategories}
+        onchange={(e) => hbarStore.setStackSubCategories(e.currentTarget.checked)}
         type="checkbox"
       />
     </label>
-    {#if $chartSpec.stackSubCategories}
+    {#if hbarStore.data.stackSubCategories}
       <label>
         Total:
         <input
-          checked={$chartSpec.portionSubCategories}
-          onchange={(e) => chartSpec.setPortionSubCategories(e.currentTarget.checked)}
+          checked={hbarStore.data.portionSubCategories}
+          onchange={(e) => hbarStore.setPortionSubCategories(e.currentTarget.checked)}
           type="checkbox"
         />
       </label>
@@ -203,7 +207,10 @@
   <p>
     <label>
       Values from:
-      <select value={$chartSpec.value} onchange={(e) => chartSpec.setValue(e.currentTarget.value)}>
+      <select
+        value={hbarStore.data.value}
+        onchange={(e) => hbarStore.setValue(e.currentTarget.value)}
+      >
         <option>{""}</option>
         {#each columns.filter((r) => r.type == "number") as row}
           <option>{row.key}</option>
@@ -326,8 +333,8 @@
     </div>
     <div class="w-05">
       <input
-        checked={$chartSpec.rectLabels}
-        onchange={(e) => chartSpec.setRectLabels(e.currentTarget.checked)}
+        checked={hbarStore.data.rectLabels}
+        onchange={(e) => hbarStore.setRectLabels(e.currentTarget.checked)}
         type="checkbox"
       />
     </div>
@@ -351,8 +358,8 @@
     <label
       >Repeat for each:
       <select
-        value={$chartSpec.repeat}
-        onchange={(e) => chartSpec.setRepeat(e.currentTarget.value)}
+        value={hbarStore.data.repeat}
+        onchange={(e) => hbarStore.setRepeat(e.currentTarget.value)}
       >
         <option>{""}</option>
         {#each columns as row}
@@ -364,7 +371,7 @@
 {/if}
 
 <b>Axis</b>
-<AxisEditor conf={chartSpec.axis()} showRepeatControl={$chartSpec.repeat != ""} />
+<AxisEditor conf={chartSpec.axis()} showRepeatControl={hbarStore.data.repeat != ""} />
 
 <style>
   .color-control {
