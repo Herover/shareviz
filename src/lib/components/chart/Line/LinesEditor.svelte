@@ -1,6 +1,5 @@
 <script lang="ts">
   import { LabelLocation, LabelStyleLine, LineMissingStyle, LineSymbol } from "$lib/chart";
-  import type { db } from "$lib/chartStore";
   import { negativeOneToInf } from "$lib/utils";
   import { onDestroy, onMount } from "svelte";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
@@ -11,24 +10,22 @@
   interface Props {
     chartColors: string[];
     values: ReturnType<typeof formatData>;
-    lineSpec: ReturnType<ReturnType<typeof db.chart>["line"]>;
     index: number;
     lineStore: LineStore;
   }
 
-  let { chartColors, values, lineSpec, index, lineStore }: Props = $props();
+  let { chartColors, values, index, lineStore }: Props = $props();
 
   let selected: { [key: string]: boolean } = $state({});
   let defaultSelected = $state(false);
-  let defaultStyle = lineSpec.defaultLineStyle();
+  let defaultStyle = lineStore.defaultLineStyle();
   let selectedIndexes = $derived(
     Object.keys(selected)
       .filter((k) => selected[k] !== false)
       .map((k) => {
-        const i = $lineSpec.style.byKey.findIndex((e) => e.k === k);
+        const i = lineStore.data.style.byKey.findIndex((e) => e.k === k);
         return {
-          style: lineSpec.lineStyle(i),
-          $style: $lineSpec.style.byKey[i],
+          style: lineStore.lineStyle(i),
           i,
           k,
         };
@@ -42,7 +39,7 @@
     typeof merged == "undefined" ? next : merged == next ? merged : undefined;
   let mergedStyle = $derived(
     selectedIndexes
-      .map((e) => e.$style)
+      .map((e) => e.style.data)
       .reduce(
         (merged, next) => {
           if (typeof next == "undefined") return merged;
@@ -63,18 +60,18 @@
         defaultSelected
           ? // Manual deep copy, `{ ...$defaultStyle }` copies some reactivity-stuff we do not want to copy!
             {
-              color: $defaultStyle.color,
-              contextColor: $defaultStyle.contextColor,
-              width: $defaultStyle.width,
+              color: defaultStyle.data.color,
+              contextColor: defaultStyle.data.contextColor,
+              width: defaultStyle.data.width,
               label: {
-                color: $defaultStyle.label.color,
-                location: $defaultStyle.label.location,
-                line: $defaultStyle.label.line,
-                text: $defaultStyle.label.text,
-                x: $defaultStyle.label.x,
+                color: defaultStyle.data.label.color,
+                location: defaultStyle.data.label.location,
+                line: defaultStyle.data.label.line,
+                text: defaultStyle.data.label.text,
+                x: defaultStyle.data.label.x,
               },
-              symbols: $defaultStyle.symbols,
-              missingStyle: $defaultStyle.missingStyle,
+              symbols: defaultStyle.data.symbols,
+              missingStyle: defaultStyle.data.missingStyle,
             }
           : ({ label: {} } as {
               color: string | undefined;
@@ -132,15 +129,15 @@
       .filter((e) => e.key.toLocaleLowerCase().includes(searchString.toLocaleLowerCase()))
       .sort(
         (a, b) =>
-          negativeOneToInf($lineSpec.style.byKey.findIndex((e) => e.k == a.key)) -
-          negativeOneToInf($lineSpec.style.byKey.findIndex((e) => e.k == b.key)),
+          negativeOneToInf(lineStore.data.style.byKey.findIndex((e) => e.k == a.key)) -
+          negativeOneToInf(lineStore.data.style.byKey.findIndex((e) => e.k == b.key)),
       )
       .map((d) => {
-        const i = $lineSpec.style.byKey.findIndex((e) => e.k == d.key);
+        const i = lineStore.data.style.byKey.findIndex((e) => e.k == d.key);
         return {
           d,
-          style: i == -1 ? undefined : lineSpec.lineStyle(i),
-          // style: $lineSpec.style.byKey.find((e) => e.k == d.key),
+          style: i == -1 ? undefined : lineStore.lineStyle(i),
+          // style: lineStore.data.style.byKey.find((e) => e.k == d.key),
         };
       }),
   );
@@ -189,7 +186,7 @@
   let setLabelToKey = $derived(() => {
     selectedIndexes.forEach((d) => {
       if (d.i == -1) {
-        lineStore.addLineStyle($lineSpec.style.byKey.length, {
+        lineStore.addLineStyle(lineStore.data.style.byKey.length, {
           key: d.k,
           labelText: d.k,
         });
@@ -199,13 +196,13 @@
     });
 
     if (defaultSelected) {
-      lineSpec.defaultLineStyle().setLabelText("auto");
+      lineStore.defaultLineStyle().setLabelText("auto");
     }
   });
   let setLineLabel = $derived((label: string) => {
     selectedIndexes.forEach((d) => {
       if (d.i == -1) {
-        lineStore.addLineStyle($lineSpec.style.byKey.length, {
+        lineStore.addLineStyle(lineStore.data.style.byKey.length, {
           key: d.k,
           labelText: label,
         });
@@ -215,21 +212,21 @@
     });
 
     if (defaultSelected) {
-      lineSpec.defaultLineStyle().setLabelText(label);
+      lineStore.defaultLineStyle().setLabelText(label);
     }
   });
   let setLineColor = $derived((color: string) => {
     selectedIndexes.forEach((d) => {
       const style = d.style;
-      if ($lineSpec.style.byKey[d.i].label.color == $lineSpec.style.byKey[d.i].color) {
+      if (lineStore.data.style.byKey[d.i].label.color == lineStore.data.style.byKey[d.i].color) {
         style.setLabelColor(color);
       }
       style.setColor(color);
     });
 
     if (defaultSelected) {
-      const style = lineSpec.defaultLineStyle();
-      if ($lineSpec.style.default.label.color == $lineSpec.style.default.color) {
+      const style = lineStore.defaultLineStyle();
+      if (lineStore.data.style.default.label.color == lineStore.data.style.default.color) {
         style.setLabelColor(color);
       }
       style.setColor(color);
@@ -241,7 +238,7 @@
     });
 
     if (defaultSelected) {
-      lineSpec.defaultLineStyle().setLabelColor(color);
+      lineStore.defaultLineStyle().setLabelColor(color);
     }
   });
   let setContextColor = $derived((color: string) => {
@@ -250,7 +247,7 @@
     });
 
     if (defaultSelected) {
-      lineSpec.defaultLineStyle().seContextColor(color);
+      lineStore.defaultLineStyle().seContextColor(color);
     }
   });
   let setWidth = $derived((width: number) => {
@@ -259,7 +256,7 @@
     });
 
     if (defaultSelected) {
-      lineSpec.defaultLineStyle().setwidth(width);
+      lineStore.defaultLineStyle().setwidth(width);
     }
   });
   let setLabelLocation = $derived((location: string) => {
@@ -268,7 +265,7 @@
     });
 
     if (defaultSelected) {
-      lineSpec.defaultLineStyle().setLabelLocation(location);
+      lineStore.defaultLineStyle().setLabelLocation(location);
     }
   });
   let type = $derived(typeof flatValues[0]?.value[0]?.x == "number" ? "number" : "date");
@@ -302,7 +299,7 @@
     });
 
     if (defaultSelected) {
-      lineSpec.defaultLineStyle().setSymbols(symbols);
+      lineStore.defaultLineStyle().setSymbols(symbols);
     }
   });
   let setMissingStyle = $derived((style: string) => {
@@ -311,7 +308,7 @@
     });
 
     if (defaultSelected) {
-      lineSpec.defaultLineStyle().setMissingStyle(style);
+      lineStore.defaultLineStyle().setMissingStyle(style);
     }
   });
 </script>
@@ -322,13 +319,13 @@
     <input bind:value={searchString} class="line-search" />
   </label>
   <LinesEditorLine
-    style={defaultStyle}
+    style={lineStore.defaultLineStyle()}
     selected={defaultSelected}
     {chartColors}
     onSelect={(d) => toggleSelect(null, d.selected, d.replace, null)}
   />
   {#each filteredValues as line, i}
-    {#if line}
+    {#if line && typeof line.style != "undefined"}
       <LinesEditorLine
         style={line.style}
         key={line.d.key}

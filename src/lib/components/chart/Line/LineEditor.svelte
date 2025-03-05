@@ -17,12 +17,13 @@
       [key: string]: DSVParsedArray<any>;
     };
     index: number;
+    id: string;
     connection: ShareDBConnection;
   }
 
-  let { spec, chart, chartData, index, connection }: Props = $props();
+  let { spec, chart, chartData, index, connection, id }: Props = $props();
 
-  let lineStore = new LineStore(connection, index);
+  let lineStore = new LineStore(connection, id);
 
   let chartSpec = chart.line(index);
 
@@ -160,7 +161,7 @@
     <br />
 
     <span class="editor-column-label">Line style</span>
-    <LinesEditor {chartColors} {values} lineSpec={chartSpec} {index} {lineStore} />
+    <LinesEditor {chartColors} {values} {index} {lineStore} />
   {/if}
   <p>
     <label class="editor-column-label">

@@ -1,0 +1,67 @@
+import ShareDB from "sharedb/lib/client";
+import type { ShareDBConnection } from "./data.svelte";
+import { type LineStyleKey } from "$lib/chart";
+
+export class LineStyleStore {
+  #doc: ShareDB.Doc = $state(new ShareDB.Doc());
+  // #connection?: ShareDBConnection;
+  #style: LineStyleKey;
+  #path: (string | number)[];
+
+  constructor(connection: ShareDBConnection, style: LineStyleKey, path: (string | number)[]) {
+    this.#doc = connection.doc;
+    // this.#connection = connection;
+    this.#style = style;
+    this.#path = path;
+  }
+
+  get data(): LineStyleKey {
+    return this.#style;
+  }
+
+  setLabelLocation(value: string) {
+    this.#doc.submitOp([...this.#path, "label", "location", { r: 0, i: value }]);
+  }
+  setLabelText(value: string) {
+    this.#doc.submitOp([...this.#path, "label", "text", { r: 0, i: value }]);
+  }
+  setKey(value: string) {
+    this.#doc.submitOp([...this.#path, "k", { r: 0, i: value }]);
+  }
+  setColor(value: string) {
+    this.#doc.submitOp([...this.#path, "color", { r: 0, i: value }]);
+  }
+  setLabelColor(value: string) {
+    this.#doc.submitOp([...this.#path, "label", "color", { r: 0, i: value }]);
+  }
+  seContextColor(value: string) {
+    this.#doc.submitOp([...this.#path, "contextColor", { r: 0, i: value }]);
+  }
+  setwidth(value: number) {
+    this.#doc.submitOp([...this.#path, "width", { r: 0, i: value }]);
+  }
+  setSymbols(value: string) {
+    this.#doc.submitOp([...this.#path, "symbols", { r: 0, i: value }]);
+  }
+  setLabelX(value: number) {
+    this.#doc.submitOp([...this.#path, "label", "x", { r: 0, i: value }]);
+  }
+  setLabelY(value: number) {
+    this.#doc.submitOp([...this.#path, "label", "y", { r: 0, i: value }]);
+  }
+  setLabelXOffset(value: number) {
+    this.#doc.submitOp([...this.#path, "label", "rx", { r: 0, i: value }]);
+  }
+  setLabelYOffset(value: number) {
+    this.#doc.submitOp([...this.#path, "label", "ry", { r: 0, i: value }]);
+  }
+  setLabelLine(value: string) {
+    this.#doc.submitOp([...this.#path, "label", "line", { r: 0, i: value }]);
+  }
+  setMissingStyle(value: string) {
+    this.#doc.submitOp([...this.#path, "missingStyle", { r: 0, i: value }]);
+  }
+  delete() {
+    this.#doc.submitOp([...this.#path, { r: 0 }]);
+  }
+}

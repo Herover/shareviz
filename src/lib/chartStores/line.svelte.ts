@@ -11,17 +11,17 @@ import {
   type LineRepeatSettingsKey,
   type LineStyleKey,
 } from "$lib/chart";
+import { LineStyleStore } from "./lineStyle.svelte";
 
 export class LineStore {
   #doc: ShareDB.Doc = $state(new ShareDB.Doc());
   #connection?: ShareDBConnection;
-  #elementIndex?: number;
+  #id?: string;
+  #elementIndex?: number = $derived(
+    this.#connection?.data?.chart.elements.findIndex((e) => e.id == this.#id),
+  );
   #componentData?: Element = $derived.by(() => {
-    if (typeof this.#elementIndex != "number") {
-      return undefined;
-    }
-
-    return this.#connection?.data?.chart.elements[this.#elementIndex];
+    return this.#connection?.data?.chart.elements.find((e) => e.id == this.#id);
   });
   #data: Line = $derived.by(() => {
     // To simplify life, lets assume that no one will ever try to create this class without checking index and root data
@@ -36,18 +36,40 @@ export class LineStore {
     return undefined as unknown as Line;
   });
 
-  constructor(connection: ShareDBConnection, index: number) {
+  constructor(connection: ShareDBConnection, id: string) {
     this.#doc = connection.doc;
-    this.#elementIndex = index;
+    this.#id = id;
     this.#connection = connection;
   }
 
   get d(): Element | undefined {
     return this.#componentData;
   }
+  get connection(): ShareDBConnection | undefined {
+    return this.#connection;
+  }
 
   get data(): Line {
     return this.#data;
+  }
+
+  lineStyle(index: number) {
+    return new LineStyleStore(
+      this.#connection as ShareDBConnection,
+      this.#data.style.byKey[index],
+      ["chart", "elements", this.#elementIndex as number, "d", "style", "byKey", index],
+    );
+  }
+
+  defaultLineStyle() {
+    return new LineStyleStore(this.#connection as ShareDBConnection, this.#data.style.default, [
+      "chart",
+      "elements",
+      this.#elementIndex as number,
+      "d",
+      "style",
+      "default",
+    ]);
   }
 
   setDataSet(value: string) {
