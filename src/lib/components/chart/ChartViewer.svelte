@@ -88,7 +88,7 @@
       {chartSpec.chart.subTitle}
     {/if}
   </p>
-  {#each chartSpec.chart.elements as element, i}
+  {#each chartSpec.chart.elements as element, i (element.id)}
     <svelte:boundary>
       {#await getComponent(element.type) then component}
         {@const SvelteComponent = component}
