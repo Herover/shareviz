@@ -16,7 +16,6 @@ import {
   type LineStyleKey,
   type Scale,
   type Colors,
-  type LineRepeatSettingsKey,
 } from "./chart";
 import { notifications } from "./notificationStore";
 import { editChartInfo } from "./api";
@@ -329,8 +328,6 @@ export const db = (function createDB() {
 
           return {
             ...hbarScope,
-            repeatSettings: (i: number) =>
-              repeatSettings(hbarScope, ["repeatSettings", "byKey", i], doc),
             xAxis: axis(hbarScope, ["x", "axis"], doc),
             yAxis: axis(hbarScope, ["y", "axis"], doc),
             defaultLineStyle: () => lineStyle(hbarScope, ["style", "default"], doc),
@@ -584,24 +581,6 @@ export const lineStyle = (
     setMissingStyle: (value: string) =>
       doc.submitOp([...styleScope.path.slice(1), "missingStyle", { r: 0, i: value }]),
     delete: () => doc.submitOp([...styleScope.path.slice(1), { r: 0 }]),
-  };
-};
-
-export const repeatSettings = (
-  scope: ReturnType<typeof createScope>,
-  key: (string | number)[],
-  doc: any,
-) => {
-  const settingsScope = createScope<LineRepeatSettingsKey>(scope, key);
-
-  return {
-    ...settingsScope,
-    setLabel: (value: string) =>
-      doc.submitOp([...settingsScope.path.slice(1), "title", { r: 0, i: value }]),
-    setOwnChart: (value: boolean) =>
-      doc.submitOp([...settingsScope.path.slice(1), "ownChart", { r: 0, i: value }]),
-    setAllCharts: (value: boolean) =>
-      doc.submitOp([...settingsScope.path.slice(1), "allCharts", { r: 0, i: value }]),
   };
 };
 

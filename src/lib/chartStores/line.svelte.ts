@@ -12,6 +12,7 @@ import {
   type LineStyleKey,
 } from "$lib/chart";
 import { LineStyleStore } from "./lineStyle.svelte";
+import { RepeatSettingsStore } from "./repeatSettings.svelte";
 
 export class LineStore {
   #doc: ShareDB.Doc = $state(new ShareDB.Doc());
@@ -267,5 +268,12 @@ export class LineStore {
         } as LineStyleKey,
       },
     ]);
+  }
+  repeatSetting(i: number) {
+    return new RepeatSettingsStore(
+      this.#connection as ShareDBConnection,
+      this.data.repeatSettings.byKey[i],
+      ["chart", "elements", this.#elementIndex, "d", "repeatSettings", "byKey", i],
+    );
   }
 }

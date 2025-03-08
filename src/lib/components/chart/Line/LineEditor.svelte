@@ -75,13 +75,13 @@
 
   let selectedIndexes: number[] = $state([]);
   const setRepeatedLabel = (value: string) => {
-    selectedIndexes.forEach((i) => chartSpec.repeatSettings(i).setLabel(value));
+    selectedIndexes.forEach((i) => lineStore.repeatSetting(i).setLabel(value));
   };
   const setRepeatedOwnChart = (value: boolean) => {
-    selectedIndexes.forEach((i) => chartSpec.repeatSettings(i).setOwnChart(value));
+    selectedIndexes.forEach((i) => lineStore.repeatSetting(i).setOwnChart(value));
   };
   const setRepeatedAllCharts = (value: boolean) => {
-    selectedIndexes.forEach((i) => chartSpec.repeatSettings(i).setAllCharts(value));
+    selectedIndexes.forEach((i) => lineStore.repeatSetting(i).setAllCharts(value));
   };
 </script>
 
