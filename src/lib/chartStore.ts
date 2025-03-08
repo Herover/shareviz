@@ -11,8 +11,6 @@ import {
   type Root,
   type Set,
   type Chart,
-  type Axis,
-  type AxisGrid,
   type LineStyleKey,
   type Scale,
   type Colors,
@@ -318,7 +316,6 @@ export const db = (function createDB() {
 
           return {
             ...hbarScope,
-            axis: () => axis(hbarScope, ["axis"], doc),
             scale: () => scale(hbarScope, ["scale"], doc),
             colors: () => colors(hbarScope, ["colors"], doc),
           };
@@ -328,8 +325,6 @@ export const db = (function createDB() {
 
           return {
             ...hbarScope,
-            xAxis: axis(hbarScope, ["x", "axis"], doc),
-            yAxis: axis(hbarScope, ["y", "axis"], doc),
             defaultLineStyle: () => lineStyle(hbarScope, ["style", "default"], doc),
             lineStyle: (i: number) => lineStyle(hbarScope, ["style", "byKey", i], doc),
           };
@@ -487,62 +482,6 @@ export const db = (function createDB() {
       ]),
   };
 })();
-
-export const axis = (scope: ReturnType<typeof createScope>, key: string[], doc: any) => {
-  const axisScope = createScope<Axis>(scope, key);
-
-  return {
-    ...axisScope,
-    setLocation: (value: string) =>
-      doc.submitOp([...axisScope.path.slice(1), "location", { r: 0, i: value }]),
-    setOrientation: (value: string) =>
-      doc.submitOp([...axisScope.path.slice(1), "orientation", { r: 0, i: value }]),
-    setRepeat: (value: string) =>
-      doc.submitOp([...axisScope.path.slice(1), "repeat", { r: 0, i: value }]),
-    setLabelSpace: (value: number) =>
-      doc.submitOp([...axisScope.path.slice(1), "labelSpace", { r: 0, i: value }]),
-    major: axisGrid(axisScope, "major", doc),
-    minor: axisGrid(axisScope, "minor", doc),
-  };
-};
-
-export const axisGrid = (scope: ReturnType<typeof createScope>, key: string, doc: any) => {
-  const majorScope = createScope<AxisGrid>(scope, [key]);
-
-  return {
-    ...majorScope,
-    setGrid: (value: boolean) =>
-      doc.submitOp([...majorScope.path.slice(1), "grid", { r: 0, i: value }]),
-    setEnabled: (value: boolean) =>
-      doc.submitOp([...majorScope.path.slice(1), "enabled", { r: 0, i: value }]),
-    setTickSize: (value: number) =>
-      doc.submitOp([...majorScope.path.slice(1), "tickSize", { r: 0, i: value }]),
-    setTickWidth: (value: number) =>
-      doc.submitOp([...majorScope.path.slice(1), "tickWidth", { r: 0, i: value }]),
-    setColor: (value: string) =>
-      doc.submitOp([...majorScope.path.slice(1), "color", { r: 0, i: value }]),
-    setLabelDivide: (value: number) =>
-      doc.submitOp([...majorScope.path.slice(1), "labelDivide", { r: 0, i: value }]),
-    setLabelThousands: (value: string) =>
-      doc.submitOp([...majorScope.path.slice(1), "labelThousands", { r: 0, i: value }]),
-    setAutoFrom: (value: number) =>
-      doc.submitOp([...majorScope.path.slice(1), "auto", "from", { r: 0, i: value }]),
-    setAutoEach: (value: number) =>
-      doc.submitOp([...majorScope.path.slice(1), "auto", "each", { r: 0, i: value }]),
-    setAutoLabels: (value: boolean) =>
-      doc.submitOp([...majorScope.path.slice(1), "auto", "labels", { r: 0, i: value }]),
-    setAfterLabel: (value: string) =>
-      doc.submitOp([...majorScope.path.slice(1), "afterLabel", { r: 0, i: value }]),
-    addTick: (index: number) =>
-      doc.submitOp([...majorScope.path.slice(1), "ticks", index, { i: { n: 0, l: "" } }]),
-    removeTick: (index: number) =>
-      doc.submitOp([...majorScope.path.slice(1), "ticks", index, { r: 0 }]),
-    setTickValue: (tickIndex: number, value: number) =>
-      doc.submitOp([...majorScope.path.slice(1), "ticks", tickIndex, "n", { r: 0, i: value }]),
-    setTickLabel: (tickIndex: number, value: string) =>
-      doc.submitOp([...majorScope.path.slice(1), "ticks", tickIndex, "l", { r: 0, i: value }]),
-  };
-};
 
 export const lineStyle = (
   scope: ReturnType<typeof createScope>,

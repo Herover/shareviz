@@ -371,7 +371,7 @@
 {/if}
 
 <b>Axis</b>
-<AxisEditor conf={chartSpec.axis()} showRepeatControl={hbarStore.data.repeat != ""} />
+<AxisEditor conf={hbarStore.axis()} showRepeatControl={hbarStore.data.repeat != ""} />
 
 <style>
   .color-control {

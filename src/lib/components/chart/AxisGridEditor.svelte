@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { axisGrid } from "$lib/chartStore";
+  import type { AxisGridStore } from "$lib/chartStores/axis.svelte";
   import ColorPicker from "./ColorPicker/ColorPicker.svelte";
 
   interface Props {
-    conf: ReturnType<typeof axisGrid>;
+    conf: AxisGridStore;
     isMinor?: boolean;
   }
 
@@ -14,18 +14,18 @@
   <label>
     Enabled:
     <input
-      checked={$conf.enabled}
+      checked={conf.data.enabled}
       onchange={(e) => conf.setEnabled(e.currentTarget.checked)}
       type="checkbox"
     />
   </label>
 </p>
-{#if $conf.enabled}
+{#if conf.data.enabled}
   <p>
     <label>
       Grid:
       <input
-        checked={$conf.grid}
+        checked={conf.data.grid}
         onchange={(e) => conf.setGrid(e.currentTarget.checked)}
         type="checkbox"
       />
@@ -36,7 +36,7 @@
     <label>
       Label tick size:
       <input
-        value={$conf.tickSize}
+        value={conf.data.tickSize}
         onchange={(e) => conf.setTickSize(Number.parseFloat(e.currentTarget.value))}
         type="number"
       />
@@ -46,7 +46,7 @@
   <label>
     Label tick width:
     <input
-      value={$conf.tickWidth}
+      value={conf.data.tickWidth}
       onchange={(e) => conf.setTickWidth(Number.parseFloat(e.currentTarget.value))}
       type="number"
     />
@@ -54,14 +54,14 @@
 
   <p>
     Label tick color:
-    <ColorPicker color={$conf.color} onchange={(s) => conf.setColor(s)} />
+    <ColorPicker color={conf.data.color} onchange={(s) => conf.setColor(s)} />
   </p>
 
   <p>
     <label>
       Auto ticks from
       <input
-        value={$conf.auto.from}
+        value={conf.data.auto.from}
         onchange={(e) => conf.setAutoFrom(Number.parseFloat(e.currentTarget.value))}
         type="number"
         style="width: 80px;"
@@ -70,7 +70,7 @@
     <label>
       every
       <input
-        value={$conf.auto.each}
+        value={conf.data.auto.each}
         onchange={(e) => conf.setAutoEach(Number.parseFloat(e.currentTarget.value))}
         type="number"
         style="width: 80px;"
@@ -83,7 +83,7 @@
       <label>
         Auto label
         <input
-          checked={$conf.auto.labels}
+          checked={conf.data.auto.labels}
           onchange={(e) => conf.setAutoLabels(e.currentTarget.checked)}
           type="checkbox"
         />
@@ -91,7 +91,7 @@
 
       <label>
         <select
-          value={$conf.labelDivide}
+          value={conf.data.labelDivide}
           onchange={(e) => conf.setLabelDivide(Number.parseFloat(e.currentTarget.value))}
           style="width: 80px;"
         >
@@ -104,7 +104,7 @@
       <label>
         after
         <input
-          value={$conf.afterLabel}
+          value={conf.data.afterLabel}
           onchange={(e) => conf.setAfterLabel(e.currentTarget.value)}
           style="width: 80px;"
         />
@@ -114,7 +114,7 @@
     <p>
       Manual marks
       <br />
-      {#each $conf.ticks as kv, i}
+      {#each conf.data.ticks as kv, i}
         <label
           >Value <input
             value={kv.n}
@@ -134,7 +134,7 @@
         <button onclick={() => conf.removeTick(i)}>delete</button>
         <br />
       {/each}
-      <button onclick={() => conf.addTick($conf.ticks.length)}>+ add</button>
+      <button onclick={() => conf.addTick(conf.data.ticks.length)}>+ add</button>
     </p>
   {/if}
 {/if}

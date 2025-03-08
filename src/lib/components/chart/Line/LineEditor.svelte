@@ -1,6 +1,5 @@
 <script lang="ts">
   import { type LineRepeatSettingsKey, type Root } from "$lib/chart";
-  import { db } from "$lib/chartStore";
   import type { DSVParsedArray } from "d3-dsv";
   import AxisEditor from "../AxisEditor.svelte";
   import { formatData } from "./data";
@@ -12,7 +11,6 @@
 
   interface Props {
     spec: Root;
-    chart: ReturnType<typeof db.chart>;
     chartData: {
       [key: string]: DSVParsedArray<any>;
     };
@@ -21,11 +19,9 @@
     connection: ShareDBConnection;
   }
 
-  let { spec, chart, chartData, index, connection, id }: Props = $props();
+  let { spec, chartData, index, connection, id }: Props = $props();
 
   let lineStore = new LineStore(connection, id);
-
-  let chartSpec = chart.line(index);
 
   let dataSet = $derived(spec.data.sets.find((set) => set.id == lineStore.data.dataSet));
 
@@ -269,7 +265,7 @@
 </p>
 
 <b>X axis</b>
-<AxisEditor conf={chartSpec.xAxis} />
+<AxisEditor conf={lineStore.xAxis()} />
 
 <b>Y axis</b>
-<AxisEditor conf={chartSpec.yAxis} />
+<AxisEditor conf={lineStore.yAxis()} />

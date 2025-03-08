@@ -1,6 +1,7 @@
 import ShareDB from "sharedb/lib/client";
 import type { ShareDBConnection } from "./data.svelte";
 import { type Element, type HBar } from "$lib/chart";
+import { AxisStore } from "./axis.svelte";
 
 export class HBarStore {
   #doc: ShareDB.Doc = $state(new ShareDB.Doc());
@@ -131,6 +132,15 @@ export class HBarStore {
       "d",
       "totalLabels",
       { r: 0, i: value },
+    ]);
+  }
+  axis() {
+    return new AxisStore(this.#connection as ShareDBConnection, this.data.axis, [
+      "chart",
+      "elements",
+      this.#elementIndex,
+      "d",
+      "axis",
     ]);
   }
 }

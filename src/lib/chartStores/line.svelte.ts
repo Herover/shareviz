@@ -13,6 +13,7 @@ import {
 } from "$lib/chart";
 import { LineStyleStore } from "./lineStyle.svelte";
 import { RepeatSettingsStore } from "./repeatSettings.svelte";
+import { AxisStore } from "./axis.svelte";
 
 export class LineStore {
   #doc: ShareDB.Doc = $state(new ShareDB.Doc());
@@ -275,5 +276,25 @@ export class LineStore {
       this.data.repeatSettings.byKey[i],
       ["chart", "elements", this.#elementIndex, "d", "repeatSettings", "byKey", i],
     );
+  }
+  xAxis() {
+    return new AxisStore(this.#connection as ShareDBConnection, this.data.x.axis, [
+      "chart",
+      "elements",
+      this.#elementIndex,
+      "d",
+      "x",
+      "axis",
+    ]);
+  }
+  yAxis() {
+    return new AxisStore(this.#connection as ShareDBConnection, this.data.y.axis, [
+      "chart",
+      "elements",
+      this.#elementIndex,
+      "d",
+      "y",
+      "axis",
+    ]);
   }
 }
