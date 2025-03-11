@@ -307,7 +307,7 @@
       {/if}
     {/each}
     <FloatingLabels
-      lines={lineSpec.style.byKey}
+      lines={lineSpec.style.byKey.filter((s) => values.findIndex((v) => v.key == s.k) != -1)}
       {xScale}
       {yScale}
       {editor}
