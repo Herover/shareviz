@@ -7,7 +7,6 @@ import { WebSocket } from "ws";
 import { createScope } from "./dataScope";
 import {
   type HBar,
-  type Line,
   type Root,
   type Set,
   type Chart,
@@ -318,15 +317,6 @@ export const db = (function createDB() {
             ...hbarScope,
             scale: () => scale(hbarScope, ["scale"], doc),
             colors: () => colors(hbarScope, ["colors"], doc),
-          };
-        },
-        line: (elementIndex: number) => {
-          const hbarScope = createScope<Line>(scoped, ["elements", elementIndex, "d"]);
-
-          return {
-            ...hbarScope,
-            defaultLineStyle: () => lineStyle(hbarScope, ["style", "default"], doc),
-            lineStyle: (i: number) => lineStyle(hbarScope, ["style", "byKey", i], doc),
           };
         },
       };

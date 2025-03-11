@@ -11,6 +11,7 @@
   import { ShareDBConnection } from "$lib/chartStores/data.svelte.js";
   import { ChartStore } from "$lib/chartStores/chart.svelte.js";
   import { env } from "$env/dynamic/public";
+  import { LineStore } from "$lib/chartStores/line.svelte.js";
 
   let { data } = $props();
 
@@ -119,9 +120,10 @@
         const [i, a] = e.v;
         if (a == "style") {
           const [_1, _2, styleI, styleA, styleV] = e.v;
-          if (styleA == "labelRelativePos") {
-            db.chart().line(i).lineStyle(styleI).setLabelXOffset(styleV[0]);
-            db.chart().line(i).lineStyle(styleI).setLabelYOffset(styleV[1]);
+          if (styleA == "labelRelativePos" && chartStore.data?.elements[i]) {
+            const lineStore = new LineStore(store, chartStore.data.elements[i].id);
+            lineStore.lineStyle(styleI).setLabelXOffset(styleV[0]);
+            lineStore.lineStyle(styleI).setLabelYOffset(styleV[1]);
           }
         }
         break;
