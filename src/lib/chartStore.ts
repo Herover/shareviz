@@ -5,15 +5,7 @@ import * as json1 from "ot-json1";
 import ShareDB from "sharedb/lib/client";
 import { WebSocket } from "ws";
 import { createScope } from "./dataScope";
-import {
-  type HBar,
-  type Root,
-  type Set,
-  type Chart,
-  type LineStyleKey,
-  type Scale,
-  type Colors,
-} from "./chart";
+import { type HBar, type Root, type Set, type Chart, type LineStyleKey } from "./chart";
 import { notifications } from "./notificationStore";
 import { editChartInfo } from "./api";
 import { defDoc } from "./initialDoc";
@@ -315,8 +307,6 @@ export const db = (function createDB() {
 
           return {
             ...hbarScope,
-            scale: () => scale(hbarScope, ["scale"], doc),
-            colors: () => colors(hbarScope, ["colors"], doc),
           };
         },
       };
@@ -510,65 +500,5 @@ export const lineStyle = (
     setMissingStyle: (value: string) =>
       doc.submitOp([...styleScope.path.slice(1), "missingStyle", { r: 0, i: value }]),
     delete: () => doc.submitOp([...styleScope.path.slice(1), { r: 0 }]),
-  };
-};
-
-export const scale = (
-  scope: ReturnType<typeof createScope>,
-  key: (string | number)[],
-  doc: any,
-) => {
-  const scaleScope = createScope<Scale>(scope, key);
-
-  return {
-    ...scaleScope,
-    setScaleFrom: (value: number) =>
-      doc.submitOp([...scaleScope.path.slice(1), "dataRange", 0, { r: 0, i: value }]),
-    setScaleTo: (value: number) =>
-      doc.submitOp([...scaleScope.path.slice(1), "dataRange", 1, { r: 0, i: value }]),
-  };
-};
-
-export const colors = (
-  scope: ReturnType<typeof createScope>,
-  key: (string | number)[],
-  doc: any,
-) => {
-  const scaleScope = createScope<Colors>(scope, key);
-
-  return {
-    ...scaleScope,
-    setColorScaleKey: (colorIndex: number, value: string) =>
-      doc.submitOp([...scaleScope.path.slice(1), "byKey", colorIndex, "k", { r: 0, i: value }]),
-    setColorScaleColor: (colorIndex: number, value: string) =>
-      doc.submitOp([...scaleScope.path.slice(1), "byKey", colorIndex, "c", { r: 0, i: value }]),
-    setColorScaleLegend: (colorIndex: number, value: string) =>
-      doc.submitOp([
-        ...scaleScope.path.slice(1),
-        "byKey",
-        colorIndex,
-        "legend",
-        { r: 0, i: value },
-      ]),
-    addColorScaleColor: (colorIndex: number, k = "", c = "", legend = "") =>
-      doc.submitOp([...scaleScope.path.slice(1), "byKey", colorIndex, { i: { c, k, legend } }]),
-    removeColorScaleColor: (colorIndex: number) =>
-      doc.submitOp([...scaleScope.path.slice(1), "byKey", colorIndex, { r: 0 }]),
-    setColorScaleDefaultColor: (value: string) =>
-      doc.submitOp([...scaleScope.path.slice(1), "default", { r: 0, i: value }]),
-    moveColorUp: (colorIndex: number) =>
-      doc.submitOp([
-        ...scaleScope.path.slice(1),
-        "byKey",
-        [colorIndex - 1, { d: 0 }],
-        [colorIndex, { p: 0 }],
-      ]),
-    moveColorDown: (colorIndex: number) =>
-      doc.submitOp([
-        ...scaleScope.path.slice(1),
-        "byKey",
-        [colorIndex, { p: 0 }],
-        [colorIndex + 1, { d: 0 }],
-      ]),
   };
 };

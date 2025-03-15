@@ -1,7 +1,6 @@
 <script lang="ts">
   /** eslint-disable @typescript-eslint/strict-boolean-expressions */
   import { HBarTotalLabelStyle, type Root } from "$lib/chart";
-  import { db } from "$lib/chartStore";
   import { group, orDefault } from "$lib/utils";
   import type { DSVParsedArray } from "d3-dsv";
   import AxisEditor from "../AxisEditor.svelte";
@@ -13,19 +12,19 @@
 
   interface Props {
     spec: Root;
-    chart: ReturnType<typeof db.chart>;
     chartData: {
       [key: string]: DSVParsedArray<any>;
     };
     index: number;
+    id: string;
     connection: ShareDBConnection;
   }
 
-  let { spec, chart, chartData, index, connection }: Props = $props();
+  let { spec, chartData, id, connection }: Props = $props();
 
-  let hbarStore = new HBarStore(connection, index);
+  let hbarStore = new HBarStore(connection, id);
 
-  let chartSpec = chart.hBar(index);
+  let colorScale = $derived(hbarStore.colors());
 
   let dataSet = $derived(spec.data.sets.find((set) => set.id == hbarStore.data.dataSet));
 
@@ -41,9 +40,6 @@
     ...orDefault(dataSet?.rows, []),
   ]);
 
-  let scale = $derived(chartSpec.scale());
-  let colorScale = $state(chartSpec.colors());
-
   const deleteColor = (ci: number) => {
     colorScale.removeColorScaleColor(ci);
   };
@@ -51,7 +47,7 @@
     colorScale.addColorScaleColor(ci);
   };
 
-  let groups = $derived(formatData(hbarStore.data, chartData, [] /* $colorScale.byKey */));
+  let groups = $derived(formatData(hbarStore.data, chartData, [] /* colorScale.data.byKey */));
   // FIXME: Having this as a $effect here means changes to data wont get detected, and it might
   // cause issues when there's multiple clients watching at the same time.
   $effect(() => {
@@ -59,16 +55,16 @@
     if (
       typeof computed == "number" &&
       !Number.isNaN(computed) &&
-      computed != $scale.dataRange?.[1]
+      computed != hbarStore.data.scale.dataRange?.[1]
     ) {
-      chartSpec.scale().setScaleTo(computed);
+      hbarStore.setScaleTo(computed);
     }
   });
 
   let unusedGroups = $derived(
     orDefault(groups[0]?.d[0]?.value, [])
       .map((d) => d.label)
-      .filter((k) => $colorScale.byKey.findIndex((c) => c.k == k) == -1),
+      .filter((k) => colorScale.data.byKey.findIndex((c) => c.k == k) == -1),
   );
   let automateColorKeys = $derived(() => {
     if (
@@ -82,8 +78,8 @@
       const dataSet = chartData[hbarStore.data.dataSet];
       const groups = group(key, dataSet, (k) => k);
       groups.forEach((k) => {
-        if (!$colorScale.byKey.find((d) => d.k == k)) {
-          const n = $colorScale.byKey.length;
+        if (!colorScale.data.byKey.find((d) => d.k == k)) {
+          const n = colorScale.data.byKey.length;
           const keyIndex = typeof n != "undefined" ? n : 0;
           colorScale.addColorScaleColor(
             keyIndex,
@@ -112,7 +108,7 @@
       const dataSet = chartData[hbarStore.data.dataSet];
       const groups = group(key, dataSet, (k) => k);
       let removed = 0;
-      $colorScale.byKey.forEach((c, keyIndex) => {
+      colorScale.data.byKey.forEach((c, keyIndex) => {
         if (typeof groups.find((k) => c.k == k) == "undefined") {
           colorScale.removeColorScaleColor(keyIndex - removed);
           removed++;
@@ -218,28 +214,6 @@
       </select>
     </label>
   </p>
-  <p>
-    <label
-      >Scale from:
-      <input
-        value={$scale.dataRange?.[0] ?? 0}
-        onkeyup={(e) => scale.setScaleFrom(Number.parseInt(e.currentTarget.value))}
-        onchange={(e) => scale.setScaleFrom(Number.parseInt(e.currentTarget.value))}
-        type="number"
-        style="width: 90px"
-      />
-    </label>
-    <label>
-      to
-      <input
-        value={$scale.dataRange?.[1] ?? 1}
-        onkeyup={(e) => scale.setScaleTo(Number.parseInt(e.currentTarget.value))}
-        onchange={(e) => scale.setScaleTo(Number.parseInt(e.currentTarget.value))}
-        type="number"
-        style="width: 90px"
-      />
-    </label>
-  </p>
   <p>Colors</p>
   {#if colorScale}
     <table class="color-control">
@@ -252,21 +226,21 @@
           <td><input value={"default"} disabled /> </td>
           <td>
             <input
-              value={$colorScale.default}
+              value={colorScale.data.default}
               onchange={(e) => colorScale.setColorScaleDefaultColor(e.currentTarget.value)}
               onkeyup={(e) => colorScale.setColorScaleDefaultColor(e.currentTarget.value)}
             />
           </td>
           <td>
             <ColorPicker
-              color={$colorScale.default}
+              color={colorScale.data.default}
               onchange={(s) => colorScale.setColorScaleDefaultColor(s)}
             />
           </td>
           <td> </td>
           <td> </td>
         </tr>
-        {#each $colorScale.byKey as color, i}
+        {#each colorScale.data.byKey as color, i}
           <tr>
             <td style="width:38px;">
               <button
@@ -275,7 +249,7 @@
                 class="color-control-arrow">&#x25B2;</button
               >
               <button
-                disabled={i == $colorScale.byKey.length - 1}
+                disabled={i == colorScale.data.byKey.length - 1}
                 onclick={() => moveColorKeyDown(i)}
                 class="color-control-arrow">&#x25BC;</button
               >
@@ -304,7 +278,7 @@
             <td>
               <ColorPicker
                 color={color.c}
-                chartColors={$colorScale.byKey.map((c) => c.c)}
+                chartColors={colorScale.data.byKey.map((c) => c.c)}
                 onchange={(s) => colorScale.setColorScaleColor(i, s)}
               />
             </td>
@@ -322,7 +296,7 @@
         {/each}
       </tbody>
     </table>
-    <button onclick={() => addColor($colorScale.byKey.length)}>Add new</button>
+    <button onclick={() => addColor(colorScale.data.byKey.length)}>Add new</button>
     <button onclick={automateColorKeys}>Add missing data keys</button>
     <button onclick={removeExtraColorKeys}>Remove extra data keys</button>
   {/if}

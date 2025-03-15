@@ -60,13 +60,6 @@
           </div>
         {/snippet}
       </EditorCollapsible>
-
-      {#snippet failed(error, reset)}
-        <button onclick={reset}
-          >A error happened in the {element.type} chart editor, click to reset</button
-        >
-        <pre>{error ? error : ""}</pre>
-      {/snippet}
     </svelte:boundary>
   {/each}
 
