@@ -63,6 +63,7 @@
       <span
         bind:innerText={chartSpec.chart.title}
         contenteditable="true"
+        spellcheck="false"
         onkeyup={(e) => editText("title", e)}
         role="textbox"
         tabindex="0"
@@ -80,6 +81,7 @@
       <span
         bind:innerText={chartSpec.chart.subTitle}
         contenteditable="true"
+        spellcheck="false"
         onkeyup={(e) => editText("subTitle", e)}
         role="textbox"
         tabindex="0"
@@ -119,6 +121,7 @@
           href={editor ? null : chartSpec.chart.sourceTextLeftLink}
           bind:innerText={chartSpec.chart.sourceTextLeft}
           contenteditable="true"
+          spellcheck="false"
           onkeyup={(e) => editText("sourceLeft", e)}
           style="color:#888888"
         >
@@ -139,6 +142,7 @@
           href={editor ? null : chartSpec.chart.sourceTextRightLink}
           bind:innerText={chartSpec.chart.sourceTextRight}
           contenteditable="true"
+          spellcheck="false"
           onkeyup={(e) => editText("sourceRight", e)}
           style="color:#888888"
         >
