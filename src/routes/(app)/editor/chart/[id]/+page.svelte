@@ -216,7 +216,7 @@
           {:else if visibleSection == "layout"}
             <StyleEditor connection={store} />
           {:else if visibleSection == "charts"}
-            <ChartEditor spec={chartSpec} chartScope={db.chart()} {chartData} connection={store} />
+            <ChartEditor spec={chartSpec} {chartData} connection={store} />
           {:else if visibleSection == "publish"}
             <a href="/view/chart/{data.id}">Embed link</a>
             <input value={env.PUBLIC_VIEWER_ORIGIN + "/view/chart/" + data.id} />
