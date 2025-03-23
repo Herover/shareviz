@@ -136,16 +136,15 @@
   });
 
   const chartToPNG = () => {
-    viewerFrame?.contentWindow?.window.postMessage(
-      {
-        type: "CHART_SCREENSHOT",
-        data: {
-          format: "png",
-          zoom: viewScale,
-        },
-      } as EditorChartScreenshot,
-      env.PUBLIC_VIEWER_ORIGIN,
-    );
+    const data: EditorChartScreenshot = {
+      type: "CHART_SCREENSHOT",
+      data: {
+        format: "png",
+        zoom: viewScale,
+        name: $db?.chartInfo?.name,
+      },
+    };
+    viewerFrame?.contentWindow?.window.postMessage(data, env.PUBLIC_VIEWER_ORIGIN);
   };
 </script>
 

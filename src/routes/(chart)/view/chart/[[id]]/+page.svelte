@@ -38,7 +38,8 @@
         });
         const link = document.createElement("a");
         link.href = canvas.toDataURL("image/png");
-        link.download = (chartSpec?.chart.title || data.id || "chart") + ".png";
+        link.download =
+          (event.data.data.name || chartSpec?.chart.title || data.id || "chart") + ".png";
         link.click();
       } catch (err) {
         console.error("Error: " + err);

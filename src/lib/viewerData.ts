@@ -11,6 +11,7 @@ export interface EditorChartScreenshot {
   data: {
     format: "png";
     zoom: number;
+    name?: string;
   };
 }
 export type EditorMessage = EditorChartData | EditorChartScreenshot;
