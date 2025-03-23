@@ -16,6 +16,7 @@
 
   let height = $state(0);
   let width = $state(0);
+  let zoomLevel = $state(1);
   let mainView: HTMLDivElement | undefined = $state();
 
   const onMessage = async (event: MessageEvent<EditorMessage>) => {
@@ -31,7 +32,10 @@
         if (typeof mainView == "undefined") {
           return;
         }
-        const canvas = await html2canvas(mainView);
+        const view = mainView;
+        const canvas = await html2canvas(view, {
+          scale: event.data.data.zoom / 100,
+        });
         const link = document.createElement("a");
         link.href = canvas.toDataURL("image/png");
         link.download = (chartSpec?.chart.title || data.id || "chart") + ".png";
@@ -80,7 +84,13 @@
 </script>
 
 {#if chartSpec && chartData}
-  <div class="main" bind:clientWidth={width} bind:clientHeight={height} bind:this={mainView}>
+  <div
+    class="main"
+    bind:clientWidth={width}
+    bind:clientHeight={height}
+    bind:this={mainView}
+    style:scale={zoomLevel}
+  >
     <ChartViewer {chartSpec} data={chartData} {width} editor={data.editor} onedit={onEdit} />
   </div>
 {/if}

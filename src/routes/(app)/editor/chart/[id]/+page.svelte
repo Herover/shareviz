@@ -141,6 +141,7 @@
         type: "CHART_SCREENSHOT",
         data: {
           format: "png",
+          zoom: viewScale,
         },
       } as EditorChartScreenshot,
       env.PUBLIC_VIEWER_ORIGIN,
