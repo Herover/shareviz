@@ -19,6 +19,7 @@
 
   let viewScale = $state(100);
   let height = $state(100);
+  let imageScale = $state(2);
 
   type section = "data" | "layout" | "charts" | "publish";
   let visibleSection: section = $state("data");
@@ -140,7 +141,7 @@
       type: "CHART_SCREENSHOT",
       data: {
         format: "png",
-        zoom: viewScale,
+        zoom: imageScale,
         name: $db?.chartInfo?.name,
       },
     };
@@ -209,6 +210,7 @@
                   value={$db?.chartInfo?.name}
                   onchange={(e) => db.updateInfo({ name: e.currentTarget.value })}
                   disabled={!canEdit || $db.chartInfo == null}
+                  type="text"
                 />
               </div>
             </div>
@@ -218,8 +220,42 @@
           {:else if visibleSection == "charts"}
             <ChartEditor spec={chartSpec} {chartData} connection={store} />
           {:else if visibleSection == "publish"}
-            <a href="/view/chart/{data.id}">Embed link</a>
-            <input value={env.PUBLIC_VIEWER_ORIGIN + "/view/chart/" + data.id} />
+            <h3 class="editor-sub-section">Embed</h3>
+            <p class="editor-sub-section-description">
+              For displaying responsive/interactable chart.
+            </p>
+            <div class="box">
+              <div class="w-025 editor-explain-box">
+                <span class="editor-column-label"
+                  ><a href="/view/chart/{data.id}">Embed link</a></span
+                >
+              </div>
+              <div class="w-075">
+                <input value={env.PUBLIC_VIEWER_ORIGIN + "/view/chart/" + data.id} type="text" />
+              </div>
+            </div>
+            <h3 class="editor-sub-section">Export image</h3>
+            <div class="box">
+              <div class="w-025 editor-explain-box">
+                <span class="editor-column-label">Scale</span>
+              </div>
+              <div class="w-075">
+                <label>
+                  <input type="radio" name="image-scale" value={1} bind:group={imageScale} />
+                  {1}x
+                </label>
+                <br />
+                <label>
+                  <input type="radio" name="image-scale" value={2} bind:group={imageScale} />
+                  {2}x
+                </label>
+                <br />
+                <label>
+                  <input type="radio" name="image-scale" value={4} bind:group={imageScale} />
+                  {4}x
+                </label>
+              </div>
+            </div>
             <button onclick={() => chartToPNG()}>Generate PNG</button>
           {/if}
         {:else}
@@ -376,7 +412,7 @@
   .part-item-selected {
     border-bottom: 1px solid var(--accent-bg-color);
   }
-  input {
+  input[type="text"] {
     width: 100%;
   }
 </style>

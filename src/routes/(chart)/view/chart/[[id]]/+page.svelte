@@ -34,7 +34,7 @@
         }
         const view = mainView;
         const canvas = await html2canvas(view, {
-          scale: event.data.data.zoom / 100,
+          scale: event.data.data.zoom,
         });
         const link = document.createElement("a");
         link.href = canvas.toDataURL("image/png");
