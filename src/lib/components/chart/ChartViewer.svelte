@@ -19,13 +19,12 @@
     onedit = () => {},
   }: Props = $props();
 
-  const editText = (
-    target: string,
-    e: KeyboardEvent & { currentTarget: EventTarget & HTMLElement },
-  ) => {
+  const editText = (target: string, e: Event & { currentTarget: EventTarget & HTMLElement }) => {
+    const k = target,
+      v = e.currentTarget.innerText;
     onedit({
-      k: target,
-      v: e.currentTarget.innerText,
+      k,
+      v,
     });
   };
 
@@ -64,7 +63,7 @@
         bind:innerText={chartSpec.chart.title}
         contenteditable="true"
         spellcheck="false"
-        onkeyup={(e) => editText("title", e)}
+        onblur={(e) => editText("title", e)}
         role="textbox"
         tabindex="0"
       ></span>
@@ -82,7 +81,7 @@
         bind:innerText={chartSpec.chart.subTitle}
         contenteditable="true"
         spellcheck="false"
-        onkeyup={(e) => editText("subTitle", e)}
+        onblur={(e) => editText("subTitle", e)}
         role="textbox"
         tabindex="0"
       ></span>
@@ -122,7 +121,7 @@
           bind:innerText={chartSpec.chart.sourceTextLeft}
           contenteditable="true"
           spellcheck="false"
-          onkeyup={(e) => editText("sourceLeft", e)}
+          onblur={(e) => editText("sourceLeft", e)}
           style="color:#888888"
         >
         </a>
@@ -130,7 +129,7 @@
         <a
           href={editor ? null : chartSpec.chart.sourceTextLeftLink}
           style="color:#888888"
-          onkeyup={(e) => editText("sourceLeft", e)}>{chartSpec.chart.sourceTextLeft}</a
+          onblur={(e) => editText("sourceLeft", e)}>{chartSpec.chart.sourceTextLeft}</a
         >
       {/if}
     </p>
@@ -143,7 +142,7 @@
           bind:innerText={chartSpec.chart.sourceTextRight}
           contenteditable="true"
           spellcheck="false"
-          onkeyup={(e) => editText("sourceRight", e)}
+          onblur={(e) => editText("sourceRight", e)}
           style="color:#888888"
         >
         </a>
@@ -151,7 +150,7 @@
         <a
           href={editor ? null : chartSpec.chart.sourceTextRightLink}
           style="color:#888888"
-          onkeyup={(e) => editText("sourceRight", e)}>{chartSpec.chart.sourceTextRight}</a
+          onblur={(e) => editText("sourceRight", e)}>{chartSpec.chart.sourceTextRight}</a
         >
       {/if}
     </p>
