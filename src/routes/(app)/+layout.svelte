@@ -91,8 +91,8 @@
     --spacing: 1.5em;
   }
   :global(body.dark-mode) {
-    --main-bg-color: #040406;
-    --accent-bg-color: #201e29;
+    --main-bg-color: #19191d;
+    --accent-bg-color: #333337;
     --hover-bg-color: #1f3447;
     --detail-color: #b7b7b7;
     --text-primary: #c2c2c2;

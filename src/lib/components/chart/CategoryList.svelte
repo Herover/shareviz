@@ -179,7 +179,7 @@
     cursor: pointer;
   }
   .line-selected {
-    background-color: #dddddd;
+    background-color: var(--accent-bg-color);
   }
   .line-unselected:hover {
     background-color: var(--hover-bg-color);
