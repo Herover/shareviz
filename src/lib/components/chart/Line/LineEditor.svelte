@@ -44,30 +44,30 @@
 
   let chartColors = $derived(lineStore.data.style.byKey.map((s) => s.color));
 
-  // $effect(() => {
-  //   if (typeof lineStore.data == "undefined") {
-  //     return;
-  //   }
-  //   const data = lineStore.data;
-  //   if (typeof lineStore.data?.repeatSettings == "undefined") {
-  //     lineStore.updateRepeatSettings(
-  //       values.map((e) => e.k),
-  //       undefined,
-  //     );
-  //   } else {
-  //     values
-  //       .map((e) => e.k)
-  //       .filter((k) => data.repeatSettings.byKey.findIndex((e) => e.k == k) == -1)
-  //       .forEach((k) => lineStore.addRepeatSetting(data.repeatSettings.byKey.length, k));
-  //     // FIXME
-  //     // chartSpec.removeRepeatSettings(
-  //     //   lineStore.data.repeatSettings.byKey
-  //     //     .map((e, i) => ({ i, e }))
-  //     //     .filter((e) => values.findIndex((v) => v.k == e.e.k) == -1)
-  //     //     .map((e) => e.i),
-  //     // );
-  //   }
-  // });
+  const updateRepeatSettings = () => {
+    if (typeof lineStore.data == "undefined") {
+      return;
+    }
+    const data = lineStore.data;
+    if (typeof lineStore.data?.repeatSettings == "undefined") {
+      lineStore.updateRepeatSettings(
+        values.map((e) => e.k),
+        undefined,
+      );
+    } else {
+      values
+        .map((e) => e.k)
+        .filter((k) => data.repeatSettings.byKey.findIndex((e) => e.k == k) == -1)
+        .forEach((k) => lineStore.addRepeatSetting(data.repeatSettings.byKey.length, k));
+      // FIXME
+      // chartSpec.removeRepeatSettings(
+      //   lineStore.data.repeatSettings.byKey
+      //     .map((e, i) => ({ i, e }))
+      //     .filter((e) => values.findIndex((v) => v.k == e.e.k) == -1)
+      //     .map((e) => e.i),
+      // );
+    }
+  };
 
   let selectedIndexes: number[] = $state([]);
   const setRepeatedLabel = (value: string) => {
@@ -164,7 +164,10 @@
       Repeat for every:
       <select
         value={lineStore.data.repeat}
-        onchange={(e) => lineStore.setRepeatKey(e.currentTarget.value)}
+        onchange={(e) => {
+          lineStore.setRepeatKey(e.currentTarget.value);
+          updateRepeatSettings();
+        }}
       >
         <option>{""}</option>
         {#each columns as row}

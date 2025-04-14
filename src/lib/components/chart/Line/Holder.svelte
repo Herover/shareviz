@@ -23,23 +23,25 @@
   let chartDebouncer = createDebouncer(250);
   $effect(() =>
     chartDebouncer([componentSpec, data], () => {
-      charts = formatData(componentSpec, data)
-        .filter((c) => c.settings?.ownChart || c.settings?.allCharts)
-        .sort(
-          (a, b) =>
-            negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == a.k)) -
-            negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == b.k)),
-        );
-      charts.forEach((chart) => {
-        let d2: typeof chart.d = [];
-        charts.forEach((chart2) => {
-          if (chart.k != chart2.k && chart2.settings?.allCharts && chart.settings?.ownChart) {
-            d2 = d2.concat(chart2.d.map((dd) => ({ ...dd, isContext: true })));
-          }
+      charts = formatData(componentSpec, data);
+      if (componentSpec.repeat) {
+        charts.forEach((chart) => {
+          let d2: typeof chart.d = [];
+          charts.forEach((chart2) => {
+            if (chart.k != chart2.k && chart2.settings?.allCharts && chart.settings?.ownChart) {
+              d2 = d2.concat(chart2.d.map((dd) => ({ ...dd, isContext: true })));
+            }
+          });
+          chart.d = d2.concat(chart.d);
         });
-        chart.d = d2.concat(chart.d);
-      });
-      charts = charts.filter((chart) => chart.settings?.ownChart);
+        charts = charts
+          .filter((c) => c.settings?.ownChart || c.settings?.allCharts)
+          .sort(
+            (a, b) =>
+              negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == a.k)) -
+              negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == b.k)),
+          );
+      }
     }),
   );
 

@@ -5,7 +5,7 @@
   import type { LineStyleStore } from "$lib/chartStores/lineStyle.svelte";
 
   interface Props {
-    style: LineStyleStore;
+    style?: LineStyleStore;
     key?: string | undefined;
     index?: number;
     chartColors?: string[];

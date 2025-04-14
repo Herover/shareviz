@@ -325,7 +325,7 @@
     onSelect={(d) => toggleSelect(null, d.selected, d.replace, null)}
   />
   {#each filteredValues as line, i}
-    {#if line && typeof line.style != "undefined"}
+    {#if line}
       <LinesEditorLine
         style={line.style}
         key={line.d.key}
