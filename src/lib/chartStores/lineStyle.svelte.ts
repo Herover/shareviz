@@ -7,12 +7,19 @@ export class LineStyleStore {
   // #connection?: ShareDBConnection;
   #style: LineStyleKey;
   #path: (string | number)[];
+  #index?: number;
 
-  constructor(connection: ShareDBConnection, style: LineStyleKey, path: (string | number)[]) {
+  constructor(
+    connection: ShareDBConnection,
+    style: LineStyleKey,
+    path: (string | number)[],
+    index?: number,
+  ) {
     this.#doc = connection.doc;
     // this.#connection = connection;
     this.#style = style;
     this.#path = path;
+    this.#index = index;
   }
 
   get data(): LineStyleKey {
@@ -63,5 +70,25 @@ export class LineStyleStore {
   }
   delete() {
     this.#doc.submitOp([...this.#path, { r: 0 }]);
+  }
+  moveUp() {
+    if (typeof this.#index == "undefined") {
+      throw new Error("Can't move default style");
+    }
+    this.#doc.submitOp([
+      ...this.#path.slice(0, -1),
+      [this.#index - 1, { d: 0 }],
+      [this.#index, { p: 0 }],
+    ]);
+  }
+  moveDown() {
+    if (typeof this.#index == "undefined") {
+      throw new Error("Can't move default style");
+    }
+    this.#doc.submitOp([
+      ...this.#path.slice(0, -1),
+      [this.#index, { p: 0 }],
+      [this.#index + 1, { d: 0 }],
+    ]);
   }
 }

@@ -60,6 +60,7 @@ export class LineStore {
       this.#connection as ShareDBConnection,
       this.#data.style.byKey[index],
       ["chart", "elements", this.#elementIndex as number, "d", "style", "byKey", index],
+      index,
     );
   }
 
@@ -137,6 +138,16 @@ export class LineStore {
     ]);
   }
   moveRepeatUp(i: number) {
+    console.log([
+      "chart",
+      "elements",
+      this.#elementIndex,
+      "d",
+      "repeatSettings",
+      "byKey",
+      [i - 1, { d: 0 }],
+      [i, { p: 0 }],
+    ]);
     this.#doc.submitOp([
       "chart",
       "elements",

@@ -119,7 +119,7 @@
     {chartColors}
     onSelect={(d) => toggleSelect(null, d.selected, d.replace, null)}
   /> -->
-  {#each filteredValues as line, i}
+  {#each filteredValues as line, i (line.k)}
     {#if line}
       <div
         onclick={(e) => toggleSelect(e, null, line.k, i)}

@@ -1,11 +1,11 @@
 <script lang="ts">
   import { LabelLocation, LabelStyleLine, LineMissingStyle, LineSymbol } from "$lib/chart";
   import { negativeOneToInf } from "$lib/utils";
-  import { onDestroy, onMount } from "svelte";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import type { formatData } from "./data";
-  import LinesEditorLine from "./LinesEditorLine.svelte";
   import type { LineStore } from "$lib/chartStores/line.svelte";
+  import CategoryList from "../CategoryList.svelte";
+  import equal from "fast-deep-equal";
 
   interface Props {
     chartColors: string[];
@@ -14,7 +14,7 @@
     lineStore: LineStore;
   }
 
-  let { chartColors, values, index, lineStore }: Props = $props();
+  let { chartColors, values, lineStore }: Props = $props();
 
   let selected: { [key: string]: boolean } = $state({});
   let defaultSelected = $state(false);
@@ -90,27 +90,6 @@
       ),
   );
 
-  let rangedSelect = $state(false);
-  let lastSelected: number | null = $state(-1);
-  const keyDown = (e: KeyboardEvent) => {
-    if (e.key == "Shift") {
-      rangedSelect = true;
-    }
-  };
-  const keyUp = (e: KeyboardEvent) => {
-    if (e.key == "Shift") {
-      rangedSelect = false;
-    }
-  };
-  onMount(() => {
-    window.addEventListener("keydown", keyDown);
-    window.addEventListener("keyup", keyUp);
-  });
-  onDestroy(() => {
-    window.removeEventListener("keydown", keyDown);
-    window.removeEventListener("keyup", keyUp);
-  });
-
   type Value = (typeof values)[number];
   let flatValues = $derived(
     values
@@ -123,10 +102,8 @@
       )
       .filter((e, i, arr) => arr.findIndex((e2) => e2.key == e.key) >= i),
   );
-  let searchString = $state("");
   let filteredValues = $derived(
     flatValues
-      .filter((e) => e.key.toLocaleLowerCase().includes(searchString.toLocaleLowerCase()))
       .sort(
         (a, b) =>
           negativeOneToInf(lineStore.data.style.byKey.findIndex((e) => e.k == a.key)) -
@@ -135,52 +112,12 @@
       .map((d) => {
         const i = lineStore.data.style.byKey.findIndex((e) => e.k == d.key);
         return {
+          k: d.key,
           d,
           style: i == -1 ? undefined : lineStore.lineStyle(i),
           // style: lineStore.data.style.byKey.find((e) => e.k == d.key),
         };
       }),
-  );
-
-  let toggleSelect = $derived(
-    (key: string | null, select: boolean, replace: boolean, lineIndex: number | null) => {
-      if (rangedSelect) {
-        if (lineIndex == null) {
-          defaultSelected = true;
-          lineIndex = 0;
-        }
-        if (lastSelected == null) {
-          defaultSelected = true;
-          lastSelected = 0;
-        }
-        for (
-          let i = Math.min(lineIndex, lastSelected);
-          i <= Math.max(lineIndex, lastSelected);
-          i++
-        ) {
-          if (i < 0 || filteredValues.length <= i) continue;
-          const element = filteredValues[i];
-          selected[element.d.key] = true;
-        }
-        document.getSelection()?.removeAllRanges();
-      } else if (replace) {
-        if (key == null) {
-          defaultSelected = true;
-        } else {
-          if (typeof selected[key] == "undefined") selected[key] = true;
-          defaultSelected = false;
-        }
-        Object.keys(selected).forEach((k) => (selected[k] = k == key));
-      } else {
-        if (key == null) {
-          defaultSelected = !defaultSelected;
-        } else {
-          selected[key] = !selected[key];
-        }
-      }
-
-      lastSelected = lineIndex;
-    },
   );
 
   let setLabelToKey = $derived(() => {
@@ -313,30 +250,21 @@
   });
 </script>
 
-<div class="line-list">
-  <label>
-    Search
-    <input bind:value={searchString} class="line-search" />
-  </label>
-  <LinesEditorLine
-    style={lineStore.defaultLineStyle()}
-    selected={defaultSelected}
-    {chartColors}
-    onSelect={(d) => toggleSelect(null, d.selected, d.replace, null)}
-  />
-  {#each filteredValues as line, i}
-    {#if line}
-      <LinesEditorLine
-        style={line.style}
-        key={line.d.key}
-        selected={selected[line.d.key]}
-        {chartColors}
-        {index}
-        onSelect={(d) => toggleSelect(line.d.key, d.selected, d.replace, i)}
-      />
-    {/if}
-  {/each}
-</div>
+{#snippet categoryTitle(d: (typeof values)[0])}
+  {d.k}
+{/snippet}
+<CategoryList
+  values={(filteredValues || []).map((e) => ({ k: e.k, d: e }))}
+  onSelectedChanged={(newSelected, _indexes) => {
+    if (!equal(selected, newSelected)) {
+      selected = newSelected;
+    }
+  }}
+  searchFn={(str, d) => d.k.toLocaleLowerCase().includes(str.toLocaleLowerCase())}
+  title={categoryTitle}
+  moveUp={(_k, i) => lineStore.lineStyle(i).moveUp()}
+  moveDown={(_k, i) => lineStore.lineStyle(i).moveDown()}
+/>
 
 <div class="box">
   <div class="w-025 editor-explain-box p-top-1">
@@ -478,16 +406,3 @@
     </select>
   </div>
 </div>
-
-<style>
-  .line-list {
-    width: 100%;
-    height: 300px;
-    overflow-y: scroll;
-    border: 1px solid black;
-    box-sizing: border-box;
-  }
-  .line-search {
-    width: 100%;
-  }
-</style>
