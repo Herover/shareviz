@@ -252,8 +252,8 @@
     top: 100%;
     left: calc(-50px + 50% - 16px);
     width: 120px;
-    border: 2px solid black;
-    background-color: #ffffff;
+    border: 2px solid var(--text-secondary);
+    background-color: var(--main-bg-color);
     margin: 8px;
     padding: 8px;
     z-index: 10;
