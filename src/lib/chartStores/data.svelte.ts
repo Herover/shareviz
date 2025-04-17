@@ -122,7 +122,7 @@ export class ShareDBConnection {
 
     const onData = (e: any) => {
       if (e && typeof e.message == "string") notifications.addError(e.message);
-      console.log("got doc", doc.data);
+      // console.log("got doc", doc.data);
       this.#data = doc.data;
     };
 

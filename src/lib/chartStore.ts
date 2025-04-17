@@ -205,7 +205,7 @@ export const db = (function createDB() {
 
       const onData = (e?: Error) => {
         if (e && typeof e.message == "string") notifications.addError(e.message);
-        console.log("doc", doc, doc.data);
+        // console.log("doc", doc, doc.data);
         update((d) => ({
           doc: doc.data,
           missing: typeof doc.data === "undefined",

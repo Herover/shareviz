@@ -52,7 +52,6 @@ export class AxisGridStore {
   #path: (string | number)[];
 
   constructor(connection: ShareDBConnection, d: AxisGrid, path: any[]) {
-    console.log(d);
     this.#doc = connection.doc;
     // this.#connection = connection;
     this.#d = d;
