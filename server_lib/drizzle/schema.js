@@ -2,7 +2,7 @@ import { integer, sqliteTable, text, primaryKey, unique } from "drizzle-orm/sqli
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 
-const sqlite = new Database("auth.sqlite");
+const sqlite = new Database("data/db.sqlite");
 export const db = drizzle({ client: sqlite, logger: true });
 
 // Auth.js types
