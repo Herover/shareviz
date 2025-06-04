@@ -32,7 +32,7 @@
         <div class="nav-item">
           {#if page.data.team}
             <a href="/org/{page.params.organizationId}/team/{page.params.teamId}/charts">Team</a>
-          {:else if page.data.teams}
+          {:else if page.data.teams && page.data.teams.length != 0}
             <a href="/org/{page.params.organizationId}/team/{page.data.teams[0].teams.id}/charts"
               >Team</a
             >
