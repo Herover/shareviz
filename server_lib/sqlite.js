@@ -454,7 +454,7 @@ export const db = {
   },
 };
 
-const init = async () => {
+export const init = async () => {
   // If there's 0 organizations, create a default one with a invite, assume first user is a site
   // administrator.
   const orgs = await drizzledb.$count(organizations);
@@ -465,5 +465,3 @@ const init = async () => {
     );
   }
 };
-
-init();
