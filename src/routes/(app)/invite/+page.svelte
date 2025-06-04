@@ -16,7 +16,7 @@
       const data = await r.json();
       message = data.message;
     } else {
-      goto("/editor/chart");
+      goto("/org");
     }
   });
 </script>
