@@ -26,7 +26,7 @@
 
 <header>
   <div class="content">
-    <div class="icon">ShareViz</div>
+    <div class="icon">DataTortilla</div>
     <nav>
       {#if page.params.organizationId}
         <div class="nav-item">
