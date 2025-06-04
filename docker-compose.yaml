@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/app/data
+    environment:
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN}
+      ORIGIN: ${ORIGIN}
+      AUTH_TRUST_HOST: ${AUTH_TRUST_HOST}
+      AUTH_SECRET: ${AUTH_SECRET}
+      AUTH_GITHUB_ID: ${AUTH_GITHUB_ID}
+      AUTH_GITHUB_SECRET: ${AUTH_GITHUB_SECRET}
+    ports:
+      - 127.0.0.1:5173:5173
