@@ -12,7 +12,7 @@ There's currently no hosted version, but there might be in the future.
 
 # Running the code
 
-Required node v22.
+Requires node v24.
 
 These environvent variables should be defined in both dev and prod settings:
 
