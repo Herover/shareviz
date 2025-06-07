@@ -286,6 +286,7 @@ export const db = (function createDB() {
         editChartInfo(id, info);
       } catch (e) {
         notifications.addError((e as Error).message);
+        console.error(e);
       }
 
       update((d) => ({

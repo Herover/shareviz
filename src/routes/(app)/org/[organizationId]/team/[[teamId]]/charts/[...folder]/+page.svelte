@@ -96,6 +96,7 @@
       goto("/editor/chart/" + docId);
     } catch (err) {
       notifications.addError((err as Error).message);
+      console.error(err);
     }
   };
 
