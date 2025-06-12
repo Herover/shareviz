@@ -18,10 +18,14 @@ export class ShareDBConnection {
   #connection?: ShareDB.Connection;
   #socket?: ReconnectingWebSocket;
 
+  #events: EventTarget;
+
   missing = $derived(typeof this.#doc?.data == "undefined");
   mode: "synced" | "local" | "invalid" = "invalid";
 
-  constructor() {}
+  constructor() {
+    this.#events = new EventTarget();
+  }
 
   connect() {
     const socket = new ReconnectingWebSocket(`//${window.location.host}/sharedb`, ["ws"], {
@@ -124,6 +128,8 @@ export class ShareDBConnection {
       if (e && typeof e.message == "string") notifications.addError(e.message);
       // console.log("got doc", doc.data);
       this.#data = doc.data;
+
+      this.#events.dispatchEvent(new CustomEvent("data", { detail: { doc: doc.data } }));
     };
 
     // Get initial value of document and subscribe to changes
@@ -176,5 +182,13 @@ export class ShareDBConnection {
 
   get doc(): ShareDB.Doc {
     return this.#doc;
+  }
+
+  on(type: "data", cb: (e: CustomEvent) => void) {
+    return this.#events.addEventListener(type, (e) => cb(e as CustomEvent));
+  }
+
+  off(type: "data", cb: (e: CustomEvent) => void) {
+    return this.#events.removeEventListener(type, (e) => cb(e as CustomEvent));
   }
 }

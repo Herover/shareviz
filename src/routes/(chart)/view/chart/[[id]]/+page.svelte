@@ -2,11 +2,16 @@
   import { localPrefix } from "$lib/chartStore";
   import type { Root } from "$lib/chart.d.ts";
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { computeData } from "$lib/data.js";
 
   import { env } from "$env/dynamic/public";
-  import type { EditorMessage, ViewerChartEdit, ViewerChartUpdated } from "$lib/viewerData.js";
+  import type {
+    EditorMessage,
+    ViewerChartEdit,
+    ViewerChartUpdated,
+    ViewerReady,
+  } from "$lib/viewerData.js";
   import html2canvas from "html2canvas";
 
   let { data } = $props();
@@ -73,6 +78,15 @@
       env.PUBLIC_ORIGIN,
     );
   };
+
+  onMount(() => {
+    window.parent.postMessage(
+      {
+        type: "READY",
+      } as ViewerReady,
+      env.PUBLIC_ORIGIN,
+    );
+  });
 
   $effect(() => {
     if (data.id && !data.id.startsWith(localPrefix) && !data.editor) {

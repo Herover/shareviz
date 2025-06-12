@@ -34,7 +34,7 @@ AUTH_GITHUB_SECRET=Z
 
 - Run the dev server `npm run dev`, or `npm run dev -- --host` if you want to test with a external device.
 
-If you run a editor like VSCode and get errors related to a node/better-sqlite3 version mismatch, then manualle set the "Svelte  Language-server: Runtime" setting to the path of your node executeable.
+If you run a editor like VSCode and get errors related to a node/better-sqlite3 version mismatch, then manually set the "Svelte Language-server: Runtime" setting to the path of your node executeable.
 
 ## Production
 

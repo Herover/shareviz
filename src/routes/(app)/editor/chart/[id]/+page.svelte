@@ -29,40 +29,30 @@
   let store = new ShareDBConnection();
   let chartStore: ChartStore;
 
-  const updateViewer = () => {
+  const updateViewer = (data?: Root) => {
     viewerFrame?.contentWindow?.window.postMessage(
       {
         type: "CHART_DATA",
         data: {
-          chart: $db.doc,
+          chart: data || $db.doc,
         },
       } as EditorChartData,
       env.PUBLIC_VIEWER_ORIGIN,
     );
   };
 
+  const onData = (e: CustomEvent) => {
+    updateViewer(JSON.parse(JSON.stringify(e.detail.doc)));
+  };
+  store.on("data", onData);
+
   $effect(() => {
     if (viewerFrame?.contentWindow != null) {
       // Make sure to send chart data the moment the viewer has loaded
-      viewerFrame?.addEventListener("load", updateViewer);
+      viewerFrame?.addEventListener("load", () => updateViewer());
 
       // Viewer can sends events regarding chart height and editor events
       window.addEventListener("message", onMessage);
-    }
-  });
-
-  // Send chart data whenever it changes
-  $effect(() => {
-    if ($db.doc != null) {
-      viewerFrame?.contentWindow?.window.postMessage(
-        {
-          type: "CHART_DATA",
-          data: {
-            chart: $db.doc,
-          },
-        } as EditorChartData,
-        env.PUBLIC_VIEWER_ORIGIN,
-      );
     }
   });
 
@@ -72,6 +62,8 @@
     }
     if (event.data.type == "CHART_UPDATED") {
       height = event.data.data.height;
+    } else if (event.data.type == "READY") {
+      updateViewer();
     } else if (event.data.type == "CHART_EDIT") {
       edit(event.data.data.edit);
     }
@@ -88,8 +80,9 @@
 
   onDestroy(() => {
     if (disconnect) disconnect();
-    viewerFrame?.contentWindow?.removeEventListener("load", updateViewer);
+    viewerFrame?.contentWindow?.removeEventListener("load", () => updateViewer());
 
+    store.off("data", onData);
     store.disconnect();
   });
 

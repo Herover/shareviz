@@ -28,5 +28,9 @@ export interface ViewerChartEdit {
     edit: { k: string; v: any };
   };
 }
+// Informs the editor that the viewer has loaded and is ready to display chart data
+export interface ViewerReady {
+  type: "READY";
+}
 
-export type ViewerMessage = ViewerChartUpdated | ViewerChartEdit;
+export type ViewerMessage = ViewerChartUpdated | ViewerChartEdit | ViewerReady;
