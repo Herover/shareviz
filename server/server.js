@@ -518,7 +518,8 @@ export function startServer(server) {
           return acc;
         }, {})
       : {};
-    req.__sharevizAuthJSToken = cookies["authjs.session-token"] || cookies["__Secure-authjs.session-token"];
+    req.__sharevizAuthJSToken =
+      cookies["authjs.session-token"] || cookies["__Secure-authjs.session-token"];
 
     backend.listen(stream, req);
   });
