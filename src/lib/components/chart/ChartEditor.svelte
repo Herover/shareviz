@@ -35,7 +35,7 @@
     <svelte:boundary>
       <EditorCollapsible
         group="element-controls"
-        key={"element-" + i}
+        key={"element-" + element.id}
         label={`#${i + 1}`}
         startOpen={true}
         lvl={2}

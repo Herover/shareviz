@@ -1,7 +1,11 @@
+<script lang="ts" module>
+  let groups: { [key: string]: string | number } = $state({});
+</script>
+
 <script lang="ts">
   // In the template, `!open` errors which doesn't make any sense.
   interface Props {
-    group: string | number;
+    group?: string | number;
     key: string | number;
     label: string;
     startOpen?: boolean;
@@ -11,9 +15,7 @@
   }
 
   let {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     group,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     key,
     label,
     startOpen = false,
@@ -22,18 +24,38 @@
     children,
   }: Props = $props();
 
-  let open = $state(startOpen || false);
+  let open = $state(startOpen);
+
+  if (group) {
+    if (typeof groups[group] == "undefined") {
+      groups[group] = startOpen ? key : "";
+    }
+  }
+
+  $effect(() => {
+    console.log(group, groups, key);
+    if (group) {
+      open = groups[group] == key;
+    }
+  });
+
+  const toggle = () => {
+    open = !open;
+    if (open && group) {
+      groups[group] = key;
+    }
+  };
 </script>
 
 <div class="container">
   <div class="header-content">
     <span
       class:header-open={open}
-      onclick={() => (open = !open)}
+      onclick={() => toggle()}
       onkeydown={(e) => {
         if (e.key == "Enter" || e.key == " ") {
-          open = !open;
           e.preventDefault();
+          toggle();
         }
       }}
       class="header"
