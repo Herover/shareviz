@@ -14,15 +14,7 @@
     children?: import("svelte").Snippet;
   }
 
-  let {
-    group,
-    key,
-    label,
-    startOpen = false,
-    lvl = 1,
-    actions,
-    children,
-  }: Props = $props();
+  let { group, key, label, startOpen = false, lvl = 1, actions, children }: Props = $props();
 
   let open = $state(startOpen);
 
@@ -99,9 +91,12 @@
     display: flex;
     flex-direction: row;
     border-bottom: 1px solid black;
-    margin-top: 1rem;
+    padding-top: 1rem;
     margin-bottom: 0.5rem;
     padding-bottom: 0.25rem;
+    position: sticky;
+    top: var(--editor-header-height);
+    background-color: var(--accent-bg-color);
   }
   .content {
     width: 100%;

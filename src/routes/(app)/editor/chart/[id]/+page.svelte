@@ -377,6 +377,7 @@
     background-color: var(--main-bg-color);
     position: sticky;
     top: 0px;
+    z-index: 10;
   }
   .parts-holder {
     position: relative;
