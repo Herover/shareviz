@@ -113,7 +113,7 @@ export interface AxisGrid {
   labelThousands: string;
   afterLabel: string;
   auto: {
-    from: number;
+    from: string;
     each: number;
     labels: boolean;
   };

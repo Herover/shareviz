@@ -102,6 +102,8 @@
         scaleHeight,
     });
   });
+
+  let dataSet = $derived(chartSpec.data.sets.find((set) => set.id == hBarSpec.dataSet));
 </script>
 
 {#if showLegend}
@@ -124,6 +126,7 @@
       scale={valueScale}
       conf={hBarSpec.axis}
       showLabels={showAxisLabels}
+      row={dataSet?.rows.find((e) => e.key == hBarSpec.value)}
     />
   </g>
 

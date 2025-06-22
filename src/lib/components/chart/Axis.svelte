@@ -1,11 +1,14 @@
 <script lang="ts">
   import type { ScaleLinear, ScaleTime } from "d3-scale";
   import { formatNumber, orDefault, orNumber } from "$lib/utils";
-  import type { Axis } from "$lib/chart";
+  import type { Axis, Row } from "$lib/chart";
   import { AxisLocation, AxisOrientation } from "$lib/chart";
+  import dayjs from "dayjs";
+  import type { ComputedData } from "$lib/data";
 
   interface Props {
     conf: Axis;
+    row?: Row;
     width: number;
     height: number;
     scale: ScaleLinear<number, number, never> | ScaleTime<number, number, never> | undefined;
@@ -20,7 +23,15 @@
     }) => void;
   }
 
-  let { conf, width, height, scale, showLabels = true, dimensions = () => {} }: Props = $props();
+  let {
+    conf,
+    row,
+    width,
+    height,
+    scale,
+    showLabels = true,
+    dimensions = () => {},
+  }: Props = $props();
 
   // TODO: more space on side with axis?
   let size = $derived(conf.major.enabled ? conf.labelSpace : 0);
@@ -50,7 +61,7 @@
       const from = scale.domain()[0];
       const to = scale.domain()[1];
       if (typeof to == "number" && typeof from == "number") {
-        const customFrom = Math.max(Math.min(conf.major.auto.from, to), from);
+        const customFrom = Math.max(Math.min(Number.parseFloat(conf.major.auto.from || "0"), to), from);
         const expectedTicks = 1 + (to - customFrom) / conf.major.auto.each;
         if (expectedTicks > maxTicks) {
           computedMajorTicks = [
@@ -72,9 +83,15 @@
           .filter((d) => d.n <= to && from <= d.n)
           .map((e) => ({ ...e, textAnchor: "middle" }));
       } else if (to instanceof Date && from instanceof Date) {
-        let d = new Date(from);
-        d.setDate(1);
-        d.setMonth(0);
+        if (!row) {
+          console.warn("axis row is not set");
+          autoMajorTicks = [];
+
+          return;
+        }
+        let d = dayjs(conf.major.auto.from, row.dateFormat || row.type).toDate();
+        // d.setDate(1);
+        // d.setMonth(0);
         let n = 0;
         while (d <= to && n < maxTicks) {
           computedMajorTicks.push({
@@ -149,11 +166,16 @@
       const from = scale.domain()[0];
       const to = scale.domain()[1];
       if (typeof to == "number" && typeof from == "number") {
-        const expectedTicks = 1 + (to - conf.minor.auto.from) / conf.minor.auto.each;
+        const expectedTicks =
+          1 + (to - Number.parseFloat(conf.minor.auto.from || "0")) / conf.minor.auto.each;
         if (expectedTicks > maxTicks) {
           computedMinorTicks = [{ n: from, l: `Too many ticks (${expectedTicks})` }];
         } else {
-          for (let i = conf.minor.auto.from; i <= to; i += conf.minor.auto.each) {
+          for (
+            let i = Number.parseFloat(conf.minor.auto.from || "0");
+            i <= to;
+            i += conf.minor.auto.each
+          ) {
             computedMinorTicks.push({
               n: i,
               l: conf.minor.auto.labels

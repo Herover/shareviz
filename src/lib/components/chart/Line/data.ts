@@ -1,8 +1,9 @@
+import type { ComputedData } from "$lib/data";
 import type { Line } from "../../../chart";
 import { group, negativeOneToInf } from "../../../utils";
 
-export const formatData = (componentSpec: Line, data: { [key: string]: any[] }) =>
-  group(componentSpec.repeat, data[componentSpec.dataSet], (k1, g1) => {
+export const formatData = (componentSpec: Line, data: ComputedData) =>
+  group(componentSpec.repeat, data[componentSpec.dataSet].data, (k1, g1) => {
     const settings = componentSpec.repeatSettings.byKey.find((e) => e.k == k1);
 
     return {

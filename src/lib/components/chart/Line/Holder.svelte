@@ -5,13 +5,12 @@
   import { formatData } from "./data";
   import Legend from "../Legend.svelte";
   import { createDebouncer, negativeOneToInf } from "$lib/utils";
+  import type { ComputedData } from "$lib/data";
 
   interface Props {
     chartSpec: Root;
     componentSpec: lineType;
-    data: {
-      [key: string]: any[];
-    };
+    data: ComputedData;
     chartWidth: number;
     editor?: boolean;
     index: number;

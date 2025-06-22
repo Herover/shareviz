@@ -197,7 +197,7 @@ export class ChartStore {
                 labelThousands: ",",
                 afterLabel: " mio.",
                 auto: {
-                  from: 0,
+                  from: "",
                   each: 5000000,
                   labels: true,
                 },
@@ -213,7 +213,7 @@ export class ChartStore {
                 labelThousands: ",",
                 afterLabel: " mio.",
                 auto: {
-                  from: 0,
+                  from: "",
                   each: 1000000,
                   labels: false,
                 },
@@ -254,7 +254,7 @@ export class ChartStore {
                   labelThousands: "",
                   afterLabel: "",
                   auto: {
-                    from: 0,
+                    from: "",
                     each: 10,
                     labels: true,
                   },
@@ -270,7 +270,7 @@ export class ChartStore {
                   labelThousands: "",
                   afterLabel: "",
                   auto: {
-                    from: 0,
+                    from: "",
                     each: 1,
                     labels: false,
                   },
@@ -296,7 +296,7 @@ export class ChartStore {
                   labelThousands: ",",
                   afterLabel: "",
                   auto: {
-                    from: 0,
+                    from: "",
                     each: 10,
                     labels: true,
                   },
@@ -312,7 +312,7 @@ export class ChartStore {
                   labelThousands: "",
                   afterLabel: "",
                   auto: {
-                    from: 0,
+                    from: "",
                     each: 1,
                     labels: false,
                   },

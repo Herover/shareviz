@@ -169,4 +169,113 @@ export const migrate = (
       ] as any);
     doc.submitOp(op);
   }
+
+  if (doc.data.m.v == 3 && doc.data.m.v < toVersion) {
+    const op = (doc.data as Root).chart.elements
+      .reduce((acc, e, ei) => {
+        if (e.type == "line") {
+          acc.push([
+            "chart",
+            "elements",
+            ei,
+            "d",
+            "x",
+            "axis",
+            "major",
+            "auto",
+            "from",
+            {
+              r: 0,
+              i: "" + (e.d as any).x.axis.major.auto.from,
+            },
+          ]);
+          acc.push([
+            "chart",
+            "elements",
+            ei,
+            "d",
+            "y",
+            "axis",
+            "major",
+            "auto",
+            "from",
+            {
+              r: 0,
+              i: "" + (e.d as any).y.axis.major.auto.from,
+            },
+          ]);
+          acc.push([
+            "chart",
+            "elements",
+            ei,
+            "d",
+            "x",
+            "axis",
+            "minor",
+            "auto",
+            "from",
+            {
+              r: 0,
+              i: "" + (e.d as any).x.axis.minor.auto.from,
+            },
+          ]);
+          acc.push([
+            "chart",
+            "elements",
+            ei,
+            "d",
+            "y",
+            "axis",
+            "minor",
+            "auto",
+            "from",
+            {
+              r: 0,
+              i: "" + (e.d as any).y.axis.minor.auto.from,
+            },
+          ]);
+        } else if (e.type == "hBar") {
+          acc.push([
+            "chart",
+            "elements",
+            ei,
+            "d",
+            "axis",
+            "major",
+            "auto",
+            "from",
+            {
+              r: 0,
+              i: "" + (e.d as any).axis.major.auto.from,
+            },
+          ]);
+          acc.push([
+            "chart",
+            "elements",
+            ei,
+            "d",
+            "axis",
+            "minor",
+            "auto",
+            "from",
+            {
+              r: 0,
+              i: "" + (e.d as any).axis.major.auto.from,
+            },
+          ]);
+        }
+
+        return acc;
+      }, [] as any[])
+      // Merge ops into a single valid op, with a op that sets the version number
+      .reduce((acc, op) => json1.type.compose(acc, op), [
+        "m",
+        "v",
+        {
+          r: 0,
+          i: 4,
+        },
+      ] as any);
+    doc.submitOp(op);
+  }
 };

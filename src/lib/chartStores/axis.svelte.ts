@@ -83,7 +83,7 @@ export class AxisGridStore {
   setLabelThousands(value: string) {
     this.#doc.submitOp([...this.#path, "labelThousands", { r: 0, i: value }]);
   }
-  setAutoFrom(value: number) {
+  setAutoFrom(value: string) {
     this.#doc.submitOp([...this.#path, "auto", "from", { r: 0, i: value }]);
   }
   setAutoEach(value: number) {

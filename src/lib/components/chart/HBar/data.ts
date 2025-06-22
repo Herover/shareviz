@@ -1,12 +1,9 @@
+import type { ComputedData } from "$lib/data";
 import type { HBar as hBarType } from "../../../chart";
 import { group, negativeOneToInf } from "../../../utils";
 
-export const formatData = (
-  componentSpec: hBarType,
-  data: { [key: string]: any[] },
-  order: { k: string }[],
-) =>
-  group(componentSpec.repeat, data[componentSpec.dataSet], (k, d) => {
+export const formatData = (componentSpec: hBarType, data: ComputedData, order: { k: string }[]) =>
+  group(componentSpec.repeat, data[componentSpec.dataSet].data, (k, d) => {
     return {
       k,
       d: group(componentSpec.categories, d, (k, g) => {

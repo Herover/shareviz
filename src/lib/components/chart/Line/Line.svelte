@@ -194,6 +194,7 @@
         yAxisWidth = d.width;
         topMargin = Math.max(-(d.topPos ?? 0), 0);
       }}
+      row={dataSet?.rows.find((e) => e.key == lineSpec.y.key)}
     />
     <Axis
       {height}
@@ -204,6 +205,7 @@
         xAxisOverflow = d;
         bottomMargin = d.labelHeight;
       }}
+      row={dataSet?.rows.find((e) => e.key == lineSpec.x.key)}
     />
     {#if lineSpec.stack}
       {#each values as d, i}

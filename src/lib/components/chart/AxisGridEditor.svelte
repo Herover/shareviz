@@ -62,8 +62,7 @@
       Auto ticks from
       <input
         value={conf.data.auto.from}
-        onchange={(e) => conf.setAutoFrom(Number.parseFloat(e.currentTarget.value))}
-        type="number"
+        onchange={(e) => conf.setAutoFrom(e.currentTarget.value)}
         style="width: 80px;"
       />
     </label>

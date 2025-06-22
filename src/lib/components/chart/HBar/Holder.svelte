@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Root, HBar as hBarType } from "$lib/chart";
   import { AxisRepeatMode } from "$lib/chart";
+  import type { ComputedData } from "$lib/data";
   import { group } from "$lib/utils";
   import HBar from "./HBar.svelte";
   import { formatData } from "./data";
@@ -8,9 +9,7 @@
   interface Props {
     chartSpec: Root;
     componentSpec: hBarType;
-    data: {
-      [key: string]: any[];
-    };
+    data: ComputedData;
     chartWidth: number;
     editor?: boolean;
     index: number;
