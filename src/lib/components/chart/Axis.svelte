@@ -61,7 +61,10 @@
       const from = scale.domain()[0];
       const to = scale.domain()[1];
       if (typeof to == "number" && typeof from == "number") {
-        const customFrom = Math.max(Math.min(Number.parseFloat(conf.major.auto.from || "0"), to), from);
+        const customFrom = Math.max(
+          Math.min(Number.parseFloat(conf.major.auto.from || "0"), to),
+          from,
+        );
         const expectedTicks = 1 + (to - customFrom) / conf.major.auto.each;
         if (expectedTicks > maxTicks) {
           computedMajorTicks = [

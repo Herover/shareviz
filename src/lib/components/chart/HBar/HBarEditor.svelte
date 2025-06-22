@@ -9,12 +9,11 @@
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import { HBarStore } from "$lib/chartStores/hbar.svelte";
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
+  import type { ComputedData } from "$lib/data";
 
   interface Props {
     spec: Root;
-    chartData: {
-      [key: string]: DSVParsedArray<any>;
-    };
+    chartData: ComputedData;
     index: number;
     id: string;
     connection: ShareDBConnection;
@@ -71,12 +70,9 @@
       typeof hbarStore.data.dataSet != "undefined" &&
       typeof chartData[hbarStore.data.dataSet] != "undefined"
     ) {
-      const key =
-        typeof hbarStore.data.subCategories != "undefined"
-          ? hbarStore.data.subCategories
-          : hbarStore.data.categories;
+      const key = hbarStore.data.subCategories || hbarStore.data.categories;
       const dataSet = chartData[hbarStore.data.dataSet];
-      const groups = group(key, dataSet, (k) => k);
+      const groups = group(key, dataSet.data, (k, o, i) => k);
       groups.forEach((k) => {
         if (!colorScale.data.byKey.find((d) => d.k == k)) {
           const n = colorScale.data.byKey.length;
@@ -106,7 +102,7 @@
           ? hbarStore.data.subCategories
           : hbarStore.data.categories;
       const dataSet = chartData[hbarStore.data.dataSet];
-      const groups = group(key, dataSet, (k) => k);
+      const groups = group(key, dataSet.data, (k) => k);
       let removed = 0;
       colorScale.data.byKey.forEach((c, keyIndex) => {
         if (typeof groups.find((k) => c.k == k) == "undefined") {
