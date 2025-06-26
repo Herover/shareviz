@@ -31,7 +31,7 @@ export async function POST({ request, locals }) {
   await new Promise<void>((resolve, reject) =>
     doc.create(defDoc, json1.type.uri, (err) => {
       if (typeof err != "undefined") reject(err);
-      resolve();
+      else resolve();
     }),
   );
 

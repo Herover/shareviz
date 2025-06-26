@@ -9,7 +9,7 @@
 {:else}
   {#each $page.data.organizations as organization}
     <p>
-      <a href="/org/{organization.organizations.id}/team/charts">
+      <a href="/org/{organization.organizations.id}/team">
         {organization.organizations.name}
       </a>
     </p>
