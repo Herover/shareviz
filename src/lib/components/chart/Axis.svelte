@@ -4,7 +4,6 @@
   import type { Axis, Row } from "$lib/chart";
   import { AxisLocation, AxisOrientation } from "$lib/chart";
   import dayjs from "dayjs";
-  import type { ComputedData } from "$lib/data";
 
   interface Props {
     conf: Axis;

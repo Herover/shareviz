@@ -1,6 +1,9 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { SignOut } from "@auth/sveltekit/components";
+  import type { PageProps } from "./$types";
+
+  let { data }: PageProps = $props();
 </script>
 
 <h3>Your user</h3>
@@ -19,7 +22,7 @@
 <div class="box p-top-1">
   <div class="w-025">Your login methods/identity providers</div>
   <div class="w-075">
-    {#each page.data.accounts as account}
+    {#each data.accounts as account}
       {account.provider}: {account.expiresAt
         ? new Date(account.expiresAt).toISOString()
         : "never expires"}<br />

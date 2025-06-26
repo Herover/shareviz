@@ -8,6 +8,9 @@
   import { addFolder, getTeam } from "$lib/api";
   import ChartList from "$lib/components/chart-list/ChartList.svelte";
   import type { FolderItem } from "$lib/components/chart-list/types";
+  import type { PageProps } from "./$types";
+
+  let { data }: PageProps = $props();
 
   let teamId: string | undefined = $state();
   $effect(() => {
@@ -110,7 +113,7 @@
 </script>
 
 <div class="holder">
-  <h3>{page.data.team?.teams?.name || "Your charts"}</h3>
+  <h3>{data.team?.teams?.name || "Your charts"}</h3>
   <ChartList
     contents={directory}
     onCreateFolder={(parentId) => teamId && onAddFolder("New folder", teamId, parentId)}

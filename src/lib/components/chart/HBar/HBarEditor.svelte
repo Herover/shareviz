@@ -2,7 +2,6 @@
   /** eslint-disable @typescript-eslint/strict-boolean-expressions */
   import { HBarTotalLabelStyle, type Root } from "$lib/chart";
   import { group, orDefault } from "$lib/utils";
-  import type { DSVParsedArray } from "d3-dsv";
   import AxisEditor from "../AxisEditor.svelte";
   import { formatData } from "./data";
   import { max } from "d3-array";
@@ -72,7 +71,7 @@
     ) {
       const key = hbarStore.data.subCategories || hbarStore.data.categories;
       const dataSet = chartData[hbarStore.data.dataSet];
-      const groups = group(key, dataSet.data, (k, o, i) => k);
+      const groups = group(key, dataSet.data, (k) => k);
       groups.forEach((k) => {
         if (!colorScale.data.byKey.find((d) => d.k == k)) {
           const n = colorScale.data.byKey.length;

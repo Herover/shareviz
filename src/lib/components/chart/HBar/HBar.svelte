@@ -30,7 +30,6 @@
     labelWidth,
     valueWidth,
     values,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     chartSpec,
     hBarSpec,
     label,

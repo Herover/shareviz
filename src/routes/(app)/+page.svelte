@@ -1,11 +1,13 @@
 <script lang="ts">
   import { SignIn } from "@auth/sveltekit/components";
-  import { page } from "$app/state";
   import { goto } from "$app/navigation";
   import { db } from "$lib/chartStore";
   import { onMount } from "svelte";
+  import type { PageProps } from "./$types";
 
-  if (page.data.session?.user) {
+  let { data }: PageProps = $props();
+
+  if (data.session?.user) {
     goto("/org");
   }
 
@@ -14,13 +16,13 @@
     goto("/editor/chart/" + docId);
   };
 
-  let charts: ReturnType<typeof db.getLocal>;
+  let charts: ReturnType<typeof db.getLocal> | undefined = $state();
   onMount(() => (charts = db.getLocal()));
 </script>
 
 <main>
   <div class="content">
-    {#if !page.data.session?.user}
+    {#if !data.session?.user}
       <h1>Sign in using</h1>
       <SignIn provider="github" signInPage="signin" />
     {:else}
@@ -33,7 +35,7 @@
       collaborative features.
     </p>
     <button onclick={() => newGraphic(false)}>Create local chart</button>
-    {#each charts as chart}
+    {#each charts || [] as chart}
       <ul>
         <li>
           <a href="/editor/chart/{chart.id}">{chart?.data?.chart?.title || "Unnamed chart"}</a>
