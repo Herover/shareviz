@@ -88,7 +88,7 @@
 
   let chartSpec = $derived($db.doc as Root);
 
-  let chartData = $derived(computeData(chartSpec) as { [key: string]: DSVParsedArray<any> });
+  let chartData = $derived(computeData(chartSpec));
 
   let canEdit = $derived(chartSpec != null);
 

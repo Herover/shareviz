@@ -6,12 +6,11 @@
   import "./editor.css";
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
   import { ChartStore } from "$lib/chartStores/chart.svelte";
+  import type { ComputedData } from "$lib/data";
 
   interface Props {
     spec: Root;
-    chartData: {
-      [key: string]: DSVParsedArray<any>;
-    };
+    chartData: ComputedData;
     connection: ShareDBConnection;
   }
 
