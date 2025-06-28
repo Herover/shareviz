@@ -250,6 +250,14 @@
               </div>
             </div>
             <button onclick={() => chartToPNG()}>Generate PNG</button>
+            <h3 class="editor-sub-section">Export Data Tortilla JSON</h3>
+            <p class="editor-sub-section-description">Import chart elsewhere.</p>
+            <input
+              value={JSON.stringify(chartSpec)}
+              onfocus={(e) => e.currentTarget.select()}
+              onkeyup={(e) => (e.currentTarget.value = JSON.stringify(chartSpec))}
+              type="text"
+            />
           {/if}
         {:else}
           <p>You do not have editor access to this chart.</p>
