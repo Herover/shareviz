@@ -236,12 +236,12 @@ export const db = (function createDB() {
           );
       }
     },
-    create: (synced: boolean, teamId?: string, folderId?: string) => {
+    create: (synced: boolean, teamId?: string, folderId?: string, data?: string) => {
       return new Promise<string>((resolve, reject) => {
         if (synced) {
           fetch("/api/chart", {
             method: "POST",
-            body: JSON.stringify({ teamId, folderId }),
+            body: JSON.stringify({ teamId, folderId, data }),
           })
             .then((res) => res.json())
             .then((data) => {
@@ -256,7 +256,7 @@ export const db = (function createDB() {
           const docId = (synced ? "" : localPrefix) + crypto.randomUUID();
           doc = synced ? connection.get("examples", docId) : getLocalDoc("examples", docId);
           doc.on("error", (e: Error) => console.warn("doc error", e));
-          doc.create(defDoc, json1.type.uri, () => resolve(docId));
+          doc.create(typeof data == "string" ? data : defDoc, json1.type.uri, () => resolve(docId));
         }
       });
     },

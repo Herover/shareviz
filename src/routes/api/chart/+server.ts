@@ -2,7 +2,8 @@ import { json } from "@sveltejs/kit";
 import * as json1 from "ot-json1";
 import { db } from "$lib/../../server_lib/user.js";
 import { connection } from "$lib/../../server_lib/sharedb";
-import { defDoc } from "$lib/initialDoc.js";
+import { defDoc, formatVersion } from "$lib/initialDoc.js";
+import type { Root } from "$lib/chart.js";
 
 export async function GET({ locals }) {
   const session = await locals.auth();
@@ -24,12 +25,30 @@ export async function POST({ request, locals }) {
     return json({ message: "invalid token" }, { status: 400 });
   }
 
-  const { teamId, folderId }: { teamId?: string; folderId?: string } = await request.json();
+  const { teamId, folderId, data }: { teamId?: string; folderId?: string; data?: string } =
+    await request.json();
+
+  let docData: Root;
+  try {
+    docData = typeof data == "string" ? (JSON.parse(data) as Root) : defDoc;
+  } catch (e) {
+    console.error(e instanceof Error ? e.message : e);
+    return json({ message: "unable to parse document" }, { status: 400 });
+  }
+
+  // TODO: optionally fully verify docData structure
+  if (!docData || !docData.m || typeof docData.m.v != "number") {
+    return json({ message: "unknown document format" }, { status: 400 });
+  } else if (docData.m.v < formatVersion) {
+    return json({ message: "format is too old" }, { status: 400 });
+  } else if (docData.m.v > formatVersion) {
+    return json({ message: "more recent than we support" }, { status: 400 });
+  }
 
   const ref = crypto.randomUUID();
   const doc = connection.get("examples", ref);
   await new Promise<void>((resolve, reject) =>
-    doc.create(defDoc, json1.type.uri, (err) => {
+    doc.create(docData, json1.type.uri, (err) => {
       if (typeof err != "undefined") reject(err);
       else resolve();
     }),

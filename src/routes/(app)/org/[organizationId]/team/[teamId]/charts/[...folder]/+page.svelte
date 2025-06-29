@@ -9,8 +9,12 @@
   import ChartList from "$lib/components/chart-list/ChartList.svelte";
   import type { FolderItem } from "$lib/components/chart-list/types";
   import type { PageProps } from "./$types";
+  import Popup from "$lib/components/Popup.svelte";
 
   let { data }: PageProps = $props();
+
+  let promptSpec = $state(false);
+  let importChartData = $state("");
 
   let teamId: string | undefined = $state();
   $effect(() => {
@@ -103,6 +107,16 @@
     }
   };
 
+  const importGraphic = async (synced: boolean, folderId?: string) => {
+    try {
+      const docId = await chartStore.create(synced, teamId, folderId, importChartData);
+      goto("/editor/chart/" + docId);
+    } catch (err) {
+      notifications.addError((err as Error).message);
+      console.error(err);
+    }
+  };
+
   const onAddFolder = async (name: string, teamId: string, parentId?: string) => {
     await addFolder(name, teamId, parentId);
     // TODO: we should just manually add the new folder instead of reload entire team
@@ -122,4 +136,16 @@
     basePath={`/org/${page.params["organizationId"]}/team/${teamId}/charts`}
     path={folderPath}
   />
+
+  <button onclick={() => (promptSpec = true)}>Import chart</button>
+  <Popup show={promptSpec} onDismiss={() => (promptSpec = false)}>
+    <h1>Import chart</h1>
+    <p>Paste exported JSON here</p>
+    <input bind:value={importChartData} />
+    <button
+      onclick={() =>
+        importGraphic(true, folderPath.length == 0 ? undefined : folderPath[folderPath.length - 1])}
+      >Import</button
+    >
+  </Popup>
 </div>
