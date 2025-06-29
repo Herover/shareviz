@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Root } from "$lib/chart";
-  import type { DSVParsedArray } from "d3-dsv";
   import EditorCollapsible from "./EditorCollapsible.svelte";
   import { getComponentList, getEditorComponent } from "./chartComponents";
   import "./editor.css";

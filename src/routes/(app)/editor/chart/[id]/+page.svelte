@@ -6,7 +6,6 @@
   import { onDestroy, onMount } from "svelte";
   import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
   import { computeData } from "$lib/data.js";
-  import type { DSVParsedArray } from "d3-dsv";
   import type { EditorChartData, EditorChartScreenshot, ViewerMessage } from "$lib/viewerData.js";
   import { ShareDBConnection } from "$lib/chartStores/data.svelte.js";
   import { ChartStore } from "$lib/chartStores/chart.svelte.js";
