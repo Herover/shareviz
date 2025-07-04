@@ -1,4 +1,6 @@
 <script lang="ts">
+  import chroma from "chroma-js";
+
   let {
     keys,
   }: {
@@ -10,7 +12,7 @@
   {#each keys as d}
     {#if d.legend != ""}
       <span class="legend-title"
-        ><span style="background-color:{d.color}" class="legend-box"></span>
+        ><span style="background-color:{chroma(d.color).hex()}" class="legend-box"></span>
         {d.legend}</span
       >
     {/if}

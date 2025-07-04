@@ -36,7 +36,7 @@
   });
 </script>
 
-<rect {x} {y} {height} {width} {fill}>
+<rect {x} {y} {height} {width} fill={chroma(fill).hex()}>
   <title>{label}: {value}</title>
 </rect>
 {#if conf.rectLabels}

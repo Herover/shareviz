@@ -16,6 +16,7 @@
   import FloatingLabels from "./FloatingLabels/FloatingLabels.svelte";
   import { createEventDispatcher, onMount } from "svelte";
   import { chartToEditor } from "$lib/chartToEditorStore";
+    import chroma from "chroma-js";
 
   interface Props {
     values: {
@@ -222,13 +223,13 @@
                   .reverse(),
               ),
           )}
-          fill={d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color}
+          fill={chroma(d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color).hex()}
         />
       {/each}
       {#each values as d}
         <path
           d={draw(d.value.map((e) => ({ x: e.x, y: e.to })))}
-          stroke={d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color}
+          stroke={chroma(d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color).hex()}
           stroke-width={getStyle(d.key).width}
           fill="none"
         />
@@ -243,18 +244,20 @@
                 { ...d.value[0], y: 0 },
               ]),
             )}
-            fill={d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color}
+            fill={chroma(d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color).hex()}
           />
         {/each}
       {/if}
       {#each values as d}
         <path
           d={draw(d.value)}
-          stroke={d.type == "missing" && getStyle(d.key).missingStyle == LineMissingStyle.NONE
-            ? "none"
-            : d.isContext
-              ? getStyle(d.key).contextColor
-              : getStyle(d.key).color}
+          stroke={chroma(
+            d.type == "missing" && getStyle(d.key).missingStyle == LineMissingStyle.NONE
+              ? "none"
+              : d.isContext
+                ? getStyle(d.key).contextColor
+                : getStyle(d.key).color
+          ).hex()}
           stroke-width={higlight === d.key ? getStyle(d.key).width + 2 : getStyle(d.key).width}
           fill="none"
           stroke-dasharray={d.type == "line" ||
@@ -272,9 +275,9 @@
             <text
               x={xScale(d.value[d.value.length - 1].x) + labelOffset}
               y={yScale(d.value[d.value.length - 1].to)}
-              fill={getStyle(d.key).label.color}
+              fill={chroma(getStyle(d.key).label.color).hex()}
               paint-order="stroke"
-              stroke={chartSpec.style.bgColor}
+              stroke={chroma(chartSpec.style.bgColor).hex()}
               stroke-width={3}
               dominant-baseline="middle"
               text-anchor="start">{getStyle(d.key).label.text}</text
@@ -285,9 +288,9 @@
             <text
               x={xScale(d.value[0].x) - labelOffset}
               y={yScale(d.value[0].to)}
-              fill={getStyle(d.key).label.color}
+              fill={chroma(getStyle(d.key).label.color).hex()}
               paint-order="stroke"
-              stroke={chartSpec.style.bgColor}
+              stroke={chroma(chartSpec.style.bgColor).hex()}
               stroke-width={3}
               dominant-baseline="middle"
               text-anchor="end">{getStyle(d.key).label.text}</text
@@ -302,7 +305,7 @@
           <circle
             cx={xScale(value.x)}
             cy={yScale(value.y)}
-            fill={getStyle(d.key).label.color}
+            fill={chroma(getStyle(d.key).label.color).hex()}
             r={getStyle(d.key).width * 2}
           />
         {/each}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { LabelStyleLine, type LineStyleKey } from "$lib/chart";
+  import chroma from "chroma-js";
   import type { ScaleLinear, ScaleTime } from "d3-scale";
   import { createEventDispatcher } from "svelte";
 
@@ -59,7 +60,7 @@
   <text
     x={line.label.rx + (moving ? relativeMove[0] : 0)}
     y={line.label.ry - 8 + (moving ? relativeMove[1] : 0)}
-    fill={line.color}
+    fill={chroma(line.color).hex()}
     bind:contentRect={box}
     cursor={moving ? "grabbing" : "grab"}
     paint-order="stroke"
