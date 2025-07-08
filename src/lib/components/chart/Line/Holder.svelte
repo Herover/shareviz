@@ -34,7 +34,7 @@
           chart.d = d2.concat(chart.d);
         });
         charts = charts
-          .filter((c) => c.settings?.ownChart || c.settings?.allCharts)
+          .filter((c) => c.settings?.ownChart)
           .sort(
             (a, b) =>
               negativeOneToInf(componentSpec.repeatSettings.byKey.findIndex((e) => e.k == a.k)) -
