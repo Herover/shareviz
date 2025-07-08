@@ -158,6 +158,9 @@
       if (lineStore.data.style.byKey[d.i].label.color == lineStore.data.style.byKey[d.i].color) {
         style.setLabelColor(color);
       }
+      if (lineStore.data.style.byKey[d.i].contextColor == lineStore.data.style.byKey[d.i].color) {
+        style.seContextColor(color);
+      }
       style.setColor(color);
     });
 

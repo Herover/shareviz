@@ -264,6 +264,7 @@ export class LineStore {
         i: {
           k: d.key ?? "",
           color: d.color ?? "#000000",
+          contextColor: d.color ?? "#000000",
           width: 1,
           label: {
             text: d.labelText ?? "",
