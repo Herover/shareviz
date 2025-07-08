@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ScaleLinear, ScaleTime } from "d3-scale";
+  import { scaleLinear, scaleTime, type ScaleLinear, type ScaleTime } from "d3-scale";
   import { formatNumber, orDefault, orNumber } from "$lib/utils";
   import type { Axis, Row } from "$lib/chart";
   import { AxisLocation, AxisOrientation } from "$lib/chart";
@@ -60,30 +60,41 @@
       const from = scale.domain()[0];
       const to = scale.domain()[1];
       if (typeof to == "number" && typeof from == "number") {
-        const customFrom = Math.max(
-          Math.min(Number.parseFloat(conf.major.auto.from || "0"), to),
-          from,
-        );
-        const expectedTicks = 1 + (to - customFrom) / conf.major.auto.each;
-        if (expectedTicks > maxTicks) {
-          computedMajorTicks = [
-            { n: from, l: `Too many ticks (${expectedTicks})`, textAnchor: "middle" },
-          ];
+        if (conf.major.auto.from != "") {
+          const customFrom = Math.max(
+            Math.min(Number.parseFloat(conf.major.auto.from || "0"), to),
+            from,
+          );
+          const expectedTicks = 1 + (to - customFrom) / conf.major.auto.each;
+          if (expectedTicks > maxTicks) {
+            computedMajorTicks = [
+              { n: from, l: `Too many ticks (${expectedTicks})`, textAnchor: "middle" },
+            ];
+          } else {
+            for (let i = customFrom; i <= to; i += conf.major.auto.each) {
+              computedMajorTicks.push({
+                n: i,
+                l: conf.major.auto.labels
+                  ? formatNumber(i, conf.major.labelDivide, conf.major.labelThousands) +
+                    conf.major.afterLabel
+                  : "",
+                textAnchor: "middle",
+              });
+            }
+          }
+          computedManualMajorTicks = conf.major.ticks
+            .filter((d) => d.n <= to && from <= d.n)
+            .map((e) => ({ ...e, textAnchor: "middle" }));
         } else {
-          for (let i = customFrom; i <= to; i += conf.major.auto.each) {
-            computedMajorTicks.push({
-              n: i,
-              l: conf.major.auto.labels
-                ? formatNumber(i, conf.major.labelDivide, conf.major.labelThousands) +
-                  conf.major.afterLabel
-                : "",
+          const ticks = scaleLinear([from, to], [0, 1]).nice().ticks(3);
+          ticks.forEach((tick) => {
+            return computedMajorTicks.push({
+              l: "" + tick,
+              n: tick,
               textAnchor: "middle",
             });
-          }
+          });
         }
-        computedManualMajorTicks = conf.major.ticks
-          .filter((d) => d.n <= to && from <= d.n)
-          .map((e) => ({ ...e, textAnchor: "middle" }));
       } else if (to instanceof Date && from instanceof Date) {
         if (!row) {
           console.warn("axis row is not set");
@@ -91,19 +102,29 @@
 
           return;
         }
-        let d = dayjs(conf.major.auto.from, row.dateFormat || row.type).toDate();
-        // d.setDate(1);
-        // d.setMonth(0);
-        let n = 0;
-        while (d <= to && n < maxTicks) {
-          computedMajorTicks.push({
-            n: new Date(d),
-            l: conf.major.auto.labels ? d.getFullYear() + conf.major.afterLabel : "",
+        const ticks = scaleTime([new Date(from), new Date(to)], [0, 1])
+          .nice()
+          .ticks(3);
+        ticks.forEach((tick) => {
+          return computedMajorTicks.push({
+            l: "" + dayjs(tick).format("YYYY"),
+            n: tick,
             textAnchor: "middle",
           });
-          d.setFullYear(d.getFullYear() + conf.major.auto.each);
-          n++;
-        }
+        });
+        // let d = dayjs(conf.major.auto.from, row.dateFormat || row.type).toDate();
+        // d.setDate(1);
+        // d.setMonth(0);
+        // let n = 0;
+        // while (d <= to && n < maxTicks) {
+        //   computedMajorTicks.push({
+        //     n: new Date(d),
+        //     l: conf.major.auto.labels ? d.getFullYear() + conf.major.afterLabel : "",
+        //     textAnchor: "middle",
+        //   });
+        //   d.setFullYear(d.getFullYear() + conf.major.auto.each);
+        //   n++;
+        // }
       }
       autoMajorTicks = computedMajorTicks.filter(
         (d) => computedManualMajorTicks.findIndex((dd) => dd.n == d.n) == -1,
