@@ -8,12 +8,11 @@
   import CategoryList from "../CategoryList.svelte";
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
   import { LineStore } from "$lib/chartStores/line.svelte";
+    import type { ComputedData } from "$lib/data";
 
   interface Props {
     spec: Root;
-    chartData: {
-      [key: string]: DSVParsedArray<any>;
-    };
+    chartData: ComputedData;
     index: number;
     id: string;
     connection: ShareDBConnection;
