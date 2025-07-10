@@ -21,11 +21,12 @@
   if (group) {
     if (typeof groups[group] == "undefined") {
       groups[group] = startOpen ? key : "";
+    } else {
+      groups[group] = startOpen ? key : "";
     }
   }
 
   $effect(() => {
-    console.log(group, groups, key);
     if (group) {
       open = groups[group] == key;
     }
