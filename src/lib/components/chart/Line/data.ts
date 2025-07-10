@@ -3,7 +3,7 @@ import type { Line } from "../../../chart";
 import { group, negativeOneToInf } from "../../../utils";
 
 export const formatData = (componentSpec: Line, data: ComputedData) =>
-  group(componentSpec.repeat, data[componentSpec.dataSet].data, (k1, g1) => {
+  group(componentSpec.repeat, data[componentSpec.dataSet]?.data ?? [], (k1, g1) => {
     const settings = componentSpec.repeatSettings.byKey.find((e) => e.k == k1);
 
     return {

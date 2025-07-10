@@ -21,7 +21,7 @@
   let charts: ReturnType<typeof formatData> = $state([]);
   let chartDebouncer = createDebouncer(250);
   $effect(() =>
-    chartDebouncer([componentSpec, data], () => {
+    chartDebouncer([componentSpec, data, data[componentSpec.dataSet]?.data], () => {
       charts = formatData(componentSpec, data);
       if (componentSpec.repeat) {
         charts.forEach((chart) => {

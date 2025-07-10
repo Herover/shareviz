@@ -16,7 +16,7 @@
   import FloatingLabels from "./FloatingLabels/FloatingLabels.svelte";
   import { createEventDispatcher, onMount } from "svelte";
   import { chartToEditor } from "$lib/chartToEditorStore";
-    import chroma from "chroma-js";
+  import chroma from "chroma-js";
 
   interface Props {
     values: {
@@ -256,7 +256,7 @@
               ? "none"
               : d.isContext
                 ? getStyle(d.key).contextColor
-                : getStyle(d.key).color
+                : getStyle(d.key).color,
           ).hex()}
           stroke-width={higlight === d.key ? getStyle(d.key).width + 2 : getStyle(d.key).width}
           fill="none"
