@@ -80,8 +80,10 @@
   };
 </script>
 
+<h3 class="editor-sub-section">General</h3>
+
 <div class="box">
-  <div class="w-025 editor-explain-box p-top-1">
+  <div class="w-025 editor-explain-box">
     <span class="editor-column-label">Data set</span>
   </div>
   <div class="w-075 p-top-1">
@@ -126,6 +128,8 @@
       </select>
     </label>
   </p>
+
+  <h3 class="editor-sub-section">Categories</h3>
   <p>
     <label class="editor-column-label">
       Categories from:
@@ -140,6 +144,30 @@
       </select>
     </label>
   </p>
+  <p>
+    <label>
+      Height is
+      <input
+        value={lineStore.data.heightRatio * 100}
+        onchange={(e) => lineStore.setHeightRatio(Number.parseFloat(e.currentTarget.value) / 100)}
+        type="number"
+        style:width="50px"
+      />
+      % of width
+    </label>
+  </p>
+    <div class="box">
+      <div class="w-025 editor-explain-box">
+        <span class="editor-column-label">Fill</span>
+      </div>
+      <div class="w-075">
+        <input
+          bind:checked={lineStore.data.fill}
+          onchange={(e) => lineStore.setFill(e.currentTarget.checked)}
+          type="checkbox"
+        />
+      </div>
+    </div>
   {#if lineStore.data.categories}
     <div class="box">
       <div class="w-025 editor-explain-box">
@@ -158,6 +186,8 @@
     <span class="editor-column-label">Line style</span>
     <LinesEditor {chartColors} {values} {index} {lineStore} />
   {/if}
+
+  <h3 class="editor-sub-section">Small multiples</h3>
   <p>
     <label class="editor-column-label">
       Repeat for every:
@@ -243,31 +273,9 @@
     {/if}
   {/if}
 {/if}
-<p>
-  <label>
-    Fill:
-    <input
-      bind:checked={lineStore.data.fill}
-      onchange={(e) => lineStore.setFill(e.currentTarget.checked)}
-      type="checkbox"
-    />
-  </label>
-</p>
-<p>
-  <label>
-    Height is
-    <input
-      value={lineStore.data.heightRatio * 100}
-      onchange={(e) => lineStore.setHeightRatio(Number.parseFloat(e.currentTarget.value) / 100)}
-      type="number"
-      style:width="50px"
-    />
-    % of width
-  </label>
-</p>
 
-<b>X axis</b>
+<h3 class="editor-sub-section">Horizontal axis</h3>
 <AxisEditor conf={lineStore.xAxis()} />
 
-<b>Y axis</b>
+<h3 class="editor-sub-section">Vertical axis</h3>
 <AxisEditor conf={lineStore.yAxis()} />
