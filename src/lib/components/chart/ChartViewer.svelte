@@ -1,11 +1,12 @@
 <script lang="ts">
   import type { Root } from "$lib/chart";
   import { getComponent } from "$lib/components/chart/chartComponents";
+  import type { ComputedData } from "$lib/data";
   import { orNumber } from "$lib/utils";
 
   interface Props {
     chartSpec: Root;
-    data: { [key: string]: any[] };
+    data: ComputedData;
     width?: number | undefined;
     editor: boolean;
     onedit?: (d: { k: string; v: any }) => void;
