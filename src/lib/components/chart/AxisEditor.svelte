@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import { AxisLocation, AxisRepeatMode } from "$lib/chart";
   import type { AxisStore } from "$lib/chartStores/axis.svelte";

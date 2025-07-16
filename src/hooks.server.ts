@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 export { handle } from "./auth";
 import type { ServerInit } from "@sveltejs/kit";
 import { db } from "../server_lib/user";

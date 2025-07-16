@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import ReconnectingWebSocket from "reconnecting-websocket";
 import * as json1 from "ot-json1";
 import ShareDB from "sharedb/lib/client";

@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import { type LineRepeatSettingsKey, type Root } from "$lib/chart";
   import type { DSVParsedArray } from "d3-dsv";

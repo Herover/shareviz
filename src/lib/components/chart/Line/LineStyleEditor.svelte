@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import { LabelLocation, LabelStyleLine } from "$lib/chart";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";

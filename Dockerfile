@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MPL-2.0
+
 FROM node:24-bookworm
 
 COPY . /app

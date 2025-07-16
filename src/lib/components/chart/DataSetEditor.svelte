@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import type { Set } from "$lib/chart";
   import type { DataSetStore } from "$lib/chartStores/dataSet.svelte";

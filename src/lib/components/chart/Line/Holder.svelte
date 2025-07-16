@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import { LabelLocation, type Root, type Line as lineType } from "$lib/chart";
   import { max, min } from "d3-array";

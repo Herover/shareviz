@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import prettier from "eslint-config-prettier";
 import js from "@eslint/js";
 import { includeIgnoreFile } from "@eslint/compat";

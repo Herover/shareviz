@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   /** eslint-disable @typescript-eslint/strict-boolean-expressions */
   import { HBarTotalLabelStyle, type Root } from "$lib/chart";

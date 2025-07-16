@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import type { Root } from "./chart";
 
 export const formatVersion = 4;

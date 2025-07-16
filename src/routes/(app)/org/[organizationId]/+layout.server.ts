@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { error, redirect } from "@sveltejs/kit";
 import { db } from "$lib/../../server_lib/sqlite.js";
 import { ORGANIZATION_ROLES } from "$lib/consts.js";

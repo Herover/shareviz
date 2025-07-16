@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { db } from "$lib/../../server_lib/sqlite.js";
 
 export async function load({ params, parent }) {

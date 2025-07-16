@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { json } from "@sveltejs/kit";
 import * as json1 from "ot-json1";
 import { db } from "$lib/../../server_lib/user.js";

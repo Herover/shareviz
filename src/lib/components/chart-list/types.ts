@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 export interface Folder {
   type: "folder";
   name: string;

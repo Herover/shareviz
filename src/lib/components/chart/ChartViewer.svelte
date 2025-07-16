@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import type { Root } from "$lib/chart";
   import { getComponent } from "$lib/components/chart/chartComponents";

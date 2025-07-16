@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import adapter from "@sveltejs/adapter-node";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 

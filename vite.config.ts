@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
 import { webSocketDevServer } from "./server/dev";

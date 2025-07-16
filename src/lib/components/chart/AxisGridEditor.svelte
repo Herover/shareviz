@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import type { AxisGridStore } from "$lib/chartStores/axis.svelte";
   import ColorPicker from "./ColorPicker/ColorPicker.svelte";

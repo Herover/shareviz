@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import type { PageData } from "./$types";
   import { TEAM_ROLES } from "$lib/consts";

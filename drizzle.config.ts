@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({

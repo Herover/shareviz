@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import ShareDB from "sharedb/lib/client";
 import type { ShareDBConnection } from "./data.svelte";
 import { type Colors, type HBar } from "$lib/chart";

@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import { HBarTotalLabelStyle, type HBar } from "$lib/chart";
   import HBarRect from "./HBarRect.svelte";

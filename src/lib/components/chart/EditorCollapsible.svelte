@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts" module>
   let groups: { [key: string]: string | number } = $state({});
 </script>

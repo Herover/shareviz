@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import { LabelLocation, type LineStyleKey } from "$lib/chart";
   import type { ScaleLinear, ScaleTime } from "d3-scale";

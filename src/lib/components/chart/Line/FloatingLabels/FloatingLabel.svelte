@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import { LabelStyleLine, type LineStyleKey } from "$lib/chart";
   import chroma from "chroma-js";

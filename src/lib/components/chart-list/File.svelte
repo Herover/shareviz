@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { formatDate, formatRelativeTime } from "$lib/utils";

@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import type { TransposedColumn } from "$lib/chart";
   // import type { Row } from "$lib/chart";

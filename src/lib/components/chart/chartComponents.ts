@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { type Component } from "svelte";
 
 import type { Root } from "$lib/chart";

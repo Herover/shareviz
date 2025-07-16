@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import { editChartInfo, editFolder } from "$lib/api";
   import File from "./File.svelte";

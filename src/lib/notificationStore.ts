@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { writable } from "svelte/store";
 
 export enum NotificationLevel {

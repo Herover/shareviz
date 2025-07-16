@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import type { TeamResponse } from "$lib/../routes/api/team/[id]/+server";
 
 export async function getTeam(teamId: string): Promise<TeamResponse> {

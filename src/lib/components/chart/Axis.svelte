@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import { scaleLinear, scaleTime, type ScaleLinear, type ScaleTime } from "d3-scale";
   import { formatNumber, orDefault, orNumber } from "$lib/utils";

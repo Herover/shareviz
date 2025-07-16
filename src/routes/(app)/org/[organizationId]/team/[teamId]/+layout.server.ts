@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { redirect } from "@sveltejs/kit";
 
 /** @type {import('./$types').PageServerLoad} */

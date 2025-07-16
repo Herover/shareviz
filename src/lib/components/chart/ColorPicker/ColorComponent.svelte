@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { orNumber } from "$lib/utils";

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { dsvFormat } from "d3-dsv";
 import type { Root, Row } from "./chart";
 import { valueParsers } from "./utils";

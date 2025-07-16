@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import type { ComputedData } from "$lib/data";
 import type { Line } from "../../../chart";
 import { group, negativeOneToInf } from "../../../utils";

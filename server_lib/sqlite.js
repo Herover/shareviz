@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { and, eq, isNull } from "drizzle-orm";
 import {
   accounts,

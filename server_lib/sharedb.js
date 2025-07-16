@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import ShareDB from "sharedb";
 import json1 from "ot-json1";
 

@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import { LabelLocation, LabelStyleLine, LineMissingStyle, LineSymbol } from "$lib/chart";
   import { negativeOneToInf } from "$lib/utils";

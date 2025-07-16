@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import { ChartStore } from "$lib/chartStores/chart.svelte";
   import { StyleStore } from "$lib/chartStores/style.svelte";

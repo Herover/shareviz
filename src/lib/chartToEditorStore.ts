@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 // Handles some communication between editor and chart
 import { writable } from "svelte/store";
 

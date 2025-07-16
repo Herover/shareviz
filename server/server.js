@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { WebSocketServer } from "ws";
 import WebSocketJSONStream from "@teamwork/websocket-json-stream";
 import json1 from "ot-json1";

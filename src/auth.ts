@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { SvelteKitAuth } from "@auth/sveltekit";
 import GitHub from "@auth/sveltekit/providers/github";

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck no good way to type the db argument
 import equal from "fast-deep-equal";

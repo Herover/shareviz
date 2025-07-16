@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   let { children }: { children: import("svelte").Snippet } = $props();
   let open = $state(false);

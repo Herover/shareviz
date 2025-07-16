@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "fs";
 import ShareDB from "sharedb";
 

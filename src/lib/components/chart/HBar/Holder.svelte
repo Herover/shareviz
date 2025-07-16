@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import type { Root, HBar as hBarType } from "$lib/chart";
   import { AxisRepeatMode } from "$lib/chart";

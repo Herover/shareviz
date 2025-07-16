@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import type { Data } from "$lib/chart";
   import { type ShareDBConnection } from "$lib/chartStores/data.svelte";

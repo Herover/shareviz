@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <script lang="ts">
   import type { Axis, HBar } from "$lib/chart";
   import { formatNumber } from "$lib/utils";

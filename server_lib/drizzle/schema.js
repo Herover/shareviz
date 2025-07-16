@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { integer, sqliteTable, text, primaryKey, unique } from "drizzle-orm/sqlite-core";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";

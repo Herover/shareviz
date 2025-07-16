@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 export interface Root {
   m: Meta;
   data: Data;

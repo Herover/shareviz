@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import { json } from "@sveltejs/kit";
 import { db, TEAM_ROLES } from "$lib/../../server_lib/sqlite";
 
