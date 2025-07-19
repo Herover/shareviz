@@ -2,7 +2,6 @@
 
 <script lang="ts">
   import { type LineRepeatSettingsKey, type Root } from "$lib/chart";
-  import type { DSVParsedArray } from "d3-dsv";
   import AxisEditor from "../AxisEditor.svelte";
   import { formatData } from "./data";
   import { orDefault } from "$lib/utils";
@@ -10,7 +9,7 @@
   import CategoryList from "../CategoryList.svelte";
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
   import { LineStore } from "$lib/chartStores/line.svelte";
-    import type { ComputedData } from "$lib/data";
+  import type { ComputedData } from "$lib/data";
 
   interface Props {
     spec: Root;
@@ -158,18 +157,18 @@
       % of width
     </label>
   </p>
-    <div class="box">
-      <div class="w-025 editor-explain-box">
-        <span class="editor-column-label">Fill</span>
-      </div>
-      <div class="w-075">
-        <input
-          bind:checked={lineStore.data.fill}
-          onchange={(e) => lineStore.setFill(e.currentTarget.checked)}
-          type="checkbox"
-        />
-      </div>
+  <div class="box">
+    <div class="w-025 editor-explain-box">
+      <span class="editor-column-label">Fill</span>
     </div>
+    <div class="w-075">
+      <input
+        bind:checked={lineStore.data.fill}
+        onchange={(e) => lineStore.setFill(e.currentTarget.checked)}
+        type="checkbox"
+      />
+    </div>
+  </div>
   {#if lineStore.data.categories}
     <div class="box">
       <div class="w-025 editor-explain-box">
