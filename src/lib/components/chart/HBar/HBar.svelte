@@ -10,6 +10,7 @@
   import Axis from "../Axis.svelte";
   import HBarLine from "./HBarLine.svelte";
   import Legend from "../Legend.svelte";
+  import { fontStore } from "$lib/fontStore.svelte";
 
   interface Props {
     labelWidth: number;
@@ -105,6 +106,13 @@
   });
 
   let dataSet = $derived(chartSpec.data.sets.find((set) => set.id == hBarSpec.dataSet));
+
+  let fontStyle: HTMLStyleElement | undefined;
+  $effect(() => {
+    if (typeof fontStyle != "undefined") {
+      fontStyle.innerHTML = fontStore.fontCSS;
+    }
+  });
 </script>
 
 {#if showLegend}
@@ -120,6 +128,7 @@
 </p>
 
 <svg {width} {height}>
+  <style bind:this={fontStyle}></style>
   <g transform="translate({labelWidth},{0})">
     <Axis
       width={valueWidth}

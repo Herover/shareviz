@@ -19,6 +19,7 @@
   import { createEventDispatcher, onMount } from "svelte";
   import { chartToEditor } from "$lib/chartToEditorStore";
   import chroma from "chroma-js";
+  import { fontStore } from "$lib/fontStore.svelte";
 
   interface Props {
     values: {
@@ -184,9 +185,17 @@
       ? ($chartToEditor.highlight[2] as string)
       : null,
   );
+
+  let fontStyle: HTMLStyleElement | undefined;
+  $effect(() => {
+    if (typeof fontStyle != "undefined") {
+      fontStyle.innerHTML = fontStore.fontCSS;
+    }
+  });
 </script>
 
 <svg {width} height={height + topMargin + bottomMargin + lineSpec.x.axis.major.tickWidth * 2}>
+  <style bind:this={fontStyle}></style>
   <g transform="translate(0, {topMargin})">
     <Axis
       {height}
