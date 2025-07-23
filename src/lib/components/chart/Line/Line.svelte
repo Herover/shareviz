@@ -262,13 +262,9 @@
       {#each values as d}
         <path
           d={draw(d.value)}
-          stroke={chroma(
-            d.type == "missing" && getStyle(d.key).missingStyle == LineMissingStyle.NONE
-              ? "none"
-              : d.isContext
-                ? getStyle(d.key).contextColor
-                : getStyle(d.key).color,
-          ).hex()}
+          stroke={d.type == "missing" && getStyle(d.key).missingStyle == LineMissingStyle.NONE
+            ? "none"
+            : chroma(d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color).hex()}
           stroke-width={higlight === d.key ? getStyle(d.key).width + 2 : getStyle(d.key).width}
           fill="none"
           stroke-dasharray={d.type == "line" ||
