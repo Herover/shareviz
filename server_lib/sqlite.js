@@ -395,11 +395,13 @@ export const db = {
         .where(and(eq(organizationInvites.code, code), isNull(organizationInvites.used)));
       if (invite.length != 1) {
         tx.rollback();
+        return 0;
       }
       if (invite[0].expires != null) {
         const expires = new Date(invite[0].expires);
         if (expires.getTime() < Date.now()) {
           tx.rollback();
+          return 0;
         }
       }
       await tx
