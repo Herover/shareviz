@@ -32,6 +32,7 @@
     {/if}
     <div class="hline"></div>
     <h1>Local editor</h1>
+    <p>Use without a account for free.</p>
     <p>
       Local charts are only viewable using this computer and browser, and does not allow
       collaborative features.

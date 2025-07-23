@@ -24,6 +24,7 @@
 </script>
 
 {#if message}
+  <p>Unable to use this invite, was it for another email or has it expired?</p>
   <p>Error: {message}.</p>
 {/if}
 
