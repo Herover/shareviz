@@ -70,6 +70,7 @@
     componentSpec.style.byKey
       .filter(
         (s) =>
+          s.label.location == LabelLocation.Legend &&
           s.label.text != "" &&
           charts.findIndex((c) => c.d.findIndex((d) => d.key == s.k) != -1) != -1,
       )
@@ -78,7 +79,7 @@
 </script>
 
 <!-- TODO: Should probably be a toggle setting -->
-{#if componentSpec.style.byKey.length != 0 && componentSpec.style.byKey[0].label.location == LabelLocation.None}
+{#if componentSpec.style.byKey.length != 0}
   <Legend keys={legendKeys} />
 {/if}
 

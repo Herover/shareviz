@@ -164,6 +164,7 @@ export enum LabelLocation {
   Left = "left",
   Right = "right",
   Float = "float",
+  Legend = "legend",
 }
 
 export enum LabelStyleLine {
