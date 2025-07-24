@@ -8,11 +8,17 @@
   import { onDestroy, onMount } from "svelte";
   import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
   import { computeData } from "$lib/data.js";
-  import type { EditorChartData, EditorChartScreenshot, ViewerMessage } from "$lib/viewerData.js";
+  import type {
+    EditorChartData,
+    EditorChartHighlight,
+    EditorChartScreenshot,
+    ViewerMessage,
+  } from "$lib/viewerData.js";
   import { ShareDBConnection } from "$lib/chartStores/data.svelte.js";
   import { ChartStore } from "$lib/chartStores/chart.svelte.js";
   import { env } from "$env/dynamic/public";
   import { LineStore } from "$lib/chartStores/line.svelte.js";
+  import { chartToEditor } from "$lib/chartToEditorStore.svelte.js";
 
   let { data } = $props();
 
@@ -141,6 +147,16 @@
     };
     viewerFrame?.contentWindow?.window.postMessage(data, env.PUBLIC_VIEWER_ORIGIN);
   };
+
+  $effect(() => {
+    const data: EditorChartHighlight = {
+      type: "CHART_HIGHLIGHT",
+      data: {
+        target: [...chartToEditor.highlight],
+      },
+    };
+    viewerFrame?.contentWindow?.window.postMessage(data, env.PUBLIC_VIEWER_ORIGIN);
+  });
 </script>
 
 <div class="main">

@@ -17,7 +17,7 @@
   import Axis from "../Axis.svelte";
   import FloatingLabels from "./FloatingLabels/FloatingLabels.svelte";
   import { createEventDispatcher, onMount } from "svelte";
-  import { chartToEditor } from "$lib/chartToEditorStore";
+  import { chartToEditor } from "$lib/chartToEditorStore.svelte";
   import chroma from "chroma-js";
   import { fontStore } from "$lib/fontStore.svelte";
 
@@ -181,8 +181,8 @@
   });
 
   let higlight = $derived(
-    $chartToEditor.highlight[0] == "elements" && $chartToEditor.highlight[1] == index
-      ? ($chartToEditor.highlight[2] as string)
+    chartToEditor.highlight[0] == "elements" && chartToEditor.highlight[1] == index
+      ? (chartToEditor.highlight[2] as string)
       : null,
   );
 

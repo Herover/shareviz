@@ -8,6 +8,7 @@
   import type { LineStore } from "$lib/chartStores/line.svelte";
   import CategoryList from "../CategoryList.svelte";
   import equal from "fast-deep-equal";
+  import { chartToEditor } from "$lib/chartToEditorStore.svelte";
 
   interface Props {
     chartColors: string[];
@@ -16,7 +17,7 @@
     lineStore: LineStore;
   }
 
-  let { chartColors, values, lineStore }: Props = $props();
+  let { chartColors, values, lineStore, index }: Props = $props();
 
   let selected: { [key: string]: boolean } = $state({});
   let defaultSelected = $state(false);
@@ -269,6 +270,8 @@
   title={categoryTitle}
   moveUp={(_k, i) => lineStore.lineStyle(i).moveUp()}
   moveDown={(_k, i) => lineStore.lineStyle(i).moveDown()}
+  onfocus={(k) => chartToEditor.setHighlight(["elements", index, k])}
+  onblur={() => chartToEditor.setHighlight([])}
 />
 
 <div class="box">

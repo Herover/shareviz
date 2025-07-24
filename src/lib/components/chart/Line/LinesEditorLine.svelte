@@ -3,7 +3,7 @@
 <script lang="ts">
   import { orDefault } from "$lib/utils";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
-  import { chartToEditor } from "../../../chartToEditorStore";
+  import { chartToEditor } from "../../../chartToEditorStore.svelte";
   import type { LineStyleStore } from "$lib/chartStores/lineStyle.svelte";
 
   interface Props {

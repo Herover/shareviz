@@ -16,7 +16,13 @@ export interface EditorChartScreenshot {
     name?: string;
   };
 }
-export type EditorMessage = EditorChartData | EditorChartScreenshot;
+export interface EditorChartHighlight {
+  type: "CHART_HIGHLIGHT";
+  data: {
+    target: any[];
+  };
+}
+export type EditorMessage = EditorChartData | EditorChartScreenshot | EditorChartHighlight;
 
 export interface ViewerChartUpdated {
   type: "CHART_UPDATED";

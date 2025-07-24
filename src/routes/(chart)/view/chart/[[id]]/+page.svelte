@@ -16,6 +16,7 @@
   } from "$lib/viewerData.js";
   import html2canvas from "html2canvas";
   import { fontStore, type FONTS } from "$lib/fontStore.svelte.js";
+  import { chartToEditor } from "$lib/chartToEditorStore.svelte.js";
 
   let { data } = $props();
 
@@ -33,9 +34,7 @@
 
     if (event.data.type == "CHART_DATA") {
       chartSpec = event.data.data.chart;
-    }
-
-    if (event.data.type == "CHART_SCREENSHOT") {
+    } else if (event.data.type == "CHART_SCREENSHOT") {
       try {
         if (typeof mainView == "undefined") {
           return;
@@ -109,6 +108,8 @@
       } catch (err) {
         console.error("Error: " + err);
       }
+    } else if (event.data.type == "CHART_HIGHLIGHT") {
+      chartToEditor.setHighlight(event.data.data.target);
     }
   };
 
