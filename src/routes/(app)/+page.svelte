@@ -6,6 +6,7 @@
   import { db } from "$lib/chartStore";
   import { onMount } from "svelte";
   import type { PageProps } from "./$types";
+  import { settings } from "$lib/settingsStore.svelte";
 
   let { data }: PageProps = $props();
 
@@ -20,12 +21,33 @@
 
   let charts: ReturnType<typeof db.getLocal> | undefined = $state();
   onMount(() => (charts = db.getLocal()));
+
+  const switchTheme = () => {
+    if (settings.theme == "dark") {
+      settings.theme = "light";
+    } else if (settings.theme == "light") {
+      settings.theme = "system";
+    } else if (settings.theme == "system") {
+      settings.theme = "dark";
+    } else {
+      settings.theme = "light";
+    }
+  };
 </script>
 
 <main>
   <div class="content">
+    <!-- svelte-ignore a11y_missing_attribute -->
+    <a
+      role="button"
+      tabindex="0"
+      onclick={() => switchTheme()}
+      onkeydown={(e) => (e.key == "Enter" || e.key == " ") && switchTheme()}
+      ><small>Switch theme</small></a
+    >
     {#if !data.session?.user}
       <h1>Sign in using</h1>
+      <p>By signing in, you will share your e-mail address, name and other login provider details. This information may be shared with other people in your organizations, or used to contact you regarding your account.</p>
       <SignIn provider="github" signInPage="signin" />
     {:else}
       <p>Redirecting you to <a href="/org">organization page</a>...</p>
