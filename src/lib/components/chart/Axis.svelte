@@ -91,7 +91,10 @@
           const ticks = scaleLinear([from, to], [0, 1]).nice().ticks(3);
           ticks.forEach((tick) => {
             return computedMajorTicks.push({
-              l: "" + tick,
+              l: conf.major.auto.labels
+                ? formatNumber(tick, conf.major.labelDivide, conf.major.labelThousands) +
+                  conf.major.afterLabel
+                : "",
               n: tick,
               textAnchor: "middle",
             });
