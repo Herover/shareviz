@@ -12,14 +12,8 @@ import { editChartInfo } from "./api";
 import { defDoc } from "./initialDoc";
 import { migrate } from "./chartMigrate";
 import { type Doc } from "sharedb";
-// import { type Connection, type LocalPresence, type Presence } from 'sharedb/lib/client';
 
 export const localPrefix = "local-";
-
-interface PresenceData {
-  selected: string;
-  color: string;
-}
 
 export const createLocalDoc = (
   collection: string,
@@ -93,28 +87,19 @@ export const db = (function createDB() {
   let connection: any;
   let id: undefined | string;
 
-  let presence: any; // Presence<PresenceData>;
-  //let localPresence: any; // LocalPresence<PresenceData>;
-
   let connected = false;
-
-  //let myColor = `hsl(${Math.random() * 360} 100% 50%)`;
 
   const { subscribe, set, update } = writable<{
     connected: boolean;
     doc: /* Doc */ Root | null;
     /** True if document was fetched but is undefined */
     missing: boolean;
-    presences: unknown;
-    presenceTargets: unknown;
     mode: "local" | "synced";
     chartInfo: null | any;
   }>({
     connected,
     doc: null,
     missing: false,
-    presences: {},
-    presenceTargets: {},
     mode: "local",
     chartInfo: null,
   });
@@ -168,43 +153,6 @@ export const db = (function createDB() {
         migrate(doc);
       }
 
-      presence = connection.getPresence("x-" + docId);
-      presence.subscribe((e: any) => console.log("presence subscribe callback", e));
-      const presences: { [key: string]: PresenceData } = {};
-      const presenceTargets: { [key: string]: string } = {};
-      presence.on("receive", (presenceId: string, data: any) => {
-        if (data === null) {
-          delete presenceTargets[presences[presenceId].selected];
-          delete presences[presenceId];
-          update((d) => {
-            d.presences = presences;
-            d.presenceTargets = presenceTargets;
-            return d;
-          });
-        } else {
-          if (
-            typeof presences[presenceId] != "undefined" &&
-            typeof presenceTargets[presences[presenceId].selected] != "undefined"
-          ) {
-            delete presenceTargets[presences[presenceId].selected];
-          }
-          presences[presenceId] = {
-            selected: data.selected,
-            color: data.color,
-          };
-          presenceTargets[data.selected] = presenceId;
-          update((d) => {
-            d.presences = presences;
-            d.presenceTargets = presenceTargets;
-            return d;
-          });
-        }
-      });
-      presence.on("error", (e: any) => {
-        console.log("presence error", e);
-      });
-      // localPresence = presence.create();
-
       const onData = (e?: Error) => {
         if (e && typeof e.message == "string") notifications.addError(e.message);
         // console.log("doc", doc, doc.data);
@@ -212,14 +160,10 @@ export const db = (function createDB() {
           doc: doc.data,
           missing: typeof doc.data === "undefined",
           connected,
-          presences,
-          presenceTargets,
           mode: doc.mode === "synced" ? "synced" : "local",
           chartInfo: d.chartInfo,
         }));
       };
-      // window.localPresence = localPresence
-      // window.presence = presence
 
       // Get initial value of document and subscribe to changes
       doc.subscribe(onData);

@@ -9,6 +9,21 @@ import sharedb from "sharedb";
 import { db as drizzledb, sessions, users } from "../server_lib/drizzle/schema.js";
 import { eq, gt } from "drizzle-orm";
 
+const authorizeOrRejectUserOnChart = (userId, chartId) => {
+  return new Promise((resolve, reject) =>
+    db
+      .getUserCharts(userId, chartId)
+      .then((charts) => {
+        if (charts.length != 0) {
+          resolve();
+        } else {
+          reject("unauthorized");
+        }
+      })
+      .catch((e) => reject(e)),
+  );
+};
+
 // Create initial document then fire callback
 export function createDoc(callback) {
   var doc = connection.get("examples", "1");
@@ -581,11 +596,33 @@ export function startServer(server) {
       }
     } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.handshake) {
       next();
-    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.presenceSubscribe) {
-      // TODO: only for allowed charts
-      next();
     } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.fetch) {
       next();
+    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.presenceRequest) {
+      const chartId = ctx.data.ch.slice("presence-".length);
+      authorizeOrRejectUserOnChart(ctx.agent.custom.user.id, chartId)
+        .then(() => {
+          next();
+        })
+        .catch((e) => next(e));
+      next();
+    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.presenceSubscribe) {
+      const chartId = ctx.data.ch.slice("presence-".length);
+      authorizeOrRejectUserOnChart(ctx.agent.custom.user.id, chartId)
+        .then(() => {
+          next();
+        })
+        .catch((e) => next(e));
+      next();
+    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.presence) {
+      const chartId = ctx.data.ch.slice("presence-".length);
+      authorizeOrRejectUserOnChart(ctx.agent.custom.user.id, chartId)
+        .then(() => {
+          // Include verified user info in response
+          ctx.data.p.name = ctx.agent.custom.user.name;
+          next();
+        })
+        .catch((e) => next(e));
     } else {
       console.log(`unauthorized receive on ${JSON.stringify(ctx.data)}`);
       next("unauthorized");
@@ -601,27 +638,9 @@ export function startServer(server) {
       next("no queries");
     } else if (ctx.reply.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.reply.c == "examples") {
       // When accessing chart, check if user is allowed to read
-      db.getUserCharts(ctx.agent.custom.user.id, ctx.request.d)
-        .then((charts) => {
-          if (charts.length != 0) {
-            next();
-          } else {
-            console.log(`unauthorized reply on ${ctx.request.c} ${ctx.request.d}`);
-            next("unauthorized");
-          }
-        })
+      authorizeOrRejectUserOnChart(ctx.agent.custom.user.id, ctx.request.d)
+        .then(() => next())
         .catch((e) => next(e));
-      // if (ctx.reply?.data?.data?.meta?.publicRead) {
-      //   next();
-      // } else {
-      //   const entry = ctx.reply?.data?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
-      //   if (entry?.read) {
-      //     next();
-      //   } else {
-      //     console.log(`unauthorized reply on ${ctx.request.c} ${ctx.request.d}`);
-      //     next("unauthorized");
-      //   }
-      // }
     } else {
       next();
     }

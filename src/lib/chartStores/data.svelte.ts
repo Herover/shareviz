@@ -2,13 +2,19 @@
 
 import ReconnectingWebSocket from "reconnecting-websocket";
 import * as json1 from "ot-json1";
-import ShareDB from "sharedb/lib/client";
+import ShareDB, { Presence } from "sharedb/lib/client";
 import { WebSocket } from "ws";
 import { notifications } from "../notificationStore";
 import { migrate } from "../chartMigrate";
 import { getLocalDoc, localPrefix } from "../chartStore";
 import { defDoc } from "../initialDoc";
 import type { Root } from "../chart";
+
+interface PresenceData {
+  selected: string;
+  color: string;
+  name: string;
+}
 
 export class ShareDBConnection {
   id: undefined | string;
@@ -19,11 +25,14 @@ export class ShareDBConnection {
   #data?: Root = $state();
   #connection?: ShareDB.Connection;
   #socket?: ReconnectingWebSocket;
+  #presence?: Presence<PresenceData>;
 
   #events: EventTarget;
 
   missing = $derived(typeof this.#doc?.data == "undefined");
   mode: "synced" | "local" | "invalid" = "invalid";
+  presences: { [key: string]: PresenceData } = $state({});
+  presenceTargets: { [key: string]: string } = $state({});
 
   constructor() {
     this.#events = new EventTarget();
@@ -50,6 +59,9 @@ export class ShareDBConnection {
   disconnect() {
     if (!this.#connection) {
       throw new Error("connect() has not been called yet");
+    }
+    if (this.#presence) {
+      this.#presence.unsubscribe();
     }
     if (this.#socket) {
       this.#socket.removeEventListener("error", this.#onSocketError);
@@ -87,20 +99,17 @@ export class ShareDBConnection {
       migrate(doc);
     }
 
-    /*
-    presence = connection.getPresence("x-" + docId);
-    presence.subscribe((e: any) => console.log("presence subscribe callback", e));
+    this.#presence = this.#connection.getPresence("presence-" + docId);
+    this.#presence.subscribe((e: any) => console.log("presence subscribe callback", e));
     const presences: { [key: string]: PresenceData } = {};
     const presenceTargets: { [key: string]: string } = {};
-    presence.on("receive", (presenceId: string, data: any) => {
+    this.#presence.on("receive", (presenceId: string, data: any) => {
+      console.log("presence", presenceId, data);
       if (data === null) {
         delete presenceTargets[presences[presenceId].selected];
         delete presences[presenceId];
-        update((d) => {
-          d.presences = presences;
-          d.presenceTargets = presenceTargets;
-          return d;
-        });
+        this.presences = presences;
+        this.presenceTargets = presenceTargets;
       } else {
         if (
           typeof presences[presenceId] != "undefined" &&
@@ -111,20 +120,18 @@ export class ShareDBConnection {
         presences[presenceId] = {
           selected: data.selected,
           color: data.color,
+          name: data.name,
         };
         presenceTargets[data.selected] = presenceId;
-        update((d) => {
-          d.presences = presences;
-          d.presenceTargets = presenceTargets;
-          return d;
-        });
+        this.presences = presences;
+        this.presenceTargets = presenceTargets;
       }
     });
-    presence.on("error", (e: any) => {
+    this.#presence.on("error", (e: any) => {
       console.log("presence error", e);
     });
-    // localPresence = presence.create();
-    */
+    const localPresence = this.#presence.create();
+    localPresence.submit({ color: `hsl(${Math.random() * 360} 70% 70%)`, selected: "", name: "" });
 
     const onData = (e: any) => {
       if (e && typeof e.message == "string") notifications.addError(e.message);

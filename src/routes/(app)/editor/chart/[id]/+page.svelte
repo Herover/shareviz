@@ -206,6 +206,18 @@
           </div>
         </div>
       </div>
+
+      <div class="presence">
+        {#each Object.keys(store.presences) as presence}
+          <div
+            style:background-color={store.presences[presence].color}
+            class="user-presence"
+            title={store.presences[presence].name}
+          >
+            {store.presences[presence].name.slice(0, 1)}
+          </div>
+        {/each}
+      </div>
     </header>
     <div class="chart-controls-pane">
       <div class="chart-controls-primary chart-controls editor">
@@ -403,6 +415,8 @@
     position: sticky;
     top: 0px;
     z-index: 10;
+    display: flex;
+    justify-content: space-between;
   }
   .parts-holder {
     position: relative;
@@ -430,6 +444,24 @@
   }
   .part-item-selected {
     border-bottom: 1px solid var(--accent-bg-color);
+  }
+  .presence {
+    position: relative;
+    height: var(--editor-header-height);
+    padding-right: 50px;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+  }
+  .user-presence {
+    border: 3px solid var(--text-primary);
+    border-radius: 50%;
+    height: 2em;
+    width: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0.2em;
   }
   input[type="text"] {
     width: 100%;
