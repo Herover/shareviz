@@ -620,6 +620,8 @@ export function startServer(server) {
         .then(() => {
           // Include verified user info in response
           ctx.data.p.name = ctx.agent.custom.user.name;
+          ctx.data.p.id = ctx.agent.custom.user.id;
+          ctx.data.p.image = ctx.agent.custom.user.image;
           next();
         })
         .catch((e) => next(e));
