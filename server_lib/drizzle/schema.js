@@ -3,9 +3,24 @@
 import { integer, sqliteTable, text, primaryKey, unique } from "drizzle-orm/sqlite-core";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
+import { getLogger } from "../log";
+
+class DrizzleLogger {
+  #logger;
+  constructor() {
+    this.#logger = getLogger({ drizzle: "sqlite3" });
+  }
+  /**
+   * @param {any} query
+   * @param {any} params
+   */
+  logQuery(query, params) {
+    this.#logger.log("query", { query, params });
+  }
+}
 
 const sqlite = new Database("data/db.sqlite");
-export const db = drizzle({ client: sqlite, logger: true });
+export const db = drizzle({ client: sqlite, logger: new DrizzleLogger() });
 
 // Auth.js types
 

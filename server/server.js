@@ -8,6 +8,9 @@ import { backend, connection } from "../server_lib/sharedb.js";
 import sharedb from "sharedb";
 import { db as drizzledb, sessions, users } from "../server_lib/drizzle/schema.js";
 import { eq, gt } from "drizzle-orm";
+import { getLogger } from "../server_lib/log.js";
+
+const logger = getLogger();
 
 const authorizeOrRejectUserOnChart = (userId, chartId) => {
   return new Promise((resolve, reject) =>
@@ -521,7 +524,7 @@ Region Nordjylland	2023	4989245`,
  * @param {import('http').Server} server
  */
 export function startServer(server) {
-  /* console.log("STARTSERVER",server) */
+  /* logger.log("STARTSERVER",server) */
   // Create a web server to serve files and listen to WebSocket connections
   // Connect any incoming WebSocket connection to ShareDB
   var wss = new WebSocketServer({ server, path: "/sharedb" });
@@ -542,7 +545,7 @@ export function startServer(server) {
   });
 
   backend.use("connect", function (ctx, next) {
-    console.log("connect");
+    logger.log("connect");
     if (ctx.req.__sharevizAuthJSToken) {
       drizzledb
         .select()
@@ -565,7 +568,7 @@ export function startServer(server) {
           next();
         })
         .catch((e) => {
-          console.error("error", e);
+          logger.error("error", { error: e });
           next(e);
         });
     } else {
@@ -573,17 +576,21 @@ export function startServer(server) {
     }
   });
   backend.use("receive", function (ctx, next) {
-    console.log(
+    logger.log(
       "receive",
-      ctx.data.a,
-      Object.keys(sharedb.MESSAGE_ACTIONS).find((k) => sharedb.MESSAGE_ACTIONS[k] == ctx.data.a),
+      {
+        a: ctx.data.a,
+        translated: Object.keys(sharedb.MESSAGE_ACTIONS).find(
+          (k) => sharedb.MESSAGE_ACTIONS[k] == ctx.data.a,
+        ),
+      },
       /* JSON.stringify(ctx.data), */
     );
 
     if (ctx.data.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.data.c == "examples") {
       // TODO: add authentication using `ctx.agent.custom.userId`
       // if (false) {
-      //   console.log("unauthorized")
+      //   logger.log("unauthorized")
       //   return next("unauthorized");
       // }
       next();
@@ -626,12 +633,12 @@ export function startServer(server) {
         })
         .catch((e) => next(e));
     } else {
-      console.log(`unauthorized receive on ${JSON.stringify(ctx.data)}`);
+      logger.log(`unauthorized receive`, { data: ctx.data });
       next("unauthorized");
     }
   });
   backend.use("reply", function (ctx, next) {
-    console.log("reply" /* JSON.stringify(ctx.reply) */);
+    logger.log("reply" /* JSON.stringify(ctx.reply) */);
     if (ctx.reply.a == sharedb.MESSAGE_ACTIONS.queryFetch && ctx.reply?.data?.length) {
       // When querying db, remove items user doesn't have access to
       // ctx.reply.data = ctx.reply?.data?.filter(
@@ -648,28 +655,28 @@ export function startServer(server) {
     }
   });
   backend.use("receivePresence", function (ctx, next) {
-    console.log("receivePresence");
+    logger.log("receivePresence");
     next();
   });
   backend.use("sendPresence", function (ctx, next) {
-    console.log("sendPresence");
+    logger.log("sendPresence");
     next();
   });
   backend.use("query", function (ctx, next) {
-    console.log("query");
+    logger.log("query");
     next();
   });
   backend.use("readSnapshots", function (ctx, next) {
-    console.log("readSnapshots");
+    logger.log("readSnapshots");
     next();
   });
   backend.use("op", function (ctx, next) {
-    console.log("op");
+    logger.log("op");
     next();
   });
 
   backend.use("submit", function (ctx, next) {
-    console.log("submit" /* ctx.snapshot */);
+    logger.log("submit" /* ctx.snapshot */);
     if (ctx.snapshot === null) {
       next();
       return;
@@ -680,7 +687,7 @@ export function startServer(server) {
         if (charts.length != 0 && (charts[0].relationType === 1 || charts[0].teamId !== null)) {
           next();
         } else {
-          console.log(`unauthorized submit on ${ctx.collection} ${ctx.id}`);
+          logger.log(`unauthorized submit`, { collection: ctx.collection, id: ctx.id });
           next("unauthorized");
         }
       })
@@ -689,12 +696,12 @@ export function startServer(server) {
     // if (entry?.write) {
     //   next();
     // } else {
-    //   console.log(`unauthorized submit on ${ctx.collection} ${ctx.id}`);
+    //   logger.log(`unauthorized submit on ${ctx.collection} ${ctx.id}`);
     //   next("unauthorized");
     // }
   });
   backend.use("apply", function (ctx, next) {
-    console.log("apply" /* ctx.agent.custom.userId, ctx */);
+    logger.log("apply" /* ctx.agent.custom.userId, ctx */);
     ctx.extra.oldMeta = ctx.snapshot?.data?.meta;
 
     if (typeof ctx.op.create == "object" && typeof ctx.snapshot?.data != "object") {
@@ -718,7 +725,7 @@ export function startServer(server) {
           ) {
             next();
           } else {
-            console.log(`unauthorized apply on ${ctx.collection} ${ctx.id}`);
+            logger.log(`unauthorized apply`, { collection: ctx.collection, id: ctx.id });
             next("unauthorized");
           }
         })
@@ -727,17 +734,17 @@ export function startServer(server) {
       // if (entry?.write) {
       //   next();
       // } else {
-      //   console.log(`unauthorized apply on ${ctx.collection} ${ctx.id}`);
+      //   logger.log(`unauthorized apply on ${ctx.collection} ${ctx.id}`);
       //   next("unauthorized");
       // }
     } else {
-      console.log(`unknown apply on ${ctx.collection} ${ctx.id}`);
+      logger.log(`unknown apply`, { collection: ctx.collection, id: ctx.id });
       next("unauthorized");
     }
     // next();
   });
   backend.use("commit", function (ctx, next) {
-    console.log("commit" /* , ctx.snapshot */);
+    logger.log("commit" /* , ctx.snapshot */);
     if (typeof ctx.extra.oldMeta == "object" && ctx.snapshot?.data !== null) {
       // Ensure user can't edit meta object
       // TODO: add some sort of check to detect disallowed changes
@@ -747,7 +754,7 @@ export function startServer(server) {
     next();
   });
   backend.use("afterWrite", function (ctx, next) {
-    console.log("afterWrite" /* , ctx */);
+    logger.log("afterWrite" /* , ctx */);
     if (typeof ctx.op.op == "object" && ctx.op.op != null) {
       db.updateChart(ctx.id, { updated: Date.now() })
         .then(() => next())
