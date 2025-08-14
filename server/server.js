@@ -588,7 +588,7 @@ export function startServer(server) {
     );
 
     if (ctx.data.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.data.c == "examples") {
-      // TODO: add authentication using `ctx.agent.custom.userId`
+      // TODO: add authentication using "ctx.agent.custom.userId"
       // if (false) {
       //   logger.log("unauthorized")
       //   return next("unauthorized");
@@ -633,7 +633,7 @@ export function startServer(server) {
         })
         .catch((e) => next(e));
     } else {
-      logger.log(`unauthorized receive`, { data: ctx.data });
+      logger.log("unauthorized receive", { data: ctx.data });
       next("unauthorized");
     }
   });
@@ -687,7 +687,7 @@ export function startServer(server) {
         if (charts.length != 0 && (charts[0].relationType === 1 || charts[0].teamId !== null)) {
           next();
         } else {
-          logger.log(`unauthorized submit`, { collection: ctx.collection, id: ctx.id });
+          logger.log("unauthorized submit", { collection: ctx.collection, id: ctx.id });
           next("unauthorized");
         }
       })
@@ -725,7 +725,7 @@ export function startServer(server) {
           ) {
             next();
           } else {
-            logger.log(`unauthorized apply`, { collection: ctx.collection, id: ctx.id });
+            logger.log("unauthorized apply", { collection: ctx.collection, id: ctx.id });
             next("unauthorized");
           }
         })
@@ -738,7 +738,7 @@ export function startServer(server) {
       //   next("unauthorized");
       // }
     } else {
-      logger.log(`unknown apply`, { collection: ctx.collection, id: ctx.id });
+      logger.log("unknown apply", { collection: ctx.collection, id: ctx.id });
       next("unauthorized");
     }
     // next();
