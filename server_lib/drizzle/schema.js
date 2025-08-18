@@ -3,7 +3,7 @@
 import { integer, sqliteTable, text, primaryKey, unique } from "drizzle-orm/sqlite-core";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
-import { getLogger } from "../log";
+import { getLogger } from "../log.js";
 
 class DrizzleLogger {
   #logger;
