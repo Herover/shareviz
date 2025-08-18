@@ -97,42 +97,40 @@ export class ShareDBConnection {
 
     if (!synced) {
       migrate(doc);
-    }
-
-    this.#presence = this.#connection.getPresence("presence-" + docId);
-    this.#presence.subscribe((e: any) => console.log("presence subscribe callback", e));
-    const presences: { [key: string]: PresenceData } = {};
-    const presenceTargets: { [key: string]: string } = {};
-    this.#presence.on("receive", (presenceId: string, data: any) => {
-      console.log("presence", presenceId, data);
-      if (data === null) {
-        delete presenceTargets[presences[presenceId].selected];
-        delete presences[presenceId];
-        this.presences = presences;
-        this.presenceTargets = presenceTargets;
-      } else {
-        if (
-          typeof presences[presenceId] != "undefined" &&
-          typeof presenceTargets[presences[presenceId].selected] != "undefined"
-        ) {
+    } else {
+      this.#presence = this.#connection.getPresence("presence-" + docId);
+      this.#presence.subscribe((e: any) => console.log("presence subscribe callback", e));
+      const presences: { [key: string]: PresenceData } = {};
+      const presenceTargets: { [key: string]: string } = {};
+      this.#presence.on("receive", (presenceId: string, data: any) => {
+        if (data === null) {
           delete presenceTargets[presences[presenceId].selected];
+          delete presences[presenceId];
+          this.presences = presences;
+          this.presenceTargets = presenceTargets;
+        } else {
+          if (
+            typeof presences[presenceId] != "undefined" &&
+            typeof presenceTargets[presences[presenceId].selected] != "undefined"
+          ) {
+            delete presenceTargets[presences[presenceId].selected];
+          }
+          presences[presenceId] = {
+            selected: data.selected,
+            color: data.color,
+            name: data.name,
+          };
+          presenceTargets[data.selected] = presenceId;
+          this.presences = presences;
+          this.presenceTargets = presenceTargets;
         }
-        presences[presenceId] = {
-          selected: data.selected,
-          color: data.color,
-          name: data.name,
-        };
-        presenceTargets[data.selected] = presenceId;
-        this.presences = presences;
-        this.presenceTargets = presenceTargets;
-      }
-    });
-    this.#presence.on("error", (e: any) => {
-      console.log("presence error", e);
-    });
-    const localPresence = this.#presence.create();
-    localPresence.submit({ color: `hsl(${Math.random() * 360} 70% 70%)`, selected: "", name: "" });
-
+      });
+      this.#presence.on("error", (e: any) => {
+        console.log("presence error", e);
+      });
+      const localPresence = this.#presence.create();
+      localPresence.submit({ color: `hsl(${Math.random() * 360} 70% 70%)`, selected: "", name: "" });
+    }
     const onData = (e: any) => {
       if (e && typeof e.message == "string") notifications.addError(e.message);
       // console.log("got doc", doc.data);
