@@ -47,7 +47,11 @@
     >
     {#if !data.session?.user}
       <h1>Sign in using</h1>
-      <p>By signing in, you will share your e-mail address, name and other login provider details. This information may be shared with other people in your organizations, or used to contact you regarding your account.</p>
+      <p>
+        By signing in, you will share your e-mail address, name and other login provider details.
+        This information may be shared with other people in your organizations, or used to contact
+        you regarding your account.
+      </p>
       <SignIn provider="github" signInPage="signin" />
     {:else}
       <p>Redirecting you to <a href="/org">organization page</a>...</p>

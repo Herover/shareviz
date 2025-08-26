@@ -19,6 +19,8 @@
   import { env } from "$env/dynamic/public";
   import { LineStore } from "$lib/chartStores/line.svelte.js";
   import { chartToEditor } from "$lib/chartToEditorStore.svelte.js";
+  import { addPublication, getChartPublications } from "$lib/api.js";
+  import dayjs from "dayjs";
 
   let { data } = $props();
 
@@ -27,6 +29,24 @@
   let viewScale = $state(100);
   let height = $state(100);
   let imageScale = $state(2);
+  let publications: {
+    charts: {
+      id: string;
+      name: string;
+      chartRef: string;
+      teamId: string | null;
+      created: number;
+      updated: number;
+      archived: number | null;
+      folderId: string | null;
+    };
+    chartPublication: {
+      id: string;
+      chartId: string;
+      v: number;
+      created: number;
+    };
+  }[] = $state([]);
 
   type section = "data" | "layout" | "charts" | "publish";
   let visibleSection: section = $state("data");
@@ -148,6 +168,28 @@
     viewerFrame?.contentWindow?.window.postMessage(data, env.PUBLIC_VIEWER_ORIGIN);
   };
 
+  const updatePublications = async (id: string) => {
+    publications = (await getChartPublications(id)).publications;
+  };
+  $effect(() => {
+    if (!store.chartInfo) {
+      return;
+    }
+    updatePublications(store.chartInfo.id);
+  })
+
+  let publisize = () => {};
+  $effect(() => {
+    publisize = async () => {
+      if (!store.chartInfo) {
+        return;
+      }
+      await addPublication(store.chartInfo.id, store.version);
+      await updatePublications(store.chartInfo.id);
+    };
+  });
+  $inspect(store.version)
+
   $effect(() => {
     const data: EditorChartHighlight = {
       type: "CHART_HIGHLIGHT",
@@ -244,18 +286,28 @@
           {:else if visibleSection == "publish"}
             <h3 class="editor-sub-section">Embed</h3>
             <p class="editor-sub-section-description">
-              For displaying responsive/interactable chart.
+              For displaying responsive/interactable chart. <button onclick={() => publisize()}
+                >+ New</button
+              >
             </p>
-            <div class="box">
-              <div class="w-025 editor-explain-box">
-                <span class="editor-column-label"
-                  ><a href="/view/chart/{data.id}">Embed link</a></span
-                >
+            {#each publications as publication}
+              <p>{dayjs(publication.chartPublication.created).format("YYYY-MM-DD HH:mm")} v. {publication.chartPublication.v}</p>
+              <div class="box">
+                <div class="w-025 editor-explain-box">
+                  <span class="editor-column-label">
+                    <a href="/view/chart/{publication.chartPublication.id}">Embed link</a>
+                  </span>
+                </div>
+                <div class="w-075">
+                  <input
+                    value={env.PUBLIC_VIEWER_ORIGIN +
+                      "/view/chart/" +
+                      publication.chartPublication.id}
+                    type="text"
+                  />
+                </div>
               </div>
-              <div class="w-075">
-                <input value={env.PUBLIC_VIEWER_ORIGIN + "/view/chart/" + data.id} type="text" />
-              </div>
-            </div>
+            {/each}
             <h3 class="editor-sub-section">Export image</h3>
             <div class="box">
               <div class="w-025 editor-explain-box">

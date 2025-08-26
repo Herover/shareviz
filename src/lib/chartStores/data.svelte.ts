@@ -19,9 +19,10 @@ interface PresenceData {
 export class ShareDBConnection {
   id: undefined | string;
   connected = $state(false);
-  chartInfo: null | { name: string } = $state(null);
+  chartInfo: null | { name: string, id: string, chartRef: string } = $state(null);
 
   #doc: ShareDB.Doc = $state(new ShareDB.Doc()); // Doc;
+  #version: number = $state(-1);
   #data?: Root = $state();
   #connection?: ShareDB.Connection;
   #socket?: ReconnectingWebSocket;
@@ -129,19 +130,26 @@ export class ShareDBConnection {
         console.log("presence error", e);
       });
       const localPresence = this.#presence.create();
-      localPresence.submit({ color: `hsl(${Math.random() * 360} 70% 70%)`, selected: "", name: "" });
+      localPresence.submit({
+        color: `hsl(${Math.random() * 360} 70% 70%)`,
+        selected: "",
+        name: "",
+      });
     }
-    const onData = (e: any) => {
+    const onData = (e?: any) => {
       if (e && typeof e.message == "string") notifications.addError(e.message);
       // console.log("got doc", doc.data);
       this.#data = doc.data;
+      this.#version = doc.version ?? -1;
 
-      this.#events.dispatchEvent(new CustomEvent("data", { detail: { doc: doc.data } }));
+      this.#events.dispatchEvent(new CustomEvent("data", { detail: { doc: doc.data, version: doc.version } }));
     };
 
     // Get initial value of document and subscribe to changes
-    doc.subscribe(onData);
-    doc.on("op", onData);
+    doc.subscribe((e) => onData(e));
+    doc.on("op", () => onData()); // Trigger when we have done something
+    doc.on("nothing pending", () => onData()); // Trigger after version has been updated
+    
 
     if (synced) {
       fetch("/api/chart/" + docId)
@@ -185,6 +193,10 @@ export class ShareDBConnection {
 
   get data(): Root | undefined {
     return this.#data;
+  }
+
+  get version(): number {
+    return this.#version;
   }
 
   get doc(): ShareDB.Doc {

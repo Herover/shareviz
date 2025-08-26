@@ -3,6 +3,7 @@
 import { and, eq, isNull } from "drizzle-orm";
 import {
   accounts,
+  chartPublications,
   charts,
   db as drizzledb,
   folders,
@@ -455,6 +456,48 @@ export const db = {
       throw new Error("Folder not found");
     }
     return lst[0];
+  },
+  addPublication: async (/** @type {string} */ chartId, /** @type {number} */ v) => {
+    const r = await drizzledb
+      .insert(chartPublications)
+      .values({
+        chartId,
+        v,
+        created: Date.now(),
+      })
+      .returning({ id: chartPublications.id });
+
+    return r[0].id;
+  },
+  getPublication: async (/** @type {string} */ publicationId) => {
+    const publications = await drizzledb
+      .select()
+      .from(chartPublications)
+      .where(eq(chartPublications.id, publicationId))
+      .innerJoin(charts, eq(charts.id, chartPublications.chartId));
+    if (publications.length == 0) {
+      throw new Error("Publication not found");
+    }
+    return publications[0];
+  },
+  getChartPublications: async (/** @type {string} */ chartId) => {
+    const publications = await drizzledb
+      .select()
+      .from(charts)
+      .where(eq(charts.id, chartId))
+      .innerJoin(chartPublications, eq(chartPublications.chartId, charts.id));
+    return publications;
+  },
+
+  userCanAccessChart: async (/** @type {string} */ userId, /** @type {string} */ chartId) => {
+    const lst = await drizzledb
+      .select()
+      .from(users)
+      .innerJoin(usersTeams, eq(usersTeams.userId, users.id))
+      .innerJoin(charts, eq(charts.teamId, usersTeams.teamId))
+      .where(and(eq(users.id, userId), eq(charts.id, chartId)));
+      console.log(lst, userId, chartId)
+    return lst.length != 0;
   },
 };
 

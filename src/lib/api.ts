@@ -115,3 +115,49 @@ export async function editChartInfo(
     throw new Error(data.message);
   }
 }
+
+export async function getChartPublications(id: string): Promise<{
+  publications: {
+    charts: {
+      id: string;
+      name: string;
+      chartRef: string;
+      teamId: string | null;
+      created: number;
+      updated: number;
+      archived: number | null;
+      folderId: string | null;
+    };
+    chartPublication: {
+      id: string;
+      chartId: string;
+      v: number;
+      created: number;
+    };
+  }[];
+}> {
+  const res = await fetch("/api/chart/" + id + "/publication", {
+    method: "GET",
+  });
+
+  if (res.status != 200) {
+    const data = await res.json();
+    throw new Error(data.message);
+  }
+
+  return await res.json();
+}
+
+export async function addPublication(chartId: string, version: number): Promise<string> {
+  const res = await fetch(`/api/chart/${chartId}/publication`, {
+    method: "POST",
+    body: JSON.stringify({
+      version,
+    }),
+  });
+  const data = await res.json();
+  if (res.status != 200) {
+    throw new Error(data.message);
+  }
+  return data.id;
+}

@@ -207,3 +207,18 @@ export const organizationInvites = sqliteTable("organizationInvites", {
   expires: text("expires"),
   role: integer("role").notNull(),
 });
+
+export const chartPublications = sqliteTable("chartPublication", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  chartId: text("chartId")
+    .references(
+      /** @type () => import("drizzle-orm/sqlite-core").AnySQLiteColumn */ () => charts.id,
+      { onDelete: "cascade" },
+    )
+    .notNull(),
+  // Revision of chart with chartId
+  v: integer("v").notNull(),
+  created: integer("created").notNull(),
+});

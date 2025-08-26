@@ -151,7 +151,7 @@
 
   $effect(() => {
     if (data.id && !data.id.startsWith(localPrefix) && !data.editor) {
-      fetch("/api/chart/" + data.id + "/data")
+      fetch("/api/publication/" + data.id + "/data")
         .then((resp) => resp.json())
         .then((data) => (chartSpec = data.chart))
         .catch((err) => console.error(err));
