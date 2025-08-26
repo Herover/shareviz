@@ -103,8 +103,7 @@ JSONDB.prototype.commit = function (collection, id, op, snapshot, options, callb
       document.ops.push(op);
       document.snapshot = jsonSnapshot;
     } else {
-      callback(null, false);
-      process.exit();
+      callback(new Error("Next version number must be one less than the number of ops"), false);
       return;
     }
 
@@ -203,7 +202,7 @@ JSONDB.prototype.getOps = function (collection, id, from, to, options, callback)
     /** @type JSONDBData */
     const document = JSON.parse(readFileSync(documentPath).toString("utf8"));
 
-    return document.ops.filter((op) => from <= op.v && op.v < to).sort((a, b) => a.v - b.v);
+    callback(null, document.ops.filter((op) => from <= op.v && op.v < to));
   } catch (err) {
     callback(err);
   }
