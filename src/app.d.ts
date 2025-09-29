@@ -5,7 +5,9 @@
 declare global {
   namespace App {
     // interface Error {}
-    // interface Locals {}
+    interface Locals {
+      session: Awaited<ReturnType<typeof import("../server_lib/sqlite").db.getUserBySession>>;
+    }
     // interface PageData {}
     // interface PageState {}
     // interface Platform {}

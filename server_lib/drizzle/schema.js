@@ -1,26 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { integer, sqliteTable, text, primaryKey, unique } from "drizzle-orm/sqlite-core";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import Database from "better-sqlite3";
-import { getLogger } from "../log.js";
-
-class DrizzleLogger {
-  #logger;
-  constructor() {
-    this.#logger = getLogger({ drizzle: "sqlite3" });
-  }
-  /**
-   * @param {any} query
-   * @param {any} params
-   */
-  logQuery(query, params) {
-    this.#logger.log("query", { query, params });
-  }
-}
-
-const sqlite = new Database("data/db.sqlite");
-export const db = drizzle({ client: sqlite, logger: new DrizzleLogger() });
 
 // Auth.js types
 
@@ -102,6 +82,31 @@ export const authenticators = sqliteTable(
     }),
   }),
 );
+
+// New login types
+
+export const userPasswordLogins = sqliteTable("userPasswordLogin", {
+  userId: text("userId")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  hash: text("hash").notNull(),
+  salt: text("salt").notNull(),
+});
+
+export const userSessions = sqliteTable("user_session", {
+  sessionToken: text("sessionToken").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
+  created: integer("created", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  IP: text("ip").notNull(),
+  agent: text("agent").notNull(),
+  // Optional oauth session id etc.
+  identifier: text("identifier"),
+});
 
 // Shareviz types
 

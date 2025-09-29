@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MPL-2.0
 
-export { handle } from "./auth";
-import type { ServerInit } from "@sveltejs/kit";
+import { handle as authHandle } from "./auth";
+import type { Handle, ServerInit } from "@sveltejs/kit";
 import { db } from "../server_lib/user";
 import { init as initDB } from "../server_lib/sqlite";
 import { connection } from "$lib/../../server_lib/sharedb";
+import { SESSION_COOKIE_KEY } from "$lib/../../server_lib/auth";
 import { migrate } from "$lib/chartMigrate";
 import { formatVersion } from "$lib/initialDoc";
+import { sequence } from "@sveltejs/kit/hooks";
 
 export const init: ServerInit = async () => {
   console.log("init db...");
@@ -44,3 +46,24 @@ export const init: ServerInit = async () => {
 
   console.log("done migrating");
 };
+
+const newAuthHandle: Handle = async ({ event, resolve }) => {
+  const sessionCookie = event.cookies.get(SESSION_COOKIE_KEY);
+  if (typeof sessionCookie == "string") {
+    const userSession = await db.getUserBySession(sessionCookie);
+    if (userSession && Date.now() < userSession.user_session.expires.getTime()) {
+      event.locals.session = userSession;
+    } else {
+      // Expired session
+      event.cookies.delete(SESSION_COOKIE_KEY, { path: "/" });
+    }
+  } else {
+    event.locals.session = null;
+  }
+
+  const response = await resolve(event);
+
+  return response;
+};
+
+export const handle = sequence(authHandle, newAuthHandle);

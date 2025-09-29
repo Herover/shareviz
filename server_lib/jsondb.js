@@ -202,7 +202,10 @@ JSONDB.prototype.getOps = function (collection, id, from, to, options, callback)
     /** @type JSONDBData */
     const document = JSON.parse(readFileSync(documentPath).toString("utf8"));
 
-    callback(null, document.ops.filter((op) => from <= op.v && op.v < to));
+    callback(
+      null,
+      document.ops.filter((op) => from <= op.v && op.v < to),
+    );
   } catch (err) {
     callback(err);
   }

@@ -6,9 +6,10 @@ import json1 from "ot-json1";
 import { db } from "../server_lib/user.js";
 import { backend, connection } from "../server_lib/sharedb.js";
 import sharedb from "sharedb";
-import { db as drizzledb, sessions, users } from "../server_lib/drizzle/schema.js";
+import { sessions, users } from "../server_lib/drizzle/schema.js";
 import { eq, gt } from "drizzle-orm";
 import { getLogger } from "../server_lib/log.js";
+import { drizzledb } from "../server_lib/sqlite.js";
 
 const logger = getLogger();
 

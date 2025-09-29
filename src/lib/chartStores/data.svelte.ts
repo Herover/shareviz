@@ -19,7 +19,7 @@ interface PresenceData {
 export class ShareDBConnection {
   id: undefined | string;
   connected = $state(false);
-  chartInfo: null | { name: string, id: string, chartRef: string } = $state(null);
+  chartInfo: null | { name: string; id: string; chartRef: string } = $state(null);
 
   #doc: ShareDB.Doc = $state(new ShareDB.Doc()); // Doc;
   #version: number = $state(-1);
@@ -142,14 +142,15 @@ export class ShareDBConnection {
       this.#data = doc.data;
       this.#version = doc.version ?? -1;
 
-      this.#events.dispatchEvent(new CustomEvent("data", { detail: { doc: doc.data, version: doc.version } }));
+      this.#events.dispatchEvent(
+        new CustomEvent("data", { detail: { doc: doc.data, version: doc.version } }),
+      );
     };
 
     // Get initial value of document and subscribe to changes
     doc.subscribe((e) => onData(e));
     doc.on("op", () => onData()); // Trigger when we have done something
     doc.on("nothing pending", () => onData()); // Trigger after version has been updated
-    
 
     if (synced) {
       fetch("/api/chart/" + docId)

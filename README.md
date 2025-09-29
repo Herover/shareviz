@@ -36,6 +36,8 @@ AUTH_GITHUB_SECRET=Z
 
 If you run a editor like VSCode and get errors related to a node/better-sqlite3 version mismatch, then manually set the "Svelte Language-server: Runtime" setting to the path of your node executeable.
 
+When creating drizzle schema changes, run `npx drizzle-kit generate` and then `npx drizzle-kit migrate`.
+
 ## Production
 
 - Install everything `npm install`.

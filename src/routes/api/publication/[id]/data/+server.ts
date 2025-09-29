@@ -15,8 +15,7 @@ export async function GET({ params }) {
         if (err != null) {
           console.error(err);
           resolve(json({ message: "404" }, { status: 404 }));
-        }
-        else resolve(json({ chart: snapshot.data }));
+        } else resolve(json({ chart: snapshot.data }));
       },
     );
   });

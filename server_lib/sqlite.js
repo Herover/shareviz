@@ -1,20 +1,38 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { and, eq, isNull } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import Database from "better-sqlite3";
 import {
   accounts,
   chartPublications,
   charts,
-  db as drizzledb,
   folders,
   organizationInvites,
   organizations,
   teams,
   userCharts,
+  userPasswordLogins,
   users,
+  userSessions,
   usersOrganizations,
   usersTeams,
 } from "./drizzle/schema.js";
+import { getLogger } from "./log.js";
+
+class DrizzleLogger {
+  #logger;
+  constructor() {
+    this.#logger = getLogger({ drizzle: "sqlite3" });
+  }
+  /**
+   * @param {any} query
+   * @param {any} params
+   */
+  logQuery(query, params) {
+    this.#logger.log("query", { query, params });
+  }
+}
 
 // FIXME: These values must match values in src/lib/consts.ts
 export const TEAM_ROLES = {
@@ -26,12 +44,73 @@ export const ORGANIZATION_ROLES = {
   ADMIN: 2,
 };
 
+const sqlite = new Database("data/db.sqlite");
+export const drizzledb = drizzle({ client: sqlite, logger: new DrizzleLogger() });
+
 export const db = {
   getUser: async (/** @type {{ username?: string, id?: string }} */ { username, id }) => {
-    return drizzledb
+    const r = await drizzledb
       .select()
       .from(users)
       .where(username ? eq(users.email, username) : id ? eq(users.id, id) : undefined);
+    if (r.length == 0) {
+      return null;
+    }
+    return r[0];
+  },
+  getUserBySession: async (/** @type string */ token) => {
+    const r = await drizzledb
+      .select()
+      .from(userSessions)
+      .innerJoin(users, eq(users.id, userSessions.userId))
+      .where(eq(userSessions.sessionToken, token));
+    if (r.length == 0) {
+      return null;
+    }
+    return r[0];
+  },
+  getUserPasswordLogin: async (/** @type {string} */ userId) => {
+    const r = await drizzledb
+      .select()
+      .from(userPasswordLogins)
+      .where(eq(userPasswordLogins.userId, userId));
+    if (r.length == 0) {
+      return null;
+    }
+    return r[0];
+  },
+  addUserPasswordLogin: async (
+    /** @type {string} */ userId,
+    /** @type {string} */ hash,
+    /** @type {string} */ salt,
+  ) => {
+    await drizzledb.insert(userPasswordLogins).values({
+      userId,
+      hash,
+      salt,
+    });
+  },
+  /**
+   * @returns {Promise<string>} token
+   */
+  addUserSession: async (
+    /** @type {string} */ userId,
+    /** @type Date */ expires,
+    /** @type {string} */ agent,
+    /** @type {string} */ IP,
+    /** @type {string?} */ identifier,
+  ) => {
+    const token = crypto.randomUUID();
+    await drizzledb.insert(userSessions).values({
+      userId,
+      expires,
+      sessionToken: token,
+      agent,
+      IP,
+      identifier,
+    });
+
+    return token;
   },
   getUserAccounts: async (/** @type {string} */ userId) => {
     return drizzledb
@@ -496,7 +575,7 @@ export const db = {
       .innerJoin(usersTeams, eq(usersTeams.userId, users.id))
       .innerJoin(charts, eq(charts.teamId, usersTeams.teamId))
       .where(and(eq(users.id, userId), eq(charts.id, chartId)));
-      console.log(lst, userId, chartId)
+    console.log(lst, userId, chartId);
     return lst.length != 0;
   },
 };

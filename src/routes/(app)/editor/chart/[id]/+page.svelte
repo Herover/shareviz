@@ -176,7 +176,7 @@
       return;
     }
     updatePublications(store.chartInfo.id);
-  })
+  });
 
   let publisize = () => {};
   $effect(() => {
@@ -188,7 +188,7 @@
       await updatePublications(store.chartInfo.id);
     };
   });
-  $inspect(store.version)
+  $inspect(store.version);
 
   $effect(() => {
     const data: EditorChartHighlight = {
@@ -291,7 +291,10 @@
               >
             </p>
             {#each publications as publication}
-              <p>{dayjs(publication.chartPublication.created).format("YYYY-MM-DD HH:mm")} v. {publication.chartPublication.v}</p>
+              <p>
+                {dayjs(publication.chartPublication.created).format("YYYY-MM-DD HH:mm")} v. {publication
+                  .chartPublication.v}
+              </p>
               <div class="box">
                 <div class="w-025 editor-explain-box">
                   <span class="editor-column-label">

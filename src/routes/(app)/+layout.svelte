@@ -71,7 +71,7 @@
     cursor: pointer;
   }
   .error {
-    background-color: #ff6666;
+    background-color: var(--bg-error);
   }
   .info {
     background-color: #70ff86;
@@ -88,6 +88,8 @@
     --detail-color: #aaaaaa;
     --text-primary: #000000;
     --text-secondary: #666666;
+    --text-error: #ff6666;
+    --bg-error: #ff6666;
 
     --width-wide: 1200px;
     --spacing: 1.5em;
@@ -99,6 +101,8 @@
     --detail-color: #b7b7b7;
     --text-primary: #c2c2c2;
     --text-secondary: #949494;
+    --text-error: #ff6666;
+    --bg-error: #ff6666;
     --link: #9098fd;
   }
 

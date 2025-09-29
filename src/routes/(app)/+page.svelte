@@ -7,11 +7,18 @@
   import { onMount } from "svelte";
   import type { PageProps } from "./$types";
   import { settings } from "$lib/settingsStore.svelte";
+  import { notifications } from "$lib/notificationStore";
 
   let { data }: PageProps = $props();
 
   if (data.session?.user) {
     goto("/org");
+  }
+
+  if (data.msg) {
+    notifications.addError(
+      data.msg == "password_error" ? "Check if username and password is correct" : "",
+    );
   }
 
   const newGraphic = async (synced: boolean) => {
@@ -53,6 +60,14 @@
         you regarding your account.
       </p>
       <SignIn provider="github" signInPage="signin" />
+      <SignIn provider="keycloak" signInPage="signin" />
+      <form method="POST" action="/signin?/password">
+        <label>Username <input name="username" /></label>
+        <br />
+        <label>Password <input name="password" /></label>
+        <br />
+        <button type="submit">Login</button>
+      </form>
     {:else}
       <p>Redirecting you to <a href="/org">organization page</a>...</p>
     {/if}
