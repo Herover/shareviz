@@ -4,7 +4,7 @@ import { redirect } from "@sveltejs/kit";
 import { db } from "$lib/../../server_lib/sqlite.js";
 
 export async function load({ locals }) {
-  const session = await locals.auth();
+  const session = locals.session;
 
   const user = session?.user;
   if (session == null || typeof user == "undefined" || typeof user.id != "string") {

@@ -4,7 +4,7 @@ import { redirect } from "@sveltejs/kit";
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ locals, params, parent }) {
-  const session = await locals.auth();
+  const session = locals.session;
 
   const user = session?.user;
   if (session == null || typeof user == "undefined" || typeof user.id != "string") {

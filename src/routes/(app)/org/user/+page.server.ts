@@ -6,7 +6,7 @@ import { redirect } from "@sveltejs/kit";
 
 // export const load: PageServerLoad = async ({ locals }) => {
 export async function load({ locals }) {
-  const session = await locals.auth();
+  const session = locals.session;
 
   const user = session?.user;
   if (session == null || typeof user == "undefined" || typeof user.id != "string") {

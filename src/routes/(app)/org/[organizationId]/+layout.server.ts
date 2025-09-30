@@ -6,7 +6,7 @@ import { ORGANIZATION_ROLES } from "$lib/consts.js";
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ locals, params }) {
-  const session = await locals.auth();
+  const session = locals.session;
 
   const user = session?.user;
   if (session == null || typeof user == "undefined" || typeof user.id != "string") {

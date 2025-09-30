@@ -4,10 +4,8 @@ import { json } from "@sveltejs/kit";
 import { db } from "$lib/../../server_lib/user";
 
 export async function POST({ request, locals }) {
-  const session = await locals.auth();
-
-  const user = session?.user;
-  if (session == null || typeof user == "undefined" || typeof user.id != "string") {
+  const user = locals.session?.user;
+  if (locals.session == null || typeof user == "undefined" || typeof user.id != "string") {
     return json({ message: "invalid token" }, { status: 400 });
   }
 

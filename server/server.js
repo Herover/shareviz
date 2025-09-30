@@ -6,10 +6,11 @@ import json1 from "ot-json1";
 import { db } from "../server_lib/user.js";
 import { backend, connection } from "../server_lib/sharedb.js";
 import sharedb from "sharedb";
-import { sessions, users } from "../server_lib/drizzle/schema.js";
+import { users, userSessions } from "../server_lib/drizzle/schema.js";
 import { eq, gt } from "drizzle-orm";
 import { getLogger } from "../server_lib/log.js";
 import { drizzledb } from "../server_lib/sqlite.js";
+import { SESSION_COOKIE_KEY } from "../server_lib/auth.js";
 
 const logger = getLogger();
 
@@ -539,8 +540,7 @@ export function startServer(server) {
           return acc;
         }, {})
       : {};
-    req.__sharevizAuthJSToken =
-      cookies["authjs.session-token"] || cookies["__Secure-authjs.session-token"];
+    req.__sharevizAuthJSToken = cookies[SESSION_COOKIE_KEY];
 
     backend.listen(stream, req);
   });
@@ -550,12 +550,12 @@ export function startServer(server) {
     if (ctx.req.__sharevizAuthJSToken) {
       drizzledb
         .select()
-        .from(sessions)
+        .from(userSessions)
         .where(
-          eq(sessions.sessionToken, ctx.req.__sharevizAuthJSToken),
-          gt(sessions.expires, new Date().toISOString()),
+          eq(userSessions.sessionToken, ctx.req.__sharevizAuthJSToken),
+          gt(userSessions.expires, new Date().toISOString()),
         )
-        .leftJoin(users, eq(sessions.userId, users.id))
+        .leftJoin(users, eq(userSessions.userId, users.id))
         .then((result) => {
           if (typeof result != "undefined" && result.length == 1) {
             ctx.agent.custom.user = result[0].user;

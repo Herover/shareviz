@@ -3,7 +3,7 @@
 import { db } from "$lib/../../server_lib/sqlite";
 
 export async function load({ url, locals }) {
-  const session = await locals.auth();
+  const session = locals.session;
 
   if (session?.user != null && session?.user?.id != null) {
     const code = url.searchParams.get("code");

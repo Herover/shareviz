@@ -4,7 +4,7 @@ import { json } from "@sveltejs/kit";
 import { db, TEAM_ROLES } from "$lib/../../server_lib/sqlite";
 
 export async function POST({ request, locals }) {
-  const session = await locals.auth();
+  const session = locals.session;
 
   const user = session?.user;
   if (session == null || typeof user == "undefined" || typeof user.id != "string") {

@@ -4,7 +4,7 @@ import { json } from "@sveltejs/kit";
 import { db } from "$lib/../../server_lib/user.js";
 
 export async function GET({ locals }) {
-  const session = await locals.auth();
+  const session = locals.session;
 
   const user = session?.user;
   if (session == null || typeof user == "undefined" || typeof user.id != "string") {

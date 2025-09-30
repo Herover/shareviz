@@ -5,7 +5,7 @@ import { db } from "$lib/../../server_lib/sqlite";
 import { ORGANIZATION_ROLES } from "$lib/consts";
 
 export async function POST({ locals, params }) {
-  const session = await locals.auth();
+  const session = locals.session;
 
   const user = session?.user;
   if (session == null || typeof user == "undefined" || typeof user.id != "string") {
@@ -28,7 +28,7 @@ export async function POST({ locals, params }) {
 }
 
 export async function GET({ locals, params }) {
-  const session = await locals.auth();
+  const session = locals.session;
 
   const user = session?.user;
   if (session == null || typeof user == "undefined" || typeof user.id != "string") {
@@ -51,7 +51,7 @@ export async function GET({ locals, params }) {
 }
 
 export async function DELETE({ locals, params, request }) {
-  const session = await locals.auth();
+  const session = locals.session;
 
   const user = session?.user;
   if (session == null || typeof user == "undefined" || typeof user.id != "string") {
