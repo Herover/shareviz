@@ -79,7 +79,11 @@ export const db = {
     }
     return r[0];
   },
-  addUserPasswordLogin: async (/** @type {string} */ userId, /** @type {string} */ hash, /** @type {string} */ salt) => {
+  addUserPasswordLogin: async (
+    /** @type {string} */ userId,
+    /** @type {string} */ hash,
+    /** @type {string} */ salt,
+  ) => {
     await drizzledb.insert(userPasswordLogins).values({
       userId,
       hash,

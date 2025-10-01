@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { page } from "$app/state";
-  import { SignOut } from "@auth/sveltekit/components";
+  import { settings } from "$lib/settingsStore.svelte";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();
@@ -36,3 +36,8 @@
 
 <form action="/signout" method="post"><button type="submit">Sign out</button></form>
 
+<button
+  onclick={() => settings.cycleTheme()}
+>
+  Switch theme
+</button>

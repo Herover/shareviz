@@ -7,6 +7,14 @@
     <link rel="icon" href="%sveltekit.assets%/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
+      @font-face {
+        font-family: "Atkinson Hyperlegible Next";
+        src:
+          url("/fonts/AtkinsonHyperlegibleNext/WOFF2/AtkinsonHyperlegibleNextVF-Variable.woff2")
+            format("woff2"),
+          url("/fonts/AtkinsonHyperlegibleNext/TTF/AtkinsonHyperlegibleNextVF-Variable.ttf")
+            format("truetype");
+      }
       html,
       body {
         margin: 0px;
@@ -14,8 +22,9 @@
       }
       body,
       button,
-      input {
-        font-family: Arial, Helvetica, sans-serif;
+      input,
+      text {
+        font-family: "Atkinson Hyperlegible Next";
       }
     </style>
     %sveltekit.head%
