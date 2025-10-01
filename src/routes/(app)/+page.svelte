@@ -1,7 +1,6 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  import { SignIn } from "@auth/sveltekit/components";
   import { goto } from "$app/navigation";
   import { db } from "$lib/chartStore";
   import { onMount } from "svelte";
@@ -28,18 +27,6 @@
 
   let charts: ReturnType<typeof db.getLocal> | undefined = $state();
   onMount(() => (charts = db.getLocal()));
-
-  const switchTheme = () => {
-    if (settings.theme == "dark") {
-      settings.theme = "light";
-    } else if (settings.theme == "light") {
-      settings.theme = "system";
-    } else if (settings.theme == "system") {
-      settings.theme = "dark";
-    } else {
-      settings.theme = "light";
-    }
-  };
 </script>
 
 <main>
@@ -48,8 +35,8 @@
     <a
       role="button"
       tabindex="0"
-      onclick={() => switchTheme()}
-      onkeydown={(e) => (e.key == "Enter" || e.key == " ") && switchTheme()}
+      onclick={() => settings.cycleTheme()}
+      onkeydown={(e) => (e.key == "Enter" || e.key == " ") && settings.cycleTheme()}
       ><small>Switch theme</small></a
     >
     {#if !data.session?.user}
@@ -59,8 +46,6 @@
         This information may be shared with other people in your organizations, or used to contact
         you regarding your account.
       </p>
-      <SignIn provider="github" signInPage="signin" />
-      <SignIn provider="keycloak" signInPage="signin" />
       <form method="POST" action="/signin?/password">
         <label>Username <input name="username" /></label>
         <br />

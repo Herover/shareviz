@@ -1,7 +1,6 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  import { SignIn } from "@auth/sveltekit/components";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
 
@@ -35,9 +34,5 @@
 {:else if $page.data.session?.user}
   <p>Unable to use this invite, was it for another email or has it expired?</p>
 {:else}
-  <SignIn provider="github">
-    {#snippet submitButton()}
-      <span>Sign In with GitHub</span>
-    {/snippet}
-  </SignIn>
+  <p><a href="/">Sign in first</a>, and then return to this page.</p>
 {/if}

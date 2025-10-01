@@ -46,8 +46,6 @@
   },
   "type": "module",
   "dependencies": {
-    "@auth/drizzle-adapter": "^1.7.2",
-    "@auth/sveltekit": "^1.10.0",
     "@node-rs/argon2": "^2.0.2",
     "@sveltejs/adapter-node": "^5.2.13",
     "@teamwork/websocket-json-stream": "^2.0.0",

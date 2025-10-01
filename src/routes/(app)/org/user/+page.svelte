@@ -34,4 +34,5 @@
 
 <div class="p-top-1"></div>
 
-<SignOut />
+<form action="/signout" method="post"><button type="submit">Sign out</button></form>
+

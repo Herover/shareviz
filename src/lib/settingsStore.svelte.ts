@@ -41,6 +41,18 @@ class Settings {
     localStorage.setItem(settingsStorageKey, JSON.stringify(this.rawSettings));
   }
 
+  cycleTheme() {
+    if (this.theme == "dark") {
+      this.theme = "light";
+    } else if (this.theme == "light") {
+      this.theme = "system";
+    } else if (this.theme == "system") {
+      this.theme = "dark";
+    } else {
+      this.theme = "light";
+    }
+  }
+
   get theme() {
     return this.#theme;
   }

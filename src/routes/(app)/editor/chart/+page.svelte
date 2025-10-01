@@ -3,7 +3,6 @@
 <script lang="ts">
   import { run } from "svelte/legacy";
 
-  import { SignIn, SignOut } from "@auth/sveltekit/components";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
   import { user } from "$lib/userStore";
@@ -52,12 +51,6 @@
   <div class="holder">
     <div class="container">
       <h1>Welcome {$page.data.session?.user?.name}</h1>
-      {#if !$page.data.session?.user}
-        <SignIn provider="github" signInPage="signin" />
-      {:else}
-        <SignOut signOutPage="signout" />
-      {/if}
-      <br /><br />
       {#if $page.data.session?.user}
         <button onclick={() => newGraphic(true)}>New graphic</button>
       {/if}

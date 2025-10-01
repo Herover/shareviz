@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
 
-import { handle as authHandle } from "./auth";
 import type { Handle, ServerInit } from "@sveltejs/kit";
 import { db } from "../server_lib/user";
 import { init as initDB } from "../server_lib/sqlite";
@@ -8,7 +7,6 @@ import { connection } from "$lib/../../server_lib/sharedb";
 import { SESSION_COOKIE_KEY } from "$lib/../../server_lib/auth";
 import { migrate } from "$lib/chartMigrate";
 import { formatVersion } from "$lib/initialDoc";
-import { sequence } from "@sveltejs/kit/hooks";
 
 export const init: ServerInit = async () => {
   console.log("init db...");
@@ -66,4 +64,4 @@ const newAuthHandle: Handle = async ({ event, resolve }) => {
   return response;
 };
 
-export const handle = sequence(authHandle, newAuthHandle);
+export const handle = newAuthHandle;
