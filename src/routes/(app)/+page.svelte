@@ -49,7 +49,7 @@
       <form method="POST" action="/signin?/password">
         <label>Username <input name="username" /></label>
         <br />
-        <label>Password <input name="password" /></label>
+        <label>Password <input name="password" type="password" /></label>
         <br />
         <button type="submit">Login</button>
       </form>
