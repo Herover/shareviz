@@ -34,14 +34,15 @@
     dimensions = () => {},
   }: Props = $props();
 
-  // TODO: more space on side with axis?
-  let size = $derived(conf.major.enabled ? conf.labelSpace : 0);
   const maxTicks = 200;
 
+  let bbs: SVGTextElement | undefined = $state();
   let labelBox: DOMRect | undefined = $state();
   let leftBox: DOMRect | undefined = $state();
   let rightBox: DOMRect | undefined = $state();
   let testBox: DOMRect | undefined = $state();
+
+  let size = $derived(conf.major.enabled ? (bbs?.getBoundingClientRect().height ?? 0) : 0);
 
   let autoMajorTicks: { n: number | Date; l: string; textAnchor: "start" | "middle" | "end" }[] =
     $state([]);
@@ -185,7 +186,7 @@
           typeof scale == "undefined"
             ? undefined
             : scale(majorTicks[majorTicks.length - 1]?.n ?? 0) - orNumber(testBox?.height, 0) - 6,
-        labelHeight: orNumber(testBox?.height, 0) + conf.major.tickSize + size,
+        labelHeight: orNumber(testBox?.height, 0) + conf.major.tickSize,
       });
   });
   $effect(() => {
@@ -289,15 +290,13 @@
             stroke-width={conf.major.tickWidth}
           />
         {/if}
+
         {#if showLabels}
           {#if conf.location == AxisLocation.START && tick.l}
-            <text text-anchor={tick.textAnchor} dominant-baseline="hanging" x={scale(tick.n)}
-              >{tick.l}</text
-            >
+            <text text-anchor={tick.textAnchor} dy="1em" x={scale(tick.n)}>{tick.l}</text>
           {:else if conf.location == AxisLocation.END && tick.l}
             <text
               text-anchor={tick.textAnchor}
-              dominant-baseline="hanging"
               y={height + conf.major.tickSize + size}
               x={scale(tick.n)}>{tick.l}</text
             >
@@ -308,6 +307,7 @@
             <text
               text-anchor={tick.textAnchor}
               bind:contentRect={leftBox}
+              bind:this={bbs}
               x={scale(tick.n)}
               visibility="hidden"
               aria-hidden="true">{tick.l}</text
