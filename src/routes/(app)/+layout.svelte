@@ -106,6 +106,17 @@
     --link: #9098fd;
   }
 
+  @font-face {
+    font-family: "Atkinson Hyperlegible Next";
+    src:
+      url("/fonts/AtkinsonHyperlegibleNext/WOFF2/AtkinsonHyperlegibleNextVF-Variable.woff2")
+        format("woff2"),
+      url("/fonts/AtkinsonHyperlegibleNext/TTF/AtkinsonHyperlegibleNextVF-Variable.ttf")
+        format("truetype");
+  }
+  :global(body, button, input, text) {
+    font-family: "Atkinson Hyperlegible Next";
+  }
   :global(body) {
     background-color: var(--main-bg-color);
     color: var(--text-primary);
