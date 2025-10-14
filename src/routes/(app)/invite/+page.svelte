@@ -3,6 +3,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
 
   let message = $state("");
 
@@ -17,7 +18,7 @@
       const data = await r.json();
       message = data.message;
     } else {
-      goto("/org");
+      goto(resolve("/(app)/org"));
     }
   });
 </script>
@@ -34,5 +35,5 @@
 {:else if $page.data.session?.user}
   <p>Unable to use this invite, was it for another email or has it expired?</p>
 {:else}
-  <p><a href="/">Sign in first</a>, and then return to this page.</p>
+  <p><a href={resolve("/")}>Sign in first</a>, and then return to this page.</p>
 {/if}

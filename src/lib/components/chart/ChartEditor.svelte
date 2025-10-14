@@ -61,7 +61,7 @@
     </svelte:boundary>
   {/each}
 
-  {#each getComponentList() as { add, label }}
+  {#each getComponentList() as { add, label, key } (key)}
     <button onclick={() => add(chartStore, chartStore.data?.elements.length || 0)}>
       + {label}
     </button>

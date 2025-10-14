@@ -131,8 +131,8 @@
       value={hbarStore.data.dataSet}
       onchange={(e) => hbarStore.setDataSet(e.currentTarget.value)}
     >
-      <option>{""}</option>
-      {#each spec.data.sets as set}
+      <option></option>
+      {#each spec.data.sets as set (set.id)}
         <option value={set.id}>{set.name}</option>
       {/each}
     </select>
@@ -156,8 +156,8 @@
         value={hbarStore.data.categories}
         onchange={(e) => hbarStore.setCategories(e.currentTarget.value)}
       >
-        <option>{""}</option>
-        {#each columns as column}
+        <option></option>
+        {#each columns as column (column.key)}
           <option>{column.key}</option>
         {/each}
       </select>
@@ -170,8 +170,8 @@
         value={hbarStore.data.subCategories}
         onchange={(e) => hbarStore.setSubCategories(e.currentTarget.value)}
       >
-        <option>{""}</option>
-        {#each columns as column}
+        <option></option>
+        {#each columns as column (column.key)}
           <option>{column.key}</option>
         {/each}
       </select>
@@ -204,8 +204,8 @@
         value={hbarStore.data.value}
         onchange={(e) => hbarStore.setValue(e.currentTarget.value)}
       >
-        <option>{""}</option>
-        {#each columns.filter((r) => r.type == "number") as row}
+        <option></option>
+        {#each columns.filter((r) => r.type == "number") as row (row.key)}
           <option>{row.key}</option>
         {/each}
       </select>
@@ -220,7 +220,7 @@
       <tbody>
         <tr>
           <td></td>
-          <td><input value={"default"} disabled /> </td>
+          <td><input value="default" disabled /> </td>
           <td>
             <input
               value={colorScale.data.default}
@@ -237,7 +237,7 @@
           <td> </td>
           <td> </td>
         </tr>
-        {#each colorScale.data.byKey as color, i}
+        {#each colorScale.data.byKey as color, i (color.k)}
           <tr>
             <td style="width:38px;">
               <button
@@ -256,11 +256,11 @@
                 value={color.k}
                 onchange={(e) => colorScale.setColorScaleKey(i, e.currentTarget.value)}
               >
-                <option>{""}</option>
+                <option></option>
                 {#if color.k}
                   <option>{color.k}</option>
                 {/if}
-                {#each unusedGroups as k}
+                {#each unusedGroups as k (k)}
                   <option>{k}</option>
                 {/each}
               </select>
@@ -316,7 +316,7 @@
       <span class="editor-column-label">Total labels</span>
     </div>
     <div class="w-05">
-      {#each Object.values(HBarTotalLabelStyle) as location}
+      {#each Object.values(HBarTotalLabelStyle) as location (location)}
         <label>
           <input type="radio" value={location} bind:group={totalLabel} />
           {location}
@@ -332,8 +332,8 @@
         value={hbarStore.data.repeat}
         onchange={(e) => hbarStore.setRepeat(e.currentTarget.value)}
       >
-        <option>{""}</option>
-        {#each columns as row}
+        <option></option>
+        {#each columns as row (row.key)}
           <option>{row.key}</option>
         {/each}
       </select>

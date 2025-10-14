@@ -65,7 +65,7 @@
     </p>
     <p>Team <b>{team.name}</b> members:</p>
     <ul>
-      {#each team.members as member}
+      {#each team.members as member (member.user.id)}
         <li>
           {member.user.name}
           {#if member.role == 2}
@@ -89,7 +89,7 @@
         Add new user to team:
         <select bind:value={userToAddToTeam}>
           <option value={null} selected disabled>Select user</option>
-          {#each data.orgUsers.filter((u) => team?.members.findIndex((m) => m.user.id == u.id) == -1) as user}
+          {#each data.orgUsers.filter((u) => team?.members.findIndex((m) => m.user.id == u.id) == -1) as user (user.id)}
             <option value={user.id}>{user.name}</option>
           {/each}
         </select>

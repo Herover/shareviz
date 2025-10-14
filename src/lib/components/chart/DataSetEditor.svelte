@@ -78,7 +78,7 @@
         value={dataStore.data.type}
         onchange={(e) => dataStore.setType(e.currentTarget.value)}
       >
-        {#each ["tsv"] as row}
+        {#each ["tsv"] as row (row)}
           <option>{row}</option>
         {/each}
       </select>
@@ -91,7 +91,7 @@
     over years but your year numbers are columns, or population per city but city names are in
     columns, then you need to turn them into rows first. Use transpose for this.
   </p>
-  {#each dataStore.data.transpose as transpose, i}
+  {#each dataStore.data.transpose as transpose, i (transpose.toKey)}
     <DataSetTransposeEditor {dataStore} {transpose} {i} />
   {/each}
 
@@ -102,7 +102,7 @@
   >
 
   <h4 class="editor-sub-section">Columns</h4>
-  {#each dataStore.data.rows as column, i}
+  {#each dataStore.data.rows as column, i (column.key)}
     <div class="box">
       <div class="w-05 editor-explain-box text-align-right">
         "{column.key}"
@@ -112,7 +112,7 @@
           value={column.type}
           onchange={(e) => dataStore.setColumnType(i, e.currentTarget.value)}
         >
-          {#each Object.keys(valueParsers) as type}
+          {#each Object.keys(valueParsers) as type (type)}
             <option>{type}</option>
           {/each}
         </select>

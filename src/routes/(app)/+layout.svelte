@@ -33,7 +33,7 @@
 </script>
 
 <div class="notifications">
-  {#each $notifications as notification, i}
+  {#each $notifications as notification, i (i)}
     <div
       onclick={() => notifications.read(i)}
       onkeydown={() => notifications.read(i)}

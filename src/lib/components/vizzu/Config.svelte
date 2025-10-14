@@ -75,7 +75,7 @@
       value={$configChart?.geometry}
       onchange={(e) => db.setConfigGeometry(index, e.currentTarget.value)}
     >
-      {#each ["rectangle", "circle", "area", "line"] as geom}
+      {#each ["rectangle", "circle", "area", "line"] as geom (geom)}
         <option value={geom}>{geom}</option>
       {/each}
     </select>
@@ -87,7 +87,7 @@
       value={$configChart?.coordSystem}
       onchange={(e) => db.setConfigCoordSystem(index, e.currentTarget.value)}
     >
-      {#each ["cartesian", "polar"] as coord}
+      {#each ["cartesian", "polar"] as coord (coord)}
         <option value={coord}>{coord}</option>
       {/each}
     </select>

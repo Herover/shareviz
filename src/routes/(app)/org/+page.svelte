@@ -1,6 +1,7 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import { page } from "$app/stores";
 </script>
 
@@ -9,9 +10,13 @@
 {#if $page.data.organizations.length == 0}
   <p>You are not yet a part of a organization yet.</p>
 {:else}
-  {#each $page.data.organizations as organization}
+  {#each $page.data.organizations as organization (organization.id)}
     <p>
-      <a href="/org/{organization.organizations.id}/team">
+      <a
+        href={resolve("/(app)/org/[organizationId]/team", {
+          organizationId: organization.organizations.id,
+        })}
+      >
         {organization.organizations.name}
       </a>
     </p>

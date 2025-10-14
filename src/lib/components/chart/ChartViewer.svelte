@@ -6,6 +6,8 @@
   import type { ComputedData } from "$lib/data";
   import { orNumber } from "$lib/utils";
 
+  /* eslint-disable svelte/no-navigation-without-resolve */
+
   interface Props {
     chartSpec: Root;
     data: ComputedData;
@@ -53,7 +55,7 @@
   style:padding-bottom="{chartSpec.style.marginBottom}px"
   style:color={chartSpec.style.textColor}
   style:fill={chartSpec.style.textColor}
-  style:--axis-text-size={"0.9em"}
+  style:--axis-text-size="0.9em"
 >
   <p
     style:font-size="{chartSpec.style.titleSize}em"
@@ -129,6 +131,7 @@
         >
         </a>
       {:else}
+        <!-- svelte/no-navigation-without-resolve -->
         <a
           href={editor ? null : chartSpec.chart.sourceTextLeftLink}
           style="color:#888888"
@@ -140,6 +143,7 @@
       {#if editor}
         <!-- Disabled as it's not applicaple when innerText is set by svelte -->
         <!-- svelte-ignore a11y_consider_explicit_label -->
+        <!-- svelte/no-navigation-without-resolve -->
         <a
           href={editor ? null : chartSpec.chart.sourceTextRightLink}
           bind:innerText={chartSpec.chart.sourceTextRight}
@@ -150,6 +154,7 @@
         >
         </a>
       {:else}
+        <!-- svelte/no-navigation-without-resolve -->
         <a
           href={editor ? null : chartSpec.chart.sourceTextRightLink}
           style="color:#888888"

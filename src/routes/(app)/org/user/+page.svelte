@@ -24,7 +24,7 @@
 <div class="box p-top-1">
   <div class="w-025">Your login methods/identity providers</div>
   <div class="w-075">
-    {#each data.accounts as account}
+    {#each data.accounts as account (account.id)}
       {account.provider}: {account.expiresAt
         ? new Date(account.expiresAt).toISOString()
         : "never expires"}<br />
@@ -36,8 +36,4 @@
 
 <form action="/signout" method="post"><button type="submit">Sign out</button></form>
 
-<button
-  onclick={() => settings.cycleTheme()}
->
-  Switch theme
-</button>
+<button onclick={() => settings.cycleTheme()}> Switch theme </button>

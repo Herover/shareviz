@@ -215,7 +215,7 @@
         />
       </div>
 
-      {#each scheme as c}
+      {#each scheme as c (c)}
         <div class="holder">
           <div
             style:background-color={c}
@@ -228,7 +228,7 @@
         </div>
       {/each}
 
-      {#each chartColors as c}
+      {#each chartColors as c (c)}
         <div class="holder">
           <div
             style:background-color={c}

@@ -58,7 +58,7 @@
 <g transform="translate({0},{i * (blockHeight + blockMargin)})">
   <text x={0} y={blockHeight / 2} dominant-baseline="middle" text-anchor="start">{d.label}</text>
 
-  {#each d.value as dd, ii}
+  {#each d.value as dd, ii (ii)}
     <HBarRect
       {conf}
       x={labelWidth + valueScale(dd.from)}
@@ -86,7 +86,7 @@
       </text>
     {/if}
   {/each}
-  {#each d.value as dd, ii}
+  {#each d.value as dd, ii (ii)}
     <rect
       x={labelWidth + valueScale(dd.from)}
       y={(conf.stackSubCategories ? 0 : ii) * valueHeight + barMargin}

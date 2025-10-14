@@ -65,7 +65,7 @@
   {#if unspecifiecKeys != null}
     <select value={style.data.k} onchange={(e) => style.setKey(e.currentTarget.value)}>
       <option>{style.data.k}</option>
-      {#each unspecifiecKeys as k}
+      {#each unspecifiecKeys as k (k)}
         <option>{k}</option>
       {/each}
     </select>
@@ -81,7 +81,7 @@
     value={style.data.label.location}
     onchange={(e) => style.setLabelLocation(e.currentTarget.value)}
   >
-    {#each Object.values(LabelLocation) as orientation}
+    {#each Object.values(LabelLocation) as orientation (orientation)}
       <option>{orientation}</option>
     {/each}
   </select>

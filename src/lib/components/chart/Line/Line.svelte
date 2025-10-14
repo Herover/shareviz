@@ -185,17 +185,10 @@
       ? (chartToEditor.highlight[2] as string)
       : null,
   );
-
-  let fontStyle: HTMLStyleElement | undefined;
-  $effect(() => {
-    if (typeof fontStyle != "undefined") {
-      fontStyle.innerHTML = fontStore.fontCSS;
-    }
-  });
 </script>
 
 <svg {width} height={height + topMargin + bottomMargin + lineSpec.x.axis.major.tickWidth * 2}>
-  <style bind:this={fontStyle}></style>
+  <style bind:innerHTML={fontStore.fontCSS} contenteditable=""></style>
   <g transform="translate(0, {topMargin})">
     <Axis
       {height}
@@ -220,7 +213,7 @@
       row={dataSet?.rows.find((e) => e.key == lineSpec.x.key)}
     />
     {#if lineSpec.stack}
-      {#each values as d, i}
+      {#each values as d, i (i)}
         <path
           d={draw(
             d.value
@@ -237,7 +230,7 @@
           fill={chroma(d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color).hex()}
         />
       {/each}
-      {#each values as d}
+      {#each values as d, i (i)}
         <path
           d={draw(d.value.map((e) => ({ x: e.x, y: e.to })))}
           stroke={chroma(d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color).hex()}
@@ -247,7 +240,7 @@
       {/each}
     {:else}
       {#if lineSpec.fill}
-        {#each values as d}
+        {#each values as d, i (i)}
           <path
             d={draw(
               d.value.concat([
@@ -259,7 +252,7 @@
           />
         {/each}
       {/if}
-      {#each values as d}
+      {#each values as d, i (i)}
         <path
           d={draw(d.value)}
           stroke={d.type == "missing" && getStyle(d.key).missingStyle == LineMissingStyle.NONE
@@ -276,7 +269,7 @@
     {/if}
 
     <g bind:contentRect={labelBox}>
-      {#each values as d, i}
+      {#each values as d, i (i)}
         {#if getStyle(d.key).label.location == LabelLocation.Right}
           {#if values.length == i + 1 || values[i + 1].key !== d.key}
             <text
@@ -306,9 +299,9 @@
         {/if}
       {/each}
     </g>
-    {#each values as d}
+    {#each values as d, i (i)}
       {#if getStyle(d.key).symbols == LineSymbol.CIRCLE}
-        {#each d.value as value}
+        {#each d.value as value, i (i)}
           <circle
             cx={xScale(value.x)}
             cy={yScale(value.y)}

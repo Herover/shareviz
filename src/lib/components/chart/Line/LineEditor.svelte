@@ -92,8 +92,8 @@
       value={lineStore.data.dataSet}
       onchange={(e) => lineStore.setDataSet(e.currentTarget.value)}
     >
-      <option>{""}</option>
-      {#each spec.data.sets as set}
+      <option></option>
+      {#each spec.data.sets as set (set.id)}
         <option value={set.id}>{set.name}</option>
       {/each}
     </select>
@@ -108,8 +108,8 @@
         value={lineStore.data.x.key}
         onchange={(e) => lineStore.setXKey(e.currentTarget.value)}
       >
-        <option>{""}</option>
-        {#each columns as row}
+        <option></option>
+        {#each columns as row (row.key)}
           <option>{row.key}</option>
         {/each}
       </select>
@@ -122,8 +122,8 @@
         value={lineStore.data.y.key}
         onchange={(e) => lineStore.setYKey(e.currentTarget.value)}
       >
-        <option>{""}</option>
-        {#each columns as row}
+        <option></option>
+        {#each columns as row (row.key)}
           <option>{row.key}</option>
         {/each}
       </select>
@@ -138,8 +138,8 @@
         value={lineStore.data.categories}
         onchange={(e) => lineStore.setCategoriesKey(e.currentTarget.value)}
       >
-        <option>{""}</option>
-        {#each columns as row}
+        <option></option>
+        {#each columns as row (row.key)}
           <option>{row.key}</option>
         {/each}
       </select>
@@ -199,8 +199,8 @@
           updateRepeatSettings();
         }}
       >
-        <option>{""}</option>
-        {#each columns as row}
+        <option></option>
+        {#each columns as row (row.key)}
           <option>{row.key}</option>
         {/each}
       </select>

@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import { goto, invalidateAll } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { addTeam } from "$lib/api";
   import NavDropdown from "$lib/components/NavDropdown.svelte";
@@ -17,8 +18,13 @@
 
   const addNewTeam = async () => {
     try {
-      const newTeamId = await addTeam("New Team", page.params.organizationId);
-      goto(`/org/${page.params.organizationId}/team/${newTeamId}`);
+      const newTeamId = await addTeam("New Team", page.params.organizationId ?? "");
+      goto(
+        resolve("/(app)/org/[organizationId]/team/[teamId]", {
+          organizationId: page.params.organizationId ?? "",
+          teamId: newTeamId,
+        }),
+      );
       invalidateAll();
     } catch (err) {
       notifications.addError((err as Error).message);
@@ -33,10 +39,18 @@
       {#if page.params.organizationId}
         <div class="nav-item">
           {#if page.data.team}
-            <a href="/org/{page.params.organizationId}/team/{page.params.teamId}/charts">Team</a>
+            <a
+              href={resolve("/(app)/org/[organizationId]/team/[teamId]/charts", {
+                organizationId: page.params.organizationId,
+                teamId: page.params.teamId ?? "",
+              })}>Team</a
+            >
           {:else if page.data.teams && page.data.teams.length != 0}
-            <a href="/org/{page.params.organizationId}/team/{page.data.teams[0].teams.id}/charts"
-              >Team</a
+            <a
+              href={resolve("/(app)/org/[organizationId]/team/[teamId]/charts", {
+                organizationId: page.params.organizationId,
+                teamId: page.data.teams[0].teams.id,
+              })}>Team</a
             >
           {/if}
           <NavDropdown>
@@ -45,16 +59,22 @@
                 {#if page.data.team}
                   <p>{page.data.team.teams.name}</p>
                   <p class="popover-link">
-                    <a href={`/org/${page.params.organizationId}/team/${page.params.teamId}`}
-                      >Configure team</a
+                    <a
+                      href={resolve("/(app)/org/[organizationId]/team/[teamId]", {
+                        organizationId: page.params.organizationId,
+                        teamId: page.params.teamId ?? "",
+                      })}>Configure team</a
                     >
                   </p>
                 {/if}
                 <p>Select team</p>
-                {#each page.data.teams as team}
+                {#each page.data.teams as team (team.teams.id)}
                   <p class="popover-link">
-                    <a href={`/org/${page.params.organizationId}/team/${team.teams.id}/charts`}
-                      >{team.teams.name}</a
+                    <a
+                      href={resolve("/(app)/org/[organizationId]/team/[teamId]/charts", {
+                        organizationId: page.params.organizationId,
+                        teamId: team.teams.id,
+                      })}>{team.teams.name}</a
                     >
                   </p>
                 {/each}
@@ -64,16 +84,20 @@
           </NavDropdown>
         </div>
         <div class="nav-item">
-          <a href="/org/{page.params.organizationId}">Organization</a>
+          <a
+            href={resolve("/(app)/org/[organizationId]", {
+              organizationId: page.params.organizationId,
+            })}>Organization</a
+          >
           <NavDropdown>
             <div class="popover-content">
               <p>{page.data.organization.organizations.name}</p>
-              <a href="/org">Change organization</a>
+              <a href={resolve("/(app)/org")}>Change organization</a>
             </div>
           </NavDropdown>
         </div>
       {/if}
-      <div class="nav-item"><a href="/org/user">User</a></div>
+      <div class="nav-item"><a href={resolve("/(app)/org/user")}>User</a></div>
     </nav>
   </div>
 </header>

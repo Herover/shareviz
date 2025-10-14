@@ -7,11 +7,12 @@
   import type { PageProps } from "./$types";
   import { settings } from "$lib/settingsStore.svelte";
   import { notifications } from "$lib/notificationStore";
+  import { resolve } from "$app/paths";
 
   let { data }: PageProps = $props();
 
   if (data.session?.user) {
-    goto("/org");
+    goto(resolve("/(app)/org"));
   }
 
   if (data.msg) {
@@ -22,7 +23,7 @@
 
   const newGraphic = async (synced: boolean) => {
     const docId = await db.create(synced);
-    goto("/editor/chart/" + docId);
+    goto(resolve("/(app)/editor/chart/[id]", { id: docId }));
   };
 
   let charts: ReturnType<typeof db.getLocal> | undefined = $state();
@@ -54,7 +55,7 @@
         <button type="submit">Login</button>
       </form>
     {:else}
-      <p>Redirecting you to <a href="/org">organization page</a>...</p>
+      <p>Redirecting you to <a href={resolve("/(app)/org")}>organization page</a>...</p>
     {/if}
     <div class="hline"></div>
     <h1>Local editor</h1>
@@ -64,10 +65,12 @@
       collaborative features.
     </p>
     <button onclick={() => newGraphic(false)}>Create local chart</button>
-    {#each charts || [] as chart}
+    {#each charts || [] as chart (chart.id)}
       <ul>
         <li>
-          <a href="/editor/chart/{chart.id}">{chart?.data?.chart?.title || "Unnamed chart"}</a>
+          <a href={resolve("/(app)/editor/chart/[id]", { id: chart.id })}
+            >{chart?.data?.chart?.title || "Unnamed chart"}</a
+          >
         </li>
       </ul>
     {/each}

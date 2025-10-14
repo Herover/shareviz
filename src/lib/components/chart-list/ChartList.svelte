@@ -5,6 +5,8 @@
   import File from "./File.svelte";
   import type { FolderItem } from "./types";
 
+  /* eslint-disable svelte/no-navigation-without-resolve */
+
   interface Props {
     contents: FolderItem[];
     onCreateFolder: (parentId?: string) => void;
@@ -103,8 +105,8 @@
 >
   Charts
 </a>
-{#each pathNamed as part, i}
-  {" "} /
+{#each pathNamed as part, i (i)}
+  /
   {#if i == pathNamed.length - 1}
     <input
       value={part.name}

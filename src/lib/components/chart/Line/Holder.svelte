@@ -84,7 +84,7 @@
 {/if}
 
 <div class="line-charts">
-  {#each charts as chart, i}
+  {#each charts as chart, i (chart.k)}
     <div
       class="line-chart"
       style:width="{(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight) /

@@ -5,6 +5,8 @@
   import { formatDate, formatRelativeTime } from "$lib/utils";
   import type { FolderItem } from "./types";
 
+  /* eslint-disable svelte/no-navigation-without-resolve */
+
   interface Props {
     item: FolderItem;
     onSelect: (selected: boolean) => void;

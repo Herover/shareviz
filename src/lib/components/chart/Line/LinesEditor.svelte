@@ -345,7 +345,7 @@
       disabled={nonEditable}
       onchange={(e) => setLabelLocation(e.currentTarget.value)}
     >
-      {#each Object.values(LabelLocation) as location}
+      {#each Object.values(LabelLocation) as location (location)}
         <option>{location}</option>
       {/each}
     </select>
@@ -391,7 +391,7 @@
       disabled={nonEditable}
       onchange={(e) => setSymbols(e.currentTarget.value)}
     >
-      {#each Object.values(LineSymbol) as symbol}
+      {#each Object.values(LineSymbol) as symbol (symbol)}
         <option>{symbol}</option>
       {/each}
     </select>
@@ -408,7 +408,7 @@
       disabled={nonEditable}
       onchange={(e) => setMissingStyle(e.currentTarget.value)}
     >
-      {#each Object.values(LineMissingStyle) as style}
+      {#each Object.values(LineMissingStyle) as style (style)}
         <option>{style}</option>
       {/each}
     </select>

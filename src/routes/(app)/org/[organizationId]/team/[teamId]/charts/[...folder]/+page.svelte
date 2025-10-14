@@ -12,6 +12,7 @@
   import type { FolderItem } from "$lib/components/chart-list/types";
   import type { PageProps } from "./$types";
   import Popup from "$lib/components/Popup.svelte";
+  import { resolve } from "$app/paths";
 
   let { data }: PageProps = $props();
 
@@ -102,7 +103,7 @@
   const newGraphic = async (synced: boolean, folderId?: string) => {
     try {
       const docId = await chartStore.create(synced, teamId, folderId);
-      goto("/editor/chart/" + docId);
+      goto(resolve("/(app)/editor/chart/[id]", { id: docId }));
     } catch (err) {
       notifications.addError((err as Error).message);
       console.error(err);
@@ -112,7 +113,7 @@
   const importGraphic = async (synced: boolean, folderId?: string) => {
     try {
       const docId = await chartStore.create(synced, teamId, folderId, importChartData);
-      goto("/editor/chart/" + docId);
+      goto(resolve("/(app)/editor/chart/[id]", { id: docId }));
     } catch (err) {
       notifications.addError((err as Error).message);
       console.error(err);
@@ -125,7 +126,7 @@
     await updateTeam(teamId);
   };
 
-  const folderPath = $derived(page.params["folder"].split("/").filter((e) => e != ""));
+  const folderPath = $derived((page.params["folder"] ?? "").split("/").filter((e) => e != ""));
 </script>
 
 <div class="holder">

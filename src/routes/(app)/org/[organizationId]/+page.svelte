@@ -74,7 +74,7 @@
     </tr>
   </thead>
   <tbody>
-    {#each invites as invite}
+    {#each invites as invite (invite.code)}
       <tr>
         <td>{invite.code}</td>
         <td>
@@ -105,7 +105,7 @@
     </tr>
   </thead>
   <tbody>
-    {#each $page.data.orgUsers as user}
+    {#each $page.data.orgUsers as user (user.id)}
       <tr>
         <td>{user.role == ORGANIZATION_ROLES.ADMIN ? "Administrator" : "user"}</td>
         <td>{user.name}</td>

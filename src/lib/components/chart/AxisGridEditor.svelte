@@ -96,7 +96,7 @@
           onchange={(e) => conf.setLabelDivide(Number.parseFloat(e.currentTarget.value))}
           style="width: 80px;"
         >
-          {#each [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000] as n}
+          {#each [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000] as n (n)}
             <option>{n}</option>
           {/each}
         </select>
@@ -115,7 +115,7 @@
     <p>
       Manual marks
       <br />
-      {#each conf.data.ticks as kv, i}
+      {#each conf.data.ticks as kv, i (i)}
         <label
           >Value <input
             value={kv.n}

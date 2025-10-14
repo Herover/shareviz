@@ -44,7 +44,7 @@
   });
 </script>
 
-{#each groups as { k, d }, i}
+{#each groups as { k, d }, i (k)}
   <HBar
     {chartSpec}
     hBarSpec={componentSpec}

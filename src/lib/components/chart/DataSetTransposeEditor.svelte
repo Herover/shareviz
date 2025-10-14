@@ -33,7 +33,7 @@
   </div>
   <div class="w-05 p-top-1">
     <select bind:value={transposedKeys} multiple onchange={() => updateTransposed()}>
-      {#each (typeof dataStore.data != "undefined" ? dataStore.data : { rows: [] }).rows as col}
+      {#each (typeof dataStore.data != "undefined" ? dataStore.data : { rows: [] }).rows as col (col.key)}
         <option selected={transpose.from.includes(col.key) ? true : null}>{col.key}</option>
       {/each}
     </select>
@@ -71,7 +71,7 @@
       value={transpose.keyType}
       onchange={(e) => dataStore.setTransposeKeyType(i, e.currentTarget.value)}
     >
-      {#each Object.keys(valueParsers) as type}
+      {#each Object.keys(valueParsers) as type (type)}
         <option>{type}</option>
       {/each}
     </select>
@@ -108,7 +108,7 @@
       value={transpose.valueType}
       onchange={(e) => dataStore.setTransposeValueType(i, e.currentTarget.value)}
     >
-      {#each Object.keys(valueParsers) as type}
+      {#each Object.keys(valueParsers) as type (type)}
         <option>{type}</option>
       {/each}
     </select>

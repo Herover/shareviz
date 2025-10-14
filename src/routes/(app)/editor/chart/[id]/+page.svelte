@@ -21,6 +21,7 @@
   import { chartToEditor } from "$lib/chartToEditorStore.svelte.js";
   import { addPublication, getChartPublications } from "$lib/api.js";
   import dayjs from "dayjs";
+  import { resolve } from "$app/paths";
 
   let { data } = $props();
 
@@ -188,7 +189,6 @@
       await updatePublications(store.chartInfo.id);
     };
   });
-  $inspect(store.version);
 
   $effect(() => {
     const data: EditorChartHighlight = {
@@ -250,7 +250,7 @@
       </div>
 
       <div class="presence">
-        {#each Object.keys(store.presences) as presence}
+        {#each Object.keys(store.presences) as presence (presence)}
           <div
             style:background-color={store.presences[presence].color}
             class="user-presence"
@@ -290,7 +290,7 @@
                 >+ New</button
               >
             </p>
-            {#each publications as publication}
+            {#each publications as publication (publication.chartPublication.id)}
               <p>
                 {dayjs(publication.chartPublication.created).format("YYYY-MM-DD HH:mm")} v. {publication
                   .chartPublication.v}
@@ -298,7 +298,11 @@
               <div class="box">
                 <div class="w-025 editor-explain-box">
                   <span class="editor-column-label">
-                    <a href="/view/chart/{publication.chartPublication.id}">Embed link</a>
+                    <a
+                      href={resolve("/(chart)/view/chart/[[id]]", {
+                        id: publication.chartPublication.id,
+                      })}>Embed link</a
+                    >
                   </span>
                 </div>
                 <div class="w-075">

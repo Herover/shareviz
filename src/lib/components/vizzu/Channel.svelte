@@ -34,10 +34,10 @@
 <div class="holder">
   <p>
     {title}
-    {#each configChannel?.set || [] as channel, i}
+    {#each configChannel?.set || [] as channel, i (i)}
       <select value={channel} onchange={(e) => configScope.set(i, e.currentTarget.value)}>
         <option value={null}></option>
-        {#each configData?.series || [] as series}
+        {#each configData?.series || [] as series (series)}
           <option value={series.name}>{series.name}</option>
         {/each}
       </select>
@@ -70,7 +70,7 @@
           onChange={(val) => configScope.setAxis(val)}
           value={axis}
           group={title + "axis"}
-          setValue={"auto"}
+          setValue="auto"
         />Auto</label
       >
       <label
@@ -96,7 +96,7 @@
           onChange={(val) => configScope.setLabels(val)}
           value={labels}
           group={title + "labels"}
-          setValue={"auto"}
+          setValue="auto"
         />Auto</label
       >
       <label
@@ -122,7 +122,7 @@
           onChange={(val) => configScope.setTicks(val)}
           value={ticks}
           group={title + "ticks"}
-          setValue={"auto"}
+          setValue="auto"
         />Auto</label
       >
       <label
@@ -148,7 +148,7 @@
           onChange={(val) => configScope.setInterlacing(val)}
           value={interlacing}
           group={title + "interlacing"}
-          setValue={"auto"}
+          setValue="auto"
         />Auto</label
       >
       <label
@@ -174,7 +174,7 @@
           onChange={(val) => configScope.setGuides(val)}
           value={guides}
           group={title + "guides"}
-          setValue={"auto"}
+          setValue="auto"
         />Auto</label
       >
       <label
@@ -200,7 +200,7 @@
           onChange={(val) => configScope.setMarkerGuides(val)}
           value={markerGuides}
           group={title + "markerGuides"}
-          setValue={"auto"}
+          setValue="auto"
         />Auto</label
       >
       <label

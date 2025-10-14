@@ -20,7 +20,7 @@
   }>();
 </script>
 
-{#each lines as line, i}
+{#each lines as line, i (line.k)}
   {#if line.label.location == LabelLocation.Float}
     <FloatingLabel
       {xScale}

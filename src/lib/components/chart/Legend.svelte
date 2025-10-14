@@ -11,7 +11,7 @@
 </script>
 
 <p>
-  {#each keys as d}
+  {#each keys as d, i (i)}
     {#if d.legend != ""}
       <span class="legend-title"
         ><span style="background-color:{chroma(d.color).hex()}" class="legend-box"></span>

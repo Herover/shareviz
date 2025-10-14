@@ -106,13 +106,6 @@
   });
 
   let dataSet = $derived(chartSpec.data.sets.find((set) => set.id == hBarSpec.dataSet));
-
-  let fontStyle: HTMLStyleElement | undefined;
-  $effect(() => {
-    if (typeof fontStyle != "undefined") {
-      fontStyle.innerHTML = fontStore.fontCSS;
-    }
-  });
 </script>
 
 {#if showLegend}
@@ -128,7 +121,7 @@
 </p>
 
 <svg {width} {height}>
-  <style bind:this={fontStyle}></style>
+  <style bind:innerHTML={fontStore.fontCSS} contenteditable=""></style>
   <g transform="translate({labelWidth},{0})">
     <Axis
       width={valueWidth}
@@ -141,7 +134,7 @@
   </g>
 
   <g transform="translate({0},{hBarSpec.axis.location == AxisLocation.START ? scaleHeight : 0})">
-    {#each values as d, i}
+    {#each values as d, i (i)}
       <HBarLine
         conf={hBarSpec}
         {i}

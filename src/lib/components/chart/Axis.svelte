@@ -216,6 +216,7 @@
         }
         manualMinorTicks = conf.minor.ticks.filter((d) => d.n <= to && from <= d.n);
       } else if (to instanceof Date && from instanceof Date) {
+        /* eslint-disable-next-line svelte/prefer-svelte-reactivity */
         let d = new Date(from);
         d.setDate(1);
         d.setMonth(0);
@@ -247,7 +248,7 @@
   {#if conf.orientation == AxisOrientation.HORIZONTAL}
     {#if conf.minor.enabled}
       {#if conf.location == AxisLocation.START}
-        {#each minorTicks as tick}
+        {#each minorTicks as tick, i (i)}
           <path
             d="m {scale(tick.n)},{lineOffset - conf.minor.tickSize} L {scale(tick.n)},{conf.minor
               .grid
@@ -258,7 +259,7 @@
           />
         {/each}
       {:else}
-        {#each minorTicks as tick}
+        {#each minorTicks as tick, i (i)}
           <path
             d="m {scale(tick.n)},{height + conf.minor.tickSize} L {scale(tick.n)},{conf.minor.grid
               ? 0
@@ -271,7 +272,7 @@
     {/if}
 
     {#if conf.major.enabled}
-      {#each majorTicks as tick, i}
+      {#each majorTicks as tick, i (i)}
         {#if conf.location == AxisLocation.START}
           <path
             d="m {scale(tick.n)},{lineOffset - conf.major.tickSize} L {scale(tick.n)},{conf.major
@@ -327,7 +328,7 @@
   {:else}
     <g bind:contentRect={labelBox}>
       {#if conf.major.enabled}
-        {#each majorTicks as tick}
+        {#each majorTicks as tick, i (i)}
           <g transform="translate(0, {scale(tick.n)})">
             {#if showLabels}
               {#if conf.location == AxisLocation.START && tick.l}
@@ -341,7 +342,7 @@
       {/if}
 
       {#if conf.minor.enabled}
-        {#each minorTicks as tick}
+        {#each minorTicks as tick, i (i)}
           <g transform="translate(0, {scale(tick.n)})">
             {#if showLabels}
               {#if conf.location == AxisLocation.START && tick.l}
@@ -356,7 +357,7 @@
     </g>
 
     {#if conf.major.enabled}
-      {#each majorTicks as tick}
+      {#each majorTicks as tick (tick.n)}
         <g transform="translate(0, {scale(tick.n)})">
           <line
             x1={0}
@@ -371,7 +372,7 @@
     {/if}
 
     {#if conf.minor.enabled}
-      {#each minorTicks as tick}
+      {#each minorTicks as tick, i (i)}
         <g transform="translate(0, {scale(tick.n)})">
           <line
             x1={0}

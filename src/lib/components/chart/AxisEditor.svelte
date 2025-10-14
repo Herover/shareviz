@@ -23,7 +23,7 @@
   <label>
     Location:
     <select value={conf.data.location} onchange={(e) => conf.setLocation(e.currentTarget.value)}>
-      {#each Object.values(AxisLocation) as location}
+      {#each Object.values(AxisLocation) as location (location)}
         <option>{location}</option>
       {/each}
     </select>
@@ -48,7 +48,7 @@
       onchange={(e) => conf.setRepeat(e.currentTarget.value)}
       disabled={!showRepeatControl}
     >
-      {#each repeatSettings as repeat}
+      {#each repeatSettings as repeat (repeat.k)}
         <option value={repeat.k}>{repeat.l}</option>
       {/each}
     </select>
