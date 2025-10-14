@@ -15,7 +15,10 @@ import { SESSION_COOKIE_KEY } from "../server_lib/auth.js";
 const logger = getLogger();
 
 const authorizeOrRejectUserOnChart = (userId, chartId) => {
-  return new Promise((resolve, reject) =>
+  return new Promise((resolve, reject) => {
+    if (!userId) {
+      reject("unauthorized");
+    }
     db
       .getUserCharts(userId, chartId)
       .then((charts) => {
@@ -25,8 +28,8 @@ const authorizeOrRejectUserOnChart = (userId, chartId) => {
           reject("unauthorized");
         }
       })
-      .catch((e) => reject(e)),
-  );
+      .catch((e) => reject(e));
+  });
 };
 
 // Create initial document then fire callback
@@ -557,13 +560,14 @@ export function startServer(server) {
         )
         .leftJoin(users, eq(userSessions.userId, users.id))
         .then((result) => {
+          console.log(result)
           if (typeof result != "undefined" && result.length == 1) {
             ctx.agent.custom.user = result[0].user;
             ctx.agent.custom.session = result[0].session;
             // TODO: respect session.expires and close user connection after this timestamp.
             return result[0];
           }
-          throw new Error("session not found");
+          next(new Error("session not found"));
         })
         .then(() => {
           next();
@@ -608,7 +612,7 @@ export function startServer(server) {
       next();
     } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.presenceRequest) {
       const chartId = ctx.data.ch.slice("presence-".length);
-      authorizeOrRejectUserOnChart(ctx.agent.custom.user.id, chartId)
+      authorizeOrRejectUserOnChart(ctx.agent.custom.user?.id, chartId)
         .then(() => {
           next();
         })
@@ -616,7 +620,7 @@ export function startServer(server) {
       next();
     } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.presenceSubscribe) {
       const chartId = ctx.data.ch.slice("presence-".length);
-      authorizeOrRejectUserOnChart(ctx.agent.custom.user.id, chartId)
+      authorizeOrRejectUserOnChart(ctx.agent.custom.user?.id, chartId)
         .then(() => {
           next();
         })
@@ -624,7 +628,7 @@ export function startServer(server) {
       next();
     } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.presence) {
       const chartId = ctx.data.ch.slice("presence-".length);
-      authorizeOrRejectUserOnChart(ctx.agent.custom.user.id, chartId)
+      authorizeOrRejectUserOnChart(ctx.agent.custom.user?.id, chartId)
         .then(() => {
           // Include verified user info in response
           ctx.data.p.name = ctx.agent.custom.user.name;
@@ -648,7 +652,7 @@ export function startServer(server) {
       next("no queries");
     } else if (ctx.reply.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.reply.c == "examples") {
       // When accessing chart, check if user is allowed to read
-      authorizeOrRejectUserOnChart(ctx.agent.custom.user.id, ctx.request.d)
+      authorizeOrRejectUserOnChart(ctx.agent.custom.user?.id, ctx.request.d)
         .then(() => next())
         .catch((e) => next(e));
     } else {
