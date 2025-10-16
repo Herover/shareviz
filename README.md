@@ -1,4 +1,6 @@
-Website for creating simple data visualizations, that can be shared as images or embedded into websites!
+# Data-Tortilla
+
+A website for creating simple data visualizations, that can be shared as images or embedded into websites!
 
 The goal is to allow non-technical users to collaborate on creating simple but effective data visualizations, while allowing programmers to extend the functionality. It is also simple to host on your own infrastructure, and comes with SSO.
 
@@ -40,13 +42,33 @@ When creating drizzle schema changes, run `npx drizzle-kit generate` and then `n
 
 ## Production
 
+### Docker Compose
+
+The simplest way is to install Docker and use the docker-compose file.
+
+1. Install Docker on your server.
+
+2. Clone the repository and open a terminal in its folder.
+
+3. Create a appropriate .env file.
+
+4. Run `docker compose up -d` to start the server. This build the app, create a data folder, and run database migrations.
+
+5. To update, first read the related release notes to make sure there's no additional manual steps, make a backup of the `data` folder, then run `git pull && docker compose up --build -d`.
+
+You access the logs by running `docker compose logs`, read the Compose documentation for more information.
+
+### Manual
+
+- Install `node`.
+
 - Install everything `npm install`.
 
 - Build the server `npm run build`.
 
-- Then run any new database migrations `npx drizzle-kit migrate`.
+- Then run any new database migrations `npx drizzle-kit migrate`. This should be done when you update as well.
 
-- Run the server `node server/prod.js`.
+- Run the server `node server/prod.js`. Remember that the server will terminate when you leave the shell, so you must set up some way to run the application in the background. Logs will be written to stdout/stderr and it's up to you to store these as well.
 
 ## Upgrading
 
