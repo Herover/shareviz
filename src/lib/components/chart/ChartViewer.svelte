@@ -166,8 +166,12 @@
 </div>
 
 <style>
+  @font-face {
+    font-family: "Open Sans";
+    src: url("/fonts/Open_Sans/OpenSans-VariableFont_wdth,wght.ttf") format("truetype");
+  }
   .chart {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: "Open Sans";
     box-sizing: border-box;
   }
   .source {
