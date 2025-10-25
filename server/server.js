@@ -19,8 +19,7 @@ const authorizeOrRejectUserOnChart = (userId, chartId) => {
     if (!userId) {
       reject("unauthorized");
     }
-    db
-      .getUserCharts(userId, chartId)
+    db.getUserCharts(userId, chartId)
       .then((charts) => {
         if (charts.length != 0) {
           resolve();
@@ -560,7 +559,7 @@ export function startServer(server) {
         )
         .leftJoin(users, eq(userSessions.userId, users.id))
         .then((result) => {
-          console.log(result)
+          console.log(result);
           if (typeof result != "undefined" && result.length == 1) {
             ctx.agent.custom.user = result[0].user;
             ctx.agent.custom.session = result[0].session;
@@ -598,6 +597,8 @@ export function startServer(server) {
       //   logger.log("unauthorized")
       //   return next("unauthorized");
       // }
+      next();
+    } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.pingPong) {
       next();
     } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.op && ctx.agent.custom.user) {
       // Only allow access to "examples", no create through websockets

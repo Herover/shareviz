@@ -28,6 +28,8 @@ export class ShareDBConnection {
   #socket?: ReconnectingWebSocket;
   #presence?: Presence<PresenceData>;
 
+  #pinger?: NodeJS.Timeout;
+
   #events: EventTarget;
 
   missing = $derived(typeof this.#doc?.data == "undefined");
@@ -55,6 +57,11 @@ export class ShareDBConnection {
 
     this.#connection = new ShareDB.Connection(socket as any);
     this.#socket = socket;
+
+    // Some load-balancers/proxies might close websockets that are inactive for a long time
+    this.#pinger = setInterval(() => {
+      this.#connection?.ping();
+    }, 25 * 1000);
   }
 
   disconnect() {
@@ -74,6 +81,8 @@ export class ShareDBConnection {
       // Cannot `delete` private identifiers
       this.#connection = undefined;
       this.#socket = undefined;
+      clearInterval(this.#pinger);
+      this.#pinger = undefined;
     }
   }
 
