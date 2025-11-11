@@ -67,6 +67,7 @@
     "ot-json1": "^1.0.2",
     "reconnecting-websocket": "^4.4.0",
     "sharedb": "^5.0.3",
+    "sharedb-json": "^1.0.0",
     "vizzu": "^0.9.3",
     "ws": "^8.18.0"
   }
