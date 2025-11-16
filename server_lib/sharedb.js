@@ -3,7 +3,7 @@
 import ShareDB from "sharedb";
 import json1 from "ot-json1";
 
-// @ts-ignore
+// @ts-expect-error because sharedb-json doesn't export ts types
 import { JSONDB } from "sharedb-json";
 
 ShareDB.types.register(json1.type);
