@@ -24,9 +24,9 @@
   import { resolve } from "$app/paths";
   import { notifications } from "$lib/notificationStore.js";
   import { goto } from "$app/navigation";
-  import type { PageProps } from "./$types";
+  import type { PageProps, PageServerData } from "./$types";
 
-  let { data }: PageProps = $props();
+  let { data }: PageProps & { data: PageServerData }= $props();
 
   let viewerFrame: HTMLIFrameElement | undefined = $state();
 
@@ -76,7 +76,7 @@
     updateViewer(JSON.parse(JSON.stringify(e.detail.doc)));
   };
   const onError = (e: CustomEvent) => {
-    if (e.detail.error.message == "unauthorized") {
+    if (e.detail.error.message == "unauthorized" && !data.signedIn) {
       /* eslint-disable-next-line svelte/no-navigation-without-resolve */
       goto(resolve("/") + "?return_url=" + encodeURI(data.url));
     } else {
