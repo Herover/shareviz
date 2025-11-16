@@ -22,8 +22,11 @@
   import { addPublication, getChartPublications } from "$lib/api.js";
   import dayjs from "dayjs";
   import { resolve } from "$app/paths";
+  import { notifications } from "$lib/notificationStore.js";
+  import { goto } from "$app/navigation";
+  import type { PageProps } from "./$types";
 
-  let { data } = $props();
+  let { data }: PageProps = $props();
 
   let viewerFrame: HTMLIFrameElement | undefined = $state();
 
@@ -72,7 +75,16 @@
   const onData = (e: CustomEvent) => {
     updateViewer(JSON.parse(JSON.stringify(e.detail.doc)));
   };
+  const onError = (e: CustomEvent) => {
+    if (e.detail.error.message == "unauthorized") {
+      /* eslint-disable-next-line svelte/no-navigation-without-resolve */
+      goto(resolve("/") + "?return_url=" + encodeURI(data.url));
+    } else {
+      notifications.addError(e.detail.error.message);
+    }
+  };
   store.on("data", onData);
+  store.on("error", onError);
 
   $effect(() => {
     if (viewerFrame?.contentWindow != null) {

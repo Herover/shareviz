@@ -10,6 +10,7 @@
   import { resolve } from "$app/paths";
 
   let { data }: PageProps = $props();
+  let returnURL = data.returnURL?.startsWith("/") ? data.returnURL : null;
 
   if (data.session?.user) {
     goto(resolve("/(app)/org"));
@@ -48,6 +49,9 @@
         you regarding your account.
       </p>
       <form method="POST" action="/signin?/password">
+        {#if returnURL}
+          <input type="hidden" name="return_url" value={returnURL} />
+        {/if}
         <label>Username <input name="username" /></label>
         <br />
         <label>Password <input name="password" type="password" /></label>

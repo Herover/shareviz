@@ -4,7 +4,6 @@ import ReconnectingWebSocket from "reconnecting-websocket";
 import * as json1 from "ot-json1";
 import ShareDB, { Presence } from "sharedb/lib/client";
 import { WebSocket } from "ws";
-import { notifications } from "../notificationStore";
 import { migrate } from "../chartMigrate";
 import { getLocalDoc, localPrefix } from "../chartStore";
 import { defDoc } from "../initialDoc";
@@ -103,7 +102,9 @@ export class ShareDBConnection {
 
     this.id = docId;
     const doc = synced ? this.#connection.get("examples", docId) : getLocalDoc("examples", docId);
-    doc.on("error", (e: ShareDB.Error) => notifications.addError(e.message));
+    doc.on("error", (e: ShareDB.Error) =>
+      this.#events.dispatchEvent(new CustomEvent("error", { detail: { error: e } })),
+    );
 
     if (!synced) {
       migrate(doc);
@@ -146,7 +147,9 @@ export class ShareDBConnection {
       });
     }
     const onData = (e?: any) => {
-      if (e && typeof e.message == "string") notifications.addError(e.message);
+      if (e && typeof e.message == "string") {
+        this.#events.dispatchEvent(new CustomEvent("error", { detail: { error: e } }));
+      }
       // console.log("got doc", doc.data);
       this.#data = doc.data;
       this.#version = doc.version ?? -1;
@@ -195,7 +198,9 @@ export class ShareDBConnection {
         const doc = synced
           ? this.#connection.get("examples", docId)
           : getLocalDoc("examples", docId);
-        doc.on("error", (e: ShareDB.Error) => console.warn("doc error", e));
+        doc.on("error", (e: ShareDB.Error) =>
+          this.#events.dispatchEvent(new CustomEvent("error", { detail: { error: e } })),
+        );
         doc.create(defDoc, json1.type.uri, () => resolve(docId));
       }
     });
@@ -213,11 +218,11 @@ export class ShareDBConnection {
     return this.#doc;
   }
 
-  on(type: "data", cb: (e: CustomEvent) => void) {
+  on(type: "data" | "error", cb: (e: CustomEvent) => void) {
     return this.#events.addEventListener(type, (e) => cb(e as CustomEvent));
   }
 
-  off(type: "data", cb: (e: CustomEvent) => void) {
+  off(type: "data" | "error", cb: (e: CustomEvent) => void) {
     return this.#events.removeEventListener(type, (e) => cb(e as CustomEvent));
   }
 }

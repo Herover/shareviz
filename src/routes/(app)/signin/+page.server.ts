@@ -13,36 +13,45 @@ export const actions: Actions = {
     const data = await request.formData();
     const username = data.get("username");
     const password = data.get("password");
+    let returnURL = data.get("return_url");
+
+    if (typeof returnURL != "string") {
+      returnURL = "/org";
+    }
+    if (!returnURL.startsWith("/") || returnURL.startsWith("//")) {
+      returnURL = "/org";
+    }
+
     if (typeof username != "string" /* || typeof password != "string" */) {
-      return redirect(303, "/?msg=password_error");
+      return redirect(303, "/?msg=password_error&return_url=" + encodeURI(returnURL));
     }
 
     const user = await db.getUser({ username });
     if (!user) {
-      return redirect(303, "/?msg=password_error");
+      return redirect(303, "/?msg=password_error&return_url=" + encodeURI(returnURL));
     }
 
     const passwordLogin = await db.getUserPasswordLogin(user.id);
     if (!passwordLogin) {
       // Temporary requirement for users to create a password until oauth is back
       setSessionCookie(user.id, request, cookies, getClientAddress(), "password");
-      return redirect(303, "/reset-password");
+      return redirect(303, "/reset-password&return_url=" + encodeURI(returnURL));
     }
 
     if (typeof password != "string") {
-      return redirect(303, "/?msg=password_error");
+      return redirect(303, "/?msg=password_error&return_url=" + encodeURI(returnURL));
     }
 
     const verified = await verify(passwordLogin.hash, password, {
       salt: Buffer.from(passwordLogin.salt, "base64"),
     });
     if (!verified) {
-      return redirect(303, "/?msg=password_error");
+      return redirect(303, "/?msg=password_error&return_url=" + encodeURI(returnURL));
     }
 
     setSessionCookie(user.id, request, cookies, getClientAddress(), "password");
 
-    return redirect(303, "/org");
+    return redirect(303, returnURL);
   },
   setPassword: async ({ request, locals }) => {
     if (!locals.session) {
