@@ -4,4 +4,4 @@ export async function load({ locals }) {
   return {
     signedIn: typeof locals.session?.user == "object",
   };
-};
+}

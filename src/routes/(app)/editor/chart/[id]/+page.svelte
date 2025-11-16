@@ -26,7 +26,7 @@
   import { goto } from "$app/navigation";
   import type { PageProps, PageServerData } from "./$types";
 
-  let { data }: PageProps & { data: PageServerData }= $props();
+  let { data }: PageProps & { data: PageServerData } = $props();
 
   let viewerFrame: HTMLIFrameElement | undefined = $state();
 
