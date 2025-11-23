@@ -29,6 +29,14 @@ export class ChartStore {
     return this.#data;
   }
 
+  scopeElement(index: number) {
+    return {
+      submitOp: (op: any) => {
+        this.#doc.submitOp(["chart", "elements", index, "d", op]);
+      }
+    }
+  }
+
   setConfigTitle(value: string) {
     this.#doc.submitOp(["chart", "title", { r: 0, i: value }]);
   }
@@ -359,6 +367,21 @@ export class ChartStore {
               byKey: [],
             },
           } as Line,
+        },
+      },
+    ]);
+  }
+
+  addElementData(elementIndex: number, type: string, def: any) {
+    this.#doc.submitOp([
+      "chart",
+      "elements",
+      elementIndex,
+      {
+        i: {
+          type,
+          id: crypto.randomUUID(),
+          d: def,
         },
       },
     ]);

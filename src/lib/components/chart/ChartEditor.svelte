@@ -43,7 +43,7 @@
         {#await getEditorComponent(element.type)}
           <p><i>Loading {element.type} editor...</i></p>
         {:then Component}
-          <Component {spec} {chartData} index={i} id={element.id} {connection} />
+          <Component {spec} {chartData} index={i} id={element.id} {connection} store={chartStore.scopeElement(i)} chartSpec={element.d} />
         {:catch e}
           <p>Unable to load {element.type} editor: {e.message}</p>
         {/await}

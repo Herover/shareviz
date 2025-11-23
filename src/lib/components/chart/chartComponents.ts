@@ -8,6 +8,26 @@ import HBar from "./HBar";
 import Line from "./Line";
 import ErrorText from "./ErrorText.svelte";
 import type { ChartStore } from "$lib/chartStores/chart.svelte";
+import type { ComputedData } from "$lib/data";
+import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
+
+export interface EditorComponentProps<chartSpec> {
+  spec: Root;
+  chartSpec: chartSpec;
+  chartData: ComputedData;
+  index: number;
+  id: string;
+  connection: ShareDBConnection;
+  store: ReturnType<typeof ChartStore.prototype.scopeElement>;
+}
+export interface ChartComponentProps {
+  chartSpec: Root;
+  componentSpec: any;
+  data: ComputedData;
+  chartWidth: number;
+  editor: boolean;
+  index: number;
+}
 
 interface ChartComponent {
   /** Human readable name of chart type */
@@ -20,16 +40,7 @@ interface ChartComponent {
   // FIXME: types are not correct
   component: () => Promise<
     Component<
-      {
-        chartSpec: Root;
-        componentSpec: any;
-        data: {
-          [key: string]: any[];
-        };
-        chartWidth: number;
-        editor: boolean;
-        index: number;
-      },
+      ChartComponentProps,
       // TODO: type events without making ChartViewer.svelte unhappy
       // {
       //   edit: any,
@@ -38,7 +49,7 @@ interface ChartComponent {
     >
   >;
   /** Component for editor */
-  editorComponent: Component<any> | (() => Promise<Component<any>>);
+  editorComponent: Component<EditorComponentProps<any>> | (() => Promise<Component<EditorComponentProps<any>>>);
 }
 
 const components: { [key: string]: ChartComponent } = {};
