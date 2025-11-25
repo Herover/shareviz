@@ -30,11 +30,13 @@ export class ChartStore {
   }
 
   scopeElement(index: number) {
+    const pathPrefix = ["chart", "elements", index, "d"];
     return {
       submitOp: (op: any) => {
-        this.#doc.submitOp(["chart", "elements", index, "d", op]);
-      }
-    }
+        this.#doc.submitOp([...pathPrefix, op]);
+      },
+      pathPrefix: () => pathPrefix,
+    };
   }
 
   setConfigTitle(value: string) {

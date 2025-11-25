@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
-import type { LineRepeatSettings, LineSymbol } from "$lib/chart";
+import type { Axis, LineRepeatSettings, LineSymbol } from "$lib/chart";
+import { AxisLocation, AxisOrientation, AxisRepeatMode } from "$lib/chart";
 import type { ChartStore } from "$lib/chartStores/chart.svelte";
-import { registerComponent } from "../chartComponents";
 import RangeEditor from "./RangeEditor.svelte";
 
 export interface categoryKeys {
@@ -22,6 +22,7 @@ export interface rangeCategoryKeys {
 }
 
 export interface RangeElement {
+  axis: Axis;
   dataSet: string;
   // A chart for each
   repeat: string;
@@ -40,6 +41,44 @@ export interface RangeElement {
 }
 
 const defaultData: RangeElement = {
+  axis: {
+    labelSpace: 20,
+    location: AxisLocation.START,
+    major: {
+      grid: false,
+      enabled: true,
+      tickSize: 8,
+      tickWidth: 1,
+      color: "#aaaaaa",
+      labelDivide: 1,
+      labelThousands: "",
+      afterLabel: "",
+      auto: {
+        from: "",
+        each: 10,
+        labels: true,
+      },
+      ticks: [],
+    },
+    minor: {
+      grid: false,
+      enabled: true,
+      tickSize: 4,
+      tickWidth: 1,
+      color: "#aaaaaa",
+      labelDivide: 1,
+      labelThousands: "",
+      afterLabel: "",
+      auto: {
+        from: "",
+        each: 1,
+        labels: false,
+      },
+      ticks: [],
+    },
+    orientation: AxisOrientation.HORIZONTAL,
+    repeat: AxisRepeatMode.FIRST,
+  },
   dataSet: "",
   repeat: "",
   repeatColumns: 2,
@@ -50,7 +89,7 @@ const defaultData: RangeElement = {
       k: "",
       ownChart: true,
       title: "",
-    }
+    },
   },
   categories: "",
   pointLabel: "",

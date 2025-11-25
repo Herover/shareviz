@@ -21,9 +21,9 @@ export interface EditorComponentProps<chartSpec> {
   connection: ShareDBConnection;
   store: ReturnType<typeof ChartStore.prototype.scopeElement>;
 }
-export interface ChartComponentProps {
+export interface ChartComponentProps<chartSpec = any> {
   chartSpec: Root;
-  componentSpec: any;
+  componentSpec: chartSpec;
   data: ComputedData;
   chartWidth: number;
   editor: boolean;
@@ -50,7 +50,9 @@ interface ChartComponent {
     >
   >;
   /** Component for editor */
-  editorComponent: Component<EditorComponentProps<any>> | (() => Promise<Component<EditorComponentProps<any>>>);
+  editorComponent:
+    | Component<EditorComponentProps<any>>
+    | (() => Promise<Component<EditorComponentProps<any>>>);
 }
 
 const components: { [key: string]: ChartComponent } = {};

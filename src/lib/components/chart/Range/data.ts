@@ -2,7 +2,6 @@
 
 import type { ComputedData } from "$lib/data";
 import type { RangeElement } from ".";
-import type { Line } from "../../../chart";
 import { group, negativeOneToInf } from "../../../utils";
 
 export const formatData = (componentSpec: RangeElement, data: ComputedData) =>
@@ -23,12 +22,10 @@ export const formatData = (componentSpec: RangeElement, data: ComputedData) =>
             // c: componentSpec.rangeCategoryKeys.find(s => s.k == d.)
           })),
         };
-      })
-        .sort(
-          (a, b) =>
-            negativeOneToInf(componentSpec.categoryKeys.findIndex((e) => e.k == b.key)) -
-            negativeOneToInf(componentSpec.categoryKeys.findIndex((e) => e.k == a.key)),
-        )
-
+      }).sort(
+        (a, b) =>
+          negativeOneToInf(componentSpec.categoryKeys.findIndex((e) => e.k == b.key)) -
+          negativeOneToInf(componentSpec.categoryKeys.findIndex((e) => e.k == a.key)),
+      ),
     };
   });
