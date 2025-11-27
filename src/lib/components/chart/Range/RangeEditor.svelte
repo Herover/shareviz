@@ -1,13 +1,91 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
+  import { type LineRepeatSettingsKey } from "$lib/chart";
+  import { LineSymbol } from "$lib/chart";
   import { AxisStore } from "$lib/chartStores/axis.svelte";
-  import type { RangeElement } from ".";
+  import type { rangeCategoryKeys, RangeElement } from ".";
   import AxisEditor from "../AxisEditor.svelte";
+  import CategoryList from "../CategoryList.svelte";
   import type { EditorComponentProps } from "../chartComponents";
+  import ColorPicker from "../ColorPicker/ColorPicker.svelte";
 
   let { spec, chartSpec, chartData, connection, store }: EditorComponentProps<RangeElement> =
     $props();
+
+  const categoryValues = $derived(
+    Object.keys(
+      chartData[chartSpec.dataSet]?.data.reduce((acc, d) => {
+        acc[d[chartSpec.pointLabel]] = true;
+        return acc;
+      }, {}),
+    ),
+  );
+  $effect(() => {
+    if (categoryValues.join() != chartSpec.rangeCategoryKeys.map((d) => d.k).join()) {
+      const newVal: rangeCategoryKeys[] = categoryValues.map((d) => ({
+        color: "#000000",
+        k: d,
+        label: {
+          text: d,
+        },
+        symbol: LineSymbol.CIRCLE,
+      }));
+      store.submitOp([
+        "rangeCategoryKeys",
+        {
+          r: 1,
+          i: newVal,
+        },
+      ]);
+    }
+  });
+
+  const movePointDown = (k: string, i: number): void => {
+    store.submitOp(["rangeCategoryKeys", [i - 1, { d: 0 }], [i, { p: 0 }]]);
+  };
+
+  const movePointUp = (k: string, i: number): void => {
+    store.submitOp(["rangeCategoryKeys", [i, { p: 0 }], [i + 1, { d: 0 }]]);
+  };
+
+  const setPointLabelText = (val: string) => {
+    selectedPoints.forEach((n) => {
+      store.submitOp([
+        "rangeCategoryKeys",
+        n,
+        "label",
+        "text",
+        {
+          r: 1,
+          i: val,
+        },
+      ]);
+    });
+  };
+
+  const setPointColor = (val: string) => {
+    selectedPoints.forEach((n) => {
+      store.submitOp([
+        "rangeCategoryKeys",
+        n,
+        "color",
+        {
+          r: 1,
+          i: val,
+        },
+      ]);
+    });
+  };
+
+  const pointSearch = (str: string, d: { k: string; d: unknown }): boolean => {
+    return d.k.toLocaleLowerCase().includes(str.toLocaleLowerCase());
+  };
+
+  let selectedPoints: number[] = $state([]);
+  const selectPoint = (values: { [key: string]: boolean }, indexes: number[]) => {
+    selectedPoints = indexes;
+  };
 
   const setDataSet = (v: string) =>
     store.submitOp([
@@ -82,7 +160,7 @@
 
   <p>
     <label class="editor-column-label">
-      Line key:
+      One line for every:
       <select value={chartSpec.categories} onchange={(e) => setCategories(e.currentTarget.value)}>
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
@@ -94,8 +172,8 @@
 
   <p>
     <label class="editor-column-label">
-      Point values:
-      <select value={chartSpec.pointValue} onchange={(e) => setPointValue(e.currentTarget.value)}>
+      One point for every:
+      <select value={chartSpec.pointLabel} onchange={(e) => setPointLabel(e.currentTarget.value)}>
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
@@ -106,8 +184,8 @@
 
   <p>
     <label class="editor-column-label">
-      Point labels:
-      <select value={chartSpec.pointLabel} onchange={(e) => setPointLabel(e.currentTarget.value)}>
+      Point value:
+      <select value={chartSpec.pointValue} onchange={(e) => setPointValue(e.currentTarget.value)}>
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
@@ -115,6 +193,41 @@
       </select>
     </label>
   </p>
+
+  {#snippet pointTitle(d: LineRepeatSettingsKey)}
+    {d.k}
+  {/snippet}
+  <CategoryList
+    moveDown={movePointDown}
+    moveUp={movePointUp}
+    onSelectedChanged={selectPoint}
+    searchFn={pointSearch}
+    title={pointTitle}
+    values={chartSpec.rangeCategoryKeys.map((d) => ({ k: d.k, d }))}
+  />
+  <div class="box">
+    <div class="w-025 p-top-1">Label</div>
+    <div class="w-075 p-top-1">
+      <input
+        value={selectedPoints.length == 1
+          ? (chartSpec.rangeCategoryKeys[selectedPoints[0]]?.label.text ?? "")
+          : ""}
+        onkeyup={(e) => setPointLabelText(e.currentTarget.value)}
+        disabled={selectedPoints.length == 0}
+      />
+    </div>
+  </div>
+  <div class="box">
+    <div class="w-025 p-top-1">Color</div>
+    <div class="w-075 p-top-1">
+      <ColorPicker
+        color={selectedPoints.length == 1
+          ? (chartSpec.rangeCategoryKeys[selectedPoints[0]]?.color ?? "")
+          : ""}
+        onchange={(e) => setPointColor(e)}
+      />
+    </div>
+  </div>
 
   <AxisEditor
     conf={new AxisStore(connection, chartSpec.axis, [...store.pathPrefix(), "axis"])}

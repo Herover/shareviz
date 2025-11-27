@@ -18,7 +18,7 @@ export const formatData = (componentSpec: RangeElement, data: ComputedData) =>
           d: g2,
           value: g2.map((d) => ({
             v: d[componentSpec.pointValue],
-            l: d[componentSpec.pointLabel],
+            s: componentSpec.rangeCategoryKeys.find((dd) => d[componentSpec.pointLabel] == dd.k),
             // c: componentSpec.rangeCategoryKeys.find(s => s.k == d.)
           })),
         };

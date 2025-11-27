@@ -84,8 +84,8 @@
 
         <g transform="translate(0, {15 + axisSpace(i, chart.d.length)})">
           {#each line.value as p (chart.k + line.key + p.v)}
-            <circle cx={xScale(p.v)} r={radius} fill="black">
-              <title>{p.l}: {p.v}</title>
+            <circle cx={xScale(p.v)} r={radius} fill={p.s?.color ?? ""}>
+              <title>{p.s?.label.text}: {p.v}</title>
             </circle>
           {/each}
         </g>
