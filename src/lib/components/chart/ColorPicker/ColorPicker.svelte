@@ -39,6 +39,9 @@
   let h = $state(0);
 
   $effect(() => {
+    if (!color) {
+      return;
+    }
     try {
       // TODO: This allows colors that cannot be rendered, is that OK?
       const parts = color.match(/oklch\((\d+\.?\d*)[, %]+(\d+\.?\d*)%[, ]+(\d+\.?\d*)(?:deg)?\)/);
@@ -53,7 +56,7 @@
         h = h2;
       }
     } catch (e) {
-      console.warn(e);
+      console.warn(e, color);
       l = 0;
       c = 0;
       h = 0;
