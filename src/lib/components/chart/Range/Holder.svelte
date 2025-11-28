@@ -55,7 +55,10 @@
           [Infinity, 0],
         ),
       )
-      .range([Math.max(radius, axisOverflow.leftOverflow ?? 0), rangeWidth - 0])
+      .range([
+        Math.max(radius, axisOverflow.leftOverflow ?? 0),
+        rangeWidth - Math.max(radius, axisOverflow.rightOverflow ?? 0),
+      ])
       .nice(),
   );
 
