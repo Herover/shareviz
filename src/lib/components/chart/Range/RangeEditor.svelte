@@ -13,6 +13,7 @@
   let { spec, chartSpec, chartData, connection, store }: EditorComponentProps<RangeElement> =
     $props();
 
+  // Check if the data appears to have changed in a way where new range points have been added/removed
   const categoryValues = $derived(
     Object.keys(
       chartData[chartSpec.dataSet]?.data.reduce((acc, d) => {
@@ -24,10 +25,10 @@
   $effect(() => {
     if (categoryValues.join() != chartSpec.rangeCategoryKeys.map((d) => d.k).join()) {
       const newVal: rangeCategoryKeys[] = categoryValues.map((d) => ({
-        color: "#000000",
+        color: chartSpec.rangeCategoryKeys.find((c) => c.k == d)?.color ?? "#000000",
         k: d,
         label: {
-          text: d,
+          text: chartSpec.rangeCategoryKeys.find((c) => c.k == d)?.label.text ?? d,
         },
         symbol: LineSymbol.CIRCLE,
       }));
