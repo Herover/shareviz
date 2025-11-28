@@ -4,8 +4,9 @@ import type { ComputedData } from "$lib/data";
 import type { RangeElement } from ".";
 import { group, negativeOneToInf } from "../../../utils";
 
-export const formatData = (componentSpec: RangeElement, data: ComputedData) =>
-  group(componentSpec.repeat, data[componentSpec.dataSet]?.data ?? [], (k1, g1) => {
+export const formatData = (componentSpec: RangeElement, data: ComputedData) => {
+  let n = 0;
+  const d = group(componentSpec.repeat, data[componentSpec.dataSet]?.data ?? [], (k1, g1) => {
     const settings = componentSpec.repeatSettings.byKey.find((e) => e.k == k1);
 
     return {
@@ -21,6 +22,7 @@ export const formatData = (componentSpec: RangeElement, data: ComputedData) =>
             s: componentSpec.rangeCategoryKeys.find((dd) => d[componentSpec.pointLabel] == dd.k),
             // c: componentSpec.rangeCategoryKeys.find(s => s.k == d.)
           })),
+          i: n++,
         };
       }).sort(
         (a, b) =>
@@ -29,3 +31,6 @@ export const formatData = (componentSpec: RangeElement, data: ComputedData) =>
       ),
     };
   });
+
+  return { d, n };
+};

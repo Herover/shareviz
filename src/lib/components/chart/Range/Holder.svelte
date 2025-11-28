@@ -8,12 +8,28 @@
   import Axis from "../Axis.svelte";
   import type { RangeElement } from ".";
   import { AxisRepeatMode } from "$lib/chart";
+  import { max } from "d3-array";
 
   let { chartSpec, componentSpec, data, chartWidth }: ChartComponentProps<RangeElement> = $props();
 
-  let realWidth = $derived(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight);
+  let charts: ReturnType<typeof formatData> = $state({ d: [], n: 0 });
+  let chartDebouncer = createDebouncer(250);
+  $effect(() =>
+    chartDebouncer([componentSpec, data, data[componentSpec.dataSet]?.data], () => {
+      charts = formatData(componentSpec, data);
+    }),
+  );
 
-  let height = 30;
+  let realWidth = $derived(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight);
+  let rangeLabelWidths: { width: number }[] = $state([]);
+  let rangeLabelWidths2: { width: number }[] = $state([]);
+  $effect(() => {
+    rangeLabelWidths2 = rangeLabelWidths.slice(0, charts.n ?? 0);
+  });
+  let rangeLabelSpace = $derived(max(rangeLabelWidths2, (d) => d.width) ?? 0);
+  let rangeWidth = $derived(realWidth - rangeLabelSpace);
+
+  let rangeHeight = 30;
   let topMargin = $state(1);
 
   let radius = 10;
@@ -23,18 +39,10 @@
     rightOverflow: 0,
   });
 
-  let charts: ReturnType<typeof formatData> = $state([]);
-  let chartDebouncer = createDebouncer(250);
-  $effect(() =>
-    chartDebouncer([componentSpec, data, data[componentSpec.dataSet]?.data], () => {
-      charts = formatData(componentSpec, data);
-    }),
-  );
-
   let xScale = $derived(
     scaleLinear()
       .domain(
-        charts.reduce(
+        charts.d.reduce(
           (acc, e) =>
             e.d.reduce(
               (acc2, e2) =>
@@ -47,11 +55,11 @@
           [Infinity, 0],
         ),
       )
-      .range([Math.max(radius, axisOverflow.leftOverflow ?? 0), realWidth - 0])
+      .range([Math.max(radius, axisOverflow.leftOverflow ?? 0), rangeWidth - 0])
       .nice(),
   );
 
-  let axisSpace = $derived((i: number, length: number) =>
+  let _axisSpace = $derived((i: number, length: number) =>
     (componentSpec.axis.repeat == AxisRepeatMode.FIRST && i == 0) ||
     (componentSpec.axis.repeat == AxisRepeatMode.LAST && i == length - 1) ||
     componentSpec.axis.repeat == AxisRepeatMode.ALL
@@ -61,13 +69,12 @@
 </script>
 
 <div class="range-charts">
-  {#each charts as chart (chart.k)}
+  {#each charts.d as chart (chart.k)}
     <p>{chart.k}</p>
-    {#each chart.d as line, i (chart.k + line.key)}
-      <b>{line.label}</b>
-      <svg width={realWidth} height={height + axisSpace(i, chart.d.length)}>
+    <svg width={realWidth} height={rangeHeight * chart.d.length + topMargin}>
+      <g transform="translate({rangeLabelSpace}, 0)">
         <Axis
-          height={60}
+          height={rangeHeight * chart.d.length + topMargin}
           width={realWidth}
           scale={xScale}
           conf={componentSpec.axis}
@@ -80,17 +87,27 @@
             }
             topMargin = Math.max(d.labelHeight ?? 0, 0);
           }}
-          showLabels={axisSpace(i, chart.d.length) != 0}
+          showLabels={true}
         />
+      </g>
 
-        <g transform="translate(0, {15 + axisSpace(i, chart.d.length)})">
-          {#each line.value as p (chart.k + line.key + p.v)}
-            <circle cx={xScale(p.v)} r={radius} fill={p.s?.color ?? ""}>
-              <title>{p.s?.label.text}: {p.v}</title>
-            </circle>
-          {/each}
-        </g>
-      </svg>
-    {/each}
+      <g transform="translate(0, {topMargin + 15})">
+        {#each chart.d as line, i (chart.k + line.key)}
+          <!-- <b>{line.label}</b> -->
+          <text
+            y={rangeHeight * i}
+            dominant-baseline="middle"
+            bind:contentRect={rangeLabelWidths[line.i]}>{line.label}</text
+          >
+          <g transform="translate({rangeLabelSpace}, {rangeHeight * i})">
+            {#each line.value as p (chart.k + line.key + p.v)}
+              <circle cx={xScale(p.v)} r={radius} fill={p.s?.color ?? ""}>
+                <title>{p.s?.label.text}: {p.v}</title>
+              </circle>
+            {/each}
+          </g>
+        {/each}
+      </g>
+    </svg>
   {/each}
 </div>
