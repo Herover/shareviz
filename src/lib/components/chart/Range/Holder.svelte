@@ -62,6 +62,7 @@
 
 <div class="range-charts">
   {#each charts as chart (chart.k)}
+    <p>{chart.k}</p>
     {#each chart.d as line, i (chart.k + line.key)}
       <b>{line.label}</b>
       <svg width={realWidth} height={height + axisSpace(i, chart.d.length)}>
