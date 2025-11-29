@@ -33,7 +33,7 @@ export class ChartStore {
     const pathPrefix = ["chart", "elements", index, "d"];
     return {
       submitOp: (op: any) => {
-        this.#doc.submitOp([...pathPrefix, op]);
+        this.#doc.submitOp([...pathPrefix, ...op]);
       },
       pathPrefix: () => pathPrefix,
     };

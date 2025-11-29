@@ -14,7 +14,7 @@ export const formatData = (componentSpec: RangeElement, data: ComputedData) => {
       settings,
       d: group(componentSpec.categories, g1, (k2, g2) => {
         return {
-          label: k2,
+          label: componentSpec.categoryKeys.find((c) => c.k == k2)?.label.text ?? k2,
           key: k2,
           d: g2,
           value: g2.map((d) => ({
@@ -26,8 +26,8 @@ export const formatData = (componentSpec: RangeElement, data: ComputedData) => {
         };
       }).sort(
         (a, b) =>
-          negativeOneToInf(componentSpec.categoryKeys.findIndex((e) => e.k == b.key)) -
-          negativeOneToInf(componentSpec.categoryKeys.findIndex((e) => e.k == a.key)),
+          negativeOneToInf(componentSpec.categoryKeys.findIndex((e) => e.k == a.key)) -
+          negativeOneToInf(componentSpec.categoryKeys.findIndex((e) => e.k == b.key)),
       ),
     };
   });
