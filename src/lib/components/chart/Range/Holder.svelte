@@ -9,6 +9,7 @@
   import type { RangeElement } from ".";
   import { AxisRepeatMode } from "$lib/chart";
   import { max } from "d3-array";
+  import Legend from "../Legend.svelte";
 
   let { chartSpec, componentSpec, data, chartWidth }: ChartComponentProps<RangeElement> = $props();
 
@@ -72,6 +73,9 @@
 </script>
 
 <div class="range-charts">
+  <Legend
+    keys={componentSpec.rangeCategoryKeys.map((d) => ({ color: d.color, legend: d.label.text }))}
+  />
   {#each charts.d as chart (chart.k)}
     <p>{chart.k}</p>
     <svg width={realWidth} height={rangeHeight * chart.d.length + topMargin}>
