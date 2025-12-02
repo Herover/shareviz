@@ -3,7 +3,7 @@
 <script lang="ts">
   import { scaleLinear, scaleTime, type ScaleLinear, type ScaleTime } from "d3-scale";
   import { formatNumber, orDefault, orNumber } from "$lib/utils";
-  import type { Axis, Row } from "$lib/chart";
+  import type { Axis, AxisGrid, Row } from "$lib/chart";
   import { AxisLocation, AxisOrientation } from "$lib/chart";
   import dayjs from "dayjs";
 
@@ -24,17 +24,7 @@
     }) => void;
   }
 
-  let {
-    conf,
-    row,
-    width,
-    height,
-    scale,
-    showLabels = true,
-    dimensions = () => {},
-  }: Props = $props();
-
-  const maxTicks = 200;
+  let { conf, width, height, scale, showLabels = true, dimensions = () => {} }: Props = $props();
 
   let bbs: SVGTextElement | undefined = $state();
   let labelBox: DOMRect | undefined = $state();
@@ -44,129 +34,8 @@
 
   let size = $derived(conf.major.enabled ? (bbs?.getBoundingClientRect().height ?? 0) : 0);
 
-  let autoMajorTicks: { n: number | Date; l: string; textAnchor: "start" | "middle" | "end" }[] =
-    $state([]);
-  let manualMajorTicks: typeof autoMajorTicks = $state([]);
-
-  let autoMinorTicks: { n: number | Date; l: string }[] = $state([]);
-  let manualMinorTicks: {
-    n: number;
-    l: string;
-  }[] = $state([]);
   let lineOffset = $derived(showLabels && conf.location == AxisLocation.START ? size : 0);
-  $effect(() => {
-    if (scale && conf.major.enabled && conf.major.auto.each != 0) {
-      // Note: we are not allowed to assign these two variables to new values after this, or we
-      // get a weird reactive loop when we access it in the reactive block that dispatch stuff.
-      let computedMajorTicks: typeof autoMajorTicks = [];
-      let computedManualMajorTicks: typeof manualMajorTicks = [];
-      const from = scale.domain()[0];
-      const to = scale.domain()[1];
-      if (typeof to == "number" && typeof from == "number") {
-        if (conf.major.auto.from != "") {
-          const customFrom = Math.max(
-            Math.min(Number.parseFloat(conf.major.auto.from || "0"), to),
-            from,
-          );
-          const expectedTicks = 1 + (to - customFrom) / conf.major.auto.each;
-          if (expectedTicks > maxTicks) {
-            computedMajorTicks = [
-              { n: from, l: `Too many ticks (${expectedTicks})`, textAnchor: "middle" },
-            ];
-          } else {
-            for (let i = customFrom; i <= to; i += conf.major.auto.each) {
-              computedMajorTicks.push({
-                n: i,
-                l: conf.major.auto.labels
-                  ? formatNumber(i, conf.major.labelDivide, conf.major.labelThousands) +
-                    conf.major.afterLabel
-                  : "",
-                textAnchor: "middle",
-              });
-            }
-          }
-          computedManualMajorTicks = conf.major.ticks
-            .filter((d) => d.n <= to && from <= d.n)
-            .map((e) => ({ ...e, textAnchor: "middle" }));
-        } else {
-          const ticks = scaleLinear([from, to], [0, 1]).nice().ticks(3);
-          ticks.forEach((tick) => {
-            return computedMajorTicks.push({
-              l: conf.major.auto.labels
-                ? formatNumber(tick, conf.major.labelDivide, conf.major.labelThousands) +
-                  conf.major.afterLabel
-                : "",
-              n: tick,
-              textAnchor: "middle",
-            });
-          });
-        }
-      } else if (to instanceof Date && from instanceof Date) {
-        if (!row) {
-          console.warn("axis row is not set");
-          autoMajorTicks = [];
 
-          return;
-        }
-        const ticks = scaleTime([new Date(from), new Date(to)], [0, 1])
-          .nice()
-          .ticks(3);
-        ticks.forEach((tick) => {
-          return computedMajorTicks.push({
-            l: "" + dayjs(tick).format("YYYY"),
-            n: tick,
-            textAnchor: "middle",
-          });
-        });
-        // let d = dayjs(conf.major.auto.from, row.dateFormat || row.type).toDate();
-        // d.setDate(1);
-        // d.setMonth(0);
-        // let n = 0;
-        // while (d <= to && n < maxTicks) {
-        //   computedMajorTicks.push({
-        //     n: new Date(d),
-        //     l: conf.major.auto.labels ? d.getFullYear() + conf.major.afterLabel : "",
-        //     textAnchor: "middle",
-        //   });
-        //   d.setFullYear(d.getFullYear() + conf.major.auto.each);
-        //   n++;
-        // }
-      }
-      autoMajorTicks = computedMajorTicks.filter(
-        (d) => computedManualMajorTicks.findIndex((dd) => dd.n == d.n) == -1,
-      );
-      manualMajorTicks = computedManualMajorTicks;
-    }
-  });
-  let majorTicks: typeof manualMajorTicks = $derived(
-    scale
-      ? [...manualMajorTicks, ...autoMajorTicks]
-          .sort((a, b) =>
-            a.n instanceof Date && b.n instanceof Date
-              ? a.n.getTime() - b.n.getTime()
-              : typeof a.n == "number" && typeof b.n == "number"
-                ? a.n - b.n
-                : 0,
-          )
-          .map((e, i, arr) => ({
-            ...e,
-            textAnchor:
-              arr.filter((e) => e.l != "").length <= 2 &&
-              ((e.n instanceof Date &&
-                scale.domain()[0] instanceof Date &&
-                // @ts-expect-error: if e.n is a date, then scale.domain will also return dates
-                (scale.domain()[0].getTime() == e.n.getTime() ||
-                  // @ts-expect-error: if e.n is a date, then scale.domain will also return dates
-                  scale.domain()[1].getTime() == e.n.getTime())) ||
-                scale.domain()[0] == e.n ||
-                scale.domain()[1] == e.n)
-                ? i == 0
-                  ? "start"
-                  : "end"
-                : "middle",
-          }))
-      : [],
-  );
   $effect(() => {
     if (labelBox || leftBox || rightBox)
       dimensions({
@@ -189,58 +58,219 @@
         labelHeight: orNumber(testBox?.height, 0) + conf.major.tickSize,
       });
   });
-  $effect(() => {
-    if (scale && conf.minor.enabled && conf.minor.auto.each != 0) {
-      let computedMinorTicks: typeof autoMinorTicks = [];
+
+  // $effect(() => {
+  //   if (scale && conf.major.enabled && conf.major.auto.each != 0) {
+  //     // Note: we are not allowed to assign these two variables to new values after this, or we
+  //     // get a weird reactive loop when we access it in the reactive block that dispatch stuff.
+  //     let computedMajorTicks: typeof autoMajorTicks = [];
+  //     let computedManualMajorTicks: typeof manualMajorTicks = [];
+  //     const from = scale.domain()[0];
+  //     const to = scale.domain()[1];
+  //     if (typeof to == "number" && typeof from == "number") {
+  //       if (conf.major.auto.from != "") {
+  //         const customFrom = Math.max(
+  //           Math.min(Number.parseFloat(conf.major.auto.from || "0"), to),
+  //           from,
+  //         );
+  //         const expectedTicks = 1 + (to - customFrom) / conf.major.auto.each;
+  //         if (expectedTicks > maxTicks) {
+  //           computedMajorTicks = [
+  //             { n: from, l: `Too many ticks (${expectedTicks})`, textAnchor: "middle" },
+  //           ];
+  //         } else {
+  //           for (let i = customFrom; i <= to; i += conf.major.auto.each) {
+  //             computedMajorTicks.push({
+  //               n: i,
+  //               l: conf.major.auto.labels
+  //                 ? formatNumber(i, conf.major.labelDivide, conf.major.labelThousands) +
+  //                   conf.major.afterLabel
+  //                 : "",
+  //               textAnchor: "middle",
+  //             });
+  //           }
+  //         }
+  //         computedManualMajorTicks = conf.major.ticks
+  //           .filter((d) => d.n <= to && from <= d.n)
+  //           .map((e) => ({ ...e, textAnchor: "middle" }));
+  //       } else {
+  //         const ticks = scaleLinear([from, to], [0, 1]).nice().ticks(3);
+  //         ticks.forEach((tick) => {
+  //           return computedMajorTicks.push({
+  //             l: conf.major.auto.labels
+  //               ? formatNumber(tick, conf.major.labelDivide, conf.major.labelThousands) +
+  //                 conf.major.afterLabel
+  //               : "",
+  //             n: tick,
+  //             textAnchor: "middle",
+  //           });
+  //         });
+  //       }
+  //     } else if (to instanceof Date && from instanceof Date) {
+  //       if (!row) {
+  //         console.warn("axis row is not set");
+  //         autoMajorTicks = [];
+
+  //         return;
+  //       }
+  //       const ticks = scaleTime([new Date(from), new Date(to)], [0, 1])
+  //         .nice()
+  //         .ticks(3);
+  //       ticks.forEach((tick) => {
+  //         return computedMajorTicks.push({
+  //           l: "" + dayjs(tick).format("YYYY"),
+  //           n: tick,
+  //           textAnchor: "middle",
+  //         });
+  //       });
+  //       // let d = dayjs(conf.major.auto.from, row.dateFormat || row.type).toDate();
+  //       // d.setDate(1);
+  //       // d.setMonth(0);
+  //       // let n = 0;
+  //       // while (d <= to && n < maxTicks) {
+  //       //   computedMajorTicks.push({
+  //       //     n: new Date(d),
+  //       //     l: conf.major.auto.labels ? d.getFullYear() + conf.major.afterLabel : "",
+  //       //     textAnchor: "middle",
+  //       //   });
+  //       //   d.setFullYear(d.getFullYear() + conf.major.auto.each);
+  //       //   n++;
+  //       // }
+  //     }
+  //     autoMajorTicks = computedMajorTicks.filter(
+  //       (d) => computedManualMajorTicks.findIndex((dd) => dd.n == d.n) == -1,
+  //     );
+  //     manualMajorTicks = computedManualMajorTicks;
+  //   }
+  // });
+
+  // $effect(() => {
+  //   if (scale && conf.minor.enabled && conf.minor.auto.each != 0) {
+  //     let computedMinorTicks: typeof autoMinorTicks = [];
+  //     const from = scale.domain()[0];
+  //     const to = scale.domain()[1];
+  //     if (typeof to == "number" && typeof from == "number") {
+  //       const expectedTicks =
+  //         1 + (to - Number.parseFloat(conf.minor.auto.from || "0")) / conf.minor.auto.each;
+  //       if (expectedTicks > maxTicks) {
+  //         computedMinorTicks = [{ n: from, l: `Too many ticks (${expectedTicks})` }];
+  //       } else {
+  //         for (
+  //           let i = Number.parseFloat(conf.minor.auto.from || "0");
+  //           i <= to;
+  //           i += conf.minor.auto.each
+  //         ) {
+  //           computedMinorTicks.push({
+  //             n: i,
+  //             l: conf.minor.auto.labels
+  //               ? formatNumber(i, conf.minor.labelDivide, conf.minor.labelThousands) +
+  //                 conf.minor.afterLabel
+  //               : "",
+  //           });
+  //         }
+  //       }
+  //       manualMinorTicks = conf.minor.ticks.filter((d) => d.n <= to && from <= d.n);
+  //     } else if (to instanceof Date && from instanceof Date) {
+  //       /* eslint-disable-next-line svelte/prefer-svelte-reactivity */
+  //       let d = new Date(from);
+  //       d.setDate(1);
+  //       d.setMonth(0);
+  //       let n = 0;
+  //       while (d <= to && n < maxTicks) {
+  //         computedMinorTicks.push({
+  //           n: new Date(d),
+  //           l: conf.minor.auto.labels ? d.getFullYear() + conf.minor.afterLabel : "",
+  //         });
+  //         d.setFullYear(d.getFullYear() + conf.minor.auto.each);
+  //         n++;
+  //       }
+  //     }
+
+  //     autoMinorTicks = computedMinorTicks;
+  //   }
+  // });
+  const genTicks = $derived((n: number, axis: AxisGrid): typeof majorTicks => {
+    if (scale && axis.enabled) {
       const from = scale.domain()[0];
       const to = scale.domain()[1];
       if (typeof to == "number" && typeof from == "number") {
-        const expectedTicks =
-          1 + (to - Number.parseFloat(conf.minor.auto.from || "0")) / conf.minor.auto.each;
-        if (expectedTicks > maxTicks) {
-          computedMinorTicks = [{ n: from, l: `Too many ticks (${expectedTicks})` }];
-        } else {
-          for (
-            let i = Number.parseFloat(conf.minor.auto.from || "0");
-            i <= to;
-            i += conf.minor.auto.each
-          ) {
-            computedMinorTicks.push({
-              n: i,
-              l: conf.minor.auto.labels
-                ? formatNumber(i, conf.minor.labelDivide, conf.minor.labelThousands) +
-                  conf.minor.afterLabel
-                : "",
-            });
-          }
-        }
-        manualMinorTicks = conf.minor.ticks.filter((d) => d.n <= to && from <= d.n);
-      } else if (to instanceof Date && from instanceof Date) {
-        /* eslint-disable-next-line svelte/prefer-svelte-reactivity */
-        let d = new Date(from);
-        d.setDate(1);
-        d.setMonth(0);
-        let n = 0;
-        while (d <= to && n < maxTicks) {
-          computedMinorTicks.push({
-            n: new Date(d),
-            l: conf.minor.auto.labels ? d.getFullYear() + conf.minor.afterLabel : "",
-          });
-          d.setFullYear(d.getFullYear() + conf.minor.auto.each);
-          n++;
-        }
-      }
+        // Manual
+        const ticks: typeof majorTicks = axis.ticks.map((tick) => ({
+          l: tick.l,
+          n: tick.n,
+          textAnchor: "middle",
+        }));
 
-      autoMinorTicks = computedMinorTicks;
+        // Auto but only if there's no manual
+        scaleLinear([from, to], [0, 1])
+          .nice()
+          .ticks(n)
+          .forEach((tick) => {
+            if (ticks.findIndex((d) => d.n == tick) == -1)
+              ticks.push({
+                l: axis.auto.labels
+                  ? formatNumber(tick, axis.labelDivide, axis.labelThousands) + axis.afterLabel
+                  : "",
+                n: tick,
+                textAnchor: "middle",
+              });
+          });
+
+        return ticks;
+      } else if (to instanceof Date && from instanceof Date) {
+        // Manual TODO
+        const ticks: typeof majorTicks = [];
+
+        // Auto but only if there's no manual
+        scaleTime([new Date(from), new Date(to)], [0, 1])
+          .nice()
+          .ticks(n)
+          .forEach((tick) => {
+            if (ticks.findIndex((d) => d.n == tick) == -1)
+              ticks.push({
+                l: "" + dayjs(tick).format("YYYY"),
+                n: tick,
+                textAnchor: "middle",
+              });
+          });
+
+        return ticks;
+      }
     }
+
+    return [];
   });
-  let minorTicks = $derived(
-    scale
-      ? [...manualMinorTicks, ...autoMinorTicks].filter(
-          (d) => !majorTicks.find((dd) => dd.l != "" && dd.n == d.n),
-        )
-      : [],
-  );
+  let majorTicks: { n: number | Date; l: string; textAnchor: "start" | "middle" | "end" }[] =
+    $derived(
+      scale
+        ? genTicks(3, conf.major)
+            .sort((a, b) =>
+              a.n instanceof Date && b.n instanceof Date
+                ? a.n.getTime() - b.n.getTime()
+                : typeof a.n == "number" && typeof b.n == "number"
+                  ? a.n - b.n
+                  : 0,
+            )
+            .map((e, i, arr) => ({
+              ...e,
+              textAnchor:
+                arr.filter((e) => e.l != "").length <= 2 &&
+                ((e.n instanceof Date &&
+                  scale.domain()[0] instanceof Date &&
+                  // @ts-expect-error: if e.n is a date, then scale.domain will also return dates
+                  (scale.domain()[0].getTime() == e.n.getTime() ||
+                    // @ts-expect-error: if e.n is a date, then scale.domain will also return dates
+                    scale.domain()[1].getTime() == e.n.getTime())) ||
+                  scale.domain()[0] == e.n ||
+                  scale.domain()[1] == e.n)
+                  ? i == 0
+                    ? "start"
+                    : "end"
+                  : "middle",
+            }))
+        : [],
+    );
+  let minorTicks = $derived(scale ? genTicks(15, conf.minor) : []);
 </script>
 
 <text bind:contentRect={testBox} aria-hidden="true" visibility="hidden">123</text>
