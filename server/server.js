@@ -552,6 +552,7 @@ export function startServer(server) {
 
   backend.use("connect", function (ctx, next) {
     ctx.req.__logger.log("connect");
+    ctx.agent.custom.logger = ctx.req.__logger;
     if (ctx.req.__sharevizAuthJSToken) {
       drizzledb
         .select()
