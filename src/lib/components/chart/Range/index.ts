@@ -62,7 +62,7 @@ const defaultData: RangeElement = {
     },
     minor: {
       grid: false,
-      enabled: true,
+      enabled: false,
       tickSize: 4,
       tickWidth: 1,
       color: "#aaaaaa",
