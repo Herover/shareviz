@@ -70,6 +70,8 @@
   let open = $state(false);
   let input: HTMLInputElement | undefined = $state();
   let container: HTMLDivElement | undefined = $state();
+  let popoutSize: { height: number; width: number } | undefined = $state();
+  let windowHeight = $state(0);
 
   let opened = $state(0);
   const ev = (e: MouseEvent | KeyboardEvent) => {
@@ -128,7 +130,10 @@
   let previewElement: HTMLDivElement | undefined = $state();
   let x = $state(0);
   let y = $state(0);
+  let popupY = $derived(Math.min(windowHeight - (popoutSize?.height ?? 0) - 16, y + 16));
 </script>
+
+<svelte:window bind:innerHeight={windowHeight} />
 
 <div
   style:border-color={disabled ? "#cccccc" : "#000000"}
@@ -146,7 +151,12 @@
     role="button"
   ></div>
   {#if open}
-    <div style:top="{y + 16}px" style:left="{x - 60}px" class="popout">
+    <div
+      style:top="{popupY}px"
+      style:left="{x - (popoutSize?.width ?? 0) / 2 - 7}px"
+      bind:contentRect={popoutSize}
+      class="popout"
+    >
       <input
         value={color}
         bind:this={input}
