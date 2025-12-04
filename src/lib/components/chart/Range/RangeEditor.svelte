@@ -80,6 +80,34 @@
       ]);
     }
   });
+  const sortCategoryKeys = $derived(() => {
+    const newVal: categoryKeys[] = categoryValues
+      .map((d) => ({
+        k: d,
+        label: {
+          text: chartSpec.categoryKeys.find((c) => c.k == d)?.label.text ?? d,
+        },
+        symbol: LineSymbol.CIRCLE,
+      }))
+      .sort((a, b) => {
+        const av = chartData[chartSpec.dataSet]?.data.reduce(
+          (acc, d) => (d[chartSpec.categories] == a.k ? acc + d[chartSpec.pointValue] : acc),
+          0,
+        );
+        const bv = chartData[chartSpec.dataSet]?.data.reduce(
+          (acc, d) => (d[chartSpec.categories] == b.k ? acc + d[chartSpec.pointValue] : acc),
+          0,
+        );
+        return bv - av;
+      });
+    store.submitOp([
+      "categoryKeys",
+      {
+        r: 1,
+        i: newVal,
+      },
+    ]);
+  });
 
   const movePointDown = (k: string, i: number): void => {
     store.submitOp(["rangeCategoryKeys", [i, { p: 0 }], [i + 1, { d: 0 }]]);
@@ -218,18 +246,6 @@
 {#if chartSpec.dataSet}
   <p>
     <label class="editor-column-label">
-      Repeat for every:
-      <select value={chartSpec.repeat} onchange={(e) => setRepeat(e.currentTarget.value)}>
-        <option></option>
-        {#each chartData[chartSpec.dataSet].rows as row (row.key)}
-          <option>{row.key}</option>
-        {/each}
-      </select>
-    </label>
-  </p>
-
-  <p>
-    <label class="editor-column-label">
       One line for every:
       <select value={chartSpec.categories} onchange={(e) => setCategories(e.currentTarget.value)}>
         <option></option>
@@ -239,6 +255,12 @@
       </select>
     </label>
   </p>
+
+  <button
+    disabled={chartSpec.pointLabel == "" || chartSpec.categories == ""}
+    onclick={sortCategoryKeys}>Sort</button
+  >
+
   {#snippet lineTitle(d: categoryKeys)}
     {d.k}
   {/snippet}
@@ -250,6 +272,7 @@
     title={lineTitle}
     values={chartSpec.categoryKeys.map((d) => ({ k: d.k, d }))}
   />
+
   <div class="box">
     <div class="w-025 p-top-1">Label</div>
     <div class="w-075 p-top-1">
@@ -322,6 +345,21 @@
     </div>
   </div>
 
+  <p>
+    <label class="editor-column-label">
+      Repeat for every:
+      <select value={chartSpec.repeat} onchange={(e) => setRepeat(e.currentTarget.value)}>
+        <option></option>
+        {#each chartData[chartSpec.dataSet].rows as row (row.key)}
+          <option>{row.key}</option>
+        {/each}
+      </select>
+    </label>
+  </p>
+
+  <h3 class="editor-sub-section">Axis</h3>
+
+  <h3 class="editor-sub-section">Axis</h3>
   <AxisEditor
     conf={new AxisStore(connection, chartSpec.axis, [...store.pathPrefix(), "axis"])}
     showRepeatControl={true}
