@@ -30,7 +30,7 @@
         .sort()
         .join()
     ) {
-      const newVal: rangeCategoryKeys[] = categoryValues.map((d) => ({
+      const newVal: rangeCategoryKeys[] = rangeCategoryValues.map((d) => ({
         color: chartSpec.rangeCategoryKeys.find((c) => c.k == d)?.color ?? "#000000",
         k: d,
         label: {
