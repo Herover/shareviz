@@ -107,7 +107,7 @@
             bind:contentRect={rangeLabelWidths[line.i]}>{line.label}</text
           >
           <g transform="translate({rangeLabelSpace}, {rangeHeight * i})">
-            {#each line.value as p (chart.k + line.key + p.v)}
+            {#each line.value as p (chart.k + line.key + p.s?.k)}
               <circle cx={xScale(p.v)} r={radius} fill={p.s?.color ?? ""}>
                 <title>{p.s?.label.text}: {p.v}</title>
               </circle>
