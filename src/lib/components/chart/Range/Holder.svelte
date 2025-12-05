@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  import { createDebouncer } from "$lib/utils";
+  import { createDebouncer, orNumber } from "$lib/utils";
   import { scaleLinear } from "d3-scale";
   import type { ChartComponentProps } from "../chartComponents";
   import { formatData } from "./data";
@@ -48,7 +48,10 @@
             e.d.reduce(
               (acc2, e2) =>
                 e2.value.reduce(
-                  (acc3, e3) => [Math.min(acc3[0], e3.v), Math.max(acc3[1], e3.v)],
+                  (acc3, e3) => [
+                    Math.min(acc3[0], orNumber(e3.v, 0)),
+                    Math.max(acc3[1], orNumber(e3.v, 0)),
+                  ],
                   acc2,
                 ),
               acc,

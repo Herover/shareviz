@@ -4,6 +4,7 @@
   import { type LineRepeatSettingsKey } from "$lib/chart";
   import { LineSymbol } from "$lib/chart";
   import { AxisStore } from "$lib/chartStores/axis.svelte";
+  import { orNumber } from "$lib/utils";
   import type { categoryKeys, rangeCategoryKeys, RangeElement } from ".";
   import AxisEditor from "../AxisEditor.svelte";
   import CategoryList from "../CategoryList.svelte";
@@ -91,11 +92,13 @@
       }))
       .sort((a, b) => {
         const av = chartData[chartSpec.dataSet]?.data.reduce(
-          (acc, d) => (d[chartSpec.categories] == a.k ? acc + d[chartSpec.pointValue] : acc),
+          (acc, d) =>
+            d[chartSpec.categories] == a.k ? acc + orNumber(d[chartSpec.pointValue], 0) : acc,
           0,
         );
         const bv = chartData[chartSpec.dataSet]?.data.reduce(
-          (acc, d) => (d[chartSpec.categories] == b.k ? acc + d[chartSpec.pointValue] : acc),
+          (acc, d) =>
+            d[chartSpec.categories] == b.k ? acc + orNumber(d[chartSpec.pointValue], 0) : acc,
           0,
         );
         return bv - av;

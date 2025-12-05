@@ -48,7 +48,21 @@ export const computeData = (chartSpec?: Root) =>
           }
         });
 
-        acc[data.id] = { data: set, rows: data.rows };
+        const rows = [...data.rows];
+        data.transpose.forEach((transpose) => {
+          rows.push({
+            dateFormat: "",
+            key: transpose.toKey,
+            type: transpose.keyType,
+          });
+          rows.push({
+            dateFormat: "",
+            key: transpose.toValue,
+            type: transpose.valueType,
+          });
+        });
+
+        acc[data.id] = { data: set, rows };
 
         return acc;
       }, {} as ComputedData);
