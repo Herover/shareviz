@@ -109,6 +109,12 @@
             dominant-baseline="middle"
             bind:contentRect={rangeLabelWidths[line.i]}>{line.label}</text
           >
+          <path
+            d="m {rangeLabelWidths[line.i]?.width ?? 0},{rangeHeight *
+              i} L {realWidth}, {rangeHeight * i}"
+            stroke-width="1"
+            stroke="#dddddd"
+          />
           <g transform="translate({rangeLabelSpace}, {rangeHeight * i})">
             {#each line.value as p (chart.k + line.key + p.s?.k)}
               <circle cx={xScale(p.v)} r={radius} fill={p.s?.color ?? ""}>
