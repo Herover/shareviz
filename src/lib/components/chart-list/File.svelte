@@ -41,7 +41,6 @@
   };
 
   const clickRow = (e: MouseEvent) => {
-    console.log(e);
     if (e.buttons != 0) {
       return;
     }
