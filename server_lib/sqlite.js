@@ -18,7 +18,9 @@ import {
   usersOrganizations,
   usersTeams,
 } from "./drizzle/schema.js";
-import { getLogger } from "./log.js";
+import { getLogger } from "../src/lib/log.js";
+
+const logger = getLogger();
 
 class DrizzleLogger {
   #logger;
@@ -575,7 +577,6 @@ export const db = {
       .innerJoin(usersTeams, eq(usersTeams.userId, users.id))
       .innerJoin(charts, eq(charts.teamId, usersTeams.teamId))
       .where(and(eq(users.id, userId), eq(charts.id, chartId)));
-    console.log(lst, userId, chartId);
     return lst.length != 0;
   },
 };
@@ -586,8 +587,8 @@ export const init = async () => {
   const orgs = await drizzledb.$count(organizations);
   if (orgs === 0) {
     const newOrg = await db.addOrganization("New organization");
-    console.log(
-      "Created initial organization with code http://localhost:5173/invite?code=" + newOrg.code,
-    );
+    logger.log("Created initial organization", {
+      initialURL: "http://localhost:5173/invite?code=" + newOrg.code,
+    });
   }
 };

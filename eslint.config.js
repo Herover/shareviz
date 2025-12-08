@@ -45,6 +45,7 @@ export default ts.config(
         },
       ],
       "@typescript-eslint/no-explicit-any": "off",
+      "no-console": ["error"],
     },
   },
 );

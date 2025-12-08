@@ -12,6 +12,9 @@ import { editChartInfo } from "./api";
 import { defDoc } from "./initialDoc";
 import { migrate } from "./chartMigrate";
 import { type Doc } from "sharedb";
+import { getLogger } from "$lib/log.js";
+
+const logger = getLogger();
 
 export const localPrefix = "local-";
 
@@ -49,7 +52,7 @@ export const createLocalDoc = (
       onOp();
     } catch (error) {
       onOp(error as Error);
-      console.error(error, op);
+      logger.error("unable to submit op on local doc", { op }, error);
     }
   };
   doc.on = (ev: string, listener: (a?: any) => any) => {
@@ -119,7 +122,7 @@ export const db = (function createDB() {
           WebSocket: WebSocket,
         },
       );
-      socket.addEventListener("error", (e) => console.warn(e.message, e));
+      socket.addEventListener("error", (e) => logger.error("websocket error", e));
 
       socket.addEventListener("open", () =>
         update((d) => {
@@ -155,7 +158,6 @@ export const db = (function createDB() {
 
       const onData = (e?: Error) => {
         if (e && typeof e.message == "string") notifications.addError(e.message);
-        // console.log("doc", doc, doc.data);
         update((d) => ({
           doc: doc.data,
           missing: typeof doc.data === "undefined",
@@ -201,7 +203,7 @@ export const db = (function createDB() {
         } else {
           const docId = (synced ? "" : localPrefix) + crypto.randomUUID();
           doc = synced ? connection.get("examples", docId) : getLocalDoc("examples", docId);
-          doc.on("error", (e: Error) => console.warn("doc error", e));
+          doc.on("error", (e: Error) => logger.log("doc error", e));
           doc.create(typeof data == "string" ? data : defDoc, json1.type.uri, () => resolve(docId));
         }
       });
@@ -232,7 +234,7 @@ export const db = (function createDB() {
         editChartInfo(id, info);
       } catch (e) {
         notifications.addError((e as Error).message);
-        console.error(e);
+        logger.error("unable to update info", e);
       }
 
       update((d) => ({

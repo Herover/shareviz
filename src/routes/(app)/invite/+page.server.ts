@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { db } from "$lib/../../server_lib/sqlite";
+import { getLogger } from "$lib/log.js";
+
+const logger = getLogger();
 
 export async function load({ url, locals }) {
   const session = locals.session;
@@ -17,7 +20,7 @@ export async function load({ url, locals }) {
           alreadyJoined: joinedOrgs.some((e) => e.organizations.id == org.organizations.id),
         };
       } catch (error) {
-        console.log((error as Error).message);
+        logger.error("unable to find invite", error);
       }
     }
   }

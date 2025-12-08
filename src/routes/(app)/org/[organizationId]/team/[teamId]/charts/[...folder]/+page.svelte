@@ -13,6 +13,9 @@
   import type { PageProps } from "./$types";
   import Popup from "$lib/components/Popup.svelte";
   import { resolve } from "$app/paths";
+  import { getLogger } from "$lib/log.js";
+
+  const logger = getLogger();
 
   let { data }: PageProps = $props();
 
@@ -106,7 +109,7 @@
       goto(resolve("/(app)/editor/chart/[id]", { id: docId }));
     } catch (err) {
       notifications.addError((err as Error).message);
-      console.error(err);
+      logger.error("unable to create chart", err);
     }
   };
 
@@ -116,7 +119,7 @@
       goto(resolve("/(app)/editor/chart/[id]", { id: docId }));
     } catch (err) {
       notifications.addError((err as Error).message);
-      console.error(err);
+      logger.error("unable to import chart", err);
     }
   };
 

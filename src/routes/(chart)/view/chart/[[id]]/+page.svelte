@@ -17,6 +17,9 @@
   import html2canvas from "html2canvas";
   import { fontStore, type FONTS } from "$lib/fontStore.svelte.js";
   import { chartToEditor } from "$lib/chartToEditorStore.svelte.js";
+  import { getLogger } from "$lib/log.js";
+
+  const logger = getLogger();
 
   let { data } = $props();
 
@@ -106,7 +109,7 @@
           (event.data.data.name || chartSpec?.chart.title || data.id || "chart") + ".png";
         link.click();
       } catch (err) {
-        console.error("Error: " + err);
+        logger.error("unable to create image", err);
       }
     } else if (event.data.type == "CHART_HIGHLIGHT") {
       chartToEditor.setHighlight(event.data.data.target);
@@ -154,7 +157,7 @@
       fetch("/api/publication/" + data.id + "/data")
         .then((resp) => resp.json())
         .then((data) => (chartSpec = data.chart))
-        .catch((err) => console.error(err));
+        .catch((err) => logger.error("unable to get chart", err));
     }
   });
 </script>

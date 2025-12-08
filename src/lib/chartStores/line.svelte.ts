@@ -140,16 +140,6 @@ export class LineStore {
     ]);
   }
   moveRepeatUp(i: number) {
-    console.log([
-      "chart",
-      "elements",
-      this.#elementIndex,
-      "d",
-      "repeatSettings",
-      "byKey",
-      [i - 1, { d: 0 }],
-      [i, { p: 0 }],
-    ]);
     this.#doc.submitOp([
       "chart",
       "elements",

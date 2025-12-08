@@ -2,6 +2,9 @@
 
 import { json } from "@sveltejs/kit";
 import { db } from "$lib/../../server_lib/sqlite";
+import { getLogger } from "../../../lib/log.js";
+
+const logger = getLogger();
 
 export async function PUT({ request, locals }) {
   const session = locals.session;
@@ -16,7 +19,7 @@ export async function PUT({ request, locals }) {
   try {
     await db.addUserOrganizationRelation(code, user.id);
   } catch (err) {
-    console.error(err);
+    logger.error("unable to create user organization relation", err);
     return json({ message: "invalid invite" }, { status: 400 });
   }
 

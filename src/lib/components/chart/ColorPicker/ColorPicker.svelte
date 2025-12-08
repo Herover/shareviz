@@ -3,6 +3,9 @@
 <script lang="ts">
   import chroma from "chroma-js";
   import ColorComponent from "./ColorComponent.svelte";
+  import { getLogger } from "$lib/log.js";
+
+  const logger = getLogger();
 
   interface Props {
     color: string;
@@ -56,7 +59,7 @@
         h = h2;
       }
     } catch (e) {
-      console.warn(e, color);
+      logger.error("invalid color", { color }, e);
       l = 0;
       c = 0;
       h = 0;

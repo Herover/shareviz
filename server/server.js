@@ -8,7 +8,7 @@ import { backend, connection } from "../server_lib/sharedb.js";
 import sharedb from "sharedb";
 import { users, userSessions } from "../server_lib/drizzle/schema.js";
 import { eq, gt } from "drizzle-orm";
-import { getLogger } from "../server_lib/log.js";
+import { getLogger } from "../src/lib/log.js";
 import { drizzledb } from "../server_lib/sqlite.js";
 import { SESSION_COOKIE_KEY } from "../server_lib/auth.js";
 
@@ -563,7 +563,6 @@ export function startServer(server) {
         )
         .leftJoin(users, eq(userSessions.userId, users.id))
         .then((result) => {
-          console.log(result);
           if (typeof result != "undefined" && result.length == 1) {
             ctx.agent.custom.user = result[0].user;
             ctx.agent.custom.session = result[0].session;

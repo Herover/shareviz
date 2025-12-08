@@ -4,6 +4,9 @@
   import { editChartInfo, editFolder } from "$lib/api";
   import File from "./File.svelte";
   import type { FolderItem } from "./types";
+  import { getLogger } from "$lib/log.js";
+
+  const logger = getLogger();
 
   /* eslint-disable svelte/no-navigation-without-resolve */
 
@@ -36,7 +39,7 @@
           return acc;
         }
         if (dir?.type != "folder") {
-          console.error("Unable to find path name");
+          logger.error("Unable to find path name");
           return acc;
         }
         acc.path.push({ id: e, name: nameOverride[e] ?? dir.name });

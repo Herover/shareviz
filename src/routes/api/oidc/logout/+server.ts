@@ -6,19 +6,22 @@ import { decode } from "jsonwebtoken";
 import { accounts, sessions } from "$lib/../../server_lib/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { drizzledb } from "../../../../../server_lib/sqlite";
+import { getLogger } from "../../../../lib/log";
+
+const logger = getLogger();
 
 export async function POST({ request }) {
-  console.log(request.headers);
+  logger.log("oidc logout herders", request.headers);
   const data = await request.formData();
 
   if (!data) {
-    console.log("missing form data");
+    logger.log("missing form data");
     return json({ message: "something went wrong" }, { status: 400 });
   }
 
   const logoutToken = data.get("logout_token")?.toString() || "";
   if (!logoutToken) {
-    console.log("missing logout_token");
+    logger.log("missing logout_token");
     return json({ message: "something went wrong" }, { status: 400 });
   }
 
@@ -30,14 +33,14 @@ export async function POST({ request }) {
   //       issuer: env.AUTH_KEYCLOAK_ISSUER,
   //     },
   //   );
-  //   console.log(verified)
+  //   logger.log(verified)
   // } catch (e) {
   //   console.error(e)
   // }
   const decoded = decode(logoutToken) as any;
-  console.log(decoded);
+  logger.log(decoded);
   if (!decoded) {
-    console.log("can't decode logout_token");
+    logger.log("can't decode logout_token");
     return json({ message: "something went wrong" }, { status: 400 });
   }
 
@@ -46,13 +49,13 @@ export async function POST({ request }) {
     .from(accounts)
     .where(eq(accounts.providerAccountId, decoded["sub"]));
   if (dbAccounts.length != 1 || !dbAccounts[0].userId) {
-    console.log("can't find related account");
+    logger.log("can't find related account");
     return json({ message: "something went wrong" }, { status: 400 });
   }
 
   const result = await drizzledb.delete(sessions).where(eq(sessions.userId, dbAccounts[0].userId));
   if (result.changes == 0) {
-    console.log("did not delete any sessions");
+    logger.log("did not delete any sessions");
     return json({ message: "something went wrong" }, { status: 400 });
   }
 

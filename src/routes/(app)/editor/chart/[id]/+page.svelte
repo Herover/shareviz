@@ -25,6 +25,9 @@
   import { notifications } from "$lib/notificationStore.js";
   import { goto } from "$app/navigation";
   import type { PageProps, PageServerData } from "./$types";
+  import { getLogger } from "$lib/log.js";
+
+  const logger = getLogger();
 
   let { data }: PageProps & { data: PageServerData } = $props();
 
@@ -164,7 +167,7 @@
       }
 
       default:
-        console.warn("attempting to edit unknown key", e.k);
+        logger.log("attempting to edit unknown key " + e.k);
         break;
     }
   });

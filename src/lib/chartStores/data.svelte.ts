@@ -8,6 +8,9 @@ import { migrate } from "../chartMigrate";
 import { getLocalDoc, localPrefix } from "../chartStore";
 import { defDoc } from "../initialDoc";
 import type { Root } from "../chart";
+import { getLogger } from "$lib/log.js";
+
+const logger = getLogger();
 
 interface PresenceData {
   selected: string;
@@ -86,7 +89,7 @@ export class ShareDBConnection {
   }
 
   #onSocketError(e: any) {
-    console.warn(e.message, e);
+    logger.error(e.message, e);
   }
   #onSocketOpen() {
     this.connected = true;
@@ -110,7 +113,7 @@ export class ShareDBConnection {
       migrate(doc);
     } else {
       this.#presence = this.#connection.getPresence("presence-" + docId);
-      this.#presence.subscribe((e: any) => console.log("presence subscribe callback", e));
+      this.#presence.subscribe((e: any) => logger.error("presence subscribe callback", e));
       const presences: { [key: string]: PresenceData } = {};
       const presenceTargets: { [key: string]: string } = {};
       this.#presence.on("receive", (presenceId: string, data: any) => {
@@ -137,7 +140,7 @@ export class ShareDBConnection {
         }
       });
       this.#presence.on("error", (e: any) => {
-        console.log("presence error", e);
+        logger.error("presence error", e);
       });
       const localPresence = this.#presence.create();
       localPresence.submit({
@@ -150,7 +153,6 @@ export class ShareDBConnection {
       if (e && typeof e.message == "string") {
         this.#events.dispatchEvent(new CustomEvent("error", { detail: { error: e } }));
       }
-      // console.log("got doc", doc.data);
       this.#data = doc.data;
       this.#version = doc.version ?? -1;
 

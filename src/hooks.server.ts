@@ -7,13 +7,16 @@ import { connection } from "$lib/../../server_lib/sharedb";
 import { SESSION_COOKIE_KEY } from "$lib/../../server_lib/auth";
 import { migrate } from "$lib/chartMigrate";
 import { formatVersion } from "$lib/initialDoc";
+import { getLogger } from "$lib/log.js";
+
+const logger = getLogger();
 
 export const init: ServerInit = async () => {
-  console.log("init db...");
+  logger.log("init db...");
   await initDB();
-  console.log("migrate...");
+  logger.log("migrate...");
   const charts = await db.getAllCharts();
-  console.log("checking", charts.length, "charts for migrations");
+  logger.log("checking charts for migrations", { n: charts.length });
   for (let i = 0; i < charts.length; i++) {
     await new Promise<void>((resolve, reject) => {
       const doc = connection.get("examples", charts[i].chartRef);
@@ -21,7 +24,7 @@ export const init: ServerInit = async () => {
         migrate(doc);
 
         if (doc.data?.m?.v != formatVersion) {
-          console.error("Failed migration for", doc.id);
+          logger.error("Failed migration", { id: doc.id });
         }
 
         doc.unsubscribe();
@@ -42,7 +45,7 @@ export const init: ServerInit = async () => {
     });
   }
 
-  console.log("done migrating");
+  logger.log("done migrating");
 };
 
 const newAuthHandle: Handle = async ({ event, resolve }) => {

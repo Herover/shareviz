@@ -6,6 +6,9 @@ import { db } from "$lib/../../server_lib/user.js";
 import { connection } from "$lib/../../server_lib/sharedb";
 import { defDoc, formatVersion } from "$lib/initialDoc.js";
 import type { Root } from "$lib/chart.js";
+import { getLogger } from "../../../lib/log";
+
+const logger = getLogger();
 
 export async function GET({ locals }) {
   const session = locals.session;
@@ -34,7 +37,7 @@ export async function POST({ request, locals }) {
   try {
     docData = typeof data == "string" ? (JSON.parse(data) as Root) : defDoc;
   } catch (e) {
-    console.error(e instanceof Error ? e.message : e);
+    logger.error("unable to parse data", e instanceof Error ? e.message : e);
     return json({ message: "unable to parse document" }, { status: 400 });
   }
 

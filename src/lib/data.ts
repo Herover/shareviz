@@ -3,6 +3,9 @@
 import { dsvFormat } from "d3-dsv";
 import type { Root, Row } from "./chart";
 import { valueParsers } from "./utils";
+import { getLogger } from "$lib/log.js";
+
+const logger = getLogger();
 
 export interface ComputedData {
   [key: string]: { data: any[]; rows: Row[] };
@@ -17,7 +20,7 @@ export const computeData = (chartSpec?: Root) =>
             const parser = valueParsers[rowInfo.type];
             if (typeof parser == "undefined") {
               // TODO: better warning?
-              console.warn("could not find parser", rowInfo.key);
+              logger.log("could not find parser " + rowInfo.key);
               acc[rowInfo.key] = row[rowInfo.key];
               return acc;
             }

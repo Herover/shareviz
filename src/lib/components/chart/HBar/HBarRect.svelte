@@ -4,6 +4,9 @@
   import type { Axis, HBar } from "$lib/chart";
   import { formatNumber } from "$lib/utils";
   import chroma from "chroma-js";
+  import { getLogger } from "$lib/log.js";
+
+  const logger = getLogger();
 
   interface Props {
     x: number;
@@ -33,7 +36,7 @@
         chroma.deltaE(fill, "#000000") > chroma.deltaE(fill, "#ffffff") ? "#000000" : "#ffffff";
     } catch (e) {
       // A error will usually be thrown if the user is manually editing the fill color
-      console.warn(e);
+      logger.error("unable to calculate delta", e);
     }
   });
 </script>

@@ -16,7 +16,7 @@
   import { line } from "d3-shape";
   import Axis from "../Axis.svelte";
   import FloatingLabels from "./FloatingLabels/FloatingLabels.svelte";
-  import { createEventDispatcher, onMount } from "svelte";
+  import { createEventDispatcher } from "svelte";
   import { chartToEditor } from "$lib/chartToEditorStore.svelte";
   import chroma from "chroma-js";
   import { fontStore } from "$lib/fontStore.svelte";
@@ -68,8 +68,7 @@
   let bottomMargin = $state(0);
   const labelOffset = 16;
   // $inspect(topMargin, bottomMargin).with(console.log)
-  let t1 = Date.now();
-  onMount(() => console.log("mounted!", Date.now() - t1));
+  // onMount(() => console.log("mounted!", Date.now() - t1));
 
   let dataSet = $derived(chartSpec.data.sets.find((set) => set.id == lineSpec.dataSet));
 

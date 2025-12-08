@@ -2,6 +2,9 @@
 
 import { json } from "@sveltejs/kit";
 import { db } from "$lib/../../server_lib/user.js";
+import { getLogger } from "../../../../lib/log";
+
+const logger = getLogger();
 
 export async function GET({ params, locals }) {
   const session = locals.session;
@@ -18,7 +21,7 @@ export async function GET({ params, locals }) {
     }
     return json({ chart: charts[0] });
   } catch (err) {
-    console.error(err);
+    logger.error("unable to find user chart", err);
     return json({ message: "could not get chart" }, { status: 500 });
   }
 }
@@ -43,7 +46,7 @@ export async function PUT({ params, request, locals }) {
     await db.updateChart(params.id, { name, folderId });
     return json({});
   } catch (err) {
-    console.error(err);
+    logger.error("unable to update chart", err);
     return json({ message: "could not update chart" }, { status: 500 });
   }
 }
