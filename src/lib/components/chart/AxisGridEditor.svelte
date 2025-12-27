@@ -2,7 +2,6 @@
 
 <script lang="ts">
   import type { AxisGridStore } from "$lib/chartStores/axis.svelte";
-  import ColorPicker from "./ColorPicker/ColorPicker.svelte";
 
   interface Props {
     conf: AxisGridStore;
@@ -53,11 +52,6 @@
       type="number"
     />
   </label>
-
-  <p>
-    Label tick color:
-    <ColorPicker color={conf.data.color.light.v} onchange={(s) => conf.setColor(s)} />
-  </p>
 
   <p>
     <label>
