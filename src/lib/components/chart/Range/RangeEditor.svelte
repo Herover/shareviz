@@ -20,7 +20,7 @@
       chartData[chartSpec.dataSet]?.data.reduce((acc, d) => {
         acc[d[chartSpec.pointLabel]] = true;
         return acc;
-      }, {}),
+      }, {}) ?? {},
     ),
   );
   $effect(() => {
@@ -56,7 +56,7 @@
       chartData[chartSpec.dataSet]?.data.reduce((acc, d) => {
         acc[d[chartSpec.categories]] = true;
         return acc;
-      }, {}),
+      }, {}) ?? {},
     ),
   );
   $effect(() => {
