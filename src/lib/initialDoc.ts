@@ -2,7 +2,7 @@
 
 import type { Root } from "./chart";
 
-export const formatVersion = 4;
+export const formatVersion = 5;
 
 export const defDoc: Root = {
   m: {
@@ -32,11 +32,21 @@ export const defDoc: Root = {
         dataKey: "",
         type: "categoriesColor",
         colors: {
-          default: "#888888",
+          default: {
+            light: {
+              c: "#888888",
+              v: "#888888",
+            },
+          },
           byKey: [
             {
               k: "2023",
-              c: "#aa2222",
+              c: {
+                light: {
+                  c: "#aa2222",
+                  v: "#aa2222",
+                },
+              },
               legend: "2023",
               x: 0,
               y: 0,
@@ -46,7 +56,12 @@ export const defDoc: Root = {
             },
             {
               k: "2022",
-              c: "#ff8888",
+              c: {
+                light: {
+                  c: "#ff8888",
+                  v: "#ff8888",
+                },
+              },
               legend: "2022",
               x: 0,
               y: 0,

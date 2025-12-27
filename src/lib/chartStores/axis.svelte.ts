@@ -2,7 +2,7 @@
 
 import ShareDB from "sharedb/lib/client";
 import type { ShareDBConnection } from "./data.svelte";
-import { type Axis, type AxisGrid } from "$lib/chart";
+import { type Axis, type AxisGrid, type Color } from "$lib/chart";
 
 export class AxisStore {
   #doc: ShareDB.Doc = $state(new ShareDB.Doc());
@@ -76,8 +76,8 @@ export class AxisGridStore {
   setTickWidth(value: number) {
     this.#doc.submitOp([...this.#path, "tickWidth", { r: 0, i: value }]);
   }
-  setColor(value: string) {
-    this.#doc.submitOp([...this.#path, "color", { r: 0, i: value }]);
+  setColor(value: Color) {
+    this.#doc.submitOp([...this.#path, "color", { r: 0, i: { light: value } }]);
   }
   setLabelDivide(value: number) {
     this.#doc.submitOp([...this.#path, "labelDivide", { r: 0, i: value }]);

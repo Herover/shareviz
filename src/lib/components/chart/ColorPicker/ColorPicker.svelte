@@ -4,6 +4,7 @@
   import chroma from "chroma-js";
   import ColorComponent from "./ColorComponent.svelte";
   import { getLogger } from "$lib/log.js";
+  import type { Color } from "$lib/chart";
 
   const logger = getLogger();
 
@@ -13,7 +14,7 @@
     scheme?: any;
     chartColors?: string[];
     disabled?: boolean;
-    onchange: (c: string) => void;
+    onchange: (c: Color) => void;
   }
 
   let {
@@ -134,6 +135,13 @@
   let x = $state(0);
   let y = $state(0);
   let popupY = $derived(Math.min(windowHeight - (popoutSize?.height ?? 0) - 16, y + 16));
+
+  const change = (c: string) => {
+    onchange({
+      c: chroma(c).hex(),
+      v: c,
+    });
+  };
 </script>
 
 <svelte:window bind:innerHeight={windowHeight} />
@@ -163,25 +171,25 @@
       <input
         value={color}
         bind:this={input}
-        onchange={(e) => onchange(e.currentTarget.value)}
-        onkeyup={(e) => onchange(e.currentTarget.value)}
+        onchange={(e) => change(e.currentTarget.value)}
+        onkeyup={(e) => change(e.currentTarget.value)}
       />
 
       <div class="component-row">
         <ColorComponent
-          on:click={(e) => onchange(e.detail)}
+          on:click={(e) => change(e.detail)}
           h={h - hueStep}
           {c}
           {l}
           title="Hue left"
         /><ColorComponent
-          on:click={(e) => onchange(e.detail)}
+          on:click={(e) => change(e.detail)}
           {h}
           {c}
           {l}
           title="Current color"
         /><ColorComponent
-          on:click={(e) => onchange(e.detail)}
+          on:click={(e) => change(e.detail)}
           h={h + hueStep}
           {c}
           {l}
@@ -190,19 +198,19 @@
       </div>
       <div class="component-row">
         <ColorComponent
-          on:click={(e) => onchange(e.detail)}
+          on:click={(e) => change(e.detail)}
           {h}
           c={c - chromaStep}
           {l}
           title="Chroma/saturation down"
         /><ColorComponent
-          on:click={(e) => onchange(e.detail)}
+          on:click={(e) => change(e.detail)}
           {h}
           {c}
           {l}
           title="Current color"
         /><ColorComponent
-          on:click={(e) => onchange(e.detail)}
+          on:click={(e) => change(e.detail)}
           {h}
           c={c + chromaStep}
           {l}
@@ -211,19 +219,19 @@
       </div>
       <div class="component-row">
         <ColorComponent
-          on:click={(e) => onchange(e.detail)}
+          on:click={(e) => change(e.detail)}
           {h}
           {c}
           l={l - lightnessStep}
           title="Lightness down"
         /><ColorComponent
-          on:click={(e) => onchange(e.detail)}
+          on:click={(e) => change(e.detail)}
           {h}
           {c}
           {l}
           title="Current color"
         /><ColorComponent
-          on:click={(e) => onchange(e.detail)}
+          on:click={(e) => change(e.detail)}
           {h}
           {c}
           l={l + lightnessStep}
@@ -235,8 +243,8 @@
         <div class="holder">
           <div
             style:background-color={c}
-            onclick={() => onchange(c)}
-            onkeyup={(e) => e.key === " " && onchange(c)}
+            onclick={() => change(c)}
+            onkeyup={(e) => e.key === " " && change(c)}
             class="color-display"
             role="button"
             tabindex="0"
@@ -248,8 +256,8 @@
         <div class="holder">
           <div
             style:background-color={c}
-            onclick={() => onchange(c)}
-            onkeyup={(e) => e.key === " " && onchange(c)}
+            onclick={() => change(c)}
+            onkeyup={(e) => e.key === " " && change(c)}
             class="color-display"
             role="button"
             tabindex="0"

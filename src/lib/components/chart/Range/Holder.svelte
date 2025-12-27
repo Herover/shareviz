@@ -77,7 +77,10 @@
 
 <div class="range-charts">
   <Legend
-    keys={componentSpec.rangeCategoryKeys.map((d) => ({ color: d.color, legend: d.label.text }))}
+    keys={componentSpec.rangeCategoryKeys.map((d) => ({
+      color: d.color.light.c,
+      legend: d.label.text,
+    }))}
   />
   {#each charts.d as chart (chart.k)}
     <p>{chart.k}</p>
@@ -117,7 +120,7 @@
           />
           <g transform="translate({rangeLabelSpace}, {rangeHeight * i})">
             {#each line.value as p (chart.k + line.key + p.s?.k)}
-              <circle cx={xScale(p.v)} r={radius} fill={p.s?.color ?? ""}>
+              <circle cx={xScale(p.v)} r={radius} fill={p.s?.color.light.c ?? ""}>
                 <title>{p.s?.label.text}: {p.v}</title>
               </circle>
             {/each}

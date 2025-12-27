@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  import { type LineRepeatSettingsKey } from "$lib/chart";
+  import { type Color, type LineRepeatSettingsKey } from "$lib/chart";
   import { LineSymbol } from "$lib/chart";
   import { AxisStore } from "$lib/chartStores/axis.svelte";
   import { orNumber } from "$lib/utils";
@@ -32,7 +32,9 @@
         .join()
     ) {
       const newVal: rangeCategoryKeys[] = rangeCategoryValues.map((d) => ({
-        color: chartSpec.rangeCategoryKeys.find((c) => c.k == d)?.color ?? "#000000",
+        color: chartSpec.rangeCategoryKeys.find((c) => c.k == d)?.color ?? {
+          light: { c: "#000000", v: "#000000" },
+        },
         k: d,
         label: {
           text: chartSpec.rangeCategoryKeys.find((c) => c.k == d)?.label.text ?? d,
@@ -135,7 +137,7 @@
     });
   };
 
-  const setPointColor = (val: string) => {
+  const setPointColor = (val: Color) => {
     selectedPoints.forEach((n) => {
       store.submitOp([
         "rangeCategoryKeys",
@@ -143,7 +145,7 @@
         "color",
         {
           r: 1,
-          i: val,
+          i: { light: val },
         },
       ]);
     });
@@ -341,7 +343,7 @@
     <div class="w-075 p-top-1">
       <ColorPicker
         color={selectedPoints.length == 1
-          ? (chartSpec.rangeCategoryKeys[selectedPoints[0]]?.color ?? "")
+          ? (chartSpec.rangeCategoryKeys[selectedPoints[0]]?.color.light.v ?? "")
           : ""}
         onchange={(e) => setPointColor(e)}
       />

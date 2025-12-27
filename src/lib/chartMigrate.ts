@@ -280,4 +280,172 @@ export const migrate = (
       ] as any);
     doc.submitOp(op);
   }
+
+  if (doc.data.m.v == 4 && doc.data.m.v < toVersion) {
+    const op = (doc.data as Root).chart.elements
+      .reduce((acc, e, ei) => {
+        if (e.type == "line") {
+          acc.push([
+            "chart",
+            "elements",
+            ei,
+            "d",
+            "style",
+            "default",
+            "color",
+            {
+              r: 0,
+              i: {
+                light: { c: (e.d as any).style.default.color, v: (e.d as any).style.default.color },
+              },
+            },
+          ]);
+          acc.push([
+            "chart",
+            "elements",
+            ei,
+            "d",
+            "style",
+            "default",
+            "contextColor",
+            {
+              r: 0,
+              i: {
+                light: {
+                  c: (e.d as any).style.default.contextColor,
+                  v: (e.d as any).style.default.contextColor,
+                },
+              },
+            },
+          ]);
+          acc.push([
+            "chart",
+            "elements",
+            ei,
+            "d",
+            "style",
+            "default",
+            "label",
+            "color",
+            {
+              r: 0,
+              i: {
+                light: {
+                  c: (e.d as any).style.default.label.color,
+                  v: (e.d as any).style.default.label.color,
+                },
+              },
+            },
+          ]);
+
+          (e.d as any).style.byKey.forEach((l: any, i: number) => {
+            acc.push([
+              "chart",
+              "elements",
+              ei,
+              "d",
+              "style",
+              "byKey",
+              i,
+              "color",
+              {
+                r: 0,
+                i: { light: { c: l.color, v: l.color } },
+              },
+            ]);
+            acc.push([
+              "chart",
+              "elements",
+              ei,
+              "d",
+              "style",
+              "byKey",
+              i,
+              "label",
+              "color",
+              {
+                r: 0,
+                i: { light: { c: l.label.color, v: l.label.color } },
+              },
+            ]);
+
+            if (l.contextColor) {
+              acc.push([
+                "chart",
+                "elements",
+                ei,
+                "d",
+                "style",
+                "byKey",
+                i,
+                "contextColor",
+                {
+                  r: 0,
+                  i: { light: { c: l.contextColor, v: l.contextColor } },
+                },
+              ]);
+            }
+          });
+        } else if (e.type == "hBar") {
+          acc.push([
+            "chart",
+            "elements",
+            ei,
+            "d",
+            "colors",
+            "default",
+            {
+              r: 0,
+              i: { light: { c: (e.d as any).colors.default, v: (e.d as any).colors.default } },
+            },
+          ]);
+
+          (e.d as any).colors.byKey.forEach((e: any, i: number) => {
+            acc.push([
+              "chart",
+              "elements",
+              ei,
+              "d",
+              "colors",
+              "byKey",
+              i,
+              "c",
+              {
+                r: 0,
+                i: { light: { c: e.c, v: e.c } },
+              },
+            ]);
+          });
+        } else if (e.type == "range") {
+          (e.d as any).rangeCategoryKeys.forEach((e: any, i: number) => {
+            acc.push([
+              "chart",
+              "elements",
+              ei,
+              "d",
+              "rangeCategoryKeys",
+              i,
+              "color",
+              {
+                r: 0,
+                i: { light: { c: e.color, v: e.color } },
+              },
+            ]);
+          });
+        }
+
+        return acc;
+      }, [] as any[])
+      // Merge ops into a single valid op, with a op that sets the version number
+      .reduce((acc, op) => json1.type.compose(acc, op), [
+        "m",
+        "v",
+        {
+          r: 0,
+          i: 5,
+        },
+      ] as any);
+    // console.log(JSON.stringify(doc.data, null, 0), JSON.stringify(op, null, 2));
+    doc.submitOp(op);
+  }
 };

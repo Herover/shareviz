@@ -226,13 +226,15 @@
                   .reverse(),
               ),
           )}
-          fill={chroma(d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color).hex()}
+          fill={d.isContext ? getStyle(d.key).contextColor.light.c : getStyle(d.key).color.light.c}
         />
       {/each}
       {#each values as d, i (i)}
         <path
           d={draw(d.value.map((e) => ({ x: e.x, y: e.to })))}
-          stroke={chroma(d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color).hex()}
+          stroke={d.isContext
+            ? getStyle(d.key).contextColor.light.c
+            : getStyle(d.key).color.light.c}
           stroke-width={getStyle(d.key).width}
           fill="none"
         />
@@ -247,7 +249,9 @@
                 { ...d.value[0], y: 0 },
               ]),
             )}
-            fill={chroma(d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color).hex()}
+            fill={d.isContext
+              ? getStyle(d.key).contextColor.light.c
+              : getStyle(d.key).color.light.c}
           />
         {/each}
       {/if}
@@ -256,7 +260,9 @@
           d={draw(d.value)}
           stroke={d.type == "missing" && getStyle(d.key).missingStyle == LineMissingStyle.NONE
             ? "none"
-            : chroma(d.isContext ? getStyle(d.key).contextColor : getStyle(d.key).color).hex()}
+            : d.isContext
+              ? getStyle(d.key).contextColor.light.c
+              : getStyle(d.key).color.light.c}
           stroke-width={higlight === d.key ? getStyle(d.key).width + 2 : getStyle(d.key).width}
           fill="none"
           stroke-dasharray={d.type == "line" ||
@@ -274,7 +280,7 @@
             <text
               x={xScale(d.value[d.value.length - 1].x) + labelOffset}
               y={yScale(d.value[d.value.length - 1].to)}
-              fill={chroma(getStyle(d.key).label.color).hex()}
+              fill={getStyle(d.key).label.color.light.c}
               paint-order="stroke"
               stroke={chroma(chartSpec.style.bgColor).hex()}
               stroke-width={3}
@@ -287,7 +293,7 @@
             <text
               x={xScale(d.value[0].x) - labelOffset}
               y={yScale(d.value[0].to)}
-              fill={chroma(getStyle(d.key).label.color).hex()}
+              fill={getStyle(d.key).label.color.light.c}
               paint-order="stroke"
               stroke={chroma(chartSpec.style.bgColor).hex()}
               stroke-width={3}
@@ -304,7 +310,7 @@
           <circle
             cx={xScale(value.x)}
             cy={yScale(value.y)}
-            fill={chroma(getStyle(d.key).label.color).hex()}
+            fill={getStyle(d.key).label.color.light.c}
             r={getStyle(d.key).width * 2}
           />
         {/each}

@@ -72,7 +72,7 @@
       {#if typeof key != "undefined"}
         &#x25B2; &#x25BC; &nbsp;
         <ColorPicker
-          color={orDefault(style?.data.color, "#00000000")}
+          color={orDefault(style?.data.color.light.v, "#00000000")}
           {chartColors}
           onchange={(s) => style.setColor(s)}
         />
@@ -86,7 +86,7 @@
         >
       {:else}
         <ColorPicker
-          color={orDefault(style?.data.color, "#00000000")}
+          color={orDefault(style?.data.color.light.v, "#00000000")}
           {chartColors}
           onchange={(s) => style.setColor(s)}
         />

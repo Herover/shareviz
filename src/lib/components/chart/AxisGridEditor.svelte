@@ -56,7 +56,7 @@
 
   <p>
     Label tick color:
-    <ColorPicker color={conf.data.color} onchange={(s) => conf.setColor(s)} />
+    <ColorPicker color={conf.data.color.light.v} onchange={(s) => conf.setColor(s)} />
   </p>
 
   <p>

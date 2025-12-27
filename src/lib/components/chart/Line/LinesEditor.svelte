@@ -1,7 +1,14 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  import { LabelLocation, LabelStyleLine, LineMissingStyle, LineSymbol } from "$lib/chart";
+  import {
+    LabelLocation,
+    LabelStyleLine,
+    LineMissingStyle,
+    LineSymbol,
+    type Color,
+    type ResponsiveColor,
+  } from "$lib/chart";
   import { negativeOneToInf } from "$lib/utils";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import type { formatData } from "./data";
@@ -11,7 +18,7 @@
   import { chartToEditor } from "$lib/chartToEditorStore.svelte";
 
   interface Props {
-    chartColors: string[];
+    chartColors: ResponsiveColor[];
     values: ReturnType<typeof formatData>;
     index: number;
     lineStore: LineStore;
@@ -77,11 +84,11 @@
               missingStyle: defaultStyle.data.missingStyle,
             }
           : ({ label: {} } as {
-              color: string | undefined;
-              contextColor: string | undefined;
+              color: ResponsiveColor | undefined;
+              contextColor: ResponsiveColor | undefined;
               width: number | undefined;
               label: {
-                color: string | undefined;
+                color: ResponsiveColor | undefined;
                 location: string | undefined;
                 line: string | undefined;
                 text: string | undefined;
@@ -155,7 +162,7 @@
       lineStore.defaultLineStyle().setLabelText(label);
     }
   });
-  let setLineColor = $derived((color: string) => {
+  let setLineColor = $derived((color: Color) => {
     selectedIndexes.forEach((d) => {
       const style = d.style;
       if (lineStore.data.style.byKey[d.i].label.color == lineStore.data.style.byKey[d.i].color) {
@@ -175,7 +182,7 @@
       style.setColor(color);
     }
   });
-  let setTextColor = $derived((color: string) => {
+  let setTextColor = $derived((color: Color) => {
     selectedIndexes.forEach((d) => {
       d.style.setLabelColor(color);
     });
@@ -184,7 +191,7 @@
       lineStore.defaultLineStyle().setLabelColor(color);
     }
   });
-  let setContextColor = $derived((color: string) => {
+  let setContextColor = $derived((color: Color) => {
     selectedIndexes.forEach((d) => {
       d.style.seContextColor(color);
     });
@@ -295,8 +302,8 @@
   </div>
   <div class="w-025 p-top-1">
     <ColorPicker
-      color={typeof mergedStyle.color == "undefined" ? "#ffffff" : mergedStyle.color}
-      {chartColors}
+      color={typeof mergedStyle.color == "undefined" ? "#ffffff" : mergedStyle.color.light.c}
+      chartColors={chartColors.map((c) => c.light.v)}
       disabled={nonEditable}
       onchange={(s) => setLineColor(s)}
     />
@@ -304,8 +311,10 @@
   <div class="w-025 p-top-1">Text color</div>
   <div class="w-025 p-top-1">
     <ColorPicker
-      color={typeof mergedStyle.label.color == "undefined" ? "#ffffff" : mergedStyle.label.color}
-      {chartColors}
+      color={typeof mergedStyle.label.color == "undefined"
+        ? "#ffffff"
+        : mergedStyle.label.color.light.c}
+      chartColors={chartColors.map((c) => c.light.v)}
       disabled={nonEditable}
       onchange={(s) => setTextColor(s)}
     />
@@ -313,8 +322,10 @@
   <div class="w-025 p-top-1">Context color</div>
   <div class="w-025 p-top-1">
     <ColorPicker
-      color={typeof mergedStyle.contextColor == "undefined" ? "#ffffff" : mergedStyle.contextColor}
-      {chartColors}
+      color={typeof mergedStyle.contextColor == "undefined"
+        ? "#ffffff"
+        : mergedStyle.contextColor.light.c}
+      chartColors={chartColors.map((c) => c.light.v)}
       disabled={nonEditable}
       onchange={(s) => setContextColor(s)}
     />

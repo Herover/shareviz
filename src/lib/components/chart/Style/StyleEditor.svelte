@@ -220,14 +220,14 @@
   Background color:
   <ColorPicker
     color={styletStore.data?.bgColor || ""}
-    onchange={(s) => styletStore.setBGColor(s)}
+    onchange={(s) => styletStore.setBGColor(s.c)}
   />
 </p>
 <p>
   Text color:
   <ColorPicker
     color={styletStore.data?.textColor || ""}
-    onchange={(s) => styletStore.setTextColor(s)}
+    onchange={(s) => styletStore.setTextColor(s.c)}
   />
 </p>
 

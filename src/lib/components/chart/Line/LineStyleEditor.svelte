@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  import { LabelLocation, LabelStyleLine } from "$lib/chart";
+  import { LabelLocation, LabelStyleLine, type Color } from "$lib/chart";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import { formatData } from "./data";
   import type { LineStyleStore } from "$lib/chartStores/lineStyle.svelte";
@@ -36,13 +36,13 @@
   );
 
   let type = $derived(typeof flatValues[0]?.value[0]?.x == "number" ? "number" : "date");
-  let updateColor = $derived((color: string) => {
+  let updateColor = $derived((color: Color) => {
     if (style.data.label.color == style.data.color) {
       style.setLabelColor(color);
     }
     style.setColor(color);
   });
-  let updateLabelColor = $derived((color: string) => {
+  let updateLabelColor = $derived((color: Color) => {
     style.setLabelColor(color);
   });
   let setLabelX = $derived((value: string) => {
@@ -104,9 +104,13 @@
     />
   {/if}
 
-  <ColorPicker color={style.data.color} {chartColors} onchange={(s) => updateColor(s)} />
+  <ColorPicker color={style.data.color.light.v} {chartColors} onchange={(s) => updateColor(s)} />
 
-  <ColorPicker color={style.data.label.color} {chartColors} onchange={(s) => updateLabelColor(s)} />
+  <ColorPicker
+    color={style.data.label.color.light.v}
+    {chartColors}
+    onchange={(s) => updateLabelColor(s)}
+  />
 
   <input
     value={style.data.width}

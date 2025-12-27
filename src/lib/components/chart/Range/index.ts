@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
-import type { Axis, LineRepeatSettings, LineSymbol } from "$lib/chart";
+import type { Axis, LineRepeatSettings, LineSymbol, ResponsiveColor } from "$lib/chart";
 import { AxisLocation, AxisOrientation, AxisRepeatMode } from "$lib/chart";
 import type { ChartStore } from "$lib/chartStores/chart.svelte";
 import RangeEditor from "./RangeEditor.svelte";
@@ -14,7 +14,7 @@ export interface categoryKeys {
 
 export interface rangeCategoryKeys {
   k: string;
-  color: string;
+  color: ResponsiveColor;
   symbol: LineSymbol;
   label: {
     text: string;
@@ -49,7 +49,6 @@ const defaultData: RangeElement = {
       enabled: true,
       tickSize: 8,
       tickWidth: 1,
-      color: "#aaaaaa",
       labelDivide: 1,
       labelThousands: "",
       afterLabel: "",
@@ -65,7 +64,6 @@ const defaultData: RangeElement = {
       enabled: false,
       tickSize: 4,
       tickWidth: 1,
-      color: "#aaaaaa",
       labelDivide: 1,
       labelThousands: "",
       afterLabel: "",

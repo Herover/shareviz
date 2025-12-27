@@ -74,7 +74,7 @@
           s.label.text != "" &&
           charts.findIndex((c) => c.d.findIndex((d) => d.key == s.k) != -1) != -1,
       )
-      .map((d) => ({ color: d.color, legend: d.label.text })),
+      .map((d) => ({ color: d.color.light.c, legend: d.label.text })),
   );
 </script>
 

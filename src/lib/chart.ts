@@ -73,13 +73,13 @@ export interface Scale {
 }
 
 export interface Colors {
-  default: string;
+  default: ResponsiveColor;
   byKey: ByKey[];
 }
 
 export interface ByKey {
   k: string;
-  c: string;
+  c: ResponsiveColor;
   legend: string;
 }
 
@@ -110,7 +110,7 @@ export interface AxisGrid {
   enabled: boolean;
   tickSize: number;
   tickWidth: number;
-  color: string;
+  // color: ResponsiveColor;
   labelDivide: number;
   labelThousands: string;
   afterLabel: string;
@@ -175,7 +175,7 @@ export enum LabelStyleLine {
 export interface LabelStyle {
   location: LabelLocation;
   text: string;
-  color: string;
+  color: ResponsiveColor;
   /** x value when location is float */
   x: number;
   /** y value when location is float */
@@ -200,8 +200,8 @@ export enum LineMissingStyle {
 
 export interface LineStyleKey {
   k: string;
-  color: string;
-  contextColor: string;
+  color: ResponsiveColor;
+  contextColor: ResponsiveColor;
   width: number;
   label: LabelStyle;
   symbols: LineSymbol;
@@ -265,4 +265,16 @@ export interface Style {
   sourceMargin: number;
   bgColor: string;
   textColor: string;
+}
+
+export interface ResponsiveColor {
+  // Light mode
+  light: Color;
+}
+
+export interface Color {
+  // Color in format #abcdef
+  c: string;
+  // Color in hcl or other format not always available in browsers
+  v: string;
 }

@@ -2,7 +2,7 @@
 
 import ShareDB from "sharedb/lib/client";
 import type { ShareDBConnection } from "./data.svelte";
-import { type LineStyleKey } from "$lib/chart";
+import { type Color, type LineStyleKey } from "$lib/chart";
 
 export class LineStyleStore {
   #doc: ShareDB.Doc = $state(new ShareDB.Doc());
@@ -37,14 +37,14 @@ export class LineStyleStore {
   setKey(value: string) {
     this.#doc.submitOp([...this.#path, "k", { r: 0, i: value }]);
   }
-  setColor(value: string) {
-    this.#doc.submitOp([...this.#path, "color", { r: 0, i: value }]);
+  setColor(value: Color) {
+    this.#doc.submitOp([...this.#path, "color", { r: 0, i: { light: value } }]);
   }
-  setLabelColor(value: string) {
-    this.#doc.submitOp([...this.#path, "label", "color", { r: 0, i: value }]);
+  setLabelColor(value: Color) {
+    this.#doc.submitOp([...this.#path, "label", "color", { r: 0, i: { light: value } }]);
   }
-  seContextColor(value: string) {
-    this.#doc.submitOp([...this.#path, "contextColor", { r: 0, i: value }]);
+  seContextColor(value: Color) {
+    this.#doc.submitOp([...this.#path, "contextColor", { r: 0, i: { light: value } }]);
   }
   setwidth(value: number) {
     this.#doc.submitOp([...this.#path, "width", { r: 0, i: value }]);

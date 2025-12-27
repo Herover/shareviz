@@ -284,7 +284,7 @@
               .grid
               ? height
               : lineOffset}"
-            stroke={conf.minor.color}
+            stroke="#aaaaaa"
             stroke-width={conf.minor.tickWidth}
           />
         {/each}
@@ -294,7 +294,7 @@
             d="m {scale(tick.n)},{height + conf.minor.tickSize} L {scale(tick.n)},{conf.minor.grid
               ? 0
               : height}"
-            stroke={conf.minor.color}
+            stroke="#aaaaaa"
             stroke-width={conf.minor.tickWidth}
           />
         {/each}
@@ -309,7 +309,7 @@
               .grid
               ? height
               : lineOffset}"
-            stroke={conf.major.color}
+            stroke="#aaaaaa"
             stroke-width={conf.major.tickWidth}
           />
         {:else}
@@ -317,7 +317,7 @@
             d="m {scale(tick.n)},{height + conf.major.tickSize} L {scale(tick.n)},{conf.major.grid
               ? -0
               : height}"
-            stroke={conf.major.color}
+            stroke="#aaaaaa"
             stroke-width={conf.major.tickWidth}
           />
         {/if}
@@ -394,7 +394,7 @@
             y1={0}
             x2={conf.major.grid ? width : conf.major.tickSize}
             y2={0}
-            stroke={conf.major.color}
+            stroke="#aaaaaa"
             stroke-width={conf.major.tickWidth}
           />
         </g>
@@ -409,7 +409,7 @@
             y1={0}
             x2={conf.minor.grid ? width : conf.minor.tickSize}
             y2={0}
-            stroke={conf.minor.color}
+            stroke="#aaaaaa"
           />
         </g>
       {/each}

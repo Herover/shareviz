@@ -72,9 +72,9 @@
   let color = $derived((d: { label: string }) => {
     const c = hBarSpec.colors.byKey.find((e) => e.k == d.label);
     if (c) {
-      return c.c;
+      return c.c.light.c;
     }
-    return hBarSpec.colors.default;
+    return hBarSpec.colors.default.light.c;
   });
 
   let height = $derived(
@@ -112,7 +112,7 @@
   <Legend
     keys={hBarSpec.colors.byKey
       .filter((d) => d.k != "")
-      .map((d) => ({ color: d.c, legend: d.legend }))}
+      .map((d) => ({ color: d.c.light.c, legend: d.legend }))}
   />
 {/if}
 

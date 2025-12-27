@@ -2,7 +2,7 @@
 
 import ShareDB from "sharedb/lib/client";
 import type { ShareDBConnection } from "./data.svelte";
-import { type Colors, type HBar } from "$lib/chart";
+import { type Color, type Colors, type HBar } from "$lib/chart";
 import { AxisStore } from "./axis.svelte";
 
 export class HBarStore {
@@ -181,20 +181,25 @@ export class HBarColors {
   setColorScaleKey(colorIndex: number, value: string) {
     this.#doc.submitOp([...this.#path, "byKey", colorIndex, "k", { r: 0, i: value }]);
   }
-  setColorScaleColor(colorIndex: number, value: string) {
-    this.#doc.submitOp([...this.#path, "byKey", colorIndex, "c", { r: 0, i: value }]);
+  setColorScaleColor(colorIndex: number, value: Color) {
+    this.#doc.submitOp([...this.#path, "byKey", colorIndex, "c", { r: 0, i: { light: value } }]);
   }
   setColorScaleLegend(colorIndex: number, value: string) {
     this.#doc.submitOp([...this.#path, "byKey", colorIndex, "legend", { r: 0, i: value }]);
   }
-  addColorScaleColor(colorIndex: number, k = "", c = "", legend = "") {
-    this.#doc.submitOp([...this.#path, "byKey", colorIndex, { i: { c, k, legend } }]);
+  addColorScaleColor(
+    colorIndex: number,
+    k = "",
+    c: Color = { c: "#000000", v: "#000000" },
+    legend = "",
+  ) {
+    this.#doc.submitOp([...this.#path, "byKey", colorIndex, { i: { c: { light: c }, k, legend } }]);
   }
   removeColorScaleColor(colorIndex: number) {
     this.#doc.submitOp([...this.#path, "byKey", colorIndex, { r: 0 }]);
   }
-  setColorScaleDefaultColor(value: string) {
-    this.#doc.submitOp([...this.#path, "default", { r: 0, i: value }]);
+  setColorScaleDefaultColor(value: Color) {
+    this.#doc.submitOp([...this.#path, "default", { r: 0, i: { light: value } }]);
   }
   moveColorUp(colorIndex: number) {
     this.#doc.submitOp([

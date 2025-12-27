@@ -11,6 +11,7 @@
   import { HBarStore } from "$lib/chartStores/hbar.svelte";
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
   import type { ComputedData } from "$lib/data";
+  import chroma from "chroma-js";
 
   interface Props {
     spec: Root;
@@ -78,11 +79,15 @@
         if (!colorScale.data.byKey.find((d) => d.k == k)) {
           const n = colorScale.data.byKey.length;
           const keyIndex = typeof n != "undefined" ? n : 0;
+          const c = `lch(${25 + Math.random() * 50}% ${80 + Math.random() * 20} ${Math.random() * 360})`;
           colorScale.addColorScaleColor(
             keyIndex,
             k,
             // TODO: only use known "good" color schemes
-            `lch(${25 + Math.random() * 50}% ${80 + Math.random() * 20} ${Math.random() * 360})`,
+            {
+              c: chroma(c).hex(),
+              v: c,
+            },
             k,
           );
         }
@@ -222,15 +227,11 @@
           <td></td>
           <td><input value="default" disabled /> </td>
           <td>
-            <input
-              value={colorScale.data.default}
-              onchange={(e) => colorScale.setColorScaleDefaultColor(e.currentTarget.value)}
-              onkeyup={(e) => colorScale.setColorScaleDefaultColor(e.currentTarget.value)}
-            />
+            <input value={colorScale.data.default.light.c} disabled />
           </td>
           <td>
             <ColorPicker
-              color={colorScale.data.default}
+              color={colorScale.data.default.light.v}
               onchange={(s) => colorScale.setColorScaleDefaultColor(s)}
             />
           </td>
@@ -266,16 +267,12 @@
               </select>
             </td>
             <td>
-              <input
-                value={color.c}
-                onchange={(e) => colorScale.setColorScaleColor(i, e.currentTarget.value)}
-                onkeyup={(e) => colorScale.setColorScaleColor(i, e.currentTarget.value)}
-              />
+              <input value={color.c.light.c} disabled />
             </td>
             <td>
               <ColorPicker
-                color={color.c}
-                chartColors={colorScale.data.byKey.map((c) => c.c)}
+                color={color.c.light.c}
+                chartColors={colorScale.data.byKey.map((c) => c.c?.light.c).filter((c) => c)}
                 onchange={(s) => colorScale.setColorScaleColor(i, s)}
               />
             </td>

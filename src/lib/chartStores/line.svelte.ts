@@ -7,6 +7,7 @@ import {
   LabelStyleLine,
   LineMissingStyle,
   LineSymbol,
+  type Color,
   type Element,
   type Line,
   type LineRepeatSettings,
@@ -239,8 +240,8 @@ export class LineStore {
     i: number,
     d: {
       key?: string;
-      color?: string;
-      labelColor?: string;
+      color?: Color;
+      labelColor?: Color;
       labelText?: string;
     } = {},
   ) {
@@ -255,13 +256,13 @@ export class LineStore {
       {
         i: {
           k: d.key ?? "",
-          color: d.color ?? "#000000",
-          contextColor: d.color ?? "#000000",
+          color: { light: d.color ?? { c: "#000000", d: "#000000" } },
+          contextColor: { light: d.color ?? { c: "#000000", d: "#000000" } },
           width: 1,
           label: {
             text: d.labelText ?? "",
             location: LabelLocation.Right,
-            color: d.labelColor ?? "#000000",
+            color: { light: d.labelColor ?? { c: "#000000", d: "#000000" } },
             x: 0,
             y: 0,
             rx: 0,
