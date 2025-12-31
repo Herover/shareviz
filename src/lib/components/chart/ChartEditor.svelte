@@ -70,6 +70,7 @@
       {#snippet failed(error, reset)}
         <button onclick={reset}>A error happened in the {element.type} chart, click to reset</button
         >
+        <button onclick={() => removeElement(i)}>Delete chart</button>
         <pre>{error ? error : ""}</pre>
       {/snippet}
     </svelte:boundary>
