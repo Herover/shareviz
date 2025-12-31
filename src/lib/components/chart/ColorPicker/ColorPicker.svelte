@@ -146,12 +146,7 @@
 
 <svelte:window bind:innerHeight={windowHeight} />
 
-<div
-  style:border-color={disabled ? "#cccccc" : "#000000"}
-  style:cursor={disabled ? "initial" : "pointer"}
-  bind:this={container}
-  class="holder"
->
+<div style:border-color={disabled ? "#cccccc" : "#000000"} bind:this={container} class="holder">
   <div
     style:background-color={color}
     onclick={() => toggleOpen()}
@@ -160,6 +155,7 @@
     tabindex={disabled ? null : 0}
     class="color-display"
     role="button"
+    style:cursor={disabled ? "initial" : "pointer"}
   ></div>
   {#if open}
     <div
