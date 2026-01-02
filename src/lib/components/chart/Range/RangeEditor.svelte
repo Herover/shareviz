@@ -345,6 +345,7 @@
         color={selectedPoints.length == 1
           ? (chartSpec.rangeCategoryKeys[selectedPoints[0]]?.color.light.v ?? "")
           : ""}
+        disabled={selectedPoints.length == 0}
         onchange={(e) => setPointColor(e)}
       />
     </div>
