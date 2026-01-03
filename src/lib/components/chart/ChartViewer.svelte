@@ -43,59 +43,89 @@
   const mkEditElement = (i: number) => {
     return (e: CustomEvent<any>) => editElement(i, e.detail);
   };
+
+  let css = $state(`
+    .chart {
+      padding-left: var(--chart-padding-left);
+      padding-right: var(--chart-padding-right);
+      padding-top: var(--chart-padding-top);
+      padding-bottom: var(--chart-padding-bottom);
+      background-color: var(--background-color);
+      color: var(--text-primary-color);
+      fill: var(--text-primary-color);
+
+
+
+
+      /* Default light theme */
+      --background-color: #ffffff;
+      --text-primary-color: #000000;
+      --text-mute-color: #888888;
+      --chart-padding-left: 16px;
+      --chart-padding-right: 16px;
+      --chart-padding-top: 16px;
+      --chart-padding-bottom: 16px;
+
+      --axis-line-color: #aaaaaa;
+      --axis-text-size: 0.9em;
+    }
+
+    .source-block {
+      color: var(--text-mute-color);
+    }
+
+    .chart {
+    }
+    .chart[data-theme='dark'] {
+      --background-color: #000000;
+      --text-primary-color: #ffffff;
+      --text-mute-color: #888888;
+      --axis-line-color: #666666;
+    }
+  `);
 </script>
 
-<div
-  class="chart"
-  style:width="{chartWidth}px"
-  style:background-color={chartSpec.style.bgColor}
-  style:padding-left="{chartSpec.style.marginLeft}px"
-  style:padding-right="{chartSpec.style.marginRight}px"
-  style:padding-top="{chartSpec.style.marginTop}px"
-  style:padding-bottom="{chartSpec.style.marginBottom}px"
-  style:color={chartSpec.style.textColor}
-  style:fill={chartSpec.style.textColor}
-  style:--axis-text-size="0.9em"
->
-  <p
-    style:font-size="{chartSpec.style.titleSize}em"
-    style:font-weight={chartSpec.style.titleBold ? "bold" : "normal"}
-    class="title"
-    dir="auto"
-  >
-    {#if editor}
-      <span
-        bind:innerText={chartSpec.chart.title}
-        contenteditable="true"
-        spellcheck="false"
-        onblur={(e) => editText("title", e)}
-        role="textbox"
-        tabindex="0"
-      ></span>
-    {:else}
-      {chartSpec.chart.title}
-    {/if}
-  </p>
-  <p
-    style:font-size="{chartSpec.style.subTitleSize}em"
-    style:font-weight={chartSpec.style.subTitleBold ? "bold" : "normal"}
-    dir="auto"
-  >
-    {#if editor}
-      <span
-        bind:innerText={chartSpec.chart.subTitle}
-        contenteditable="true"
-        spellcheck="false"
-        onblur={(e) => editText("subTitle", e)}
-        role="textbox"
-        tabindex="0"
-      ></span>
-    {:else}
-      {chartSpec.chart.subTitle}
-    {/if}
-  </p>
-  {#each chartSpec.chart.elements as element, i (element.id)}
-    <svelte:boundary>
+<div>
+  <style bind:innerHTML={css} contenteditable=""></style>
+  <div class="chart" style:width="{chartWidth}px">
+    <p
+      style:font-size="{chartSpec.style.titleSize}em"
+      style:font-weight={chartSpec.style.titleBold ? "bold" : "normal"}
+      class="title"
+      dir="auto"
+    >
+      {#if editor}
+        <span
+          bind:innerText={chartSpec.chart.title}
+          contenteditable="true"
+          spellcheck="false"
+          onblur={(e) => editText("title", e)}
+          role="textbox"
+          tabindex="0"
+        ></span>
+      {:else}
+        {chartSpec.chart.title}
+      {/if}
+    </p>
+    <p
+      style:font-size="{chartSpec.style.subTitleSize}em"
+      style:font-weight={chartSpec.style.subTitleBold ? "bold" : "normal"}
+      dir="auto"
+    >
+      {#if editor}
+        <span
+          bind:innerText={chartSpec.chart.subTitle}
+          contenteditable="true"
+          spellcheck="false"
+          onblur={(e) => editText("subTitle", e)}
+          role="textbox"
+          tabindex="0"
+        ></span>
+      {:else}
+        {chartSpec.chart.subTitle}
+      {/if}
+    </p>
+    {#each chartSpec.chart.elements as element, i (element.id)}
       {#await getComponent(element.type) then component}
         {@const SvelteComponent = component}
         <SvelteComponent
@@ -108,60 +138,54 @@
           on:edit={mkEditElement(i)}
         />
       {/await}
-
-      {#snippet failed(error, reset)}
-        <button onclick={reset}>A error happened in the {element.type} chart, click to reset</button
-        >
-        <pre>{error ? error : ""}</pre>
-      {/snippet}
-    </svelte:boundary>
-  {/each}
-  <div class="source">
-    <p class="source-left" dir="auto">
-      {#if editor}
-        <!-- Disabled as it's not applicaple when innerText is set by svelte -->
-        <!-- svelte-ignore a11y_consider_explicit_label -->
-        <a
-          href={editor ? null : chartSpec.chart.sourceTextLeftLink}
-          bind:innerText={chartSpec.chart.sourceTextLeft}
-          contenteditable="true"
-          spellcheck="false"
-          onblur={(e) => editText("sourceLeft", e)}
-          style="color:#888888"
-        >
-        </a>
-      {:else}
-        <!-- svelte/no-navigation-without-resolve -->
-        <a
-          href={editor ? null : chartSpec.chart.sourceTextLeftLink}
-          style="color:#888888"
-          onblur={(e) => editText("sourceLeft", e)}>{chartSpec.chart.sourceTextLeft}</a
-        >
-      {/if}
-    </p>
-    <p class="source-right" dir="auto">
-      {#if editor}
-        <!-- Disabled as it's not applicaple when innerText is set by svelte -->
-        <!-- svelte-ignore a11y_consider_explicit_label -->
-        <!-- svelte/no-navigation-without-resolve -->
-        <a
-          href={editor ? null : chartSpec.chart.sourceTextRightLink}
-          bind:innerText={chartSpec.chart.sourceTextRight}
-          contenteditable="true"
-          spellcheck="false"
-          onblur={(e) => editText("sourceRight", e)}
-          style="color:#888888"
-        >
-        </a>
-      {:else}
-        <!-- svelte/no-navigation-without-resolve -->
-        <a
-          href={editor ? null : chartSpec.chart.sourceTextRightLink}
-          style="color:#888888"
-          onblur={(e) => editText("sourceRight", e)}>{chartSpec.chart.sourceTextRight}</a
-        >
-      {/if}
-    </p>
+    {/each}
+    <div class="source">
+      <p class="source-left" dir="auto">
+        {#if editor}
+          <!-- Disabled as it's not applicaple when innerText is set by svelte -->
+          <!-- svelte-ignore a11y_consider_explicit_label -->
+          <a
+            href={editor ? null : chartSpec.chart.sourceTextLeftLink}
+            bind:innerText={chartSpec.chart.sourceTextLeft}
+            contenteditable="true"
+            spellcheck="false"
+            onblur={(e) => editText("sourceLeft", e)}
+            class="source-block"
+          >
+          </a>
+        {:else}
+          <!-- svelte/no-navigation-without-resolve -->
+          <a
+            href={editor ? null : chartSpec.chart.sourceTextLeftLink}
+            class="source-block"
+            onblur={(e) => editText("sourceLeft", e)}>{chartSpec.chart.sourceTextLeft}</a
+          >
+        {/if}
+      </p>
+      <p class="source-right" dir="auto">
+        {#if editor}
+          <!-- Disabled as it's not applicaple when innerText is set by svelte -->
+          <!-- svelte-ignore a11y_consider_explicit_label -->
+          <!-- svelte/no-navigation-without-resolve -->
+          <a
+            href={editor ? null : chartSpec.chart.sourceTextRightLink}
+            bind:innerText={chartSpec.chart.sourceTextRight}
+            contenteditable="true"
+            spellcheck="false"
+            onblur={(e) => editText("sourceRight", e)}
+            class="source-block"
+          >
+          </a>
+        {:else}
+          <!-- svelte/no-navigation-without-resolve -->
+          <a
+            href={editor ? null : chartSpec.chart.sourceTextRightLink}
+            class="source-block"
+            onblur={(e) => editText("sourceRight", e)}>{chartSpec.chart.sourceTextRight}</a
+          >
+        {/if}
+      </p>
+    </div>
   </div>
 </div>
 

@@ -277,98 +277,104 @@
 {#if scale}
   {#if conf.orientation == AxisOrientation.HORIZONTAL}
     {#if conf.minor.enabled}
-      {#if conf.location == AxisLocation.START}
-        {#each minorTicks as tick, i (i)}
-          <path
-            d="m {scale(tick.n)},{lineOffset - conf.minor.tickSize} L {scale(tick.n)},{conf.minor
-              .grid
-              ? height
-              : lineOffset}"
-            stroke="#aaaaaa"
-            stroke-width={conf.minor.tickWidth}
-          />
-        {/each}
-      {:else}
-        {#each minorTicks as tick, i (i)}
-          <path
-            d="m {scale(tick.n)},{height + conf.minor.tickSize} L {scale(tick.n)},{conf.minor.grid
-              ? 0
-              : height}"
-            stroke="#aaaaaa"
-            stroke-width={conf.minor.tickWidth}
-          />
-        {/each}
-      {/if}
+      <g class="axis-minor axis-horizontal">
+        {#if conf.location == AxisLocation.START}
+          {#each minorTicks as tick, i (i)}
+            <path
+              d="m {scale(tick.n)},{lineOffset - conf.minor.tickSize} L {scale(tick.n)},{conf.minor
+                .grid
+                ? height
+                : lineOffset}"
+              stroke="var(--axis-line-color)"
+              stroke-width={conf.minor.tickWidth}
+            />
+          {/each}
+        {:else}
+          {#each minorTicks as tick, i (i)}
+            <path
+              d="m {scale(tick.n)},{height + conf.minor.tickSize} L {scale(tick.n)},{conf.minor.grid
+                ? 0
+                : height}"
+              stroke="var(--axis-line-color)"
+              stroke-width={conf.minor.tickWidth}
+            />
+          {/each}
+        {/if}
+      </g>
     {/if}
 
     {#if conf.major.enabled}
-      {#each majorTicks as tick, i (i)}
-        {#if conf.location == AxisLocation.START}
-          <path
-            d="m {scale(tick.n)},{lineOffset - conf.major.tickSize} L {scale(tick.n)},{conf.major
-              .grid
-              ? height
-              : lineOffset}"
-            stroke="#aaaaaa"
-            stroke-width={conf.major.tickWidth}
-          />
-        {:else}
-          <path
-            d="m {scale(tick.n)},{height + conf.major.tickSize} L {scale(tick.n)},{conf.major.grid
-              ? -0
-              : height}"
-            stroke="#aaaaaa"
-            stroke-width={conf.major.tickWidth}
-          />
-        {/if}
-
-        {#if showLabels}
-          {#if conf.location == AxisLocation.START && tick.l}
-            <text text-anchor={tick.textAnchor} dy="1em" x={scale(tick.n)}>{tick.l}</text>
-          {:else if conf.location == AxisLocation.END && tick.l}
-            <text
-              text-anchor={tick.textAnchor}
-              y={height + conf.major.tickSize + size}
-              x={scale(tick.n)}>{tick.l}</text
-            >
+      <g class="axis-major axis-horizontal">
+        {#each majorTicks as tick, i (i)}
+          {#if conf.location == AxisLocation.START}
+            <path
+              d="m {scale(tick.n)},{lineOffset - conf.major.tickSize} L {scale(tick.n)},{conf.major
+                .grid
+                ? height
+                : lineOffset}"
+              stroke="var(--axis-line-color)"
+              stroke-width={conf.major.tickWidth}
+            />
+          {:else}
+            <path
+              d="m {scale(tick.n)},{height + conf.major.tickSize} L {scale(tick.n)},{conf.major.grid
+                ? -0
+                : height}"
+              stroke="var(--axis-line-color)"
+              stroke-width={conf.major.tickWidth}
+            />
           {/if}
 
-          <!-- Used to calculate labels overflowing outside of chart area -->
-          {#if i == 0}
-            <text
-              text-anchor={tick.textAnchor}
-              bind:contentRect={leftBox}
-              bind:this={bbs}
-              x={scale(tick.n)}
-              visibility="hidden"
-              aria-hidden="true">{tick.l}</text
-            >
-          {:else if i == majorTicks.length - 1}
-            <text
-              text-anchor={tick.textAnchor}
-              bind:contentRect={rightBox}
-              x={scale(tick.n)}
-              visibility="hidden"
-              aria-hidden="true">{tick.l}</text
-            >
+          {#if showLabels}
+            {#if conf.location == AxisLocation.START && tick.l}
+              <text text-anchor={tick.textAnchor} dy="1em" x={scale(tick.n)}>{tick.l}</text>
+            {:else if conf.location == AxisLocation.END && tick.l}
+              <text
+                text-anchor={tick.textAnchor}
+                y={height + conf.major.tickSize + size}
+                x={scale(tick.n)}>{tick.l}</text
+              >
+            {/if}
+
+            <!-- Used to calculate labels overflowing outside of chart area -->
+            {#if i == 0}
+              <text
+                text-anchor={tick.textAnchor}
+                bind:contentRect={leftBox}
+                bind:this={bbs}
+                x={scale(tick.n)}
+                visibility="hidden"
+                aria-hidden="true">{tick.l}</text
+              >
+            {:else if i == majorTicks.length - 1}
+              <text
+                text-anchor={tick.textAnchor}
+                bind:contentRect={rightBox}
+                x={scale(tick.n)}
+                visibility="hidden"
+                aria-hidden="true">{tick.l}</text
+              >
+            {/if}
           {/if}
-        {/if}
-      {/each}
+        {/each}
+      </g>
     {/if}
   {:else}
     <g bind:contentRect={labelBox}>
       {#if conf.major.enabled}
-        {#each majorTicks as tick, i (i)}
-          <g transform="translate(0, {scale(tick.n)})">
-            {#if showLabels}
-              {#if conf.location == AxisLocation.START && tick.l}
-                <text x={0} y={-6}>{tick.l}</text>
-              {:else if conf.location == AxisLocation.END && tick.l}
-                <text x={width} y={-6} text-anchor="end">{tick.l}</text>
+        <g class="axis-major axis-vertical">
+          {#each majorTicks as tick, i (i)}
+            <g transform="translate(0, {scale(tick.n)})">
+              {#if showLabels}
+                {#if conf.location == AxisLocation.START && tick.l}
+                  <text x={0} y={-6}>{tick.l}</text>
+                {:else if conf.location == AxisLocation.END && tick.l}
+                  <text x={width} y={-6} text-anchor="end">{tick.l}</text>
+                {/if}
               {/if}
-            {/if}
-          </g>
-        {/each}
+            </g>
+          {/each}
+        </g>
       {/if}
 
       {#if conf.minor.enabled}
@@ -387,32 +393,36 @@
     </g>
 
     {#if conf.major.enabled}
-      {#each majorTicks as tick (tick.n)}
-        <g transform="translate(0, {scale(tick.n)})">
-          <line
-            x1={0}
-            y1={0}
-            x2={conf.major.grid ? width : conf.major.tickSize}
-            y2={0}
-            stroke="#aaaaaa"
-            stroke-width={conf.major.tickWidth}
-          />
-        </g>
-      {/each}
+      <g class="axis-major axis-vertical">
+        {#each majorTicks as tick (tick.n)}
+          <g transform="translate(0, {scale(tick.n)})">
+            <line
+              x1={0}
+              y1={0}
+              x2={conf.major.grid ? width : conf.major.tickSize}
+              y2={0}
+              stroke="var(--axis-line-color)"
+              stroke-width={conf.major.tickWidth}
+            />
+          </g>
+        {/each}
+      </g>
     {/if}
 
     {#if conf.minor.enabled}
-      {#each minorTicks as tick, i (i)}
-        <g transform="translate(0, {scale(tick.n)})">
-          <line
-            x1={0}
-            y1={0}
-            x2={conf.minor.grid ? width : conf.minor.tickSize}
-            y2={0}
-            stroke="#aaaaaa"
-          />
-        </g>
-      {/each}
+      <g class="axis-minor axis-vertical">
+        {#each minorTicks as tick, i (i)}
+          <g transform="translate(0, {scale(tick.n)})">
+            <line
+              x1={0}
+              y1={0}
+              x2={conf.minor.grid ? width : conf.minor.tickSize}
+              y2={0}
+              stroke="var(--axis-line-color)"
+            />
+          </g>
+        {/each}
+      </g>
     {/if}
   {/if}
 {/if}

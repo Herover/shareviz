@@ -65,7 +65,7 @@
     bind:contentRect={box}
     cursor={moving ? "grabbing" : "grab"}
     paint-order="stroke"
-    stroke="#ffffff"
+    stroke="var(--background-color)"
     stroke-width="3"
     text-anchor="middle">{line.label.text}</text
   >

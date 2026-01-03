@@ -18,7 +18,6 @@
   import FloatingLabels from "./FloatingLabels/FloatingLabels.svelte";
   import { createEventDispatcher } from "svelte";
   import { chartToEditor } from "$lib/chartToEditorStore.svelte";
-  import chroma from "chroma-js";
   import { fontStore } from "$lib/fontStore.svelte";
 
   interface Props {
@@ -282,7 +281,7 @@
               y={yScale(d.value[d.value.length - 1].to)}
               fill={getStyle(d.key).label.color.light.c}
               paint-order="stroke"
-              stroke={chroma(chartSpec.style.bgColor).hex()}
+              stroke="var(--background-color)"
               stroke-width={3}
               dominant-baseline="middle"
               text-anchor="start">{getStyle(d.key).label.text}</text
@@ -295,7 +294,7 @@
               y={yScale(d.value[0].to)}
               fill={getStyle(d.key).label.color.light.c}
               paint-order="stroke"
-              stroke={chroma(chartSpec.style.bgColor).hex()}
+              stroke="var(--background-color)"
               stroke-width={3}
               dominant-baseline="middle"
               text-anchor="end">{getStyle(d.key).label.text}</text

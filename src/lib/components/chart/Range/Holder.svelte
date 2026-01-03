@@ -116,7 +116,7 @@
             d="m {rangeLabelWidths[line.i]?.width ?? 0},{rangeHeight *
               i} L {realWidth}, {rangeHeight * i}"
             stroke-width="1"
-            stroke="#dddddd"
+            stroke="var(--axis-line-color)"
           />
           <g transform="translate({rangeLabelSpace}, {rangeHeight * i})">
             {#each line.value as p (chart.k + line.key + p.s?.k)}
