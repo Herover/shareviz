@@ -10,6 +10,7 @@
   import { AxisRepeatMode } from "$lib/chart";
   import { max } from "d3-array";
   import Legend from "../Legend.svelte";
+  import { fontStore } from "$lib/fontStore.svelte";
 
   let { chartSpec, componentSpec, data, chartWidth }: ChartComponentProps<RangeElement> = $props();
 
@@ -85,6 +86,7 @@
   {#each charts.d as chart (chart.k)}
     <p>{chart.k}</p>
     <svg width={realWidth} height={rangeHeight * chart.d.length + topMargin}>
+      <style bind:innerHTML={fontStore.fontCSS} contenteditable=""></style>
       <g transform="translate({rangeLabelSpace}, 0)">
         <Axis
           height={rangeHeight * chart.d.length + topMargin}
