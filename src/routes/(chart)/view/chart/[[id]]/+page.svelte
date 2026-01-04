@@ -53,20 +53,14 @@
               const family = rule.style.getPropertyValue("font-family");
               const src = rule.style.getPropertyValue("src");
 
-              const srcs = src.split(/,\s*/g);
-              for (let sr = 0; sr < srcs.length; sr++) {
-                const source = srcs[sr];
-                if (source.startsWith("url(")) {
-                  const url = source.match(/url\((?:"|')((\w|\d|\/|\.|-)*)(?:"|')\)/);
-                  const format = source.match(/format\((?:"|')((\w|\d|\/|\.|-)*)(?:"|')\)/);
-                  if (url && url.length > 2 && format && format.length > 2) {
-                    fontMap[family] = {
-                      url: url[1],
-                      format: format[1],
-                    };
-                    break;
-                  }
-                }
+              const url = src.match(/url\("(.*?(?=\"))"\)/);
+              const format = src.match(/format\("(.*?(?=\"))"\)/);
+              if (url && url.length > 1 && format && format.length > 1) {
+                fontMap[family] = {
+                  url: url[1],
+                  format: format[1],
+                };
+                break;
               }
             }
           }
