@@ -2,8 +2,11 @@
 
 <script lang="ts">
   import type { Root } from "$lib/chart";
+  import { migrate } from "$lib/chartMigrate";
+  import { createLocalDoc } from "$lib/chartStore";
   import { getComponent } from "$lib/components/chart/chartComponents";
   import type { ComputedData } from "$lib/data";
+  import { formatVersion } from "$lib/initialDoc";
   import { orNumber } from "$lib/utils";
 
   /* eslint-disable svelte/no-navigation-without-resolve */
@@ -23,6 +26,17 @@
     editor,
     onedit = () => {},
   }: Props = $props();
+
+  // Upgrade chart if it's not using the most recent format.
+  // Should this be done server side so we can detect issues?
+  if (chartSpec.m.v != formatVersion) {
+    const d = createLocalDoc("temp-migration", "", {
+      initial: chartSpec,
+      noStorage: true,
+    });
+    migrate(d, formatVersion);
+    chartSpec = d.data;
+  }
 
   const editText = (target: string, e: Event & { currentTarget: EventTarget & HTMLElement }) => {
     const k = target,
