@@ -53,8 +53,8 @@
               const family = rule.style.getPropertyValue("font-family");
               const src = rule.style.getPropertyValue("src");
 
-              const url = src.match(/url\("(.*?(?=\"))"\)/);
-              const format = src.match(/format\("(.*?(?=\"))"\)/);
+              const url = src.match(/url\("(.*?(?="))"\)/);
+              const format = src.match(/format\("(.*?(?="))"\)/);
               if (url && url.length > 1 && format && format.length > 1) {
                 fontMap[family] = {
                   url: url[1],

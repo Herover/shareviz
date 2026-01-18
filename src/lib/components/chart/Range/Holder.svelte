@@ -24,10 +24,7 @@
 
   let realWidth = $derived(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight);
   let rangeLabelWidths: { width: number }[] = $state([]);
-  let rangeLabelWidths2: { width: number }[] = $state([]);
-  $effect(() => {
-    rangeLabelWidths2 = rangeLabelWidths.slice(0, charts.n ?? 0);
-  });
+  let rangeLabelWidths2: { width: number }[] = $derived(rangeLabelWidths.slice(0, charts.n ?? 0));
   let rangeLabelSpace = $derived(max(rangeLabelWidths2, (d) => d.width) ?? 0);
   let rangeWidth = $derived(realWidth - rangeLabelSpace);
 

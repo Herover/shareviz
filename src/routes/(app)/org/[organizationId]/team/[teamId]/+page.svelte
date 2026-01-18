@@ -14,11 +14,9 @@
   $effect(() => {
     getTeam(page.params.teamId).then((t) => (team = t));
   });
-  let isTeamAdmin = $state(false);
-  $effect(() => {
-    isTeamAdmin =
-      team?.members.find((u) => u.user.id == data.session?.user?.id)?.role === TEAM_ROLES.ADMIN;
-  });
+  let isTeamAdmin = $derived(
+    team?.members.find((u) => u.user.id == data.session?.user?.id)?.role === TEAM_ROLES.ADMIN,
+  );
 
   let userToAddToTeam: string | undefined = $state();
 

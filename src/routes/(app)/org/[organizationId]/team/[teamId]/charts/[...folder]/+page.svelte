@@ -22,10 +22,7 @@
   let promptSpec = $state(false);
   let importChartData = $state("");
 
-  let teamId: string | undefined = $state();
-  $effect(() => {
-    teamId = page.params.teamId;
-  });
+  let teamId: string | undefined = $derived(page.params.teamId);
   let directory: FolderItem[] = $state([]);
   $effect(() => {
     if (typeof teamId == "undefined") {
