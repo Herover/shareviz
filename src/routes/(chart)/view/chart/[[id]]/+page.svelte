@@ -122,7 +122,7 @@
           height: height,
         },
       } as ViewerChartUpdated,
-      env.PUBLIC_ORIGIN,
+      "*",
     );
   });
   const onEdit = (d: { k: string; v: any }) => {
@@ -142,7 +142,7 @@
       {
         type: "READY",
       } as ViewerReady,
-      env.PUBLIC_ORIGIN,
+      "*",
     );
   });
 
