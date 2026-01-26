@@ -6,6 +6,7 @@
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
   import { onDestroy, onMount, tick } from "svelte";
   import { computeData } from "$lib/data.js";
+  import { page } from "$app/state";
 
   import { env } from "$env/dynamic/public";
   import type {
@@ -157,17 +158,27 @@
         .catch((err) => logger.error("unable to get chart", err));
     }
   });
+
+  let themeKey = $derived(page.url.hash.includes("t=dark") ? "dark" : "");
 </script>
 
 {#if chartSpec && chartData}
   <div
     class="main"
+    class:theme={themeKey}
     bind:clientWidth={width}
     bind:clientHeight={height}
     bind:this={mainView}
     style:scale={zoomLevel}
   >
-    <ChartViewer {chartSpec} data={chartData} {width} editor={data.editor} onedit={onEdit} />
+    <ChartViewer
+      {chartSpec}
+      data={chartData}
+      {width}
+      editor={data.editor}
+      onedit={onEdit}
+      {themeKey}
+    />
   </div>
 {/if}
 

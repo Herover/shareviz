@@ -17,6 +17,7 @@
     width?: number | undefined;
     editor: boolean;
     onedit?: (d: { k: string; v: any }) => void;
+    themeKey: string;
   }
 
   let {
@@ -25,6 +26,7 @@
     width = undefined,
     editor,
     onedit = () => {},
+    themeKey,
   }: Props = $props();
 
   // Upgrade chart if it's not using the most recent format.
@@ -101,7 +103,7 @@
 
 <div>
   <style bind:innerHTML={css} contenteditable=""></style>
-  <div class="chart" style:width="{chartWidth}px">
+  <div class="chart" style:width="{chartWidth}px" data-theme={themeKey}>
     <p
       style:font-size="{chartSpec.style.titleSize}em"
       style:font-weight={chartSpec.style.titleBold ? "bold" : "normal"}
