@@ -121,6 +121,7 @@
         data: {
           height: height,
         },
+        id: data.id ?? "",
       } as ViewerChartUpdated,
       "*",
     );
@@ -132,6 +133,7 @@
         data: {
           edit: d,
         },
+        id: data.id ?? "",
       } as ViewerChartEdit,
       env.PUBLIC_ORIGIN,
     );
@@ -141,6 +143,7 @@
     window.parent.postMessage(
       {
         type: "READY",
+        id: data.id ?? "",
       } as ViewerReady,
       "*",
     );

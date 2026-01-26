@@ -29,16 +29,19 @@ export interface ViewerChartUpdated {
   data: {
     height: number;
   };
+  id: string;
 }
 export interface ViewerChartEdit {
   type: "CHART_EDIT";
   data: {
     edit: { k: string; v: any };
   };
+  id: string;
 }
 // Informs the editor that the viewer has loaded and is ready to display chart data
 export interface ViewerReady {
   type: "READY";
+  id: string;
 }
 
 export type ViewerMessage = ViewerChartUpdated | ViewerChartEdit | ViewerReady;
