@@ -33,6 +33,7 @@
 
 <main>
   <div class="content">
+    <h1>Data Tortilla</h1>
     <!-- svelte-ignore a11y_missing_attribute -->
     <a
       role="button"
@@ -42,7 +43,7 @@
       ><small>Switch theme</small></a
     >
     {#if !data.session?.user}
-      <h1>Sign in using</h1>
+      <h2>Sign in</h2>
       <p>
         By signing in, you will share your e-mail address, name and other login provider details.
         This information may be shared with other people in your organizations, or used to contact
@@ -62,13 +63,13 @@
       <p>Redirecting you to <a href={resolve("/(app)/org", {})}>organization page</a>...</p>
     {/if}
     <div class="hline"></div>
-    <h1>Local editor</h1>
-    <p>Use without a account for free.</p>
+    <h2>Local editor</h2>
+    <p>Try without a account for free.</p>
     <p>
       Local charts are only viewable using this computer and browser, and does not allow
       collaborative features.
     </p>
-    <button onclick={() => newGraphic(false)}>Create local chart</button>
+    <button onclick={() => newGraphic(false)}>Create chart</button>
     {#each charts || [] as chart (chart.id)}
       <ul>
         <li>
@@ -90,5 +91,11 @@
   }
   .content {
     max-width: 500px;
+  }
+  h1 {
+    font-size: 4em;
+  }
+  h2 {
+    font-size: 2em;
   }
 </style>
