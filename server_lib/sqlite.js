@@ -184,25 +184,24 @@ export const db = {
     /** @type {string | undefined} */ teamId,
     /** @type {string | undefined} */ folderId,
   ) => {
-    return drizzledb.transaction(async (tx) => {
-      const chartRef = await tx
-        .insert(charts)
-        .values({
-          name,
-          chartRef: ref,
-          teamId,
-          created: Date.now(),
-          updated: 0,
-          folderId,
-        })
-        .returning({ id: charts.id });
-      await tx.insert(userCharts).values({
-        chartId: chartRef[0].id,
-        userId,
-      });
-
-      return chartRef[0].id;
+    // TODO: should be a transaction https://github.com/drizzle-team/drizzle-orm/issues/2275
+    const chartRef = await drizzledb
+      .insert(charts)
+      .values({
+        name,
+        chartRef: ref,
+        teamId,
+        created: Date.now(),
+        updated: 0,
+        folderId,
+      })
+      .returning({ id: charts.id });
+    await drizzledb.insert(userCharts).values({
+      chartId: chartRef[0].id,
+      userId,
     });
+
+    return chartRef[0].id;
   },
 
   /**
