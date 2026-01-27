@@ -81,7 +81,7 @@
   const onError = (e: CustomEvent) => {
     if (e.detail.error.message == "unauthorized" && !data.signedIn) {
       /* eslint-disable-next-line svelte/no-navigation-without-resolve */
-      goto(resolve("/") + "?return_url=" + encodeURI(data.url));
+      goto(resolve("/", {}) + "?return_url=" + encodeURI(data.url));
     } else {
       notifications.addError(e.detail.error.message);
     }
