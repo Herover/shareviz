@@ -60,7 +60,7 @@
     return (e: CustomEvent<any>) => editElement(i, e.detail);
   };
 
-  let css = $state(`
+  let css = $derived(`
     .chart {
       padding-left: var(--chart-padding-left);
       padding-right: var(--chart-padding-right);
@@ -90,14 +90,13 @@
       color: var(--text-mute-color);
     }
 
-    .chart {
-    }
     .chart[data-theme='dark'] {
       --background-color: #000000;
       --text-primary-color: #ffffff;
       --text-mute-color: #888888;
       --axis-line-color: #666666;
     }
+    ${chartSpec.style.css}
   `);
 </script>
 

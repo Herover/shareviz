@@ -2,7 +2,7 @@
 
 import type { Root } from "./chart";
 
-export const formatVersion = 5;
+export const formatVersion = 6;
 
 export const defDoc: Root = {
   m: {

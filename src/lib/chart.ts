@@ -265,6 +265,7 @@ export interface Style {
   sourceMargin: number;
   bgColor: string;
   textColor: string;
+  css: string;
 }
 
 export interface ResponsiveColor {

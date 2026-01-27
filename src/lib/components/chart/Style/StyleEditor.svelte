@@ -14,6 +14,19 @@
 
   let chartStore = new ChartStore(connection);
   let styletStore = new StyleStore(connection);
+
+  const cssExample = `.chart {
+  --background-color: #ffffff;
+  --text-primary-color: #000000;
+  --text-mute-color: #888888;
+  --chart-padding-left: 16px;
+  --chart-padding-right: 16px;
+  --chart-padding-top: 16px;
+  --chart-padding-bottom: 16px;
+
+  --axis-line-color: #aaaaaa;
+  --axis-text-size: 0.9em;
+}`;
 </script>
 
 <h3 class="editor-sub-section">Labels</h3>
@@ -230,6 +243,15 @@
     onchange={(s) => styletStore.setTextColor(s.c)}
   />
 </p>
+
+<p><label for="style-overrides">Style overrides</label></p>
+<p class="editor-sub-section-description">Ovverride css, use on own risk!</p>
+<pre class="editor-sub-section-description">{cssExample}</pre>
+<textarea
+  rows="10"
+  onchange={(e) => styletStore.setCSS(e.currentTarget.value)}
+  onkeyup={(e) => styletStore.setCSS(e.currentTarget.value)}>{styletStore.data?.css}</textarea
+>
 
 <style>
   .control {

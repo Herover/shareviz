@@ -448,4 +448,17 @@ export const migrate = (
     // console.log(JSON.stringify(doc.data, null, 0), JSON.stringify(op, null, 2));
     doc.submitOp(op);
   }
+
+  if (doc.data.m.v == 5 && doc.data.m.v < toVersion) {
+    const op = [["style", "css", { i: "" }]].reduce((acc, op) => json1.type.compose(acc, op), [
+      "m",
+      "v",
+      {
+        r: 0,
+        i: 6,
+      },
+    ] as any);
+    // console.log(JSON.stringify(doc.data, null, 0), JSON.stringify(op, null, 2));
+    doc.submitOp(op);
+  }
 };

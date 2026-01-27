@@ -48,4 +48,7 @@ export class StyleStore {
   setTextColor(value: string) {
     this.#doc.submitOp(["style", "textColor", { r: 0, i: value }]);
   }
+  setCSS(value: string) {
+    this.#doc.submitOp(["style", "css", { r: 0, i: value }]);
+  }
 }
