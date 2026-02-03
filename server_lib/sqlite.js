@@ -71,6 +71,16 @@ export const db = {
     }
     return r[0];
   },
+  addUser: async (/** @type {{ email: string, name: string }} */ { email, name }) => {
+    const r = await drizzledb
+      .insert(users)
+      .values({
+        email,
+        name,
+      })
+      .returning();
+    return r[0];
+  },
   getUserPasswordLogin: async (/** @type {string} */ userId) => {
     const r = await drizzledb
       .select()
