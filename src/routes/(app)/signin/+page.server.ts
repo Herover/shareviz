@@ -33,9 +33,7 @@ export const actions: Actions = {
 
     const passwordLogin = await db.getUserPasswordLogin(user.id);
     if (!passwordLogin) {
-      // Temporary requirement for users to create a password until oauth is back
-      setSessionCookie(user.id, request, cookies, getClientAddress(), "password");
-      return redirect(303, "/reset-password&return_url=" + encodeURI(returnURL));
+      return redirect(303, "/?msg=password_error&return_url=" + encodeURI(returnURL));
     }
 
     if (typeof password != "string") {
