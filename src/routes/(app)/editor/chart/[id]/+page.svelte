@@ -27,6 +27,8 @@
   import type { PageProps, PageServerData } from "./$types";
   import { getLogger } from "$lib/log.js";
 
+  /* eslint-disable svelte/no-navigation-without-resolve */
+
   const logger = getLogger();
 
   let { data }: PageProps & { data: PageServerData } = $props();
@@ -80,7 +82,6 @@
   };
   const onError = (e: CustomEvent) => {
     if (e.detail.error.message == "unauthorized" && !data.signedIn) {
-      /* eslint-disable-next-line svelte/no-navigation-without-resolve */
       goto(resolve("/", {}) + "?return_url=" + encodeURI(data.url));
     } else {
       notifications.addError(e.detail.error.message);
@@ -314,9 +315,9 @@
                 <div class="w-025 editor-explain-box">
                   <span class="editor-column-label">
                     <a
-                      href={resolve("/(chart)/view/chart/[[id]]", {
-                        id: publication.chartPublication.id,
-                      })}>Embed link</a
+                      href={env.PUBLIC_VIEWER_ORIGIN +
+                        "/view/chart/" +
+                        publication.chartPublication.id}>Embed link</a
                     >
                   </span>
                 </div>
