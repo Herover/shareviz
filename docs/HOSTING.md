@@ -90,6 +90,9 @@ server {
 And for viewers
 
 ```
+# Make sure this directory exists
+proxy_cache_path /data/nginx/cache keys_zone=dtv:10m loader_threshold=300 loader_files=200 max_size=500m;
+
 server {             # the port nginx is listening on
     server_name     dtv.leonora.app;    # setup your domain here
 
@@ -100,7 +103,7 @@ server {             # the port nginx is listening on
     access_log /var/log/dt-viewer/access.log;
     error_log /var/log/dt-viewer/error.log warn;
 
-    location / {
+    location @proxied {
         #expires $expires;
 
         proxy_redirect                      off;
@@ -110,7 +113,23 @@ server {             # the port nginx is listening on
         proxy_set_header X-Forwarded-Proto  $scheme;
         proxy_read_timeout          1m;
         proxy_connect_timeout       1m;
+        proxy_cache dtv;
+        proxy_cache_valid 200 60m;
+        proxy_cache_valid 404 1m;
         proxy_pass                          http://127.0.0.1:5173; # set the address of the Node.js instance here
+    }
+
+    location /view {
+        try_files /dev/null @proxied;
+    }
+    location /_app {
+        try_files /dev/null @proxied;
+    }
+    location /api/publication {
+        try_files /dev/null @proxied;
+    }
+    location /fonts {
+        try_files /dev/null @proxied;
     }
 }
 ```
