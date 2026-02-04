@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 import {
@@ -101,6 +101,23 @@ export const db = {
       hash,
       salt,
     });
+  },
+  setUserPasswordLogin: async (
+    /** @type {string} */ email,
+    /** @type {string} */ hash,
+    /** @type {string} */ salt,
+  ) => {
+    const r = await drizzledb
+      .update(userPasswordLogins)
+      .set({ hash, salt })
+      .where(
+        inArray(
+          userPasswordLogins.userId,
+          drizzledb.select({ id: users.id }).from(users).where(eq(users.email, email)),
+        ),
+      );
+
+    return r.changes != 0;
   },
   /**
    * @returns {Promise<string>} token
