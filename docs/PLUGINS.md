@@ -10,6 +10,6 @@ Refer to the `src/lib/components/chart/chartComponents.ts` file for the actual i
 
 The general flow is
 
-* The add function use ShareDB to insert a component in the component list.
-* A editor edits the chart using the editor component, which use ShareDB to change the component JSON definition.
-* ShareDB will send operations to the server and other editors currently viewing the chart, where the operations are merged into the chart definition, while the resulting definition is also sent to the viewer component which renders a chart.
+- The add function use ShareDB to insert a component in the component list.
+- A editor edits the chart using the editor component, which use ShareDB to change the component JSON definition.
+- ShareDB will send operations to the server and other editors currently viewing the chart, where the operations are merged into the chart definition, while the resulting definition is also sent to the viewer component which renders a chart.

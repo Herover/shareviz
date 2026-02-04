@@ -6,17 +6,17 @@ Here's a example using CSS variables:
 
 ```css
 .chart {
-    /* Default light theme */
-    --background-color: #ffffff;
-    --text-primary-color: #000000;
-    --text-mute-color: #888888;
-    --chart-padding-left: 16px;
-    --chart-padding-right: 16px;
-    --chart-padding-top: 16px;
-    --chart-padding-bottom: 16px;
+  /* Default light theme */
+  --background-color: #ffffff;
+  --text-primary-color: #000000;
+  --text-mute-color: #888888;
+  --chart-padding-left: 16px;
+  --chart-padding-right: 16px;
+  --chart-padding-top: 16px;
+  --chart-padding-bottom: 16px;
 
-    --axis-line-color: #aaaaaa;
-    --axis-text-size: 0.9em;
+  --axis-line-color: #aaaaaa;
+  --axis-text-size: 0.9em;
 }
 ```
 

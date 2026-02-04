@@ -2,28 +2,28 @@
 
 DataTortilla is written in Svelte using SvelteKit. While we try to keep the number of external dependencies down, it might also be good to know about
 
-* **SQLite**: a simple relational database that writes it database to a local file.
-* **Drizzle**: the ORM used to create SQL queries to SQLite.
-* **ShareDB**: a library for real-time collaboration on JSON files, this allows many people to edit the same chart simultaniously over web-sockets. DataTortilla uses a custom file based backend.
+- **SQLite**: a simple relational database that writes it database to a local file.
+- **Drizzle**: the ORM used to create SQL queries to SQLite.
+- **ShareDB**: a library for real-time collaboration on JSON files, this allows many people to edit the same chart simultaniously over web-sockets. DataTortilla uses a custom file based backend.
 
 ## The code
 
 The important folders are, in alphabetic order
 
-* **server**: some code related to starting the HTTP server, as well as access control on ShareDB connections.
-* **server_lib**: shared code that only runs on the server but is used by both code in `server` and `src`. Contains database functions and schemas.
-* **src**: SvelteKit code.
-* **src/lib**: Svelte components, stores, other most of the applications brain sits here.
-* **src/routes/(app)**: pages you visit with the browser and some form action handlers.
-* **src/routes/(chart)**: the public viewer route.
-* **src/routes/api**: API endpoints.
+- **server**: some code related to starting the HTTP server, as well as access control on ShareDB connections.
+- **server_lib**: shared code that only runs on the server but is used by both code in `server` and `src`. Contains database functions and schemas.
+- **src**: SvelteKit code.
+- **src/lib**: Svelte components, stores, other most of the applications brain sits here.
+- **src/routes/(app)**: pages you visit with the browser and some form action handlers.
+- **src/routes/(chart)**: the public viewer route.
+- **src/routes/api**: API endpoints.
 
 The frontend generally use API endpoints to change data or load data that might change while using a page. There's also cases where we use `+layout.server.ts` and `+page.server.ts` files for loading data if it makes more sense in the situation.
 
 Before you commit code, you also have to run the commands
 
-* `npm run format` for automatic formatting of code.
-* `npm run lint` for best linting. Most rules comes from existing best practice definitaions, but it's allowed to ignore rules when really required.
+- `npm run format` for automatic formatting of code.
+- `npm run lint` for best linting. Most rules comes from existing best practice definitaions, but it's allowed to ignore rules when really required.
 
 ## Running the code
 

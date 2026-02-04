@@ -4,7 +4,7 @@ import { randomBytes } from "node:crypto";
 import { db } from "$lib/../../server_lib/user";
 import type { Actions } from "./$types";
 import { redirect } from "@sveltejs/kit";
-import { hash, verify } from "@node-rs/argon2";
+import { hash } from "@node-rs/argon2";
 import { setSessionCookie } from "$lib/auth";
 
 export const actions: Actions = {

@@ -1,17 +1,17 @@
 # Hosting
 
-You need a server and 2 things to host a DataTortilla server: 
+You need a server and 2 things to host a DataTortilla server:
 
-* The DataTortilla server, either using Docker or running NodeJS directly
-* A reverse proxy, in the example we use Nginx + Lets Encrypt
+- The DataTortilla server, either using Docker or running NodeJS directly
+- A reverse proxy, in the example we use Nginx + Lets Encrypt
 
 A design goal is to keep hosting of DataTortilla simple and cheap. Therefore the number of external services required is kepts at a minimum. This also means that you can't run DataTortilla is a high-availability setup. The logic here is that the cost of having to maintain the required infrastructure is expected to be higher than the gains of doing so.
 
-* Upgrades to the NodeJS server usually only takes a few seconds, meaning editors won't feel much impact.
+- Upgrades to the NodeJS server usually only takes a few seconds, meaning editors won't feel much impact.
 
-* A single Nginx server with a bit of cache can deliver thousands of requests per second even on a low powered server, meaning viewers won't be impacted during updates.
+- A single Nginx server with a bit of cache can deliver thousands of requests per second even on a low powered server, meaning viewers won't be impacted during updates.
 
-* SQLite + flat JSON files can run thousands of reads/writes per second even on old hard drives, and if you have enough editors for this to happen, you probably also have enough money for a nice server with fast drives.
+- SQLite + flat JSON files can run thousands of reads/writes per second even on old hard drives, and if you have enough editors for this to happen, you probably also have enough money for a nice server with fast drives.
 
 Hopefully these choises will also make life easier to sys admins.
 
@@ -121,8 +121,8 @@ Use Certbot to aquire HTTPS certificates for the servers.
 
 ## Upgrades
 
-Always check release notes to make sure there's no manual actions required from you. 
+Always check release notes to make sure there's no manual actions required from you.
 
-* Before upgrading, consider backup up the `data` directory.
-* If you are not using the Docker image, make sure to run `npx drizzle-kit migrate` while the server is not running.
-* The server may upgrade chart definitions, the files that encode how a chart should look. This happens on every restart, and will block starting the server on servers with huge amounts of charts that requires changes. You can see if it's done by scanning the logs for a line that starts with `checking charts for migrations` and another line saying `done migrating`.
+- Before upgrading, consider backup up the `data` directory.
+- If you are not using the Docker image, make sure to run `npx drizzle-kit migrate` while the server is not running.
+- The server may upgrade chart definitions, the files that encode how a chart should look. This happens on every restart, and will block starting the server on servers with huge amounts of charts that requires changes. You can see if it's done by scanning the logs for a line that starts with `checking charts for migrations` and another line saying `done migrating`.

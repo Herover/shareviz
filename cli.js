@@ -16,7 +16,6 @@ const main = async () => {
     const salt = randomBytes(16);
     const pwHash = await hash(password, { salt: salt });
     const r = await db.setUserPasswordLogin(email, pwHash, salt);
-    // console.log(await db.getUser({username: email}))
     console.log(r ? "OK" : "Failed");
   } else {
     console.log("Unknown command");
