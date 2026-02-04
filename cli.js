@@ -1,4 +1,7 @@
+// SPDX-License-Identifier: MPL-2.0
+
 /* eslint-disable no-console */
+
 import { randomBytes } from "node:crypto";
 
 import { hash } from "@node-rs/argon2";
@@ -15,14 +18,14 @@ const main = async () => {
 
     const u = await db.getUser({ username: email });
     if (u == null) {
-        console.log("User does not exist");
-        return;
+      console.log("User does not exist");
+      return;
     }
 
     const p = db.getUserPasswordLogin(u.id);
     if (p == null) {
-        console.log("User does not have a password");
-        return;
+      console.log("User does not have a password");
+      return;
     }
 
     const salt = randomBytes(16);
