@@ -3,7 +3,7 @@
 <script lang="ts">
   import type { Root } from "$lib/chart";
   import { migrate } from "$lib/chartMigrate";
-  import { createLocalDoc } from "$lib/chartStore";
+  import { createLocalDoc } from "$lib/localShareDBDoc";
   import { getComponent } from "$lib/components/chart/chartComponents";
   import type { ComputedData } from "$lib/data";
   import { formatVersion } from "$lib/initialDoc";
