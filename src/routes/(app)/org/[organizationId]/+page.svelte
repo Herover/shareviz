@@ -4,6 +4,8 @@
   import { page } from "$app/stores";
   import { ORGANIZATION_ROLES } from "$lib/consts";
 
+  // Not sure why it should be derived
+  /* eslint-disable-next-line svelte/prefer-writable-derived */
   let invites: { code: string; expires: Date | null; used: boolean }[] = $state([]);
   let newInvites: typeof invites = $state([]);
   let inviteCode = $state("");
