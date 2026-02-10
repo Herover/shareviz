@@ -7,7 +7,6 @@
   import { getComponent } from "$lib/components/chart/chartComponents";
   import type { ComputedData } from "$lib/data";
   import { formatVersion } from "$lib/initialDoc";
-  import { orNumber } from "$lib/utils";
 
   /* eslint-disable svelte/no-navigation-without-resolve */
 
@@ -54,7 +53,7 @@
     onedit({ k: type, v: [i, ...d] });
   };
 
-  let chartWidth = $derived(orNumber(width, chartSpec.chart.width));
+  let chartWidth = $derived(width);
 
   const mkEditElement = (i: number) => {
     return (e: CustomEvent<any>) => editElement(i, e.detail);
@@ -101,8 +100,8 @@
 </script>
 
 <div>
-  <style bind:innerHTML={css} contenteditable=""></style>
-  <div class="chart" style:width="{chartWidth}px" data-theme={themeKey}>
+  <style bind:innerText={css} contenteditable=""></style>
+  <div class="chart" style:width={chartWidth ? chartWidth + "px" : undefined} data-theme={themeKey}>
     <p
       style:font-size="{chartSpec.style.titleSize}em"
       style:font-weight={chartSpec.style.titleBold ? "bold" : "normal"}

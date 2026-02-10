@@ -384,7 +384,7 @@
           -->
           <iframe
             bind:this={viewerFrame}
-            src={env.PUBLIC_VIEWER_ORIGIN + "/view/chart/" + data.id + "?editor"}
+            src={env.PUBLIC_VIEWER_ORIGIN + "/view/chart/?editor"}
             width={chartSpec.chart.width}
             {height}
             title="Chart preview"

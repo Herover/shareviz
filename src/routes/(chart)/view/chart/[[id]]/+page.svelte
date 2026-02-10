@@ -1,7 +1,6 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  import { localPrefix } from "$lib/chartStore";
   import type { Root } from "$lib/chart.d.ts";
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
   import { onDestroy, onMount, tick } from "svelte";
@@ -19,22 +18,29 @@
   import { fontStore, type FONTS } from "$lib/fontStore.svelte.js";
   import { chartToEditor } from "$lib/chartToEditorStore.svelte.js";
   import { getLogger } from "$lib/log.js";
+  import { browser } from "$app/environment";
 
   const logger = getLogger();
 
   let { data } = $props();
 
-  let chartSpec: Root | undefined = $state();
+  let chartSpec: Root | undefined = $derived(data.data ? data.data : undefined);
   let chartData = $derived(computeData(chartSpec));
 
   let height = $state(0);
-  let width = $state(0);
+  let width: number | undefined = $state(undefined);
   let zoomLevel = $state(1);
   let mainView: HTMLDivElement | undefined = $state();
 
   const onMessage = async (event: MessageEvent<EditorMessage>) => {
     // For now only allow rendering data from our own server
-    if (event.origin !== env.PUBLIC_ORIGIN) return;
+    if (event.origin !== env.PUBLIC_ORIGIN) {
+      logger.log("Rejecting message of wrong origin", {
+        origin: event.origin,
+        expectedOrigin: env.PUBLIC_ORIGIN,
+      });
+      return;
+    }
 
     if (event.data.type == "CHART_DATA") {
       chartSpec = event.data.data.chart;
@@ -111,22 +117,35 @@
     }
   };
 
-  window.addEventListener("message", onMessage, false);
-  onDestroy(() => {
-    window.removeEventListener("message", onMessage, false);
-  });
-  $effect(() => {
-    window.parent.postMessage(
-      {
-        type: "CHART_UPDATED",
-        data: {
-          height: height,
-        },
-        id: data.id ?? "",
-      } as ViewerChartUpdated,
-      "*",
-    );
-  });
+  if (browser) {
+    window.addEventListener("message", onMessage, false);
+    onDestroy(() => {
+      window.removeEventListener("message", onMessage, false);
+    });
+    $effect(() => {
+      window.parent.postMessage(
+        {
+          type: "CHART_UPDATED",
+          data: {
+            height: height,
+          },
+          id: data.id ?? "",
+        } as ViewerChartUpdated,
+        "*",
+      );
+    });
+
+    onMount(() => {
+      window.parent.postMessage(
+        {
+          type: "READY",
+          id: data.id ?? "",
+        } as ViewerReady,
+        "*",
+      );
+    });
+  }
+
   const onEdit = (d: { k: string; v: any }) => {
     window.parent.postMessage(
       {
@@ -140,26 +159,7 @@
     );
   };
 
-  onMount(() => {
-    window.parent.postMessage(
-      {
-        type: "READY",
-        id: data.id ?? "",
-      } as ViewerReady,
-      "*",
-    );
-  });
-
-  $effect(() => {
-    if (data.id && !data.id.startsWith(localPrefix) && !data.editor) {
-      fetch("/api/publication/" + data.id + "/data")
-        .then((resp) => resp.json())
-        .then((data) => (chartSpec = data.chart))
-        .catch((err) => logger.error("unable to get chart", err));
-    }
-  });
-
-  let themeKey = $derived(page.url.hash.includes("t=dark") ? "dark" : "");
+  let themeKey = $derived(page.url.searchParams.get("t") ?? "");
 </script>
 
 {#if chartSpec && chartData}
