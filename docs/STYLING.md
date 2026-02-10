@@ -20,4 +20,15 @@ Here's a example using CSS variables:
 }
 ```
 
-The current available CSS variables can be found in `src/lib/components/chart/ChartViewer.svelte`,
+The current available CSS variables can be found in `src/lib/components/chart/ChartViewer.svelte`.
+
+It's possible to include multiple themes for a chart by matching on the `data-theme` attribute:
+
+```css
+.chart[data-theme='dark'] {
+  --background-color: black;
+  --text-primary-color: white;
+}
+```
+
+When embedding charts, you control which theme to use by appending `?t=dark` to the url.
