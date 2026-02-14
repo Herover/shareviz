@@ -99,5 +99,6 @@ export const defDoc: Root = {
     sourceMargin: 8,
     bgColor: "#ffffff",
     textColor: "#000000",
+    css: "",
   },
 };
