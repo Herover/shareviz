@@ -21,7 +21,11 @@ export const formatData = (componentSpec: RangeElement, data: ComputedData) => {
             v: d[componentSpec.pointValue],
             s: componentSpec.rangeCategoryKeys.find((dd) => d[componentSpec.pointLabel] == dd.k),
             // c: componentSpec.rangeCategoryKeys.find(s => s.k == d.)
-          })),
+          })).sort(
+            (a, b) => 
+              negativeOneToInf(componentSpec.rangeCategoryKeys.findIndex((e) => e.k == b.s?.k)) - 
+              negativeOneToInf(componentSpec.rangeCategoryKeys.findIndex((e) => e.k == a.s?.k)),
+          ),
           i: n++,
         };
       }).sort(
