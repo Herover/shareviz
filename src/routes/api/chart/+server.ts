@@ -17,7 +17,7 @@ export async function GET({ locals }) {
   if (session == null || typeof user == "undefined" || typeof user.id != "string") {
     return json({ message: "invalid token" }, { status: 400 });
   }
-  const charts = await db.getUserCharts(user.id);
+  const charts = await db.getUserTeamCharts(user.id);
   return json({ charts }, { status: 200 });
   // return json({  }, { status: 200 });
 }

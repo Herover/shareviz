@@ -13,7 +13,7 @@
 <ul>
   {#each data.teams as team (team.teams.id)}
     <a
-      href={resolve("/(app)/org/[organizationId]/team/[teamId]/charts", {
+      href={resolve("/(app)/(main)/org/[organizationId]/team/[teamId]/charts", {
         organizationId: page.params.organizationId ?? "",
         teamId: team.teams.id,
       })}>{team.teams.name}</a

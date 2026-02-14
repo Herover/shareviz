@@ -15,7 +15,7 @@ export async function GET({ params, locals }) {
   }
 
   try {
-    const charts = await db.getUserCharts(user.id, params.id);
+    const charts = await db.getUserTeamCharts(user.id, params.id);
     if (charts.length == 0) {
       throw new Error("chart not found");
     }
@@ -38,7 +38,7 @@ export async function PUT({ params, request, locals }) {
 
   try {
     // Check if user can access chart
-    const charts = await db.getUserCharts(user.id, params.id);
+    const charts = await db.getUserTeamCharts(user.id, params.id);
     if (charts.length == 0) {
       throw new Error("chart not found");
     }

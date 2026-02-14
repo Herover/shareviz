@@ -19,7 +19,7 @@ const authorizeOrRejectUserOnChart = (userId, chartId) => {
     if (!userId) {
       reject("unauthorized");
     }
-    db.getUserCharts(userId, chartId)
+    db.getUserTeamCharts(userId, chartId)
       .then((charts) => {
         if (charts.length != 0) {
           resolve();
@@ -691,7 +691,7 @@ export function startServer(server) {
       next();
       return;
     }
-    db.getUserCharts(ctx.agent.custom.user.id, ctx.id)
+    db.getUserTeamCharts(ctx.agent.custom.user.id, ctx.id)
       .then((charts) => {
         // TODO: get rid of hard coded constant
         if (charts.length != 0 && (charts[0].relationType === 1 || charts[0].teamId !== null)) {
@@ -730,7 +730,7 @@ export function startServer(server) {
       next();
     } else if (typeof ctx.snapshot == "object") {
       // Only allow editing charts with write access
-      db.getUserCharts(ctx.agent.custom.user.id, ctx.id)
+      db.getUserTeamCharts(ctx.agent.custom.user.id, ctx.id)
         .then((charts) => {
           // TODO: get rid of hard coded constant
           if (

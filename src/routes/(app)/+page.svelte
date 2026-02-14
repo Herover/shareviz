@@ -13,7 +13,7 @@
   let returnURL = data.returnURL?.startsWith("/") ? data.returnURL : null;
 
   if (data.session?.user) {
-    goto(resolve("/(app)/org", {}));
+    goto(resolve("/(app)/(main)/me", {}));
   }
 
   if (data.msg) {
@@ -60,7 +60,7 @@
         <button type="submit">Login</button>
       </form>
     {:else}
-      <p>Redirecting you to <a href={resolve("/(app)/org", {})}>organization page</a>...</p>
+      <p>Redirecting you to <a href={resolve("/(app)/(main)/me", {})}>your page</a>...</p>
     {/if}
     <div class="hline"></div>
     <h2>Local editor</h2>

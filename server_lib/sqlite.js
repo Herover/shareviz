@@ -182,7 +182,7 @@ export const db = {
       .where(eq(usersOrganizations.userId, userId));
   },
 
-  getUserCharts: async (
+  getUserTeamCharts: async (
     /** @type {string} */ userId,
     /** @type {string | undefined} */ chartRef = undefined,
   ) => {
@@ -223,10 +223,6 @@ export const db = {
         folderId,
       })
       .returning({ id: charts.id });
-    await drizzledb.insert(userCharts).values({
-      chartId: chartRef[0].id,
-      userId,
-    });
 
     return chartRef[0].id;
   },
@@ -275,6 +271,26 @@ export const db = {
     //     resolve();
     //   }).finalize();
     // });
+  },
+
+  getUserCharts: async (
+    /** @type {string} */ userId,
+    /** @type {string | undefined} */ chartRef = undefined,
+  ) => {
+    return drizzledb
+      .select({
+        id: charts.id,
+        name: charts.name,
+        chartRef: charts.chartRef,
+        teamId: charts.teamId,
+        created: charts.created,
+        updated: charts.updated,
+      })
+      .from(userCharts)
+      .innerJoin(charts, eq(userCharts.chartId, charts.id))
+      .where(
+        and(eq(userCharts.userId, userId), chartRef ? eq(charts.chartRef, chartRef) : undefined),
+      );
   },
 
   /**

@@ -18,7 +18,7 @@
       const data = await r.json();
       message = data.message;
     } else {
-      goto(resolve("/(app)/org"));
+      goto(resolve("/(app)/(main)/me", {}));
     }
   });
 </script>
@@ -35,5 +35,5 @@
 {:else if $page.data.session?.user}
   <p>Unable to use this invite, was it for another email or has it expired?</p>
 {:else}
-  <p><a href={resolve("/")}>Sign in first</a>, and then return to this page.</p>
+  <p><a href={resolve("/", {})}>Sign in first</a>, and then return to this page.</p>
 {/if}

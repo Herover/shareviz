@@ -36,6 +36,6 @@ export const actions: Actions = {
 
     setSessionCookie(user.id, request, cookies, getClientAddress(), "password");
 
-    return redirect(303, "/org");
+    return redirect(303, "/me");
   },
 };

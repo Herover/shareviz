@@ -16,10 +16,10 @@ export const actions: Actions = {
     let returnURL = data.get("return_url");
 
     if (typeof returnURL != "string") {
-      returnURL = "/org";
+      returnURL = "/me";
     }
     if (!returnURL.startsWith("/") || returnURL.startsWith("//")) {
-      returnURL = "/org";
+      returnURL = "/me";
     }
 
     if (typeof username != "string" /* || typeof password != "string" */) {
@@ -82,6 +82,6 @@ export const actions: Actions = {
     const pwHash = await hash(newPassword, { salt: salt });
     await db.addUserPasswordLogin(locals.session.user.id, pwHash, salt.toString("base64"));
 
-    return redirect(303, "/org");
+    return redirect(303, "/me");
   },
 };

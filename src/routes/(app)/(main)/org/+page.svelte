@@ -13,7 +13,7 @@
   {#each $page.data.organizations as organization (organization.id)}
     <p>
       <a
-        href={resolve("/(app)/org/[organizationId]/team", {
+        href={resolve("/(app)/(main)/org/[organizationId]/team", {
           organizationId: organization.organizations.id,
         })}
       >
