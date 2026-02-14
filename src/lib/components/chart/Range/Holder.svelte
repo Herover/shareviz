@@ -21,7 +21,6 @@
       charts = formatData(componentSpec, data);
     }),
   );
-  $inspect(data)
 
   let realWidth = $derived(chartWidth - chartSpec.style.marginLeft - chartSpec.style.marginRight);
   let rangeLabelWidths: { width: number }[] = $state([]);

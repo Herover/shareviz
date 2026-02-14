@@ -17,15 +17,17 @@ export const formatData = (componentSpec: RangeElement, data: ComputedData) => {
           label: componentSpec.categoryKeys.find((c) => c.k == k2)?.label.text ?? k2,
           key: k2,
           d: g2,
-          value: g2.map((d) => ({
-            v: d[componentSpec.pointValue],
-            s: componentSpec.rangeCategoryKeys.find((dd) => d[componentSpec.pointLabel] == dd.k),
-            // c: componentSpec.rangeCategoryKeys.find(s => s.k == d.)
-          })).sort(
-            (a, b) => 
-              negativeOneToInf(componentSpec.rangeCategoryKeys.findIndex((e) => e.k == b.s?.k)) - 
-              negativeOneToInf(componentSpec.rangeCategoryKeys.findIndex((e) => e.k == a.s?.k)),
-          ),
+          value: g2
+            .map((d) => ({
+              v: d[componentSpec.pointValue],
+              s: componentSpec.rangeCategoryKeys.find((dd) => d[componentSpec.pointLabel] == dd.k),
+              // c: componentSpec.rangeCategoryKeys.find(s => s.k == d.)
+            }))
+            .sort(
+              (a, b) =>
+                negativeOneToInf(componentSpec.rangeCategoryKeys.findIndex((e) => e.k == b.s?.k)) -
+                negativeOneToInf(componentSpec.rangeCategoryKeys.findIndex((e) => e.k == a.s?.k)),
+            ),
           i: n++,
         };
       }).sort(
