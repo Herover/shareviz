@@ -165,6 +165,7 @@
             spellcheck="false"
             onblur={(e) => editText("sourceLeft", e)}
             class="source-block"
+            target="_parent"
           >
           </a>
         {:else}
@@ -172,6 +173,7 @@
           <a
             href={editor ? null : chartSpec.chart.sourceTextLeftLink}
             class="source-block"
+            target="_parent"
             onblur={(e) => editText("sourceLeft", e)}>{chartSpec.chart.sourceTextLeft}</a
           >
         {/if}
@@ -188,6 +190,7 @@
             spellcheck="false"
             onblur={(e) => editText("sourceRight", e)}
             class="source-block"
+            target="_parent"
           >
           </a>
         {:else}
@@ -195,6 +198,7 @@
           <a
             href={editor ? null : chartSpec.chart.sourceTextRightLink}
             class="source-block"
+            target="_parent"
             onblur={(e) => editText("sourceRight", e)}>{chartSpec.chart.sourceTextRight}</a
           >
         {/if}
