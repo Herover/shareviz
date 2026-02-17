@@ -17,9 +17,8 @@ export async function GET({ locals }) {
   if (session == null || typeof user == "undefined" || typeof user.id != "string") {
     return json({ message: "invalid token" }, { status: 400 });
   }
-  const charts = await db.getUserTeamCharts(user.id);
+  const charts = await db.getUserCharts(user.id);
   return json({ charts }, { status: 200 });
-  // return json({  }, { status: 200 });
 }
 
 export async function POST({ request, locals }) {
@@ -30,7 +29,12 @@ export async function POST({ request, locals }) {
     return json({ message: "invalid token" }, { status: 400 });
   }
 
-  const { teamId, folderId, data }: { teamId?: string; folderId?: string; data?: string } =
+  const {
+    teamId,
+    folderId,
+    data,
+    isUserChart,
+  }: { teamId?: string; folderId?: string; data?: string; isUserChart?: boolean } =
     await request.json();
 
   let docData: Root;
@@ -60,5 +64,10 @@ export async function POST({ request, locals }) {
   );
 
   const id = await db.addChart(ref, "Chart name", user.id, teamId, folderId);
+
+  if (isUserChart) {
+    await db.addUserChart(user.id, id);
+  }
+
   return json({ message: "ok", id, ref }, { status: 200 });
 }

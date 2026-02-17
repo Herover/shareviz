@@ -230,15 +230,10 @@ export const db = {
   /**
    * @returns {Promise<boolean>} add a new user-chart relation
    */
-  addUserChart: async (
-    /** @type {string} */ userId,
-    /** @type {string} */ chartId,
-    /** @type {number} */ _typeId,
-  ) => {
+  addUserChart: async (/** @type {string} */ userId, /** @type {string} */ chartId) => {
     const res = await drizzledb.insert(userCharts).values({
       userId,
       chartId,
-      // typeId,
     });
     // .returning({ id: userCharts.id });
     return res.changes != 0;

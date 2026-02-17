@@ -12,7 +12,7 @@
 
   interface Props {
     contents: FolderItem[];
-    onCreateFolder: (parentId?: string) => void;
+    onCreateFolder?: (parentId?: string) => void;
     onAddChart: (folderId?: string) => void;
     onUpdate: () => void;
     path: string[];
@@ -133,11 +133,13 @@
       <th style:width="2em"></th>
       <th>
         Name
-        <button
-          onclick={() => onCreateFolder(path.length == 0 ? undefined : path[path.length - 1])}
-        >
-          + Folder
-        </button>
+        {#if typeof onCreateFolder == "function"}
+          <button
+            onclick={() => onCreateFolder(path.length == 0 ? undefined : path[path.length - 1])}
+          >
+            + Folder
+          </button>
+        {/if}
         <button onclick={() => onAddChart(path.length == 0 ? undefined : path[path.length - 1])}>
           + Chart
         </button>

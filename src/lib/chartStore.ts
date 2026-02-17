@@ -132,12 +132,18 @@ export const db = (function createDB() {
           );
       }
     },
-    create: (synced: boolean, teamId?: string, folderId?: string, data?: string) => {
+    create: (
+      synced: boolean,
+      teamId?: string,
+      folderId?: string,
+      data?: string,
+      isUserChart?: boolean,
+    ) => {
       return new Promise<string>((resolve, reject) => {
         if (synced) {
           fetch("/api/chart", {
             method: "POST",
-            body: JSON.stringify({ teamId, folderId, data }),
+            body: JSON.stringify({ teamId, folderId, data, isUserChart }),
           })
             .then((res) => res.json())
             .then((data) => {

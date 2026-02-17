@@ -24,6 +24,13 @@ const authorizeOrRejectUserOnChart = (userId, chartId) => {
         if (charts.length != 0) {
           resolve();
         } else {
+          return db.getUserCharts(userId, chartId);
+        }
+      })
+      .then((charts) => {
+        if (charts.length != 0) {
+          resolve();
+        } else {
           reject("unauthorized");
         }
       })
@@ -729,30 +736,9 @@ export function startServer(server) {
       //   .catch((e) => next(e));
       next();
     } else if (typeof ctx.snapshot == "object") {
-      // Only allow editing charts with write access
-      db.getUserTeamCharts(ctx.agent.custom.user.id, ctx.id)
-        .then((charts) => {
-          // TODO: get rid of hard coded constant
-          if (
-            charts.length != 0 /* && (charts[0].relationType === 1 || charts[0].teamId !== null) */
-          ) {
-            next();
-          } else {
-            ctx.agent.custom.logger.log("unauthorized apply", {
-              collection: ctx.collection,
-              id: ctx.id,
-            });
-            next("unauthorized");
-          }
-        })
+      authorizeOrRejectUserOnChart(ctx.agent.custom.user.id, ctx.id)
+        .then(() => next())
         .catch((e) => next(e));
-      // const entry = ctx.snapshot?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
-      // if (entry?.write) {
-      //   next();
-      // } else {
-      //   ctx.agent.custom.logger.log(`unauthorized apply on ${ctx.collection} ${ctx.id}`);
-      //   next("unauthorized");
-      // }
     } else {
       ctx.agent.custom.logger.log("unknown apply", { collection: ctx.collection, id: ctx.id });
       next("unauthorized");

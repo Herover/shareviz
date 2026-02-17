@@ -4,7 +4,6 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { notifications } from "$lib/notificationStore";
-  import { user } from "$lib/userStore";
   import { db as chartStore } from "$lib/chartStore";
   import { onDestroy, onMount } from "svelte";
   import { addFolder, getTeam } from "$lib/api";
@@ -22,26 +21,10 @@
   let promptSpec = $state(false);
   let importChartData = $state("");
 
-  let teamId: string | undefined = $derived(page.params.teamId);
+  let teamId: string = $derived(page.params.teamId);
   let directory: FolderItem[] = $state([]);
   $effect(() => {
-    if (typeof teamId == "undefined") {
-      user
-        .geUserCharts()
-        .then((c) => {
-          directory = c.map((c) => ({
-            type: "file",
-            chartRef: c.chartRef,
-            id: c.id,
-            name: c.name,
-            created: c.created,
-            updated: c.updated,
-          }));
-        })
-        .catch((e) => notifications.addError(e.message));
-    } else {
-      updateTeam(teamId);
-    }
+    updateTeam(teamId);
   });
   const updateTeam = async (teamId: string) => {
     const c = await getTeam(teamId);
@@ -133,8 +116,8 @@
   <h3>{data.team?.teams?.name || "Your charts"}</h3>
   <ChartList
     contents={directory}
-    onCreateFolder={(parentId) => teamId && onAddFolder("New folder", teamId, parentId)}
-    onUpdate={() => teamId && updateTeam(teamId)}
+    onCreateFolder={(parentId) => onAddFolder("New folder", teamId, parentId)}
+    onUpdate={() => updateTeam(teamId)}
     onAddChart={(id) => newGraphic(true, id)}
     basePath={`/org/${page.params["organizationId"]}/team/${teamId}/charts`}
     path={folderPath}
