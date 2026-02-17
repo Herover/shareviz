@@ -97,6 +97,18 @@
     }
     ${chartSpec.style.css}
   `);
+
+  const cleanupLink = (url: string) => {
+    if (!url) {
+      return null;
+    }
+
+    if (!url.startsWith("https://") || !url.startsWith("http://")) {
+      return "https://" + url;
+    }
+
+    return url;
+  };
 </script>
 
 <div>
@@ -159,7 +171,7 @@
           <!-- Disabled as it's not applicaple when innerText is set by svelte -->
           <!-- svelte-ignore a11y_consider_explicit_label -->
           <a
-            href={editor ? null : chartSpec.chart.sourceTextLeftLink}
+            href={editor ? null : cleanupLink(chartSpec.chart.sourceTextLeftLink)}
             bind:innerText={chartSpec.chart.sourceTextLeft}
             contenteditable="true"
             spellcheck="false"
@@ -171,7 +183,7 @@
         {:else}
           <!-- svelte/no-navigation-without-resolve -->
           <a
-            href={editor ? null : chartSpec.chart.sourceTextLeftLink}
+            href={editor ? null : cleanupLink(chartSpec.chart.sourceTextLeftLink)}
             class="source-block"
             target="_parent"
             onblur={(e) => editText("sourceLeft", e)}>{chartSpec.chart.sourceTextLeft}</a
@@ -184,7 +196,7 @@
           <!-- svelte-ignore a11y_consider_explicit_label -->
           <!-- svelte/no-navigation-without-resolve -->
           <a
-            href={editor ? null : chartSpec.chart.sourceTextRightLink}
+            href={editor ? null : cleanupLink(chartSpec.chart.sourceTextRightLink)}
             bind:innerText={chartSpec.chart.sourceTextRight}
             contenteditable="true"
             spellcheck="false"
@@ -196,7 +208,7 @@
         {:else}
           <!-- svelte/no-navigation-without-resolve -->
           <a
-            href={editor ? null : chartSpec.chart.sourceTextRightLink}
+            href={editor ? null : cleanupLink(chartSpec.chart.sourceTextRightLink)}
             class="source-block"
             target="_parent"
             onblur={(e) => editText("sourceRight", e)}>{chartSpec.chart.sourceTextRight}</a
