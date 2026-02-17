@@ -103,7 +103,7 @@
       return null;
     }
 
-    if (!url.startsWith("https://") || !url.startsWith("http://")) {
+    if (!url.startsWith("https://") && !url.startsWith("http://")) {
       return "https://" + url;
     }
 
