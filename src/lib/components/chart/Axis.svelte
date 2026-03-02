@@ -202,8 +202,7 @@
         }));
 
         // Auto but only if there's no manual
-        scaleLinear([from, to], [0, 1])
-          .nice()
+        (scale as ReturnType<typeof scaleLinear>)
           .ticks(n)
           .forEach((tick) => {
             if (ticks.findIndex((d) => d.n == tick) == -1)
@@ -222,8 +221,7 @@
         const ticks: typeof majorTicks = [];
 
         // Auto but only if there's no manual
-        scaleTime([new Date(from), new Date(to)], [0, 1])
-          .nice()
+        (scale as ReturnType<typeof scaleTime>)
           .ticks(n)
           .forEach((tick) => {
             if (ticks.findIndex((d) => d.n == tick) == -1)
