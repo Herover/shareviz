@@ -202,18 +202,16 @@
         }));
 
         // Auto but only if there's no manual
-        (scale as ReturnType<typeof scaleLinear>)
-          .ticks(n)
-          .forEach((tick) => {
-            if (ticks.findIndex((d) => d.n == tick) == -1)
-              ticks.push({
-                l: axis.auto.labels
-                  ? formatNumber(tick, axis.labelDivide, axis.labelThousands) + axis.afterLabel
-                  : "",
-                n: tick,
-                textAnchor: "middle",
-              });
-          });
+        (scale as ReturnType<typeof scaleLinear>).ticks(n).forEach((tick) => {
+          if (ticks.findIndex((d) => d.n == tick) == -1)
+            ticks.push({
+              l: axis.auto.labels
+                ? formatNumber(tick, axis.labelDivide, axis.labelThousands) + axis.afterLabel
+                : "",
+              n: tick,
+              textAnchor: "middle",
+            });
+        });
 
         return ticks;
       } else if (to instanceof Date && from instanceof Date) {
@@ -221,16 +219,14 @@
         const ticks: typeof majorTicks = [];
 
         // Auto but only if there's no manual
-        (scale as ReturnType<typeof scaleTime>)
-          .ticks(n)
-          .forEach((tick) => {
-            if (ticks.findIndex((d) => d.n == tick) == -1)
-              ticks.push({
-                l: "" + dayjs(tick).format("YYYY"),
-                n: tick,
-                textAnchor: "middle",
-              });
-          });
+        (scale as ReturnType<typeof scaleTime>).ticks(n).forEach((tick) => {
+          if (ticks.findIndex((d) => d.n == tick) == -1)
+            ticks.push({
+              l: "" + dayjs(tick).format("YYYY"),
+              n: tick,
+              textAnchor: "middle",
+            });
+        });
 
         return ticks;
       }

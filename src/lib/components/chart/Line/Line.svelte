@@ -19,6 +19,7 @@
   import { createEventDispatcher } from "svelte";
   import { chartToEditor } from "$lib/chartToEditorStore.svelte";
   import { fontStore } from "$lib/fontStore.svelte";
+  import AxisLabels from "./AxisLabels.svelte";
 
   interface Props {
     values: {
@@ -183,6 +184,38 @@
       ? (chartToEditor.highlight[2] as string)
       : null,
   );
+
+  let labelItems = $derived(
+    values
+      .filter(
+        (d) =>
+          getStyle(d.key).label.location == LabelLocation.Left ||
+          getStyle(d.key).label.location == LabelLocation.Right,
+      )
+      .reduce<{ color: string; text: string; y: number; key: string }[]>((acc, d, i) => {
+        if (i == 0) {
+          acc.push({
+            color: getStyle(d.key).label.color.light.c,
+            text: getStyle(d.key).label.text,
+            y: yScale(d.value[d.value.length - 1].to),
+            key: d.key,
+          });
+        } else {
+          if (acc[acc.length - 1].key == d.key) {
+            acc[acc.length - 1].y = yScale(d.value[d.value.length - 1].to);
+          } else {
+            acc.push({
+              color: getStyle(d.key).label.color.light.c,
+              text: getStyle(d.key).label.text,
+              y: yScale(d.value[d.value.length - 1].to),
+              key: d.key,
+            });
+          }
+        }
+        return acc;
+      }, [])
+      .sort((a, b) => a.y - b.y),
+  );
 </script>
 
 <svg {width} height={height + topMargin + bottomMargin + lineSpec.x.axis.major.tickWidth * 2}>
@@ -273,35 +306,31 @@
     {/if}
 
     <g bind:contentRect={labelBox}>
-      {#each values as d, i (i)}
-        {#if getStyle(d.key).label.location == LabelLocation.Right}
-          {#if values.length == i + 1 || values[i + 1].key !== d.key}
-            <text
-              x={xScale(d.value[d.value.length - 1].x) + labelOffset}
-              y={yScale(d.value[d.value.length - 1].to)}
-              fill={getStyle(d.key).label.color.light.c}
-              paint-order="stroke"
-              stroke="var(--background-color)"
-              stroke-width={3}
-              dominant-baseline="middle"
-              text-anchor="start">{getStyle(d.key).label.text}</text
-            >
-          {/if}
-        {:else if getStyle(d.key).label.location == LabelLocation.Left}
-          {#if i == 0 || values[i - 1].key !== d.key}
-            <text
-              x={xScale(d.value[0].x) - labelOffset}
-              y={yScale(d.value[0].to)}
-              fill={getStyle(d.key).label.color.light.c}
-              paint-order="stroke"
-              stroke="var(--background-color)"
-              stroke-width={3}
-              dominant-baseline="middle"
-              text-anchor="end">{getStyle(d.key).label.text}</text
-            >
-          {/if}
-        {/if}
-      {/each}
+      {#if values.some((d) => getStyle(d.key).label.location == LabelLocation.Left || getStyle(d.key).label.location == LabelLocation.Right)}
+        <AxisLabels
+          align={getStyle(
+            values.find(
+              (d) =>
+                getStyle(d.key).label.location == LabelLocation.Left ||
+                getStyle(d.key).label.location == LabelLocation.Right,
+            )?.key ?? "",
+          ).label.location == LabelLocation.Right
+            ? "left"
+            : "right"}
+          x={values.length == 0
+            ? 0
+            : getStyle(
+                  values.find(
+                    (d) =>
+                      getStyle(d.key).label.location == LabelLocation.Left ||
+                      getStyle(d.key).label.location == LabelLocation.Right,
+                  )?.key ?? "",
+                ).label.location == LabelLocation.Right
+              ? xScale.range()[1] + labelOffset
+              : xScale.range()[0] - labelOffset}
+          items={labelItems}
+        />
+      {/if}
     </g>
     {#each values as d, i (i)}
       {#if getStyle(d.key).symbols == LineSymbol.CIRCLE}
