@@ -265,6 +265,45 @@
         : [],
     );
   let minorTicks = $derived(scale ? genTicks(15, conf.minor) : []);
+
+  let majorTickBoxes: DOMRect[] = $state([]);
+  let majorTickBoxes2: DOMRect[] = $derived(majorTickBoxes.slice(0, majorTicks.length ?? 0));
+  let majorTickVisibility = $derived.by(() => {
+    let acc: ({ visible: boolean; x2: number } | undefined)[] = [];
+    for (let i = 0; i < majorTickBoxes2.length; i++) {
+      const d = majorTickBoxes2[i];
+
+      // Tick without label
+      if (!d) {
+        acc.push(undefined);
+        continue;
+      }
+
+      const tick = majorTicks[i];
+      const x = scale ? scale(tick.n) : 0;
+      const right =
+        tick.textAnchor == "end" ? 0 : tick.textAnchor == "start" ? d.width : d.width / 2;
+      const left =
+        tick.textAnchor == "end" ? -d.width : tick.textAnchor == "start" ? 0 : -d.width / 2;
+      const x2 = x + right;
+
+      let prevX2Overlaps = false;
+      for (let ii = acc.length; ii >= 0; ii--) {
+        const dd = acc[ii];
+        if (typeof dd != "undefined" && dd.visible && dd.x2 > x + left) {
+          prevX2Overlaps = true;
+          break;
+        }
+      }
+
+      acc.push({
+        visible: !prevX2Overlaps,
+        x2,
+      });
+    }
+
+    return acc;
+  });
 </script>
 
 <text bind:contentRect={testBox} aria-hidden="true" visibility="hidden">123</text>
@@ -321,13 +360,27 @@
 
           {#if showLabels}
             {#if conf.location == AxisLocation.START && tick.l}
-              <text text-anchor={tick.textAnchor} dy="1em" x={scale(tick.n)}>{tick.l}</text>
+              <text
+                text-anchor={tick.textAnchor}
+                dy="1em"
+                x={scale(tick.n)}
+                visibility={majorTickVisibility[i]?.visible ? null : "hidden"}
+                aria-hidden={majorTickVisibility[i]?.visible ? null : "true"}
+                bind:contentRect={majorTickBoxes[i]}
+              >
+                {tick.l}
+              </text>
             {:else if conf.location == AxisLocation.END && tick.l}
               <text
                 text-anchor={tick.textAnchor}
                 y={height + conf.major.tickSize + size}
-                x={scale(tick.n)}>{tick.l}</text
+                x={scale(tick.n)}
+                visibility={majorTickVisibility[i]?.visible ? null : "hidden"}
+                aria-hidden={majorTickVisibility[i]?.visible ? null : "true"}
+                bind:contentRect={majorTickBoxes[i]}
               >
+                {tick.l}
+              </text>
             {/if}
 
             <!-- Used to calculate labels overflowing outside of chart area -->
