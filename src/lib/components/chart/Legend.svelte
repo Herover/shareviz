@@ -3,18 +3,24 @@
 <script lang="ts">
   let {
     keys,
+    indicator,
   }: {
     keys: { color: string; legend: string }[];
+    indicator?: (d: any) => ReturnType<import("svelte").Snippet>;
   } = $props();
 </script>
 
 <p>
   {#each keys as d, i (i)}
     {#if d.legend != ""}
-      <span class="legend-title"
-        ><span style="background-color:{d.color}" class="legend-box"></span>
-        {d.legend}</span
-      >
+      <span class="legend-title">
+        {#if indicator}
+          {@render indicator(d)}
+        {:else}
+          <span style="background-color:{d.color}" class="legend-box"></span>
+        {/if}
+        {d.legend}
+      </span>
     {/if}
   {/each}
 </p>

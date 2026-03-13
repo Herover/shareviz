@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  import { LabelLocation, type Root, type Line as lineType } from "$lib/chart";
+  import { LabelLocation, type LineStyleKey, type Root, type Line as lineType } from "$lib/chart";
   import { max, min } from "d3-array";
   import Line from "./Line.svelte";
   import { formatData } from "./data";
@@ -74,13 +74,31 @@
           s.label.text != "" &&
           charts.findIndex((c) => c.d.findIndex((d) => d.key == s.k) != -1) != -1,
       )
-      .map((d) => ({ color: d.color.light.c, legend: d.label.text })),
+      .map((d) => ({ color: d.color.light.c, legend: d.label.text, style: d })),
   );
 </script>
 
 <!-- TODO: Should probably be a toggle setting -->
+{#snippet legendIndicator(d: { style: LineStyleKey })}
+  <svg
+    style:line-height="1"
+    style:width="1.25em"
+    style:height="1em"
+    style:display="inline-block"
+    viewBox="0 0 20 16"
+  >
+    <line
+      x1="0"
+      x2="16"
+      y1="10"
+      y2="10"
+      stroke={d.style.color.light.c}
+      stroke-width={d.style.width}
+    />
+  </svg>
+{/snippet}
 {#if componentSpec.style.byKey.length != 0}
-  <Legend keys={legendKeys} />
+  <Legend keys={legendKeys} indicator={legendIndicator} />
 {/if}
 
 <div class="line-charts">
