@@ -542,6 +542,10 @@ export function startServer(server) {
   wss.on("connection", function (ws, req) {
     var stream = new WebSocketJSONStream(ws);
 
+    stream.on("error", (error) => {
+      logger.log("stream error", { error });
+    });
+
     const cookies = req.headers.cookie
       ? req.headers.cookie.split(";").reduce((acc, part) => {
           const [key, value] = part.trim().split("=");
