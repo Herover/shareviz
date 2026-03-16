@@ -1,8 +1,22 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { ComputedData } from "$lib/data";
-import type { Line } from "../../../chart";
+import type { Line, LineStyleKey } from "../../../chart";
 import { group, negativeOneToInf } from "../../../utils";
+
+const getStyle = (componentSpec: Line, k: string) => {
+  const style = componentSpec.style.byKey.find((s) => s.k == k);
+  if (style) return style;
+  else {
+    const def = {
+      ...componentSpec.style.default,
+      label: { ...componentSpec.style.default.label },
+    };
+    def.label.text = def.label.text == "" ? "" : k;
+
+    return def;
+  }
+};
 
 export const formatData = (componentSpec: Line, data: ComputedData) =>
   group(componentSpec.repeat, data[componentSpec.dataSet]?.data ?? [], (k1, g1) => {
@@ -69,6 +83,7 @@ export const formatData = (componentSpec: Line, data: ComputedData) =>
                   label: line.label,
                   key: line.key,
                   type: "line",
+                  settings: getStyle(componentSpec, line.key),
                   value,
                 });
                 if (i != arr.length - 1) {
@@ -76,6 +91,7 @@ export const formatData = (componentSpec: Line, data: ComputedData) =>
                     label: line.label,
                     key: line.key,
                     type: "missing",
+                    settings: getStyle(componentSpec, line.key),
                     value: [{ ...value[value.length - 1] }, { ...arr[i + 1][0] }],
                   });
                 }
@@ -86,6 +102,7 @@ export const formatData = (componentSpec: Line, data: ComputedData) =>
             label: string;
             key: string;
             type: "missing" | "line";
+            settings: LineStyleKey;
             value: { x: number | Date; y: number; to: number; from: number }[];
           }[],
         ),

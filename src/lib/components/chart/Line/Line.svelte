@@ -9,6 +9,7 @@
     LineMissingStyle,
     LineSymbol,
     type Line,
+    type LineStyleKey,
     type Root,
   } from "$lib/chart";
   import { orDefault, orNumber, valueKinds, valueParsers } from "$lib/utils";
@@ -26,6 +27,7 @@
       label: string;
       key: string;
       type: "missing" | "line";
+      settings: LineStyleKey;
       isContext?: boolean;
       value: {
         x: number | Date;
@@ -165,20 +167,6 @@
       .y((d) => yScale(d.y)),
   );
 
-  let getStyle = $derived((k: string) => {
-    const style = lineSpec.style.byKey.find((s) => s.k == k);
-    if (style) return style;
-    else {
-      const def = {
-        ...lineSpec.style.default,
-        label: { ...lineSpec.style.default.label },
-      };
-      def.label.text = def.label.text == "" ? "" : k;
-
-      return def;
-    }
-  });
-
   let higlight = $derived(
     chartToEditor.highlight[0] == "elements" && chartToEditor.highlight[1] == index
       ? (chartToEditor.highlight[2] as string)
@@ -189,14 +177,14 @@
     values
       .filter(
         (d) =>
-          getStyle(d.key).label.location == LabelLocation.Left ||
-          getStyle(d.key).label.location == LabelLocation.Right,
+          d.settings.label.location == LabelLocation.Left ||
+          d.settings.label.location == LabelLocation.Right,
       )
       .reduce<{ color: string; text: string; y: number; key: string }[]>((acc, d, i) => {
         if (i == 0) {
           acc.push({
-            color: getStyle(d.key).label.color.light.c,
-            text: getStyle(d.key).label.text,
+            color: d.settings.label.color.light.c,
+            text: d.settings.label.text,
             y: yScale(d.value[d.value.length - 1].to),
             key: d.key,
           });
@@ -205,8 +193,8 @@
             acc[acc.length - 1].y = yScale(d.value[d.value.length - 1].to);
           } else {
             acc.push({
-              color: getStyle(d.key).label.color.light.c,
-              text: getStyle(d.key).label.text,
+              color: d.settings.label.color.light.c,
+              text: d.settings.label.text,
               y: yScale(d.value[d.value.length - 1].to),
               key: d.key,
             });
@@ -258,16 +246,14 @@
                   .reverse(),
               ),
           )}
-          fill={d.isContext ? getStyle(d.key).contextColor.light.c : getStyle(d.key).color.light.c}
+          fill={d.isContext ? d.settings.contextColor.light.c : d.settings.color.light.c}
         />
       {/each}
       {#each values as d, i (i)}
         <path
           d={draw(d.value.map((e) => ({ x: e.x, y: e.to })))}
-          stroke={d.isContext
-            ? getStyle(d.key).contextColor.light.c
-            : getStyle(d.key).color.light.c}
-          stroke-width={getStyle(d.key).width}
+          stroke={d.isContext ? d.settings.contextColor.light.c : d.settings.color.light.c}
+          stroke-width={d.settings.width}
           fill="none"
         />
       {/each}
@@ -281,24 +267,21 @@
                 { ...d.value[0], y: 0 },
               ]),
             )}
-            fill={d.isContext
-              ? getStyle(d.key).contextColor.light.c
-              : getStyle(d.key).color.light.c}
+            fill={d.isContext ? d.settings.contextColor.light.c : d.settings.color.light.c}
           />
         {/each}
       {/if}
       {#each values as d, i (i)}
         <path
           d={draw(d.value)}
-          stroke={d.type == "missing" && getStyle(d.key).missingStyle == LineMissingStyle.NONE
+          stroke={d.type == "missing" && d.settings.missingStyle == LineMissingStyle.NONE
             ? "none"
             : d.isContext
-              ? getStyle(d.key).contextColor.light.c
-              : getStyle(d.key).color.light.c}
-          stroke-width={higlight === d.key ? getStyle(d.key).width + 2 : getStyle(d.key).width}
+              ? d.settings.contextColor.light.c
+              : d.settings.color.light.c}
+          stroke-width={higlight === d.key ? d.settings.width + 2 : d.settings.width}
           fill="none"
-          stroke-dasharray={d.type == "line" ||
-          getStyle(d.key).missingStyle == LineMissingStyle.LINE
+          stroke-dasharray={d.type == "line" || d.settings.missingStyle == LineMissingStyle.LINE
             ? null
             : "3"}
         />
@@ -306,26 +289,22 @@
     {/if}
 
     <g bind:contentRect={labelBox}>
-      {#if values.some((d) => getStyle(d.key).label.location == LabelLocation.Left || getStyle(d.key).label.location == LabelLocation.Right)}
+      {#if values.some((d) => d.settings.label.location == LabelLocation.Left || d.settings.label.location == LabelLocation.Right)}
         <AxisLabels
-          align={getStyle(
-            values.find(
+          align={values.find(
               (d) =>
-                getStyle(d.key).label.location == LabelLocation.Left ||
-                getStyle(d.key).label.location == LabelLocation.Right,
-            )?.key ?? "",
-          ).label.location == LabelLocation.Right
+              d.settings.label.location == LabelLocation.Left ||
+              d.settings.label.location == LabelLocation.Right,
+          )?.settings.label.location == LabelLocation.Right
             ? "left"
             : "right"}
           x={values.length == 0
             ? 0
-            : getStyle(
-                  values.find(
+            : values.find(
                     (d) =>
-                      getStyle(d.key).label.location == LabelLocation.Left ||
-                      getStyle(d.key).label.location == LabelLocation.Right,
-                  )?.key ?? "",
-                ).label.location == LabelLocation.Right
+                    d.settings.label.location == LabelLocation.Left ||
+                    d.settings.label.location == LabelLocation.Right,
+                )?.settings.label.location == LabelLocation.Right
               ? xScale.range()[1] + labelOffset
               : xScale.range()[0] - labelOffset}
           items={labelItems}
@@ -333,13 +312,13 @@
       {/if}
     </g>
     {#each values as d, i (i)}
-      {#if getStyle(d.key).symbols == LineSymbol.CIRCLE}
+      {#if d.settings.symbols == LineSymbol.CIRCLE}
         {#each d.value as value, i (i)}
           <circle
             cx={xScale(value.x)}
             cy={yScale(value.y)}
-            fill={getStyle(d.key).label.color.light.c}
-            r={getStyle(d.key).width * 2}
+            fill={d.settings.label.color.light.c}
+            r={d.settings.width * 2}
           />
         {/each}
       {/if}
