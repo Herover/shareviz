@@ -98,7 +98,7 @@
   </svg>
 {/snippet}
 {#if componentSpec.style.byKey.length != 0}
-  <Legend keys={legendKeys} indicator={legendIndicator} />
+  <Legend keys={legendKeys} indicator={componentSpec.stack ? undefined : legendIndicator} />
 {/if}
 
 <div class="line-charts">
