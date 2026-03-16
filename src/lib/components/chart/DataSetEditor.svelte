@@ -102,7 +102,7 @@
   >
 
   <h4 class="editor-sub-section">Columns</h4>
-  {#each dataStore.data.rows as column, i (column.key)}
+  {#each dataStore.data.rows as column, i (i)}
     <div class="box">
       <div class="w-05 editor-explain-box text-align-right">
         "{column.key}"

@@ -109,7 +109,7 @@
         onchange={(e) => lineStore.setXKey(e.currentTarget.value)}
       >
         <option></option>
-        {#each columns as row (row.key)}
+        {#each columns as row, i (i)}
           <option>{row.key}</option>
         {/each}
       </select>
@@ -123,7 +123,7 @@
         onchange={(e) => lineStore.setYKey(e.currentTarget.value)}
       >
         <option></option>
-        {#each columns as row (row.key)}
+        {#each columns as row, i (i)}
           <option>{row.key}</option>
         {/each}
       </select>
@@ -139,7 +139,7 @@
         onchange={(e) => lineStore.setCategoriesKey(e.currentTarget.value)}
       >
         <option></option>
-        {#each columns as row (row.key)}
+        {#each columns as row, i (i)}
           <option>{row.key}</option>
         {/each}
       </select>
@@ -200,7 +200,7 @@
         }}
       >
         <option></option>
-        {#each columns as row (row.key)}
+        {#each columns as row, i (i)}
           <option>{row.key}</option>
         {/each}
       </select>
