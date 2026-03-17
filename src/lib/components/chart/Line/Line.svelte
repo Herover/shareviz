@@ -66,7 +66,41 @@
   }>();
 
   let labelBox: DOMRect | undefined = $state();
-  let topMargin = $state(0);
+  let yAxisTop = $state(0);
+  let topLine = $derived.by(() => {
+    const top = values.reduce<{ n: number | null; settings: LineStyleKey | null }>(
+      (acc, line) => {
+        const n = line.value.reduce((acc, point) => Math.min(point.y, acc), 0);
+
+        if (acc.n == null) {
+          return {
+            n,
+            settings: line.settings,
+          };
+        }
+
+        if (acc.n < n) {
+          return {
+            n,
+            settings: line.settings,
+          };
+        }
+
+        return acc;
+      },
+      {
+        n: null,
+        settings: null,
+      },
+    );
+
+    if (top.n != null && top.settings != null) {
+      return top.n + top.settings.symbols != LineSymbol.NONE ? top.settings.width * 2 : 0;
+    }
+
+    return 0;
+  });
+  let topMargin = $derived(Math.max(yAxisTop, topLine));
   let bottomMargin = $state(0);
   const labelOffset = 16;
   // $inspect(topMargin, bottomMargin).with(console.log)
@@ -216,7 +250,7 @@
       conf={lineSpec.y.axis}
       dimensions={(d) => {
         yAxisWidth = d.width;
-        topMargin = Math.max(-(d.topPos ?? 0), 0);
+        yAxisTop = Math.max(-(d.topPos ?? 0), 0);
       }}
       row={dataSet?.rows.find((e) => e.key == lineSpec.y.key)}
     />
@@ -292,7 +326,7 @@
       {#if values.some((d) => d.settings.label.location == LabelLocation.Left || d.settings.label.location == LabelLocation.Right)}
         <AxisLabels
           align={values.find(
-              (d) =>
+            (d) =>
               d.settings.label.location == LabelLocation.Left ||
               d.settings.label.location == LabelLocation.Right,
           )?.settings.label.location == LabelLocation.Right
@@ -301,7 +335,7 @@
           x={values.length == 0
             ? 0
             : values.find(
-                    (d) =>
+                  (d) =>
                     d.settings.label.location == LabelLocation.Left ||
                     d.settings.label.location == LabelLocation.Right,
                 )?.settings.label.location == LabelLocation.Right
