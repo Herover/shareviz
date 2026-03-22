@@ -237,6 +237,7 @@
   h1.title {
     margin-top: 0px;
     font-size: 2em;
+    font-weight: normal;
   }
   p.subtitle {
     font-size: 1.1em;
