@@ -47,10 +47,16 @@
   const barMargin = 0;
   const blockMargin = 16;
   let legendHeight = 0;
+  let rightOverflow = $state(0);
 
   let labelOverflows: number[] = $state([]);
   $effect(() => {
-    labelOverflow(labelOverflows.slice(0, values.length).reduce((acc, n) => Math.max(acc, n), 0));
+    labelOverflow(
+      Math.max(
+        labelOverflows.slice(0, values.length).reduce((acc, n) => Math.max(acc, n), 0),
+        rightOverflow,
+      ),
+    );
   });
 
   let scaleHeight = $derived(
@@ -130,6 +136,9 @@
       conf={hBarSpec.axis}
       showLabels={showAxisLabels}
       row={dataSet?.rows.find((e) => e.key == hBarSpec.value)}
+      dimensions={(e) => {
+        rightOverflow = e.rightOverflow ?? 0;
+      }}
     />
   </g>
 
