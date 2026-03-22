@@ -302,9 +302,9 @@
           {:else if visibleSection == "publish"}
             <h3 class="editor-sub-section">Embed</h3>
             <p class="editor-sub-section-description">
-              For displaying responsive/interactable chart. <button onclick={() => publisize()}
-                >+ New</button
-              >
+              For responsive/interactable chart.
+              <button onclick={() => publisize()}>+ New</button>
+              (v. {chartStore.version})
             </p>
             {#each publications as publication (publication.chartPublication.id)}
               <p>

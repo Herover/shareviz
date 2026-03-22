@@ -20,6 +20,7 @@ export class ChartStore {
   #doc: ShareDB.Doc = $state(new ShareDB.Doc());
   #connection?: ShareDBConnection;
   #data?: Chart = $derived(this.#connection?.data?.chart);
+  #version?: number = $derived(this.#connection?.version);
 
   constructor(connection: ShareDBConnection) {
     this.#doc = connection.doc;
@@ -28,6 +29,10 @@ export class ChartStore {
 
   get data(): Chart | undefined {
     return this.#data;
+  }
+
+  get version(): number | undefined {
+    return this.#version;
   }
 
   scopeElement(index: number) {
