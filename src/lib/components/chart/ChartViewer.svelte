@@ -114,12 +114,7 @@
 <div>
   <style bind:innerText={css} contenteditable=""></style>
   <div class="chart" style:width={chartWidth ? chartWidth + "px" : undefined} data-theme={themeKey}>
-    <h1
-      style:font-size="{chartSpec.style.titleSize}em"
-      style:font-weight={chartSpec.style.titleBold ? "bold" : "normal"}
-      class="title"
-      dir="auto"
-    >
+    <h1 class="title" dir="auto">
       {#if editor}
         <span
           bind:innerText={chartSpec.chart.title}
@@ -133,11 +128,7 @@
         {chartSpec.chart.title}
       {/if}
     </h1>
-    <p
-      style:font-size="{chartSpec.style.subTitleSize}em"
-      style:font-weight={chartSpec.style.subTitleBold ? "bold" : "normal"}
-      dir="auto"
-    >
+    <p class="subtitle" dir="auto">
       {#if editor}
         <span
           bind:innerText={chartSpec.chart.subTitle}
@@ -245,5 +236,9 @@
   }
   h1.title {
     margin-top: 0px;
+    font-size: 2em;
+  }
+  p.subtitle {
+    font-size: 1.1em;
   }
 </style>
