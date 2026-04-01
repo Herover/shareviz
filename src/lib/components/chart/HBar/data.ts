@@ -35,7 +35,7 @@ export const formatData = (componentSpec: hBarType, data: ComputedData, order: {
           last = componentSpec.stackSubCategories ? to : 0;
           return {
             label: d.label,
-            value: d.value / sum,
+            value: d.value,
             from,
             to,
           };
