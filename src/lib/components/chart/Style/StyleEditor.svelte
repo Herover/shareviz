@@ -4,7 +4,6 @@
   import { ChartStore } from "$lib/chartStores/chart.svelte";
   import { StyleStore } from "$lib/chartStores/style.svelte";
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
-  import ColorPicker from "../ColorPicker/ColorPicker.svelte";
 
   interface Props {
     connection: ShareDBConnection;
