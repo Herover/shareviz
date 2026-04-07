@@ -21,9 +21,12 @@
     const names = getColumnNames(dataStore.data, newRaw);
     const data = dataStore.data;
     dataStore.setColumns(
-      names.map((key) => ({
+      names.map((key, i) => ({
         key,
-        type: orDefault(data.rows.find((e) => e.key === key)?.type, "text"),
+        type: orDefault(
+          data.rows.find((e) => e.key === key)?.type,
+          guessColumnType(dataStore.data, newRaw, i),
+        ),
         dateFormat: "",
       })),
     );
@@ -37,6 +40,34 @@
     }
 
     return [];
+  };
+
+  const guessColumnType = (
+    set: Set | undefined,
+    raw: string,
+    columnIndex: number,
+  ): keyof typeof valueParsers => {
+    if (set && set.type == "tsv") {
+      const secondLine = raw.split("\n")[1];
+      if (typeof secondLine == "undefined") {
+        return "text";
+      }
+      const cell = secondLine.split("\t")[columnIndex];
+      if (typeof cell == "undefined") {
+        return "text";
+      }
+
+      const numericMatch = cell.match(/^\d+(\.\d+)?$/);
+      if (numericMatch && numericMatch.length != 0) {
+        return "number";
+      }
+
+      const dateMatch = cell.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (dateMatch && dateMatch.length != 0) {
+        return "ISODate";
+      }
+    }
+    return "text";
   };
 </script>
 

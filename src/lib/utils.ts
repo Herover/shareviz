@@ -82,17 +82,19 @@ export enum valueKinds {
   TEXT = "text",
   DATE = "date",
 }
-export const valueParsers: {
-  [name: string]: { fn: (s: string, opts: { dateFormat?: string }) => any; type: valueKinds };
-} = {
+export type Parser = {
+  fn: (d: string, opts?: any) => number | string | Date;
+  type: valueKinds;
+};
+export const valueParsers = {
   number: {
     fn: (d: string) => Number.parseFloat(d),
     type: valueKinds.NUMBER,
-  },
+  } as Parser,
   text: {
     fn: (d: string) => d,
     type: valueKinds.TEXT,
-  },
+  } as Parser,
   ISODate: {
     fn: (d: string) => {
       const parts = d.match(/(\d{4})-(\d{2})-(\d{2})/);
@@ -102,7 +104,7 @@ export const valueParsers: {
       return null;
     },
     type: valueKinds.DATE,
-  },
+  } as Parser,
   yyyyMmm: {
     fn: (d: string) => {
       const parts = d.match(/(\d{4})M(\d{2})/);
@@ -112,7 +114,7 @@ export const valueParsers: {
       return null;
     },
     type: valueKinds.DATE,
-  },
+  } as Parser,
   yyyyKk: {
     fn: (d: string) => {
       const parts = d.match(/(\d{4})K(\d{1})/);
@@ -124,11 +126,11 @@ export const valueParsers: {
       return null;
     },
     type: valueKinds.DATE,
-  },
+  } as Parser,
   date: {
-    fn: (d: string, opts) => dayjs(d, opts.dateFormat).toDate(),
+    fn: (d: string, opts: { dateFormat?: string }) => dayjs(d, opts.dateFormat).toDate(),
     type: valueKinds.DATE,
-  },
+  } as Parser,
 };
 
 export const orDefault = <T>(n: T | undefined, def: T): T => {

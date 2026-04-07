@@ -2,7 +2,7 @@
 
 import { dsvFormat } from "d3-dsv";
 import type { Root, Row } from "./chart";
-import { valueParsers } from "./utils";
+import { valueParsers, type Parser } from "./utils";
 import { getLogger } from "$lib/log.js";
 
 const logger = getLogger();
@@ -17,7 +17,10 @@ export const computeData = (chartSpec?: Root) =>
     : chartSpec.data.sets.reduce((acc, data) => {
         let set = dsvFormat("\t").parse<any, string>(data.raw, (row) => {
           return data.rows.reduce((acc: any, rowInfo) => {
-            const parser = valueParsers[rowInfo.type];
+            // Kind of fighting typescript here...
+            const parser = valueParsers[rowInfo.type as keyof typeof valueParsers] as
+              | Parser
+              | undefined;
             if (typeof parser == "undefined") {
               // TODO: better warning?
               logger.log("could not find parser " + rowInfo.key);
@@ -33,8 +36,12 @@ export const computeData = (chartSpec?: Root) =>
         data.transpose.forEach((transpose) => {
           const set2: any[] = [];
 
-          const valueParser = valueParsers[transpose.valueType];
-          const keyParser = valueParsers[transpose.keyType];
+          const valueParser = valueParsers[transpose.valueType as keyof typeof valueParsers] as
+            | Parser
+            | undefined;
+          const keyParser = valueParsers[transpose.keyType as keyof typeof valueParsers] as
+            | Parser
+            | undefined;
           if (typeof valueParser != "undefined" && typeof keyParser != "undefined") {
             // TODO
             transpose.from.forEach((key) => {
