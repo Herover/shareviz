@@ -220,6 +220,18 @@
 <div class="main">
   {#if chartSpec != null}
     <header>
+      <h1>
+        <a
+          href={data.chartRelations
+            ? resolve("/(app)/org/[organizationId]/team/[teamId]/charts", {
+                organizationId: data.chartRelations?.teams.organizationId,
+                teamId: data.chartRelations?.teams.id,
+              })
+            : "/"}
+        >
+          DT
+        </a>
+      </h1>
       <div class="parts-holder">
         <div class="parts-bottom">
           <div
@@ -491,7 +503,12 @@
     top: 0px;
     z-index: 10;
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
+    padding-left: 50px;
+  }
+  header a {
+    color: var(--text-primary);
+    text-decoration: none;
   }
   .parts-holder {
     position: relative;

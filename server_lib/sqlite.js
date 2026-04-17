@@ -343,6 +343,17 @@ export const db = {
     // });
   },
 
+  getChartRelations: async (/** @type {string} */ chartRef) => {
+    const res = await drizzledb
+      .select()
+      .from(charts)
+      .innerJoin(teams, eq(teams.id, charts.teamId))
+      .innerJoin(organizations, eq(organizations.id, teams.organizationId))
+      .where(eq(charts.chartRef, chartRef));
+
+    return res[0];
+  },
+
   getAllCharts: async () => {
     return drizzledb.select().from(charts);
   },
