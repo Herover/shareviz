@@ -186,11 +186,11 @@
   .charts th {
     text-align: start;
     font-weight: normal;
-    color: var(--text-secondary);
+    color: var(--fg-secondary);
     padding-bottom: 0.5em;
   }
   .drag-target {
-    border: 2px var(--text-primary);
+    border: 2px var(--fg-primary);
     border-style: dashed;
   }
 </style>

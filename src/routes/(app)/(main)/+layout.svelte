@@ -32,7 +32,7 @@
 
 <header>
   <div class="content">
-    <div class="icon">DataTortilla</div>
+    <h1 class="icon">DataTortilla</h1>
     <nav>
       {#if page.params.organizationId}
         <div class="nav-item">
@@ -109,7 +109,7 @@
 <style>
   header {
     width: 100%;
-    border-bottom: solid 1px var(--detail-color);
+    /* border-bottom: solid 1px var(--accent-primary); */
   }
   header .content {
     box-sizing: border-box;
@@ -124,7 +124,6 @@
     align-items: center;
   }
   .icon {
-    font-size: 1.9em;
     margin-right: 1em;
   }
   .nav-item {
@@ -132,10 +131,10 @@
     padding-left: 1em;
     padding-right: 1em;
     font-weight: bold;
-    color: var(--text-secondary);
+    color: var(--fg-secondary);
   }
   .nav-item > a {
-    color: var(--text-secondary);
+    color: var(--fg-secondary);
     text-decoration: none;
   }
   .nav-item:last-child {
@@ -154,8 +153,8 @@
     padding-right: 1em;
   }
   .popover-content {
-    box-shadow: 0px 0px 4px 4px var(--accent-bg-color);
-    background-color: var(--main-bg-color);
+    box-shadow: var(--shadow-3);
+    background-color: var(--bg-base);
     padding-top: 0.5rem;
     padding-bottom: 1rem;
     padding-left: 1rem;
@@ -163,7 +162,7 @@
     margin-top: 0.5rem;
     width: 13em;
     font-size: 1rem;
-    color: var(--text-primary);
+    color: var(--fg-primary);
   }
   .popover-content p {
     margin-top: 1em;
@@ -174,7 +173,7 @@
     margin-top: 0.5em;
   }
   .popover-content .popover-link {
-    color: var(--text-secondary);
+    color: var(--fg-secondary);
     margin-top: 0.5em;
     margin-bottom: 0.5em;
     font-size: 1rem;

@@ -12,8 +12,8 @@
   <p><label>E-mail <input name="email" bind:value={email} /></label></p>
   <p><label>Password <input name="password" type="password" bind:value={password} /></label></p>
   <p><label>Repeat password <input type="password" bind:value={password2} /></label></p>
-  {#if !passwordSame}<p>Passwords are not the same.</p>{/if}
-  {#if !passwordLong}<p>Password need to be 10 characters.</p>{/if}
+  {#if !passwordSame}<p class="error">Passwords are not the same.</p>{/if}
+  {#if !passwordLong}<p class="error">Password need to be 10 characters.</p>{/if}
   <p>
     By signing up, you agree to allow us to store your email, name, IP address, securely hashed
     password, and other details you give us. This information may be shared with other people in
@@ -24,6 +24,6 @@
 
 <style>
   .error {
-    color: var(--text-error);
+    color: var(--state-error);
   }
 </style>

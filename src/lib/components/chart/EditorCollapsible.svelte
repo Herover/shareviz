@@ -99,7 +99,7 @@
     padding-bottom: 0.25rem;
     position: sticky;
     top: var(--editor-header-height);
-    background-color: var(--accent-bg-color);
+    background-color: var(--bg-base);
   }
   .content {
     width: 100%;

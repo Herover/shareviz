@@ -42,7 +42,7 @@
     max-width: 600px;
     width: 100%;
     min-height: 300px;
-    background-color: var(--main-bg-color);
+    background-color: var(--bg-base);
     padding-left: 1em;
     padding-right: 1em;
   }

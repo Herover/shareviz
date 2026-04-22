@@ -81,8 +81,9 @@
 </tr>
 
 <style>
-  a {
-    color: var(--text-primary);
+  a:visited,
+  a:link {
+    color: var(--fg-primary);
     text-decoration: none;
   }
   .icon {
@@ -95,10 +96,10 @@
   }
   tr:hover,
   .selected {
-    background-color: var(--hover-bg-color);
+    background-color: var(--bg-sunken);
   }
   .drag-target {
-    border: 2px var(--text-primary);
+    border: 2px var(--fg-primary);
     border-style: dashed;
   }
 </style>

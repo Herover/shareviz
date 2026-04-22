@@ -274,8 +274,8 @@
     top: 100%;
     left: calc(-50px + 50% - 16px);
     width: 120px;
-    border: 2px solid var(--text-secondary);
-    background-color: var(--main-bg-color);
+    border: 2px solid var(--fg-secondary);
+    background-color: var(--bg-base);
     margin: 8px;
     padding: 8px;
     z-index: 10;

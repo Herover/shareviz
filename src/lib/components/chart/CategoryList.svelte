@@ -164,9 +164,9 @@
     width: 100%;
     height: 300px;
     overflow-y: scroll;
-    border: 1px solid var(--text-primary);
+    border: 1px solid var(--fg-primary);
     box-sizing: border-box;
-    background-color: var(--main-bg-color);
+    background-color: var(--bg-surface);
   }
   .line-search {
     width: 100%;
@@ -181,10 +181,10 @@
     cursor: pointer;
   }
   .line-selected {
-    background-color: var(--accent-bg-color);
+    background-color: var(--accent-primary-subtle);
   }
   .line-unselected:hover {
-    background-color: var(--hover-bg-color);
+    background-color: var(--bg-sunken);
   }
   .line-text {
   }

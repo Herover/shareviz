@@ -433,7 +433,7 @@
     flex-direction: row;
     align-content: space-between;
     flex-wrap: wrap;
-    background-color: var(--accent-bg-color);
+    background-color: var(--bg-base);
 
     --editor-header-height: 4em;
     --editor-primary-controls-width: 500px;
@@ -497,8 +497,8 @@
   header {
     width: 100%;
     height: var(--editor-header-height);
-    border-bottom: 1px solid var(--text-primary);
-    background-color: var(--main-bg-color);
+    border-bottom: 1px solid var(--fg-primary);
+    background-color: var(--bg-surface);
     position: sticky;
     top: 0px;
     z-index: 10;
@@ -507,7 +507,7 @@
     padding-left: 50px;
   }
   header a {
-    color: var(--text-primary);
+    color: var(--fg-primary);
     text-decoration: none;
   }
   .parts-holder {
@@ -524,18 +524,18 @@
     margin-left: 0.2em;
     margin-right: 0.2em;
     padding: 0.2em;
-    border-left: 1px solid var(--text-primary);
-    border-right: 1px solid var(--text-primary);
-    border-top: 1px solid var(--text-primary);
-    border-bottom: 1px solid var(--text-primary);
+    border-left: 1px solid var(--fg-primary);
+    border-right: 1px solid var(--fg-primary);
+    border-top: 1px solid var(--fg-primary);
+    border-bottom: 1px solid var(--fg-primary);
     z-index: 1;
     position: relative;
     top: 0px;
     font-size: 1.1em;
-    background-color: var(--accent-bg-color);
+    background-color: var(--bg-base);
   }
   .part-item-selected {
-    border-bottom: 1px solid var(--accent-bg-color);
+    border-bottom: 1px solid var(--bg-base);
   }
   .presence {
     position: relative;
@@ -546,7 +546,7 @@
     align-items: center;
   }
   .user-presence {
-    border: 3px solid var(--text-primary);
+    border: 3px solid var(--fg-primary);
     border-radius: 50%;
     height: 2em;
     width: 2em;
