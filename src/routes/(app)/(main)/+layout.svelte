@@ -7,11 +7,9 @@
   import { addTeam } from "$lib/api";
   import NavDropdown from "$lib/components/NavDropdown.svelte";
   import { notifications } from "$lib/notificationStore";
-  import type { PageData } from "./$types";
 
   interface Props {
     children?: import("svelte").Snippet;
-    data: PageData;
   }
 
   let { children }: Props = $props();
