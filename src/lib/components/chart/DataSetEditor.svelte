@@ -6,6 +6,7 @@
   import { orDefault, valueParsers } from "$lib/utils";
   import DataSetTransposeEditor from "./DataSetTransposeEditor.svelte";
   import DateParserInput from "./DateParser/DateParserInput.svelte";
+  import EditorCard from "./EditorCard.svelte";
 
   interface Props {
     dataStore: DataSetStore;
@@ -71,94 +72,97 @@
   };
 </script>
 
-<h3 class="editor-sub-section">Dataset</h3>
-
-{#if typeof dataStore.data != "undefined"}
-  <div class="editor-row">
-    <div class="editor-column-label">
-      <span>Name</span>
-    </div>
-    <div>
-      <input
-        type="text"
-        value={dataStore.data.name}
-        onchange={(e) => dataStore.setName(e.currentTarget.value)}
-        onkeyup={(e) => dataStore.setName(e.currentTarget.value)}
-      />
-    </div>
-  </div>
-
-  <p>
-    <label
-      >Raw data <textarea
-        value={dataStore.data.raw}
-        onchange={(e) => updateColumns(e.currentTarget.value)}
-        rows="4"
-        placeholder={dataStore.data.type == "tsv"
-          ? `column1\tcolumn2
-  value1\tvalue2
-  value3\tvalue4
-  ...`
-          : ""}
-      ></textarea></label
-    >
-  </p>
-
-  <div class="editor-row">
-    <div class="editor-column-label">
-      <span>Format</span>
-    </div>
-    <div>
-      <select
-        value={dataStore.data.type}
-        onchange={(e) => dataStore.setType(e.currentTarget.value)}
-      >
-        {#each ["tsv"] as row (row)}
-          <option>{row}</option>
-        {/each}
-      </select>
-    </div>
-  </div>
-
-  <h4 class="editor-sub-section">Columns to rows (transpose)</h4>
-  <p class="editor-sub-section-description">
-    You typically want your data in rows, not columns. If you want to plot ex. population changes
-    over years but your year numbers are columns, or population per city but city names are in
-    columns, then you need to turn them into rows first. Use transpose for this.
-  </p>
-  {#each dataStore.data.transpose as transpose, i (transpose.toKey)}
-    <DataSetTransposeEditor {dataStore} {transpose} {i} />
-  {/each}
-
-  <button
-    onclick={() =>
-      typeof dataStore.data != "undefined" &&
-      dataStore.addTranspose(dataStore.data.transpose.length)}>Add transpose</button
-  >
-
-  <h4 class="editor-sub-section">Columns</h4>
-
-  {#each dataStore.data.rows as column, i (i)}
+<EditorCard title="Dataset">
+  {#if typeof dataStore.data != "undefined"}
     <div class="editor-row">
       <div class="editor-column-label">
-        <span>"{column.key}"</span>
+        <span>Name</span>
+      </div>
+      <div>
+        <input
+          type="text"
+          value={dataStore.data.name}
+          onchange={(e) => dataStore.setName(e.currentTarget.value)}
+          onkeyup={(e) => dataStore.setName(e.currentTarget.value)}
+        />
+      </div>
+    </div>
+
+    <div class="editor-row">
+      <div class="editor-column-label">
+        <span>Format</span>
       </div>
       <div>
         <select
-          value={column.type}
-          onchange={(e) => dataStore.setColumnType(i, e.currentTarget.value)}
+          value={dataStore.data.type}
+          onchange={(e) => dataStore.setType(e.currentTarget.value)}
         >
-          {#each Object.keys(valueParsers) as type (type)}
-            <option>{type}</option>
+          {#each ["tsv"] as row (row)}
+            <option>{row}</option>
           {/each}
         </select>
-        {#if column.type == "date"}
-          <DateParserInput
-            value={column.dateFormat}
-            onchange={(val) => dataStore.setColumnDateFormat(i, val)}
-          />
-        {/if}
       </div>
     </div>
-  {/each}
-{/if}
+
+    <div class="editor-row">
+      <div class="editor-column-label">
+        <span>Raw data</span>
+      </div>
+      <div>
+        <textarea
+          value={dataStore.data.raw}
+          onchange={(e) => updateColumns(e.currentTarget.value)}
+          rows="4"
+          placeholder={dataStore.data.type == "tsv"
+            ? `column1\tcolumn2
+value1\tvalue2
+value3\tvalue4
+...`
+            : ""}
+        ></textarea>
+      </div>
+    </div>
+
+    <h4 class="editor-sub-section">Columns to rows (transpose)</h4>
+    <p class="editor-sub-section-description">
+      You typically want your data in rows, not columns. If you want to plot ex. population changes
+      over years but your year numbers are columns, or population per city but city names are in
+      columns, then you need to turn them into rows first. Use transpose for this.
+    </p>
+    {#each dataStore.data.transpose as transpose, i (transpose.toKey)}
+      <DataSetTransposeEditor {dataStore} {transpose} {i} />
+    {/each}
+
+    <button
+      onclick={() =>
+        typeof dataStore.data != "undefined" &&
+        dataStore.addTranspose(dataStore.data.transpose.length)}>Add transpose</button
+    >
+
+    <h4 class="editor-sub-section">Columns</h4>
+
+    {#each dataStore.data.rows as column, i (i)}
+      <div class="editor-row">
+        <div class="editor-column-label">
+          <span>"{column.key}"</span>
+        </div>
+        <div>
+          <select
+            value={column.type}
+            onchange={(e) => dataStore.setColumnType(i, e.currentTarget.value)}
+          >
+            {#each Object.keys(valueParsers) as type (type)}
+              <option>{type}</option>
+            {/each}
+          </select>
+          {#if column.type == "date"}
+            <DateParserInput
+              value={column.dateFormat}
+              onchange={(val) => dataStore.setColumnDateFormat(i, val)}
+            />
+          {/if}
+        </div>
+      </div>
+    {/each}
+  {/if}
+</EditorCard>

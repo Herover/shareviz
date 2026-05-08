@@ -1,8 +1,5 @@
 /* SPDX-License-Identifier: MPL-2.0 */
 
-.editor textarea {
-  resize: vertical;
-}
 .editor textarea,
 .editor select,
 .editor input[type="number"],
@@ -11,6 +8,13 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   background: var(--bg-surface);
+  height: var(--space-8);
+  padding: 0 var(--space-3);
+}
+.editor textarea {
+  resize: vertical;
+  min-height: var(--space-16);
+  padding: var(--space-2) var(--space-3);
 }
 .editor-column-label {
   font-size: 1.1rem;
