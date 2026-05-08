@@ -389,7 +389,7 @@
         <div><button onclick={() => (viewScale += 10)}>+</button></div>
       </div>
       <div class="chart-view">
-        <div style:scale={viewScale / 100}>
+        <div class="chart-view-holder" style:scale={viewScale / 100}>
           <!--
             We could use the ChartViewer component directly, but to get a clean window that
             behaves like readers will see it (without our CSS and JS) in embeds, use a iframe.
@@ -437,6 +437,7 @@
 
     --editor-header-height: 4em;
     --editor-primary-controls-width: 500px;
+    margin-bottom: 10px;
   }
   .chart-controls-pane {
     width: fit-content;
@@ -475,6 +476,9 @@
     align-items: start;
     align-items: safe center; /* Safari unsupported */
   }
+  .chart-view-holder {
+    box-shadow: var(--shadow-3);
+  }
   .view-controls {
     height: 2em;
     width: calc(100% - var(--editor-primary-controls-width));
@@ -493,6 +497,7 @@
   }
   iframe {
     border: none;
+    display: block;
   }
   header {
     width: 100%;
