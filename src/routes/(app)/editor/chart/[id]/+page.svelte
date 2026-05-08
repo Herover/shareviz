@@ -435,7 +435,6 @@
 
     --editor-header-height: 4em;
     --editor-primary-controls-width: 500px;
-    margin-bottom: 10px;
   }
   .chart-controls-pane {
     width: fit-content;
