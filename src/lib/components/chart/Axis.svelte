@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { scaleLinear, scaleTime, type ScaleLinear, type ScaleTime } from "d3-scale";
-  import { formatNumber, orDefault, orNumber } from "$lib/utils";
+  import { createDebouncer, formatNumber, orDefault, orNumber } from "$lib/utils";
   import type { Axis, AxisGrid, Row } from "$lib/chart";
   import { AxisLocation, AxisOrientation } from "$lib/chart";
   import dayjs from "dayjs";
@@ -36,26 +36,31 @@
 
   let lineOffset = $derived(showLabels && conf.location == AxisLocation.START ? size : 0);
 
+  // To avoid feedback loop on initial render
+  let dimensionsDebouncer = createDebouncer(250)
+
   $effect(() => {
     if (labelBox || leftBox || rightBox)
-      dimensions({
-        width: orNumber(labelBox?.width, 0),
-        height: orNumber(labelBox?.height, 0),
-        leftOverflow: Math.max(
-          orNumber(leftBox?.width, 0) / 2 -
-            (scale
-              ? Math.floor((scale(orDefault(majorTicks[0]?.n, 0)) - scale.range()[0]) / 10) * 10
-              : 0),
-          0,
-        ),
-        rightOverflow: orNumber(rightBox?.width, 0) / 2,
-        topPos:
-          majorTicks.length == 0 ||
-          majorTicks[majorTicks.length - 1].l == "" ||
-          typeof scale == "undefined"
-            ? undefined
-            : scale(majorTicks[majorTicks.length - 1]?.n ?? 0) - orNumber(testBox?.height, 0) - 6,
-        labelHeight: orNumber(testBox?.height, 0) + conf.major.tickSize,
+      dimensionsDebouncer([labelBox, leftBox, rightBox], () => {
+        dimensions({
+          width: orNumber(labelBox?.width, 0),
+          height: orNumber(labelBox?.height, 0),
+          leftOverflow: Math.max(
+            orNumber(leftBox?.width, 0) / 2 -
+              (scale
+                ? Math.floor((scale(orDefault(majorTicks[0]?.n, 0)) - scale.range()[0]) / 10) * 10
+                : 0),
+            0,
+          ),
+          rightOverflow: orNumber(rightBox?.width, 0) / 2,
+          topPos:
+            majorTicks.length == 0 ||
+            majorTicks[majorTicks.length - 1].l == "" ||
+            typeof scale == "undefined"
+              ? undefined
+              : scale(majorTicks[majorTicks.length - 1]?.n ?? 0) - orNumber(testBox?.height, 0) - 6,
+          labelHeight: orNumber(testBox?.height, 0) + conf.major.tickSize,
+        });
       });
   });
 
