@@ -72,19 +72,22 @@
 </script>
 
 <h3 class="editor-sub-section">Dataset</h3>
+
 {#if typeof dataStore.data != "undefined"}
-  <div class="box">
-    <div class="w-025 editor-explain-box">
-      <span class="editor-column-label">Name</span>
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Name</span>
     </div>
-    <div class="w-075">
+    <div>
       <input
+        type="text"
         value={dataStore.data.name}
         onchange={(e) => dataStore.setName(e.currentTarget.value)}
         onkeyup={(e) => dataStore.setName(e.currentTarget.value)}
       />
     </div>
   </div>
+
   <p>
     <label
       >Raw data <textarea
@@ -100,11 +103,12 @@
       ></textarea></label
     >
   </p>
-  <div class="box">
-    <div class="w-025 editor-explain-box">
-      <span class="editor-column-label">Format</span>
+
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Format</span>
     </div>
-    <div class="w-075">
+    <div>
       <select
         value={dataStore.data.type}
         onchange={(e) => dataStore.setType(e.currentTarget.value)}
@@ -133,12 +137,13 @@
   >
 
   <h4 class="editor-sub-section">Columns</h4>
+
   {#each dataStore.data.rows as column, i (i)}
-    <div class="box">
-      <div class="w-05 editor-explain-box text-align-right">
-        "{column.key}"
+    <div class="editor-row">
+      <div class="editor-column-label">
+        <span>"{column.key}"</span>
       </div>
-      <div class="w-05">
+      <div>
         <select
           value={column.type}
           onchange={(e) => dataStore.setColumnType(i, e.currentTarget.value)}

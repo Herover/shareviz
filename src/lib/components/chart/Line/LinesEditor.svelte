@@ -281,11 +281,11 @@
   onblur={() => chartToEditor.setHighlight([])}
 />
 
-<div class="box">
-  <div class="w-025 editor-explain-box p-top-1">
-    <span class="editor-column-label">Label</span>
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Label</span>
   </div>
-  <div class="w-075 p-top-1">
+  <div>
     <input
       value={typeof mergedStyle.label.text == "undefined" ? "" : mergedStyle.label.text}
       disabled={nonEditable && selectedIndexes.length != 1}
@@ -296,11 +296,11 @@
   </div>
 </div>
 
-<div class="box">
-  <div class="w-025 editor-explain-box p-top-1">
-    <span class="editor-column-label">Line color</span>
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Line color</span>
   </div>
-  <div class="w-025 p-top-1">
+  <div>
     <ColorPicker
       color={typeof mergedStyle.color == "undefined" ? "#ffffff" : mergedStyle.color.light.c}
       chartColors={chartColors.map((c) => c.light.v)}
@@ -308,8 +308,13 @@
       onchange={(s) => setLineColor(s)}
     />
   </div>
-  <div class="w-025 p-top-1">Text color</div>
-  <div class="w-025 p-top-1">
+</div>
+
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Text color</span>
+  </div>
+  <div>
     <ColorPicker
       color={typeof mergedStyle.label.color == "undefined"
         ? "#ffffff"
@@ -319,8 +324,13 @@
       onchange={(s) => setTextColor(s)}
     />
   </div>
-  <div class="w-025 p-top-1">Context color</div>
-  <div class="w-025 p-top-1">
+</div>
+
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Context color</span>
+  </div>
+  <div>
     <ColorPicker
       color={typeof mergedStyle.contextColor == "undefined"
         ? "#ffffff"
@@ -332,11 +342,11 @@
   </div>
 </div>
 
-<div class="box">
-  <div class="w-025 editor-explain-box p-top-1">
-    <span class="editor-column-label">Width</span>
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Width</span>
   </div>
-  <div class="w-025 p-top-1">
+  <div>
     <input
       value={typeof mergedStyle.width == "undefined" ? "" : mergedStyle.width}
       disabled={nonEditable}
@@ -346,11 +356,11 @@
   </div>
 </div>
 
-<div class="box">
-  <div class="w-025 editor-explain-box p-top-1">
-    <span class="editor-column-label">Location</span>
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Location</span>
   </div>
-  <div class="w-075 p-top-1">
+  <div>
     <select
       value={typeof mergedStyle.label.location == "undefined" ? "" : mergedStyle.label.location}
       disabled={nonEditable}
@@ -392,11 +402,11 @@
   </div>
 </div>
 
-<div class="box">
-  <div class="w-025 editor-explain-box p-top-1">
-    <span class="editor-column-label">Symbols</span>
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Symbols</span>
   </div>
-  <div class="w-075 p-top-1">
+  <div>
     <select
       value={typeof mergedStyle.symbols == "undefined" ? "" : mergedStyle.symbols}
       disabled={nonEditable}
@@ -409,11 +419,11 @@
   </div>
 </div>
 
-<div class="box">
-  <div class="w-025 editor-explain-box p-top-1">
-    <span class="editor-column-label">Missing data</span>
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Missing data</span>
   </div>
-  <div class="w-075 p-top-1">
+  <div>
     <select
       value={typeof mergedStyle.missingStyle == "undefined" ? "" : mergedStyle.missingStyle}
       disabled={nonEditable}

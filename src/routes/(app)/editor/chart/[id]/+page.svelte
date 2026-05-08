@@ -293,11 +293,9 @@
       <div class="chart-controls-primary chart-controls editor">
         {#if canEdit && store.data}
           {#if visibleSection == "data"}
-            <div class="box">
-              <div class="w-025 editor-explain-box p-top-1">
-                <span class="editor-column-label">Internal chart name</span>
-              </div>
-              <div class="w-075 p-top-1">
+            <div class="editor-row">
+              <div class="editor-column-label">Internal chart name</div>
+              <div>
                 <input
                   value={$db?.chartInfo?.name}
                   onchange={(e) => db.updateInfo({ name: e.currentTarget.value })}
@@ -306,6 +304,7 @@
                 />
               </div>
             </div>
+
             <DataSetEditor chartData={chartSpec.data} connection={store} />
           {:else if visibleSection == "layout"}
             <StyleEditor connection={store} />
@@ -323,17 +322,15 @@
                 {dayjs(publication.chartPublication.created).format("YYYY-MM-DD HH:mm")} v. {publication
                   .chartPublication.v}
               </p>
-              <div class="box">
-                <div class="w-025 editor-explain-box">
-                  <span class="editor-column-label">
-                    <a
-                      href={env.PUBLIC_VIEWER_ORIGIN +
-                        "/view/chart/" +
-                        publication.chartPublication.id}>Embed link</a
-                    >
-                  </span>
+              <div class="editor-row">
+                <div class="editor-column-label">
+                  <a
+                    href={env.PUBLIC_VIEWER_ORIGIN +
+                      "/view/chart/" +
+                      publication.chartPublication.id}>Embed link</a
+                  >
                 </div>
-                <div class="w-075">
+                <div>
                   <input
                     value={env.PUBLIC_VIEWER_ORIGIN +
                       "/view/chart/" +
@@ -343,12 +340,12 @@
                 </div>
               </div>
             {/each}
+
             <h3 class="editor-sub-section">Export image</h3>
-            <div class="box">
-              <div class="w-025 editor-explain-box">
-                <span class="editor-column-label">Scale</span>
-              </div>
-              <div class="w-075">
+
+            <div class="editor-row">
+              <div class="editor-column-label">Scale</div>
+              <div>
                 <label>
                   <input type="radio" name="image-scale" value={1} bind:group={imageScale} />
                   {1}x
@@ -365,6 +362,7 @@
                 </label>
               </div>
             </div>
+
             <button onclick={() => chartToPNG()}>Generate PNG</button>
             <h3 class="editor-sub-section">Export Data Tortilla JSON</h3>
             <p class="editor-sub-section-description">Import chart elsewhere.</p>

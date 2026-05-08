@@ -8,29 +8,16 @@
 .editor input[type="number"],
 .editor input[type="text"] {
   width: 100%;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
 }
 .editor-column-label {
   font-size: 1.1rem;
 }
-.editor h3,
-.editor h4,
-.editor h5,
-.editor h6 {
-  font-weight: normal;
-  margin-bottom: 0rem;
-  margin-top: 0rem;
-  padding-bottom: 0rem;
-  padding-top: 0rem;
-}
 .editor .editor-sub-section {
   margin-bottom: 1em;
   margin-top: 2em;
-}
-.editor h3.editor-sub-section {
-  font-size: 1.45rem;
-}
-.editor h4.editor-sub-section {
-  font-size: 1.25rem;
 }
 .editor-column-label-description,
 .editor-sub-section-description {
@@ -38,6 +25,25 @@
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
   display: block;
+  text-align: left;
+}
+.editor-label-hint {
+  color: var(--fg-tertiary);
+  font-size: var(--text-sm);
+}
+.editor-column-label {
+  text-align: right;
+}
+.editor-row {
+  display: grid;
+  grid-template-columns: 40% 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  /* border-bottom: 1px solid var(--border-subtle); */
+}
+.text-align-left {
+  text-align: left;
 }
 .text-align-right {
   text-align: right;

@@ -10,20 +10,20 @@
 
 <h3>Your user</h3>
 
-<div class="box">
-  <div class="w-025">
+<div class="editor-row">
+  <div class="editor-column-label text-align-left">
     Display name
     <br />
     <i>The name is loaded when you log in from your login method/identity provider</i>
   </div>
-  <div class="w-075">
+  <div>
     {page.data.session?.user?.name}
   </div>
 </div>
 
-<div class="box p-top-1">
-  <div class="w-025">Your login methods/identity providers</div>
-  <div class="w-075">
+<div class="editor-row">
+  <div class="editor-column-label text-align-left">Your login methods/identity providers</div>
+  <div>
     {#each data.accounts as account (account.id)}
       {account.provider}: {account.expiresAt
         ? new Date(account.expiresAt).toISOString()

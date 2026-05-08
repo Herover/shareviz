@@ -11,58 +11,70 @@
   let { conf, isMinor = false }: Props = $props();
 </script>
 
-<p>
-  <label>
-    Enabled:
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Enabled</span>
+  </div>
+  <div>
     <input
       checked={conf.data.enabled}
       onchange={(e) => conf.setEnabled(e.currentTarget.checked)}
       type="checkbox"
     />
-  </label>
-</p>
+  </div>
+</div>
+
 {#if conf.data.enabled}
-  <p>
-    <label>
-      Grid:
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Grid</span>
+    </div>
+    <div>
       <input
         checked={conf.data.grid}
         onchange={(e) => conf.setGrid(e.currentTarget.checked)}
         type="checkbox"
       />
-    </label>
-  </p>
+    </div>
+  </div>
 
-  <p>
-    <label>
-      Label tick size:
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Label tick size</span>
+    </div>
+    <div>
       <input
         value={conf.data.tickSize}
         onchange={(e) => conf.setTickSize(Number.parseFloat(e.currentTarget.value))}
         type="number"
       />
-    </label>
-  </p>
+    </div>
+  </div>
 
-  <label>
-    Label tick width:
-    <input
-      value={conf.data.tickWidth}
-      onchange={(e) => conf.setTickWidth(Number.parseFloat(e.currentTarget.value))}
-      type="number"
-    />
-  </label>
-
-  <p>
-    <label>
-      Auto ticks from
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Label tick width</span>
+    </div>
+    <div>
       <input
+        value={conf.data.tickWidth}
+        onchange={(e) => conf.setTickWidth(Number.parseFloat(e.currentTarget.value))}
+        type="number"
+      />
+    </div>
+  </div>
+
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Auto ticks from</span>
+    </div>
+    <div>
+      <input
+        type="number"
         value={conf.data.auto.from}
         onchange={(e) => conf.setAutoFrom(e.currentTarget.value)}
         style="width: 80px;"
       />
-    </label>
-    <label>
       every
       <input
         value={conf.data.auto.each}
@@ -70,21 +82,20 @@
         type="number"
         style="width: 80px;"
       />
-    </label>
-  </p>
+    </div>
+  </div>
 
   {#if !isMinor}
-    <p>
-      <label>
-        Auto label
+    <div class="editor-row">
+      <div class="editor-column-label">
+        <span>Auto label</span>
+      </div>
+      <div>
         <input
           checked={conf.data.auto.labels}
           onchange={(e) => conf.setAutoLabels(e.currentTarget.checked)}
           type="checkbox"
         />
-      </label>
-
-      <label>
         <select
           value={conf.data.labelDivide}
           onchange={(e) => conf.setLabelDivide(Number.parseFloat(e.currentTarget.value))}
@@ -94,17 +105,15 @@
             <option>{n}</option>
           {/each}
         </select>
-      </label>
-
-      <label>
         after
         <input
+          type="text"
           value={conf.data.afterLabel}
           onchange={(e) => conf.setAfterLabel(e.currentTarget.value)}
           style="width: 80px;"
         />
-      </label>
-    </p>
+      </div>
+    </div>
 
     <p>
       Manual marks
@@ -113,7 +122,7 @@
         <label
           >Value <input
             value={kv.n}
-            onchange={(e) => conf.setTickValue(i, Number.parseInt(e.currentTarget.value))}
+            onchange={(e) => conf.setTickValue(i, Number.parseFloat(e.currentTarget.value))}
             type="number"
             style="width: 80px;"
           /></label

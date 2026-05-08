@@ -234,11 +234,11 @@
 
 <h3 class="editor-sub-section">General</h3>
 
-<div class="box">
-  <div class="w-025 editor-explain-box">
-    <span class="editor-column-label">Data set</span>
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Data set</span>
   </div>
-  <div class="w-075 p-top-1">
+  <div>
     <select value={chartSpec.dataSet} onchange={(e) => setDataSet(e.currentTarget.value)}>
       <option></option>
       {#each spec.data.sets as set (set.id)}
@@ -249,17 +249,19 @@
 </div>
 
 {#if chartSpec.dataSet}
-  <p>
-    <label class="editor-column-label">
-      One line for every:
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>One line for every</span>
+    </div>
+    <div>
       <select value={chartSpec.categories} onchange={(e) => setCategories(e.currentTarget.value)}>
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
         {/each}
       </select>
-    </label>
-  </p>
+    </div>
+  </div>
 
   <button
     disabled={chartSpec.pointLabel == "" || chartSpec.categories == ""}
@@ -278,9 +280,11 @@
     values={chartSpec.categoryKeys.map((d) => ({ k: d.k, d }))}
   />
 
-  <div class="box">
-    <div class="w-025 p-top-1">Label</div>
-    <div class="w-075 p-top-1">
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Label</span>
+    </div>
+    <div>
       <input
         value={selectedLines.length == 1
           ? (chartSpec.categoryKeys[selectedLines[0]]?.label.text ?? "")
@@ -291,29 +295,33 @@
     </div>
   </div>
 
-  <p>
-    <label class="editor-column-label">
-      One point for every:
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>One point for every</span>
+    </div>
+    <div>
       <select value={chartSpec.pointLabel} onchange={(e) => setPointLabel(e.currentTarget.value)}>
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
         {/each}
       </select>
-    </label>
-  </p>
+    </div>
+  </div>
 
-  <p>
-    <label class="editor-column-label">
-      Point value:
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Point value</span>
+    </div>
+    <div>
       <select value={chartSpec.pointValue} onchange={(e) => setPointValue(e.currentTarget.value)}>
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
         {/each}
       </select>
-    </label>
-  </p>
+    </div>
+  </div>
 
   {#snippet pointTitle(d: LineRepeatSettingsKey)}
     {d.k}
@@ -326,9 +334,12 @@
     title={pointTitle}
     values={chartSpec.rangeCategoryKeys.map((d) => ({ k: d.k, d }))}
   />
-  <div class="box">
-    <div class="w-025 p-top-1">Label</div>
-    <div class="w-075 p-top-1">
+
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Label</span>
+    </div>
+    <div>
       <input
         value={selectedPoints.length == 1
           ? (chartSpec.rangeCategoryKeys[selectedPoints[0]]?.label.text ?? "")
@@ -338,9 +349,12 @@
       />
     </div>
   </div>
-  <div class="box">
-    <div class="w-025 p-top-1">Color</div>
-    <div class="w-075 p-top-1">
+
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Color</span>
+    </div>
+    <div>
       <ColorPicker
         color={selectedPoints.length == 1
           ? (chartSpec.rangeCategoryKeys[selectedPoints[0]]?.color.light.v ?? "")
@@ -351,19 +365,19 @@
     </div>
   </div>
 
-  <p>
-    <label class="editor-column-label">
-      Repeat for every:
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Repeat for every</span>
+    </div>
+    <div>
       <select value={chartSpec.repeat} onchange={(e) => setRepeat(e.currentTarget.value)}>
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
         {/each}
       </select>
-    </label>
-  </p>
-
-  <h3 class="editor-sub-section">Axis</h3>
+    </div>
+  </div>
 
   <h3 class="editor-sub-section">Axis</h3>
   <AxisEditor

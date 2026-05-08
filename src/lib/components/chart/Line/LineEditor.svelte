@@ -83,11 +83,11 @@
 
 <h3 class="editor-sub-section">General</h3>
 
-<div class="box">
-  <div class="w-025 editor-explain-box">
-    <span class="editor-column-label">Data set</span>
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Data set</span>
   </div>
-  <div class="w-075 p-top-1">
+  <div>
     <select
       value={lineStore.data.dataSet}
       onchange={(e) => lineStore.setDataSet(e.currentTarget.value)}
@@ -101,9 +101,11 @@
 </div>
 
 {#if dataSet}
-  <p>
-    <label class="editor-column-label">
-      X values from:
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>X values from:</span>
+    </div>
+    <div>
       <select
         value={lineStore.data.x.key}
         onchange={(e) => lineStore.setXKey(e.currentTarget.value)}
@@ -113,11 +115,14 @@
           <option>{row.key}</option>
         {/each}
       </select>
-    </label>
-  </p>
-  <p>
-    <label class="editor-column-label">
-      Y values from:
+    </div>
+  </div>
+
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Y values from:</span>
+    </div>
+    <div>
       <select
         value={lineStore.data.y.key}
         onchange={(e) => lineStore.setYKey(e.currentTarget.value)}
@@ -127,13 +132,16 @@
           <option>{row.key}</option>
         {/each}
       </select>
-    </label>
-  </p>
+    </div>
+  </div>
 
   <h3 class="editor-sub-section">Categories</h3>
-  <p>
-    <label class="editor-column-label">
-      Categories from:
+
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Categories from:</span>
+    </div>
+    <div>
       <select
         value={lineStore.data.categories}
         onchange={(e) => lineStore.setCategoriesKey(e.currentTarget.value)}
@@ -143,25 +151,27 @@
           <option>{row.key}</option>
         {/each}
       </select>
-    </label>
-  </p>
-  <p>
-    <label>
-      Height is
+    </div>
+  </div>
+
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Height</span> <span class="editor-label-hint">(% of width)</span>
+    </div>
+    <div>
       <input
         value={lineStore.data.heightRatio * 100}
         onchange={(e) => lineStore.setHeightRatio(Number.parseFloat(e.currentTarget.value) / 100)}
         type="number"
-        style:width="50px"
       />
-      % of width
-    </label>
-  </p>
-  <div class="box">
-    <div class="w-025 editor-explain-box">
-      <span class="editor-column-label">Fill</span>
     </div>
-    <div class="w-075">
+  </div>
+
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Fill</span>
+    </div>
+    <div>
       <input
         bind:checked={lineStore.data.fill}
         onchange={(e) => lineStore.setFill(e.currentTarget.checked)}
@@ -169,12 +179,13 @@
       />
     </div>
   </div>
+
   {#if lineStore.data.categories}
-    <div class="box">
-      <div class="w-025 editor-explain-box">
-        <span class="editor-column-label">Stack</span>
+    <div class="editor-row">
+      <div class="editor-column-label">
+        <span>Stack</span>
       </div>
-      <div class="w-075">
+      <div>
         <input
           bind:checked={lineStore.data.stack}
           onchange={(e) => lineStore.setStack(e.currentTarget.checked)}
@@ -182,16 +193,18 @@
         />
       </div>
     </div>
-    <br />
 
     <span class="editor-column-label">Line style</span>
     <LinesEditor {chartColors} {values} {index} {lineStore} />
   {/if}
 
   <h3 class="editor-sub-section">Small multiples</h3>
-  <p>
-    <label class="editor-column-label">
-      Repeat for every:
+
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Repeat for every</span>
+    </div>
+    <div>
       <select
         value={lineStore.data.repeat}
         onchange={(e) => {
@@ -204,14 +217,15 @@
           <option>{row.key}</option>
         {/each}
       </select>
-    </label>
-  </p>
+    </div>
+  </div>
+
   {#if lineStore.data.repeat != ""}
-    <div class="box">
-      <div class="w-025 editor-explain-box">
-        <span class="editor-column-label">Columns</span>
+    <div class="editor-row">
+      <div class="editor-column-label">
+        <span>Columns</span>
       </div>
-      <div class="w-075">
+      <div>
         <input
           value={lineStore.data.repeatColumns}
           onchange={(e) => lineStore.setRepeatColumns(Number.parseInt(e.currentTarget.value))}
@@ -232,10 +246,13 @@
       moveUp={(_k, i) => lineStore.moveRepeatUp(i)}
       moveDown={(_k, i) => lineStore.moveRepeatDown(i)}
     />
+
     {#if selectedIndexes.length != 0}
-      <div class="box">
-        <div class="w-025 p-top-1">Label</div>
-        <div class="w-075 p-top-1">
+      <div class="editor-row">
+        <div class="editor-column-label">
+          <span>Label</span>
+        </div>
+        <div>
           <input
             value={selectedIndexes.length == 1
               ? lineStore.data.repeatSettings.byKey[selectedIndexes[0]].title ||
@@ -245,30 +262,34 @@
           />
         </div>
       </div>
-      <div class="box">
-        <div class="w-025 p-top-1">Display</div>
-        <div class="w-075 p-top-1">
-          <label>
-            <input
-              type="checkbox"
-              checked={selectedIndexes.length == 1
-                ? lineStore.data.repeatSettings.byKey[selectedIndexes[0]].ownChart
-                : false}
-              onchange={(e) => setRepeatedOwnChart(e.currentTarget.checked)}
-            />
-            Has own chart
-          </label>
-          <br />
-          <label>
-            <input
-              type="checkbox"
-              checked={selectedIndexes.length == 1
-                ? lineStore.data.repeatSettings.byKey[selectedIndexes[0]].allCharts
-                : false}
-              onchange={(e) => setRepeatedAllCharts(e.currentTarget.checked)}
-            />
-            Show on all charts
-          </label>
+
+      <div class="editor-row">
+        <div class="editor-column-label">
+          <span>Has own chart</span>
+        </div>
+        <div>
+          <input
+            type="checkbox"
+            checked={selectedIndexes.length == 1
+              ? lineStore.data.repeatSettings.byKey[selectedIndexes[0]].ownChart
+              : false}
+            onchange={(e) => setRepeatedOwnChart(e.currentTarget.checked)}
+          />
+        </div>
+      </div>
+
+      <div class="editor-row">
+        <div class="editor-column-label">
+          <span>Show on all charts</span>
+        </div>
+        <div>
+          <input
+            type="checkbox"
+            checked={selectedIndexes.length == 1
+              ? lineStore.data.repeatSettings.byKey[selectedIndexes[0]].allCharts
+              : false}
+            onchange={(e) => setRepeatedAllCharts(e.currentTarget.checked)}
+          />
         </div>
       </div>
     {/if}

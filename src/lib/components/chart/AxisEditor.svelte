@@ -19,30 +19,37 @@
   ];
 </script>
 
-<p>
-  <label>
-    Location:
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Location</span>
+  </div>
+  <div>
     <select value={conf.data.location} onchange={(e) => conf.setLocation(e.currentTarget.value)}>
       {#each Object.values(AxisLocation) as location (location)}
         <option>{location}</option>
       {/each}
     </select>
-  </label>
-</p>
+  </div>
+</div>
 
-<p>
-  <label>
-    Label space:
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Label space</span>
+  </div>
+  <div>
     <input
+      type="number"
       value={conf.data.labelSpace}
       onchange={(e) => conf.setLabelSpace(Number.parseInt(e.currentTarget.value))}
     />
-  </label>
-</p>
+  </div>
+</div>
 
-<p>
-  <label>
-    Repeat labels:
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Repeat labels</span>
+  </div>
+  <div>
     <select
       value={conf.data.repeat}
       onchange={(e) => conf.setRepeat(e.currentTarget.value)}
@@ -52,11 +59,11 @@
         <option value={repeat.k}>{repeat.l}</option>
       {/each}
     </select>
-  </label>
-</p>
+  </div>
+</div>
 
-<u>Major gridlines:</u>
+<h4>Major gridlines</h4>
 <AxisGridEditor conf={conf.major()} />
 
-<u>Minor gridlines:</u>
+<h4>Minor gridlines</h4>
 <AxisGridEditor conf={conf.minor()} isMinor={true} />

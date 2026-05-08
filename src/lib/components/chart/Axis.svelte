@@ -37,7 +37,7 @@
   let lineOffset = $derived(showLabels && conf.location == AxisLocation.START ? size : 0);
 
   // To avoid feedback loop on initial render
-  let dimensionsDebouncer = createDebouncer(250)
+  let dimensionsDebouncer = createDebouncer(250);
 
   $effect(() => {
     if (labelBox || leftBox || rightBox)

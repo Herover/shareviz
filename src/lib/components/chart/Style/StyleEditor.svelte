@@ -29,9 +29,12 @@
 </script>
 
 <h3 class="editor-sub-section">Labels</h3>
-<div class="box">
-  <div class="w-025 editor-column-label"><label for="editor-title">Title: </label></div>
-  <div class="w-075">
+
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Title</span>
+  </div>
+  <div>
     <textarea
       id="editor-title"
       value={chartStore.data?.title}
@@ -41,11 +44,12 @@
     ></textarea>
   </div>
 </div>
-<div class="box">
-  <div class="w-025 editor-column-label p-top-1">
-    <label for="editor-subtitle"> Sub title: </label>
+
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Sub title</span>
   </div>
-  <div class="w-075 p-top-1">
+  <div>
     <textarea
       id="editor-subtitle"
       value={chartStore.data?.subTitle}
@@ -56,89 +60,100 @@
   </div>
 </div>
 
-<div class="box">
-  <div class="w-025 editor-column-label p-top-1">
-    <label for="editor-source-text-left"> Source text (left):</label>
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Source text (left)</span>
   </div>
-  <div class="w-075 p-top-1">
+  <div>
     <input
       id="editor-source-text-left"
       value={chartStore.data?.sourceTextLeft}
       onkeyup={(e) => chartStore.setSourceTextLeft(e.currentTarget.value)}
+      type="text"
       class="control"
     />
   </div>
 </div>
 
-<div class="box">
-  <div class="w-025 editor-column-label p-top-1">
-    <label for="editor-source-link-left"> Source link (left):</label>
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Source link (left)</span>
   </div>
-  <div class="w-075 p-top-1">
+  <div>
     <input
       id="editor-source-link-left"
       value={chartStore.data?.sourceTextLeftLink}
       onkeyup={(e) => chartStore.setSourceTextLeftLink(e.currentTarget.value)}
+      type="text"
       class="control"
     />
   </div>
 </div>
 
-<div class="box">
-  <div class="w-025 editor-column-label p-top-1">
-    <label for="editor-source-text-right"> Source text (right):</label>
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Source text (right)</span>
   </div>
-  <div class="w-075 p-top-1">
+  <div>
     <input
       id="editor-source-text-lerightft"
       value={chartStore.data?.sourceTextRight}
       onkeyup={(e) => chartStore.setSourceTextRight(e.currentTarget.value)}
+      type="text"
       class="control"
     />
   </div>
 </div>
 
-<div class="box">
-  <div class="w-025 editor-column-label p-top-1">
-    <label for="editor-source-text-right"> Source link (right):</label>
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Source link (right)</span>
   </div>
-  <div class="w-075 p-top-1">
+  <div>
     <input
       id="editor-source-text-right"
       value={chartStore.data?.sourceTextRightLink}
       onkeyup={(e) => chartStore.setSourceTextRightLink(e.currentTarget.value)}
+      type="text"
       class="control"
     />
   </div>
 </div>
 
-<p>
-  <label>
-    Height: <input
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Height</span>
+  </div>
+  <div>
+    <input
       value={chartStore.data?.height}
       onkeyup={(e) => chartStore.setConfigHeight(Number.parseInt(e.currentTarget.value))}
       onchange={(e) => chartStore.setConfigHeight(Number.parseInt(e.currentTarget.value))}
       type="number"
       class="control"
     />
-  </label>
-</p>
-<p>
-  <label>
-    Width: <input
+  </div>
+</div>
+
+<div class="editor-row">
+  <div class="editor-column-label">
+    <span>Width</span>
+  </div>
+  <div>
+    <input
       value={chartStore.data?.width}
       onkeyup={(e) => chartStore.setConfigWidth(Number.parseInt(e.currentTarget.value))}
       onchange={(e) => chartStore.setConfigWidth(Number.parseInt(e.currentTarget.value))}
       type="number"
       class="control"
     />
-  </label>
-</p>
+  </div>
+</div>
 
 <h3 class="editor-sub-section">Style</h3>
 
 <p><label for="style-overrides">Style overrides</label></p>
-<p class="editor-sub-section-description">Ovverride css, use on own risk!</p>
+<p class="editor-sub-section-description">Override css, use on own risk!</p>
 <pre class="editor-sub-section-description">{cssExample}</pre>
 <textarea
   rows="10"

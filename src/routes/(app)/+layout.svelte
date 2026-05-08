@@ -197,24 +197,24 @@
       ============================================================ */
       /* Display / Hero */
       --h1-font: var(--font-display);
-      --h1-size: var(--text-3xl);
+      --h1-size: var(--text-2xl);
       --h1-weight: var(--weight-regular);
       --h1-leading: var(--leading-tight);
       --h1-tracking: var(--tracking-tight);
 
       --h2-font: var(--font-display);
-      --h2-size: var(--text-2xl);
+      --h2-size: var(--text-xl);
       --h2-weight: var(--weight-regular);
       --h2-leading: var(--leading-tight);
       --h2-tracking: var(--tracking-tight);
 
-      --h3-font: var(--font-body);
-      --h3-size: var(--text-xl);
+      --h3-font: var(--font-display);
+      --h3-size: var(--text-lg);
       --h3-weight: var(--weight-semibold);
       --h3-leading: var(--leading-snug);
 
       --h4-font: var(--font-body);
-      --h4-size: var(--text-lg);
+      --h4-size: var(--text-md);
       --h4-weight: var(--weight-semibold);
       --h4-leading: var(--leading-snug);
 

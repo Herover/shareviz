@@ -16,6 +16,7 @@
   <label>
     Format
     <input
+      type="text"
       bind:value
       onchange={(e) => onchange(e.currentTarget.value)}
       onkeyup={(e) => onchange(e.currentTarget.value)}
