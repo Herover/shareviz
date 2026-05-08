@@ -105,13 +105,13 @@
       SEMANTIC COLOR TOKENS
       ============================================================ */
       /* Backgrounds */
-      --bg-base: var(--color-warm-100); /* #F7F3EE — page background */
+      --bg-base: var(--color-warm-100); /* page background */
       --bg-surface: #ffffff; /* card / panel surface */
       --bg-sunken: var(--color-warm-200); /* inset / trough */
       --bg-overlay: rgba(247, 243, 238, 0.88); /* frosted overlay */
 
       /* Foregrounds */
-      --fg-primary: var(--color-warm-900); /* #2A1E14 — primary text */
+      --fg-primary: var(--color-warm-900); /* primary text */
       --fg-secondary: var(--color-warm-700); /* secondary / muted text */
       --fg-tertiary: var(--color-warm-500); /* placeholder / disabled */
       --fg-inverse: var(--color-warm-50); /* text on dark bg */
@@ -127,10 +127,10 @@
       --accent-secondary-subtle: var(--color-slate-100);
 
       /* Links */
-      --color-link: var(--color-slate-500); /* #3A5E8E — default link */
-      --color-link-hover: var(--color-slate-700); /* #1E3655 — hover */
-      --color-link-visited: var(--color-slate-600); /* #2C4A72 — visited */
-      --color-link-active: var(--color-terra-500); /* #C9502A — active/pressed */
+      --color-link: var(--color-slate-500);
+      --color-link-hover: var(--color-slate-700);
+      --color-link-visited: var(--color-slate-600);
+      --color-link-active: var(--color-terra-500);
 
       /* Borders */
       --border-subtle: var(--color-warm-200); /* card borders, dividers */
@@ -198,7 +198,7 @@
       /* Display / Hero */
       --h1-font: var(--font-display);
       --h1-size: var(--text-3xl);
-      --h1-weight: var(--weight-regular); /* DM Serif looks best at regular */
+      --h1-weight: var(--weight-regular);
       --h1-leading: var(--leading-tight);
       --h1-tracking: var(--tracking-tight);
 
