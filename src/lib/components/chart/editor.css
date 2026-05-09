@@ -28,7 +28,7 @@
 }
 .editor-column-label-description,
 .editor-sub-section-description {
-  color: var(--text-secondary);
+  color: var(--fg-secondary);
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
   display: block;

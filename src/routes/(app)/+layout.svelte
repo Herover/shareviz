@@ -210,7 +210,7 @@
 
       --h3-font: var(--font-display);
       --h3-size: var(--text-lg);
-      --h3-weight: var(--weight-semibold);
+      --h3-weight: var(--weight-medium);
       --h3-leading: var(--leading-snug);
 
       --h4-font: var(--font-body);
