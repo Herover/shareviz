@@ -60,9 +60,11 @@
       <!-- h3 is technically not allowed inside a button, but appears like the most accessible solution if we want a
         clickable header -->
       {#if lvl == 1}
-        <h3>{open ? "-" : "+"} {label}</h3>
+        <span class="chevron">{open ? "▾" : "▸"}</span>
+        <h3>{label}</h3>
       {:else if lvl == 2}
-        <h4>{open ? "-" : "+"} {label}</h4>
+        <span class="chevron">{open ? "▾" : "▸"}</span>
+        <h4>{label}</h4>
       {/if}
     </span>
     {@render actions?.()}
@@ -88,7 +90,10 @@
     font-weight: bold;
   }
   .header {
-    flex: 1 1 auto;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
   .header-content {
     display: flex;
@@ -107,9 +112,15 @@
   h3,
   h4 {
     margin: 0px;
-    padding-top: 10px;
+    font-family: var(--font-display);
   }
   h3 {
     font-size: 1.5rem;
+  }
+  .chevron {
+    font-size: var(--text-sm);
+    color: var(--fg-tertiary);
+    display: inline-block;
+    transform: translateY(-1px);
   }
 </style>

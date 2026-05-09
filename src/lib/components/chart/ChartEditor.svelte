@@ -36,7 +36,7 @@
       <EditorCollapsible
         group="element-controls"
         key={"element-" + element.id}
-        label={`#${i + 1}`}
+        label={`#${i + 1} · ${getComponentList().find((e) => e.key == element.type)?.label}`}
         startOpen={true}
         lvl={2}
       >
@@ -77,7 +77,10 @@
   {/each}
 
   {#each getComponentList() as { add, label, key } (key)}
-    <button onclick={() => add(chartStore, chartStore.data?.elements.length || 0)}>
+    <button
+      class="btn-primary"
+      onclick={() => add(chartStore, chartStore.data?.elements.length || 0)}
+    >
       + {label}
     </button>
     &nbsp;
