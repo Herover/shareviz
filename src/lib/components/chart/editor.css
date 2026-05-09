@@ -11,6 +11,9 @@
   height: var(--space-8);
   padding: 0 var(--space-3);
 }
+.editor select[multiple] {
+  height: unset;
+}
 .editor textarea {
   resize: vertical;
   min-height: var(--space-16);
