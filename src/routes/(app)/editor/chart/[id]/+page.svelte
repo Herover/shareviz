@@ -537,7 +537,7 @@
     position: relative;
     top: 0px;
     background-color: var(--bg-base);
-    color: var(--fg-secondary)
+    color: var(--fg-secondary);
   }
   .part-item-selected {
     border-bottom: 1px solid var(--bg-base);

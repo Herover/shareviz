@@ -280,11 +280,11 @@
       --spacing: 1.5em;
     }
     body.dark-mode {
-      --bg-base: #1A1714; /* var(--color-warm-900); */
-      --bg-surface: #231F1B;
+      --bg-base: #1a1714; /* var(--color-warm-900); */
+      --bg-surface: #231f1b;
       --bg-sunken: var(--color-warm-800);
       --bg-overlay: rgba(42, 30, 20, 0.88);
-      --fg-primary: #F2EBE0; /* var(--color-warm-50); */
+      --fg-primary: #f2ebe0; /* var(--color-warm-50); */
       --fg-secondary: var(--color-warm-300);
       --fg-tertiary: var(--color-warm-500);
       --fg-inverse: var(--color-warm-900);
