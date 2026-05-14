@@ -386,5 +386,47 @@
     header h1 {
       font-size: var(--text-xl);
     }
+
+    textarea,
+    select,
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      height: var(--space-8);
+      padding: 0 var(--space-3);
+      color: var(--fg-primary);
+    }
+    select[multiple] {
+      height: unset;
+    }
+    textarea {
+      resize: vertical;
+      min-height: var(--space-16);
+      padding: var(--space-2) var(--space-3);
+    }
+    button {
+      height: var(--space-8);
+      padding: 0 10px;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      color: var(--fg-secondary);
+      cursor: pointer;
+      transition: background var(--duration-micro) var(--ease-standard);
+    }
+    button[disabled] {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    button.btn-primary {
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
   }
 </style>
