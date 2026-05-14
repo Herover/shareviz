@@ -499,7 +499,7 @@
   header {
     width: 100%;
     height: var(--editor-header-height);
-    border-bottom: 1px solid var(--fg-primary);
+    border-bottom: 1px solid var(--border-default);
     background-color: var(--bg-surface);
     position: sticky;
     top: 0px;
@@ -525,16 +525,19 @@
   .part-item {
     margin-left: 0.2em;
     margin-right: 0.2em;
-    padding: 0.2em;
-    border-left: 1px solid var(--fg-primary);
-    border-right: 1px solid var(--fg-primary);
-    border-top: 1px solid var(--fg-primary);
-    border-bottom: 1px solid var(--fg-primary);
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border-left: 1px solid var(--border-default);
+    border-right: 1px solid var(--border-default);
+    border-top: 1px solid var(--border-default);
+    border-bottom: 1px solid var(--border-default);
     z-index: 1;
     position: relative;
     top: 0px;
-    font-size: 1.1em;
     background-color: var(--bg-base);
+    color: var(--fg-secondary)
   }
   .part-item-selected {
     border-bottom: 1px solid var(--bg-base);
