@@ -111,74 +111,89 @@
 </script>
 
 <div class="line-list">
-  <label>
-    Search
-    <input bind:value={searchString} class="line-search" />
-  </label>
+  <div class="line-search-box">
+    <input
+      bind:value={searchString}
+      class="line-search"
+      type="text"
+      placeholder="Search categories..."
+    />
+  </div>
   <!-- <LinesEditorLine
     style={defaultStyle}
     selected={defaultSelected}
     {chartColors}
     onSelect={(d) => toggleSelect(null, d.selected, d.replace, null)}
   /> -->
-  {#each filteredValues as line, i (line.k)}
-    {#if line}
-      <div
-        onclick={(e) => toggleSelect(e, null, line.k, i)}
-        onkeydown={(e) => toggleSelect(null, e, line.k, i)}
-        onmouseover={() => onfocus && onfocus(line.k, i, line)}
-        onmouseout={() => onblur && onblur(line.k, i, null)}
-        onfocus={() => onfocus && onfocus(line.k, i, line.d)}
-        onblur={() => onblur && onblur(line.k, i, line.d)}
-        class:line-selected={selected[line.k]}
-        class:line-unselected={!selected[line.k]}
-        class="line-item"
-        role="button"
-        tabindex="0"
-      >
-        <div class="line-text">
-          {@render title(line)}
+  <div class="line-box">
+    {#each filteredValues as line, i (line.k)}
+      {#if line}
+        <div
+          onclick={(e) => toggleSelect(e, null, line.k, i)}
+          onkeydown={(e) => toggleSelect(null, e, line.k, i)}
+          onmouseover={() => onfocus && onfocus(line.k, i, line)}
+          onmouseout={() => onblur && onblur(line.k, i, null)}
+          onfocus={() => onfocus && onfocus(line.k, i, line.d)}
+          onblur={() => onblur && onblur(line.k, i, line.d)}
+          class:line-selected={selected[line.k]}
+          class:line-unselected={!selected[line.k]}
+          class="line-item"
+          role="button"
+          tabindex="0"
+        >
+          <div class="line-text">
+            {@render title(line)}
+          </div>
+          <div class="line-buttons">
+            <span
+              role="button"
+              tabindex="0"
+              onkeydown={(e) => e.key == " " && i != 0 && moveUp(line.k, i)}
+              onclick={() => i != 0 && moveUp(line.k, i)}>&#x25B2;</span
+            >
+            <span
+              role="button"
+              tabindex="0"
+              onkeydown={(e) =>
+                e.key == " " && i != filteredValues.length - 1 && moveDown(line.k, i)}
+              onclick={() => i != filteredValues.length - 1 && moveDown(line.k, i)}>&#x25BC;</span
+            >
+            <!-- extra actions -->
+          </div>
         </div>
-        <div class="line-buttons">
-          <span
-            role="button"
-            tabindex="0"
-            onkeydown={(e) => e.key == " " && i != 0 && moveUp(line.k, i)}
-            onclick={() => i != 0 && moveUp(line.k, i)}>&#x25B2;</span
-          >
-          <span
-            role="button"
-            tabindex="0"
-            onkeydown={(e) => e.key == " " && i != filteredValues.length - 1 && moveDown(line.k, i)}
-            onclick={() => i != filteredValues.length - 1 && moveDown(line.k, i)}>&#x25BC;</span
-          >
-          <!-- extra actions -->
-        </div>
-      </div>
-    {/if}
-  {/each}
+      {/if}
+    {/each}
+  </div>
 </div>
 
 <style>
   .line-list {
     width: 100%;
-    height: 300px;
     overflow-y: scroll;
-    border: 1px solid var(--fg-primary);
-    box-sizing: border-box;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
     background-color: var(--bg-surface);
+  }
+  .line-search-box {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--bg-base);
   }
   .line-search {
     width: 100%;
   }
-
+  .line-box {
+    max-height: 300px;
+    overflow-y: auto;
+  }
   .line-item {
-    width: 100%;
-    padding: 0.3em;
     display: flex;
-    box-sizing: border-box;
-    align-items: center;
     cursor: pointer;
+    align-items: center;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background var(--duration-micro) var(--ease-standard);
+    color: var(--fg-primary);
   }
   .line-selected {
     background-color: var(--accent-primary-subtle);
@@ -193,5 +208,10 @@
     height: 16px;
     display: flex;
     align-items: center;
+    color: var(--fg-tertiary);
+  }
+  .line-buttons span {
+    padding: 4px 6px;
+    font-size: 0.7rem;
   }
 </style>
