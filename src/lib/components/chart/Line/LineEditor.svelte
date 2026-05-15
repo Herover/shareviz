@@ -259,6 +259,7 @@
                 lineStore.data.repeatSettings.byKey[selectedIndexes[0]].k
               : ""}
             onkeyup={(e) => setRepeatedLabel(e.currentTarget.value)}
+            type="text"
           />
         </div>
       </div>

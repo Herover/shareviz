@@ -291,6 +291,7 @@
       disabled={nonEditable && selectedIndexes.length != 1}
       onchange={(e) => setLineLabel(e.currentTarget.value)}
       onkeyup={(e) => setLineLabel(e.currentTarget.value)}
+      type="text"
     />
     <button disabled={selectedIndexes.length == 0} onclick={() => setLabelToKey()}>Auto</button>
   </div>
