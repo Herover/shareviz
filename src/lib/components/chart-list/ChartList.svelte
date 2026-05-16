@@ -117,6 +117,8 @@
         editFolder(part.id, { name: e.currentTarget.value });
         nameOverride[part.id] = e.currentTarget.value;
       }}
+      type="text"
+      style:width="300px"
     />
   {:else}
     <a
