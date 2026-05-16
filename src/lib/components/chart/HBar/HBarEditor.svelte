@@ -131,10 +131,11 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Data set</span>
+    <label for="hbar-data-set">Data set</label>
   </div>
   <div>
     <select
+      id="hbar-data-set"
       value={hbarStore.data.dataSet}
       onchange={(e) => hbarStore.setDataSet(e.currentTarget.value)}
     >
@@ -148,10 +149,11 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Label width</span>
+    <label for="hbar-label-width">Label width</label>
   </div>
   <div>
     <input
+      id="hbar-label-width"
       value={hbarStore.data.labelWidth}
       onkeyup={(e) => hbarStore.setLabelWidth(Number.parseInt(e.currentTarget.value))}
       onchange={(e) => hbarStore.setLabelWidth(Number.parseInt(e.currentTarget.value))}
@@ -163,10 +165,11 @@
 {#if dataSet}
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Categories from</span>
+      <label for="hbar-categories">Categories from</label>
     </div>
     <div>
       <select
+        id="hbar-categories"
         value={hbarStore.data.categories}
         onchange={(e) => hbarStore.setCategories(e.currentTarget.value)}
       >
@@ -180,10 +183,11 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Sub categories from</span>
+      <label for="hbar-sub-categories">Sub categories from</label>
     </div>
     <div>
       <select
+        id="hbar-sub-categories"
         value={hbarStore.data.subCategories}
         onchange={(e) => hbarStore.setSubCategories(e.currentTarget.value)}
       >
@@ -197,10 +201,11 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Stack sub categories</span>
+      <label for="hbar-stack-sub-categories">Stack sub categories</label>
     </div>
     <div>
       <input
+        id="hbar-stack-sub-categories"
         checked={hbarStore.data.stackSubCategories}
         onchange={(e) => hbarStore.setStackSubCategories(e.currentTarget.checked)}
         type="checkbox"
@@ -211,10 +216,11 @@
   {#if hbarStore.data.stackSubCategories}
     <div class="editor-row">
       <div class="editor-column-label">
-        <span>Total</span>
+        <label for="hbar-total">Total</label>
       </div>
       <div>
         <input
+          id="hbar-total"
           checked={hbarStore.data.portionSubCategories}
           onchange={(e) => hbarStore.setPortionSubCategories(e.currentTarget.checked)}
           type="checkbox"
@@ -225,10 +231,11 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Values from</span>
+      <label for="hbar-values-from">Values from</label>
     </div>
     <div>
       <select
+        id="hbar-values-from"
         value={hbarStore.data.value}
         onchange={(e) => hbarStore.setValue(e.currentTarget.value)}
       >
@@ -321,10 +328,11 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Rectangle labels</span>
+      <label for="hbar-rect-labels">Rectangle labels</label>
     </div>
     <div>
       <input
+        id="hbar-rect-labels"
         checked={hbarStore.data.rectLabels}
         onchange={(e) => hbarStore.setRectLabels(e.currentTarget.checked)}
         type="checkbox"
@@ -348,10 +356,11 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Repeat for each</span>
+      <label for="hbar-repeat-for-each">Repeat for each</label>
     </div>
     <div>
       <select
+        id="hbar-repeat-for-each"
         value={hbarStore.data.repeat}
         onchange={(e) => hbarStore.setRepeat(e.currentTarget.value)}
       >
@@ -365,7 +374,7 @@
 {/if}
 
 <b>Axis</b>
-<AxisEditor conf={hbarStore.axis()} showRepeatControl={hbarStore.data.repeat != ""} />
+<AxisEditor conf={hbarStore.axis()} showRepeatControl={hbarStore.data.repeat != ""} idPrefix="hbar-" />
 
 <style>
   .color-control {

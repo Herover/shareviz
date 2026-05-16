@@ -6,17 +6,19 @@
   interface Props {
     conf: AxisGridStore;
     isMinor?: boolean;
+    idPrefix?: string;
   }
 
-  let { conf, isMinor = false }: Props = $props();
+  let { conf, isMinor = false, idPrefix = "" }: Props = $props();
 </script>
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Enabled</span>
+    <label for="{idPrefix}grid-enabled">Enabled</label>
   </div>
   <div>
     <input
+      id="{idPrefix}grid-enabled"
       checked={conf.data.enabled}
       onchange={(e) => conf.setEnabled(e.currentTarget.checked)}
       type="checkbox"
@@ -27,10 +29,11 @@
 {#if conf.data.enabled}
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Grid</span>
+      <label for="{idPrefix}grid-grid">Grid</label>
     </div>
     <div>
       <input
+        id="{idPrefix}grid-grid"
         checked={conf.data.grid}
         onchange={(e) => conf.setGrid(e.currentTarget.checked)}
         type="checkbox"
@@ -40,10 +43,11 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Label tick size</span>
+      <label for="{idPrefix}grid-tick-size">Label tick size</label>
     </div>
     <div>
       <input
+        id="{idPrefix}grid-tick-size"
         value={conf.data.tickSize}
         onchange={(e) => conf.setTickSize(Number.parseFloat(e.currentTarget.value))}
         type="number"
@@ -53,10 +57,11 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Label tick width</span>
+      <label for="{idPrefix}grid-tick-width">Label tick width</label>
     </div>
     <div>
       <input
+        id="{idPrefix}grid-tick-width"
         value={conf.data.tickWidth}
         onchange={(e) => conf.setTickWidth(Number.parseFloat(e.currentTarget.value))}
         type="number"
@@ -66,17 +71,19 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Auto ticks from</span>
+      <label for="{idPrefix}grid-auto-from">Auto ticks from</label>
     </div>
     <div>
       <input
+        id="{idPrefix}grid-auto-from"
         type="number"
         value={conf.data.auto.from}
         onchange={(e) => conf.setAutoFrom(e.currentTarget.value)}
         style="width: 80px;"
       />
-      every
+      <label for="{idPrefix}grid-auto-each">every</label>
       <input
+        id="{idPrefix}grid-auto-each"
         value={conf.data.auto.each}
         onchange={(e) => conf.setAutoEach(Number.parseFloat(e.currentTarget.value))}
         type="number"
@@ -88,10 +95,11 @@
   {#if !isMinor}
     <div class="editor-row">
       <div class="editor-column-label">
-        <span>Auto label</span>
+        <label for="{idPrefix}grid-auto-label">Auto label</label>
       </div>
       <div>
         <input
+          id="{idPrefix}grid-auto-label"
           checked={conf.data.auto.labels}
           onchange={(e) => conf.setAutoLabels(e.currentTarget.checked)}
           type="checkbox"
@@ -105,8 +113,9 @@
             <option>{n}</option>
           {/each}
         </select>
-        after
+        <label for="{idPrefix}grid-after-label">after</label>
         <input
+          id="{idPrefix}grid-after-label"
           type="text"
           value={conf.data.afterLabel}
           onchange={(e) => conf.setAfterLabel(e.currentTarget.value)}

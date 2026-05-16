@@ -283,10 +283,11 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Label</span>
+    <label for="lines-label">Label</label>
   </div>
   <div>
     <input
+      id="lines-label"
       value={typeof mergedStyle.label.text == "undefined" ? "" : mergedStyle.label.text}
       disabled={nonEditable && selectedIndexes.length != 1}
       onchange={(e) => setLineLabel(e.currentTarget.value)}
@@ -345,10 +346,11 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Width</span>
+    <label for="lines-width">Width</label>
   </div>
   <div>
     <input
+      id="lines-width"
       value={typeof mergedStyle.width == "undefined" ? "" : mergedStyle.width}
       disabled={nonEditable}
       onchange={(e) => setWidth(Number.parseInt(e.currentTarget.value))}
@@ -359,10 +361,11 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Location</span>
+    <label for="lines-location">Location</label>
   </div>
   <div>
     <select
+      id="lines-location"
       value={typeof mergedStyle.label.location == "undefined" ? "" : mergedStyle.label.location}
       disabled={nonEditable}
       onchange={(e) => setLabelLocation(e.currentTarget.value)}
@@ -405,10 +408,11 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Symbols</span>
+    <label for="lines-symbols">Symbols</label>
   </div>
   <div>
     <select
+      id="lines-symbols"
       value={typeof mergedStyle.symbols == "undefined" ? "" : mergedStyle.symbols}
       disabled={nonEditable}
       onchange={(e) => setSymbols(e.currentTarget.value)}
@@ -422,10 +426,11 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Missing data</span>
+    <label for="lines-missing-data">Missing data</label>
   </div>
   <div>
     <select
+      id="lines-missing-data"
       value={typeof mergedStyle.missingStyle == "undefined" ? "" : mergedStyle.missingStyle}
       disabled={nonEditable}
       onchange={(e) => setMissingStyle(e.currentTarget.value)}

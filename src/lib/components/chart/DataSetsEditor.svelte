@@ -24,7 +24,7 @@
   {#if i != 0}
     <br />
   {/if}
-  <DataSetEditor dataStore={new DataSetStore(connection, i)} />
+  <DataSetEditor dataStore={new DataSetStore(connection, i)} idPrefix="ds{dataSet.id}-" />
 {/each}
 
 <button onclick={() => addDataSet()}>+ Data set</button>

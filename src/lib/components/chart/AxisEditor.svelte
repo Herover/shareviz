@@ -8,9 +8,10 @@
   interface Props {
     conf: AxisStore;
     showRepeatControl?: boolean;
+    idPrefix?: string;
   }
 
-  let { conf, showRepeatControl = false }: Props = $props();
+  let { conf, showRepeatControl = false, idPrefix = "" }: Props = $props();
 
   const repeatSettings = [
     { l: "Always show", k: AxisRepeatMode.ALL },
@@ -21,10 +22,10 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Location</span>
+    <label for="{idPrefix}axis-location">Location</label>
   </div>
   <div>
-    <select value={conf.data.location} onchange={(e) => conf.setLocation(e.currentTarget.value)}>
+    <select id="{idPrefix}axis-location" value={conf.data.location} onchange={(e) => conf.setLocation(e.currentTarget.value)}>
       {#each Object.values(AxisLocation) as location (location)}
         <option>{location}</option>
       {/each}
@@ -34,10 +35,11 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Label space</span>
+    <label for="{idPrefix}axis-label-space">Label space</label>
   </div>
   <div>
     <input
+      id="{idPrefix}axis-label-space"
       type="number"
       value={conf.data.labelSpace}
       onchange={(e) => conf.setLabelSpace(Number.parseInt(e.currentTarget.value))}
@@ -47,10 +49,11 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Repeat labels</span>
+    <label for="{idPrefix}axis-repeat-labels">Repeat labels</label>
   </div>
   <div>
     <select
+      id="{idPrefix}axis-repeat-labels"
       value={conf.data.repeat}
       onchange={(e) => conf.setRepeat(e.currentTarget.value)}
       disabled={!showRepeatControl}
@@ -63,7 +66,7 @@
 </div>
 
 <h4>Major gridlines</h4>
-<AxisGridEditor conf={conf.major()} />
+<AxisGridEditor conf={conf.major()} idPrefix="{idPrefix}major-" />
 
 <h4>Minor gridlines</h4>
-<AxisGridEditor conf={conf.minor()} isMinor={true} />
+<AxisGridEditor conf={conf.minor()} isMinor={true} idPrefix="{idPrefix}minor-" />

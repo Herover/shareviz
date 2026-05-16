@@ -236,10 +236,10 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Data set</span>
+    <label for="range-data-set">Data set</label>
   </div>
   <div>
-    <select value={chartSpec.dataSet} onchange={(e) => setDataSet(e.currentTarget.value)}>
+    <select id="range-data-set" value={chartSpec.dataSet} onchange={(e) => setDataSet(e.currentTarget.value)}>
       <option></option>
       {#each spec.data.sets as set (set.id)}
         <option value={set.id}>{set.name}</option>
@@ -251,10 +251,10 @@
 {#if chartSpec.dataSet}
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>One line for every</span>
+      <label for="range-line-for-every">One line for every</label>
     </div>
     <div>
-      <select value={chartSpec.categories} onchange={(e) => setCategories(e.currentTarget.value)}>
+      <select id="range-line-for-every" value={chartSpec.categories} onchange={(e) => setCategories(e.currentTarget.value)}>
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
@@ -282,10 +282,12 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Label</span>
+      <label for="range-line-label">Label</label>
     </div>
     <div>
       <input
+        id="range-line-label"
+        type="text"
         value={selectedLines.length == 1
           ? (chartSpec.categoryKeys[selectedLines[0]]?.label.text ?? "")
           : ""}
@@ -297,10 +299,10 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>One point for every</span>
+      <label for="range-point-for-every">One point for every</label>
     </div>
     <div>
-      <select value={chartSpec.pointLabel} onchange={(e) => setPointLabel(e.currentTarget.value)}>
+      <select id="range-point-for-every" value={chartSpec.pointLabel} onchange={(e) => setPointLabel(e.currentTarget.value)}>
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
@@ -311,10 +313,10 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Point value</span>
+      <label for="range-point-value">Point value</label>
     </div>
     <div>
-      <select value={chartSpec.pointValue} onchange={(e) => setPointValue(e.currentTarget.value)}>
+      <select id="range-point-value" value={chartSpec.pointValue} onchange={(e) => setPointValue(e.currentTarget.value)}>
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
@@ -337,10 +339,12 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Label</span>
+      <label for="range-point-label">Label</label>
     </div>
     <div>
       <input
+        id="range-point-label"
+        type="text"
         value={selectedPoints.length == 1
           ? (chartSpec.rangeCategoryKeys[selectedPoints[0]]?.label.text ?? "")
           : ""}
@@ -367,10 +371,10 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Repeat for every</span>
+      <label for="range-repeat-for-every">Repeat for every</label>
     </div>
     <div>
-      <select value={chartSpec.repeat} onchange={(e) => setRepeat(e.currentTarget.value)}>
+      <select id="range-repeat-for-every" value={chartSpec.repeat} onchange={(e) => setRepeat(e.currentTarget.value)}>
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
@@ -383,5 +387,6 @@
   <AxisEditor
     conf={new AxisStore(connection, chartSpec.axis, [...store.pathPrefix(), "axis"])}
     showRepeatControl={true}
+    idPrefix="range-"
   />
 {/if}

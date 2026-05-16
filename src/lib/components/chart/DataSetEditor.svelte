@@ -10,9 +10,10 @@
 
   interface Props {
     dataStore: DataSetStore;
+    idPrefix?: string;
   }
 
-  let { dataStore }: Props = $props();
+  let { dataStore, idPrefix = "" }: Props = $props();
 
   const updateColumns = (newRaw: string) => {
     if (typeof dataStore.data == "undefined") {
@@ -76,10 +77,11 @@
   {#if typeof dataStore.data != "undefined"}
     <div class="editor-row">
       <div class="editor-column-label">
-        <span>Name</span>
+        <label for="{idPrefix}dataset-name">Name</label>
       </div>
       <div>
         <input
+          id="{idPrefix}dataset-name"
           type="text"
           value={dataStore.data.name}
           onchange={(e) => dataStore.setName(e.currentTarget.value)}
@@ -90,10 +92,11 @@
 
     <div class="editor-row">
       <div class="editor-column-label">
-        <span>Format</span>
+        <label for="{idPrefix}dataset-format">Format</label>
       </div>
       <div>
         <select
+          id="{idPrefix}dataset-format"
           value={dataStore.data.type}
           onchange={(e) => dataStore.setType(e.currentTarget.value)}
         >
@@ -106,10 +109,11 @@
 
     <div class="editor-row">
       <div class="editor-column-label">
-        <span>Raw data</span>
+        <label for="{idPrefix}dataset-raw">Raw data</label>
       </div>
       <div>
         <textarea
+          id="{idPrefix}dataset-raw"
           value={dataStore.data.raw}
           onchange={(e) => updateColumns(e.currentTarget.value)}
           rows="4"
@@ -130,7 +134,7 @@ value3\tvalue4
       columns, then you need to turn them into rows first. Use transpose for this.
     </p>
     {#each dataStore.data.transpose as transpose, i (transpose.toKey)}
-      <DataSetTransposeEditor {dataStore} {transpose} {i} />
+      <DataSetTransposeEditor {dataStore} {transpose} {i} idPrefix="{idPrefix}t{i}-" />
     {/each}
 
     <button
@@ -144,10 +148,11 @@ value3\tvalue4
     {#each dataStore.data.rows as column, i (i)}
       <div class="editor-row">
         <div class="editor-column-label">
-          <span>"{column.key}"</span>
+          <label for="{idPrefix}col-{i}">"{column.key}"</label>
         </div>
         <div>
           <select
+            id="{idPrefix}col-{i}"
             value={column.type}
             onchange={(e) => dataStore.setColumnType(i, e.currentTarget.value)}
           >

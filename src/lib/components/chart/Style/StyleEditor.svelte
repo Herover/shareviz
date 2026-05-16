@@ -32,7 +32,7 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Title</span>
+    <label for="editor-title">Title</label>
   </div>
   <div>
     <textarea
@@ -47,7 +47,7 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Sub title</span>
+    <label for="editor-subtitle">Sub title</label>
   </div>
   <div>
     <textarea
@@ -62,7 +62,7 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Source text (left)</span>
+    <label for="editor-source-text-left">Source text (left)</label>
   </div>
   <div>
     <input
@@ -77,7 +77,7 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Source link (left)</span>
+    <label for="editor-source-link-left">Source link (left)</label>
   </div>
   <div>
     <input
@@ -92,11 +92,11 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Source text (right)</span>
+    <label for="editor-source-text-right">Source text (right)</label>
   </div>
   <div>
     <input
-      id="editor-source-text-lerightft"
+      id="editor-source-text-right"
       value={chartStore.data?.sourceTextRight}
       onkeyup={(e) => chartStore.setSourceTextRight(e.currentTarget.value)}
       type="text"
@@ -107,11 +107,11 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Source link (right)</span>
+    <label for="editor-source-link-right">Source link (right)</label>
   </div>
   <div>
     <input
-      id="editor-source-text-right"
+      id="editor-source-link-right"
       value={chartStore.data?.sourceTextRightLink}
       onkeyup={(e) => chartStore.setSourceTextRightLink(e.currentTarget.value)}
       type="text"
@@ -122,10 +122,11 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Height</span>
+    <label for="style-height">Height</label>
   </div>
   <div>
     <input
+      id="style-height"
       value={chartStore.data?.height}
       onkeyup={(e) => chartStore.setConfigHeight(Number.parseInt(e.currentTarget.value))}
       onchange={(e) => chartStore.setConfigHeight(Number.parseInt(e.currentTarget.value))}
@@ -137,10 +138,11 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <span>Width</span>
+    <label for="style-width">Width</label>
   </div>
   <div>
     <input
+      id="style-width"
       value={chartStore.data?.width}
       onkeyup={(e) => chartStore.setConfigWidth(Number.parseInt(e.currentTarget.value))}
       onchange={(e) => chartStore.setConfigWidth(Number.parseInt(e.currentTarget.value))}
@@ -156,6 +158,7 @@
 <p class="editor-sub-section-description">Override css, use on own risk!</p>
 <pre class="editor-sub-section-description">{cssExample}</pre>
 <textarea
+  id="style-overrides"
   rows="10"
   onchange={(e) => styletStore.setCSS(e.currentTarget.value)}
   onkeyup={(e) => styletStore.setCSS(e.currentTarget.value)}>{styletStore.data?.css}</textarea

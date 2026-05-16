@@ -294,9 +294,12 @@
         {#if canEdit && store.data}
           {#if visibleSection == "data"}
             <div class="editor-row">
-              <div class="editor-column-label">Internal chart name</div>
+              <div class="editor-column-label">
+                <label for="editor-chart-name">Internal chart name</label>
+              </div>
               <div>
                 <input
+                  id="editor-chart-name"
                   value={$db?.chartInfo?.name}
                   onchange={(e) => db.updateInfo({ name: e.currentTarget.value })}
                   disabled={!canEdit || $db.chartInfo == null}
@@ -381,9 +384,9 @@
 
     <div class="chart-viewer">
       <div class="view-controls">
-        <div>Zoom</div>
+        <div><label for="view-zoom">Zoom</label></div>
         <div><button onclick={() => (viewScale -= 10)}>-</button></div>
-        <div><input value={viewScale} size="2" /></div>
+        <div><input id="view-zoom" value={viewScale} size="2" /></div>
         <div><button onclick={() => (viewScale += 10)}>+</button></div>
       </div>
       <div class="chart-view">
