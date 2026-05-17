@@ -25,7 +25,11 @@
     <label for="{idPrefix}axis-location">Location</label>
   </div>
   <div>
-    <select id="{idPrefix}axis-location" value={conf.data.location} onchange={(e) => conf.setLocation(e.currentTarget.value)}>
+    <select
+      id="{idPrefix}axis-location"
+      value={conf.data.location}
+      onchange={(e) => conf.setLocation(e.currentTarget.value)}
+    >
       {#each Object.values(AxisLocation) as location (location)}
         <option>{location}</option>
       {/each}

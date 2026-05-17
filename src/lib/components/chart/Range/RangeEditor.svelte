@@ -239,7 +239,11 @@
     <label for="range-data-set">Data set</label>
   </div>
   <div>
-    <select id="range-data-set" value={chartSpec.dataSet} onchange={(e) => setDataSet(e.currentTarget.value)}>
+    <select
+      id="range-data-set"
+      value={chartSpec.dataSet}
+      onchange={(e) => setDataSet(e.currentTarget.value)}
+    >
       <option></option>
       {#each spec.data.sets as set (set.id)}
         <option value={set.id}>{set.name}</option>
@@ -254,7 +258,11 @@
       <label for="range-line-for-every">One line for every</label>
     </div>
     <div>
-      <select id="range-line-for-every" value={chartSpec.categories} onchange={(e) => setCategories(e.currentTarget.value)}>
+      <select
+        id="range-line-for-every"
+        value={chartSpec.categories}
+        onchange={(e) => setCategories(e.currentTarget.value)}
+      >
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
@@ -302,7 +310,11 @@
       <label for="range-point-for-every">One point for every</label>
     </div>
     <div>
-      <select id="range-point-for-every" value={chartSpec.pointLabel} onchange={(e) => setPointLabel(e.currentTarget.value)}>
+      <select
+        id="range-point-for-every"
+        value={chartSpec.pointLabel}
+        onchange={(e) => setPointLabel(e.currentTarget.value)}
+      >
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
@@ -316,7 +328,11 @@
       <label for="range-point-value">Point value</label>
     </div>
     <div>
-      <select id="range-point-value" value={chartSpec.pointValue} onchange={(e) => setPointValue(e.currentTarget.value)}>
+      <select
+        id="range-point-value"
+        value={chartSpec.pointValue}
+        onchange={(e) => setPointValue(e.currentTarget.value)}
+      >
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
@@ -374,7 +390,11 @@
       <label for="range-repeat-for-every">Repeat for every</label>
     </div>
     <div>
-      <select id="range-repeat-for-every" value={chartSpec.repeat} onchange={(e) => setRepeat(e.currentTarget.value)}>
+      <select
+        id="range-repeat-for-every"
+        value={chartSpec.repeat}
+        onchange={(e) => setRepeat(e.currentTarget.value)}
+      >
         <option></option>
         {#each chartData[chartSpec.dataSet].rows as row (row.key)}
           <option>{row.key}</option>
