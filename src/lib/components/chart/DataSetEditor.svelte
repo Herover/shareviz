@@ -23,14 +23,14 @@
     const names = getColumnNames(dataStore.data, newRaw);
     const data = dataStore.data;
     dataStore.setColumns(
-      names.map((key, i) => ({
-        key,
-        type: orDefault(
-          data.rows.find((e) => e.key === key)?.type,
-          guessColumnType(dataStore.data, newRaw, i),
-        ),
-        dateFormat: "",
-      })),
+      names.map((key, i) => {
+        const old = data.rows.find((e) => e.key === key);
+        return {
+          key,
+          type: orDefault(old?.type, guessColumnType(dataStore.data, newRaw, i)),
+          dateFormat: old?.dateFormat ?? "",
+        };
+      }),
     );
   };
 
