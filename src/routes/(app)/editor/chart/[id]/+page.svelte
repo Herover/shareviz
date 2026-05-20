@@ -5,6 +5,7 @@
   import type { Root } from "$lib/chart.d.ts";
   import ChartEditor from "$lib/components/chart/ChartEditor.svelte";
   import DataSetEditor from "$lib/components/chart/DataSetsEditor.svelte";
+  import PublishTab from "$lib/components/chart/PublishTab.svelte";
   import { onDestroy, onMount } from "svelte";
   import StyleEditor from "$lib/components/chart/Style/StyleEditor.svelte";
   import { computeData } from "$lib/data.js";
@@ -20,7 +21,6 @@
   import { LineStore } from "$lib/chartStores/line.svelte.js";
   import { chartToEditor } from "$lib/chartToEditorStore.svelte.js";
   import { addPublication, getChartPublications } from "$lib/api.js";
-  import dayjs from "dayjs";
   import { resolve } from "$app/paths";
   import { notifications } from "$lib/notificationStore.js";
   import { goto } from "$app/navigation";
@@ -186,7 +186,9 @@
   };
 
   const updatePublications = async (id: string) => {
-    publications = (await getChartPublications(id)).publications;
+    publications = (await getChartPublications(id)).publications.sort(
+      (a, b) => b.chartPublication.v - a.chartPublication.v,
+    );
   };
   $effect(() => {
     if (!store.chartInfo) {
@@ -314,66 +316,14 @@
           {:else if visibleSection == "charts"}
             <ChartEditor spec={chartSpec} {chartData} connection={store} />
           {:else if visibleSection == "publish"}
-            <h3 class="editor-sub-section">Embed</h3>
-            <p class="editor-sub-section-description">
-              For responsive/interactable chart.
-              <button onclick={() => publisize()}>+ New</button>
-              (v. {chartStore.version})
-            </p>
-            {#each publications as publication (publication.chartPublication.id)}
-              <p>
-                {dayjs(publication.chartPublication.created).format("YYYY-MM-DD HH:mm")} v. {publication
-                  .chartPublication.v}
-              </p>
-              <div class="editor-row">
-                <div class="editor-column-label">
-                  <a
-                    href={env.PUBLIC_VIEWER_ORIGIN +
-                      "/view/chart/" +
-                      publication.chartPublication.id}>Embed link</a
-                  >
-                </div>
-                <div>
-                  <input
-                    value={env.PUBLIC_VIEWER_ORIGIN +
-                      "/view/chart/" +
-                      publication.chartPublication.id}
-                    type="text"
-                  />
-                </div>
-              </div>
-            {/each}
-
-            <h3 class="editor-sub-section">Export image</h3>
-
-            <div class="editor-row">
-              <div class="editor-column-label">Scale</div>
-              <div>
-                <label>
-                  <input type="radio" name="image-scale" value={1} bind:group={imageScale} />
-                  {1}x
-                </label>
-                <br />
-                <label>
-                  <input type="radio" name="image-scale" value={2} bind:group={imageScale} />
-                  {2}x
-                </label>
-                <br />
-                <label>
-                  <input type="radio" name="image-scale" value={4} bind:group={imageScale} />
-                  {4}x
-                </label>
-              </div>
-            </div>
-
-            <button onclick={() => chartToPNG()}>Generate PNG</button>
-            <h3 class="editor-sub-section">Export Data Tortilla JSON</h3>
-            <p class="editor-sub-section-description">Import chart elsewhere.</p>
-            <input
-              value={JSON.stringify(chartSpec)}
-              onfocus={(e) => e.currentTarget.select()}
-              onkeyup={(e) => (e.currentTarget.value = JSON.stringify(chartSpec))}
-              type="text"
+            <PublishTab
+              {publications}
+              version={chartStore.version}
+              viewerOrigin={env.PUBLIC_VIEWER_ORIGIN}
+              {chartSpec}
+              bind:imageScale
+              onPublish={() => publisize()}
+              onGeneratePng={() => chartToPNG()}
             />
           {/if}
         {:else}

@@ -165,6 +165,10 @@
       /* Subtle accent wash (hover/active fills) */
       --accent-primary-wash: rgba(201, 80, 42, 0.13);
 
+      /* Foreground for text/icons placed on top of --accent-primary fills
+         (theme-stable: accent stays warm rust in both modes). */
+      --fg-on-accent: var(--color-warm-50);
+
       /* Shadows */
       --shadow-1: 0 1px 3px rgba(42, 30, 20, 0.07), 0 1px 2px rgba(42, 30, 20, 0.04);
       --shadow-2: 0 4px 16px rgba(42, 30, 20, 0.12), 0 2px 4px rgba(42, 30, 20, 0.06);
@@ -378,21 +382,6 @@
       font-family: var(--font-mono);
       font-size: var(--text-sm);
     }
-    a {
-      color: var(--color-link);
-      text-decoration: none;
-    }
-    a:hover {
-      color: var(--color-link-hover);
-      text-decoration: underline;
-    }
-    a:visited {
-      color: var(--color-link-visited);
-    }
-    a:active {
-      color: var(--color-link-active);
-    }
-
     button,
     input,
     text {
