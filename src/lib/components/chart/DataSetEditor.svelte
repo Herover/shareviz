@@ -203,3 +203,125 @@
     </EditorCollapsible>
   </EditorCollapsible>
 {/if}
+
+<style>
+  /* Column list with type badges */
+  .ed-col-list {
+    width: 100%;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    background: var(--bg-surface);
+    overflow: hidden;
+  }
+  .ed-col-row {
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .ed-col-row:last-child {
+    border-bottom: 0;
+  }
+  .ed-col-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+  }
+  .ed-col-badge {
+    flex-shrink: 0;
+    width: 30px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .ed-col-badge.is-empty {
+    opacity: 0.35;
+  }
+  .ed-col-badge.badge-num {
+    background: var(--badge-num-bg);
+    color: var(--badge-num-fg);
+  }
+  .ed-col-badge.badge-text {
+    background: var(--badge-text-bg);
+    color: var(--badge-text-fg);
+  }
+  .ed-col-badge.badge-date {
+    background: var(--badge-date-bg);
+    color: var(--badge-date-fg);
+  }
+  .ed-col-name {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--fg-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .ed-col-name.is-empty {
+    color: var(--fg-tertiary);
+    font-style: italic;
+  }
+  select.ed-col-select {
+    width: 110px;
+    flex-shrink: 0;
+    height: 26px;
+    font-size: 0.85rem;
+  }
+
+  /* Date format expansion */
+  .ed-col-date {
+    padding: 8px 12px 12px 50px;
+    border-top: 1px dashed var(--border-subtle);
+    background: var(--bg-base);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ed-col-date input[type="text"] {
+    height: 28px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    max-width: 220px;
+  }
+  .ed-date-hint {
+    background: var(--bg-deep);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 280px;
+  }
+  .ed-date-hint-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+  .ed-date-fmt {
+    color: var(--accent-primary);
+    font-weight: 500;
+    min-width: 90px;
+  }
+  .ed-date-ex {
+    color: var(--fg-on-deep-muted);
+  }
+  .ed-date-hint-link {
+    margin-top: 6px;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--fg-on-deep-muted);
+    text-decoration: none;
+  }
+  .ed-date-hint-link:hover {
+    text-decoration: underline;
+    color: var(--fg-on-deep);
+  }
+</style>

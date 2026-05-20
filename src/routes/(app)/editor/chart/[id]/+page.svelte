@@ -461,7 +461,8 @@
     /* justify-content: space-between; */
     padding-left: 50px;
   }
-  header a {
+  header a,
+  header a:visited {
     color: var(--fg-primary);
     text-decoration: none;
   }
