@@ -282,7 +282,7 @@
       <div class="presence">
         {#each Object.keys(store.presences) as presence (presence)}
           <div
-            style:background-color={store.presences[presence].color}
+            style:border="2px solid {store.presences[presence].color}"
             class="user-presence"
             title={store.presences[presence].name}
           >
@@ -336,7 +336,7 @@
       <div class="view-controls">
         <div><label for="view-zoom">Zoom</label></div>
         <div><button onclick={() => (viewScale -= 10)}>-</button></div>
-        <div><input id="view-zoom" value={viewScale} size="2" /></div>
+        <div><input id="view-zoom" type="number" value={viewScale} min="10" /></div>
         <div><button onclick={() => (viewScale += 10)}>+</button></div>
       </div>
       <div class="chart-view">
@@ -458,7 +458,7 @@
     top: 0px;
     z-index: 10;
     display: flex;
-    /* justify-content: space-between; */
+    justify-content: stretch;
     padding-left: 50px;
   }
   header a,
@@ -470,6 +470,7 @@
     position: relative;
     height: var(--editor-header-height);
     padding-left: 50px;
+    flex: 1;
   }
   .parts-bottom {
     display: flex;
@@ -505,7 +506,8 @@
     align-items: center;
   }
   .user-presence {
-    border: 3px solid var(--fg-primary);
+    color: var(--fg-primary);
+    background-color: var(--bg-base);
     border-radius: 50%;
     height: 2em;
     width: 2em;
@@ -516,5 +518,11 @@
   }
   input[type="text"] {
     width: 100%;
+  }
+  /* Hide buttons */
+  input#view-zoom[type="number"] {
+    appearance: textfield;
+    width: 5em;
+    text-align: center;
   }
 </style>

@@ -144,7 +144,7 @@ export class ShareDBConnection {
       });
       const localPresence = this.#presence.create();
       localPresence.submit({
-        color: `hsl(${Math.random() * 360} 70% 70%)`,
+        color: `hsl(${Math.random() * 360} 70% 60%)`,
         selected: "",
         name: "",
       });
