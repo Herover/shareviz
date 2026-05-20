@@ -26,6 +26,7 @@
   import { goto } from "$app/navigation";
   import type { PageProps, PageServerData } from "./$types";
   import { getLogger } from "$lib/log.js";
+  import { scale } from "svelte/transition";
 
   /* eslint-disable svelte/no-navigation-without-resolve */
 
@@ -283,6 +284,7 @@
         {#each Object.keys(store.presences) as presence (presence)}
           <div
             style:border="2px solid {store.presences[presence].color}"
+            transition:scale
             class="user-presence"
             title={store.presences[presence].name}
           >
