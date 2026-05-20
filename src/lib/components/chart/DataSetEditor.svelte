@@ -30,6 +30,7 @@
     ["hh a", "2 pm"],
     ["YYYY[Q]Q", "2025Q1"],
   ];
+  const rawDataHint = "column1\tcolumn2\nvalue1\tvalue2\nvalue3\tvalue4\n...";
 
   const getBadge = (type: string) => TYPE_BADGES[type] ?? TYPE_BADGES.text;
 
@@ -106,7 +107,7 @@
           value={dataStore.data.raw}
           onchange={(e) => updateColumns(e.currentTarget.value)}
           rows="6"
-          placeholder={`column1\tcolumn2\nvalue1\tvalue2\nvalue3\tvalue4\n...`}
+          placeholder={rawDataHint}
         ></textarea>
       </div>
     </div>

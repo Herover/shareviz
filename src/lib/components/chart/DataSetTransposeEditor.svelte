@@ -31,7 +31,12 @@
     <label for="{idPrefix}transpose-from">From</label>
   </div>
   <div>
-    <select id="{idPrefix}transpose-from" bind:value={transposedKeys} multiple onchange={() => updateTransposed()}>
+    <select
+      id="{idPrefix}transpose-from"
+      bind:value={transposedKeys}
+      multiple
+      onchange={() => updateTransposed()}
+    >
       {#each (typeof dataStore.data != "undefined" ? dataStore.data : { rows: [] }).rows as col, i (i)}
         <option selected={transpose.from.includes(col.key) ? true : null}>{col.key}</option>
       {/each}

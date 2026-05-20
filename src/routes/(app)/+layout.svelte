@@ -118,7 +118,7 @@
 
       /* Brand Interactive */
       --accent-primary: var(--color-terra-500);
-      --accent-primary-hover: var(--color-terra-600);
+      --accent-primary-hover: var(--color-terra-50);
       --accent-primary-press: var(--color-terra-700);
       --accent-primary-subtle: var(--color-terra-100);
 
@@ -307,6 +307,7 @@
       --border-subtle: var(--color-warm-800);
       --border-default: var(--color-warm-700);
       --border-strong: var(--color-warm-500);
+      --accent-primary-hover: var(--color-terra-900);
 
       /* Data-type badge surfaces — shifted for dark legibility */
       --badge-num-bg: var(--color-slate-800);
@@ -338,6 +339,7 @@
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
       text-wrap: pretty;
+      transition: background var(--duration-layout) var(--ease-standard);
     }
 
     /* Semantic element defaults */
@@ -444,6 +446,9 @@
       cursor: pointer;
       transition: background var(--duration-micro) var(--ease-standard);
     }
+    button:hover {
+      background-color: var(--bg-sunken);
+    }
     button[disabled] {
       cursor: not-allowed;
       opacity: 0.5;
@@ -451,6 +456,9 @@
     button.btn-primary {
       color: var(--accent-primary);
       border-color: var(--accent-primary);
+    }
+    button.btn-primary:hover {
+      background-color: var(--accent-primary-hover);
     }
   }
 </style>

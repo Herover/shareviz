@@ -27,4 +27,4 @@
   <DataSetEditor dataStore={new DataSetStore(connection, i)} idPrefix="ds{dataSet.id}-" />
 {/each}
 
-<button onclick={() => addDataSet()}>+ Data set</button>
+<button class="btn-primary" onclick={() => addDataSet()}>+ Data set</button>

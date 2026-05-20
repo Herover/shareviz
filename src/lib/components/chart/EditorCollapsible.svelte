@@ -114,9 +114,6 @@
     margin: 0px;
     font-family: var(--font-display);
   }
-  h3 {
-    font-size: 1.5rem;
-  }
   .chevron {
     font-size: var(--text-sm);
     color: var(--fg-tertiary);
