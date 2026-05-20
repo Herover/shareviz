@@ -29,7 +29,6 @@
   align-items: center;
   gap: 12px;
   padding: 6px 0;
-  /* border-bottom: 1px solid var(--border-subtle); */
 }
 .text-align-left {
   text-align: left;
@@ -40,4 +39,124 @@
 .editor-explain-box {
   padding-right: var(--spacing);
   padding-right: calc(var(--spacing) * 0.5);
+}
+
+/* ── Column list with type badges ── */
+.editor .ed-col-list {
+  width: 100%;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+.editor .ed-col-row {
+  border-bottom: 1px solid var(--border-subtle);
+}
+.editor .ed-col-row:last-child {
+  border-bottom: 0;
+}
+.editor .ed-col-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+}
+.editor .ed-col-badge {
+  flex-shrink: 0;
+  width: 30px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.editor .ed-col-badge.is-empty {
+  opacity: 0.35;
+}
+.editor .ed-col-badge.badge-num {
+  background: var(--badge-num-bg);
+  color: var(--badge-num-fg);
+}
+.editor .ed-col-badge.badge-text {
+  background: var(--badge-text-bg);
+  color: var(--badge-text-fg);
+}
+.editor .ed-col-badge.badge-date {
+  background: var(--badge-date-bg);
+  color: var(--badge-date-fg);
+}
+.editor .ed-col-name {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--fg-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.editor .ed-col-name.is-empty {
+  color: var(--fg-tertiary);
+  font-style: italic;
+}
+.editor select.ed-col-select {
+  width: 110px;
+  flex-shrink: 0;
+  height: 26px;
+  font-size: 0.85rem;
+}
+
+/* ── Date format expansion ── */
+.editor .ed-col-date {
+  padding: 8px 12px 12px 50px;
+  border-top: 1px dashed var(--border-subtle);
+  background: var(--bg-base);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.editor .ed-col-date input[type="text"] {
+  height: 28px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  max-width: 220px;
+}
+.editor .ed-date-hint {
+  background: var(--bg-deep);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 280px;
+}
+.editor .ed-date-hint-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+.editor .ed-date-fmt {
+  color: var(--accent-primary);
+  font-weight: 500;
+  min-width: 90px;
+}
+.editor .ed-date-ex {
+  color: var(--fg-on-deep-muted);
+}
+.editor .ed-date-hint-link {
+  margin-top: 6px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--fg-on-deep-muted);
+  text-decoration: none;
+}
+.editor .ed-date-hint-link:hover {
+  text-decoration: underline;
+  color: var(--fg-on-deep);
 }

@@ -149,6 +149,22 @@
       --state-success-bg: var(--color-sage-100);
       --state-info-bg: var(--color-slate-100);
 
+      /* Data-type badge surfaces (number / text / date column chips) */
+      --badge-num-bg: var(--color-slate-100);
+      --badge-num-fg: var(--color-slate-700);
+      --badge-text-bg: var(--color-warm-200);
+      --badge-text-fg: var(--fg-secondary);
+      --badge-date-bg: var(--color-sage-100);
+      --badge-date-fg: var(--color-sage-600);
+
+      /* Deep inset panel (e.g. format hint) — intentionally dark in both themes */
+      --bg-deep: var(--color-warm-900);
+      --fg-on-deep: var(--color-warm-50);
+      --fg-on-deep-muted: var(--color-warm-300);
+
+      /* Subtle accent wash (hover/active fills) */
+      --accent-primary-wash: rgba(201, 80, 42, 0.13);
+
       /* Shadows */
       --shadow-1: 0 1px 3px rgba(42, 30, 20, 0.07), 0 1px 2px rgba(42, 30, 20, 0.04);
       --shadow-2: 0 4px 16px rgba(42, 30, 20, 0.12), 0 2px 4px rgba(42, 30, 20, 0.06);
@@ -291,6 +307,14 @@
       --border-subtle: var(--color-warm-800);
       --border-default: var(--color-warm-700);
       --border-strong: var(--color-warm-500);
+
+      /* Data-type badge surfaces — shifted for dark legibility */
+      --badge-num-bg: var(--color-slate-800);
+      --badge-num-fg: var(--color-slate-200);
+      --badge-text-bg: var(--color-warm-800);
+      --badge-text-fg: var(--fg-secondary);
+      --badge-date-bg: var(--color-sage-600);
+      --badge-date-fg: var(--color-sage-100);
     }
 
     @font-face {
