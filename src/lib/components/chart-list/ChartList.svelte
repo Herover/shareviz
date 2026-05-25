@@ -100,99 +100,178 @@
   let isDragging: boolean = $state(false);
 </script>
 
-<a
-  href={basePath}
-  ondrop={() => moveTo(null)}
-  ondragover={(e) => e.preventDefault()}
-  class:drag-target={isDragging && path.length != 0}
->
-  Charts
-</a>
-{#each pathNamed as part, i (i)}
-  /
-  {#if i == pathNamed.length - 1}
-    <input
-      value={part.name}
-      onblur={(e) => {
-        editFolder(part.id, { name: e.currentTarget.value });
-        nameOverride[part.id] = e.currentTarget.value;
-      }}
-      type="text"
-      style:width="300px"
-    />
-  {:else}
-    <a
-      href={basePath + "/" + path.slice(0, i + 1).join("/")}
-      class:drag-target={isDragging}
-      ondrop={() => moveTo(part.id)}
-      ondragover={(e) => e.preventDefault()}>{part.name}</a
-    >
-  {/if}
-{/each}
-<table class="charts">
-  <thead>
-    <tr>
-      <th style:width="2em"></th>
-      <th>
-        Name
-        {#if typeof onCreateFolder == "function"}
-          <button
-            onclick={() => onCreateFolder(path.length == 0 ? undefined : path[path.length - 1])}
-          >
-            + Folder
-          </button>
-        {/if}
-        <button onclick={() => onAddChart(path.length == 0 ? undefined : path[path.length - 1])}>
-          + Chart
-        </button>
-      </th>
-      <th style:width="120px"> Updated </th>
-      <th style:width="100px"> Created </th>
-    </tr>
-  </thead>
-  <tbody>
-    {#if pathContents != null}
-      {#each pathContents as item (item.id)}
-        {#if item.type == "file"}
-          <File
-            {item}
-            onSelect={(selected) => (selectedFiles[item.chartRef] = selected)}
-            selected={selectedFiles[item.chartRef] == true}
-            link="/editor/chart/{item.chartRef}"
-            onDragStart={() => (isDragging = true)}
-            onDragEnd={() => (isDragging = false)}
-          />
-        {:else if item.type == "folder"}
-          <File
-            {item}
-            onSelect={(selected) => (selectedFolders[item.id] = selected)}
-            selected={selectedFolders[item.id] == true}
-            onChangeFolder={() => onChangeFolder()}
-            onMoveItems={(id) => moveTo(id)}
-            onDragStart={() => (isDragging = true)}
-            onDragEnd={() => (isDragging = false)}
-            link={basePath + "/" + [...path, ""].join("/") + item.id}
-            {isDragging}
-          />
-        {/if}
-      {/each}
+<div class="ch-crumbs">
+  <a
+    href={basePath}
+    ondrop={() => moveTo(null)}
+    ondragover={(e) => e.preventDefault()}
+    class:drag-target={isDragging && path.length != 0}
+  >
+    Charts
+  </a>
+  {#each pathNamed as part, i (i)}
+    <span class="ch-crumb-sep">/</span>
+    {#if i == pathNamed.length - 1}
+      <input
+        value={part.name}
+        onblur={(e) => {
+          editFolder(part.id, { name: e.currentTarget.value });
+          nameOverride[part.id] = e.currentTarget.value;
+        }}
+        type="text"
+        style:width="300px"
+      />
+    {:else}
+      <a
+        href={basePath + "/" + path.slice(0, i + 1).join("/")}
+        class:drag-target={isDragging}
+        ondrop={() => moveTo(part.id)}
+        ondragover={(e) => e.preventDefault()}
+      >
+        {part.name}
+      </a>
     {/if}
-  </tbody>
-</table>
+  {/each}
+</div>
+
+<div class="ch-list-actions">
+  {#if typeof onCreateFolder == "function"}
+    <button onclick={() => onCreateFolder(path.length == 0 ? undefined : path[path.length - 1])}>
+      + Folder
+    </button>
+  {/if}
+  <button
+    class="btn-primary"
+    onclick={() => onAddChart(path.length == 0 ? undefined : path[path.length - 1])}
+  >
+    + Chart
+  </button>
+</div>
+
+<div class="ch-table-wrap">
+  <table class="ch-table">
+    <thead>
+      <tr>
+        <th class="ch-th-check"></th>
+        <th class="ch-th-icon"></th>
+        <th>Name</th>
+        <th class="ch-th-date">Updated</th>
+        <th class="ch-th-date">Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      {#if pathContents == null || pathContents.length == 0}
+        <tr>
+          <td colspan="5" class="ch-empty-folder">This folder is empty.</td>
+        </tr>
+      {:else}
+        {#each pathContents as item (item.id)}
+          {#if item.type == "file"}
+            <File
+              {item}
+              onSelect={(selected) => (selectedFiles[item.chartRef] = selected)}
+              selected={selectedFiles[item.chartRef] == true}
+              link="/editor/chart/{item.chartRef}"
+              onDragStart={() => (isDragging = true)}
+              onDragEnd={() => (isDragging = false)}
+            />
+          {:else if item.type == "folder"}
+            <File
+              {item}
+              onSelect={(selected) => (selectedFolders[item.id] = selected)}
+              selected={selectedFolders[item.id] == true}
+              onChangeFolder={() => onChangeFolder()}
+              onMoveItems={(id) => moveTo(id)}
+              onDragStart={() => (isDragging = true)}
+              onDragEnd={() => (isDragging = false)}
+              link={basePath + "/" + [...path, ""].join("/") + item.id}
+              {isDragging}
+            />
+          {/if}
+        {/each}
+      {/if}
+    </tbody>
+  </table>
+</div>
 
 <style>
-  .charts {
-    width: 100%;
-    border-spacing: 0px;
-  }
-  .charts th {
-    text-align: start;
-    font-weight: normal;
+  .ch-crumbs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
     color: var(--fg-secondary);
-    padding-bottom: 0.5em;
+    margin: 16px 0;
+    flex-wrap: wrap;
   }
-  .drag-target {
-    border: 2px var(--fg-primary);
-    border-style: dashed;
+  .ch-crumbs a {
+    color: var(--fg-secondary);
+    text-decoration: none;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+  }
+  .ch-crumbs a:hover {
+    color: var(--fg-primary);
+    background: var(--bg-sunken);
+  }
+  .ch-crumb-sep {
+    color: var(--fg-tertiary);
+  }
+  .ch-crumbs .drag-target {
+    outline: 2px dashed var(--accent-primary);
+    outline-offset: -2px;
+    color: var(--accent-primary);
+  }
+
+  .ch-list-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .ch-table-wrap {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-1);
+  }
+  .ch-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-body);
+  }
+  .ch-table thead th {
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg-tertiary);
+    padding: 12px 14px;
+    background: var(--bg-base);
+    border-bottom: 1px solid var(--border-subtle);
+    white-space: nowrap;
+    user-select: none;
+  }
+  .ch-th-check {
+    width: 38px;
+    padding-left: 18px !important;
+  }
+  .ch-th-icon {
+    width: 28px;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .ch-th-date {
+    width: 130px;
+  }
+
+  .ch-empty-folder {
+    text-align: center;
+    padding: 32px 14px !important;
+    color: var(--fg-tertiary);
+    font-size: 0.9rem;
   }
 </style>
