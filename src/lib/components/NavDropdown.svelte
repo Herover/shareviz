@@ -1,7 +1,12 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  let { children }: { children: import("svelte").Snippet } = $props();
+  interface Props {
+    children: import("svelte").Snippet;
+    ariaLabel?: string;
+  }
+  let { children, ariaLabel = "Open menu" }: Props = $props();
+
   let open = $state(false);
   let container: HTMLDivElement | undefined = $state();
 
@@ -40,20 +45,32 @@
   };
 </script>
 
-<div class="nav-dropdown">
-  <div
+<div class="nav-dropdown" class:is-open={open}>
+  <button
+    type="button"
+    class="ch-nav-arrow"
+    aria-label={ariaLabel}
+    aria-expanded={open}
     onclick={() => toggleOpen()}
-    onkeydown={(e) => e.key == " " && toggleOpen()}
-    role="button"
-    tabindex="0"
-    class="nav-dropdown-arrow"
   >
-    {#if open}
-      ▲
-    {:else}
-      ▼
-    {/if}
-  </div>
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      {#if open}
+        <path d="M18 15l-6-6-6 6" />
+      {:else}
+        <path d="M6 9l6 6 6-6" />
+      {/if}
+    </svg>
+  </button>
   {#if open}
     <div bind:this={container} class="nav-dropdown-view">
       {@render children()}
@@ -63,11 +80,34 @@
 
 <style>
   .nav-dropdown {
-    display: inline-block;
+    display: inline-flex;
+    align-items: stretch;
+    height: 100%;
   }
-  .nav-dropdown .nav-dropdown-view {
+  .ch-nav-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 14px 0 4px;
+    cursor: pointer;
+    color: var(--fg-tertiary);
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    transition: color var(--duration-micro) var(--ease-standard);
+  }
+  .ch-nav-arrow:hover {
+    color: var(--fg-primary);
+    background: transparent;
+  }
+  .nav-dropdown.is-open .ch-nav-arrow {
+    color: var(--accent-primary);
+  }
+  .nav-dropdown-view {
     position: absolute;
-    top: 2em;
-    translate: calc(-100% + 1rem) 0%;
+    top: calc(100% - 1px);
+    left: 0;
+    z-index: 50;
   }
 </style>
