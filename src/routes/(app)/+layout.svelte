@@ -331,6 +331,13 @@
           format("truetype");
     }
 
+    @font-face {
+      font-family: "DM Serif Display";
+      src:
+        url("/fonts/DMSerifDisplay/DMSerifDisplay-Regular.ttf")
+          format("truetype");
+    }
+
     body * {
       box-sizing: border-box;
     }
