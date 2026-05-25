@@ -20,6 +20,6 @@ You can access a example server at https://dt.leonora.app/ or host your own. Loo
 
 All of DataTortillas code, documentation and other application parts are licensed under Mozilla Public License (MPL). It comes with 3 fonts that have their own copyright notices:
 
-* [Atkinson Hyperlegible](https://www.brailleinstitute.org/freefont/) by Braille Institute (OFL)
-* [DM Serif Display](https://fonts.google.com/specimen/DM+Serif+Display) by Colophon Foundry (OFL)
-* [Open Sans](https://github.com/googlefonts/opensans) by Steve Matteson and more (OFL)
+- [Atkinson Hyperlegible](https://www.brailleinstitute.org/freefont/) by Braille Institute (OFL)
+- [DM Serif Display](https://fonts.google.com/specimen/DM+Serif+Display) by Colophon Foundry (OFL)
+- [Open Sans](https://github.com/googlefonts/opensans) by Steve Matteson and more (OFL)
