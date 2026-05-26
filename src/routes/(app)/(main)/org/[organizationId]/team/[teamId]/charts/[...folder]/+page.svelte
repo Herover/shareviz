@@ -66,14 +66,6 @@
       dirList[path].forEach((item) => {
         if (item.type == "folder") {
           item.contents = buildDir(item.id);
-        } else {
-          item.tags = Array.from({ length: Math.floor(Math.random() * 5) }).map((e, i) => ({
-            category: "datasets",
-            color: `HSL(${Math.random() * 360}, 42.4%, 88.4%)`,
-            key: Math.random() < 0.5 ? "dst" : "eurostat",
-            val: Math.random() < 0.8 ? "" : "" + Math.floor(Math.random() * 100),
-            id: "" + i,
-          }));
         }
         folder.push(item);
       });
