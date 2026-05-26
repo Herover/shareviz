@@ -17,6 +17,15 @@ export interface File {
   created: number;
   updated: number;
   chartRef: string;
+  tags?: FileTag[];
+}
+
+export interface FileTag {
+  id: string;
+  category: string;
+  key: string;
+  val?: string;
+  color: string;
 }
 
 export type FolderItem = Folder | File;

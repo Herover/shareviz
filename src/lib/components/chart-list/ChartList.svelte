@@ -24,6 +24,7 @@
 
   let { contents, onAddChart, onCreateFolder, onImportChart, onUpdate, path, basePath }: Props =
     $props();
+  $inspect(contents);
 
   const currentFolderId = $derived(path.length == 0 ? undefined : path[path.length - 1]);
 
