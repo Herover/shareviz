@@ -314,33 +314,19 @@ export const db = {
   },
 
   /**
-   * @returns {Promise<{ id: string, name: string, chartRef: string }>} update a charts info
+   * get chart by chart reference
    */
   getChart: async (/** @type {string} */ chartRef) => {
     const res = await drizzledb.select().from(charts).where(eq(charts.chartRef, chartRef));
     return res[0];
-    // return new Promise((resolve, reject) => {
-    // resolve("");
-    // const stmt = db.prepare(`
-    //   SELECT
-    //     charts.id AS id,
-    //     charts.name AS name,
-    //     charts.chart_ref AS chartRef
-    //   FROM
-    //     charts
-    //   WHERE
-    //     charts.chart_ref = ?
-    // `);
+  },
 
-    // stmt.get([chartRef], function (err, row) {
-    //   if (err != null) {
-    //     reject(err);
-    //     return;
-    //   }
-
-    //   resolve(row);
-    // }).finalize();
-    // });
+  /**
+   * get chart by id
+   */
+  getChartById: async (/** @type {string} */ chartId) => {
+    const res = await drizzledb.select().from(charts).where(eq(charts.id, chartId));
+    return res[0];
   },
 
   getChartRelations: async (/** @type {string} */ chartRef) => {

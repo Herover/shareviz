@@ -5,6 +5,7 @@
   import DropdownButton from "$lib/components/DropdownButton.svelte";
   import DropdownItem from "$lib/components/DropdownItem.svelte";
   import File from "./File.svelte";
+  import FileCard from "./FileCard.svelte";
   import type { FolderItem } from "./types";
   import { getLogger } from "$lib/log.js";
 
@@ -24,7 +25,6 @@
 
   let { contents, onAddChart, onCreateFolder, onImportChart, onUpdate, path, basePath }: Props =
     $props();
-  $inspect(contents);
 
   const currentFolderId = $derived(path.length == 0 ? undefined : path[path.length - 1]);
 
@@ -105,6 +105,7 @@
   };
 
   let isDragging: boolean = $state(false);
+  let view: "list" | "grid" = $state("list");
 </script>
 
 <div class="ch-crumbs">
@@ -188,53 +189,128 @@
       </DropdownItem>
     {/if}
   </DropdownButton>
+
+  <div class="ch-list-actions-spacer"></div>
+
+  <div class="ch-view-toggle" role="group" aria-label="View">
+    <button
+      type="button"
+      class:is-active={view == "list"}
+      onclick={() => (view = "list")}
+      title="List view"
+      aria-label="List view"
+      aria-pressed={view == "list"}
+    >
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <line x1="8" y1="6" x2="21" y2="6" />
+        <line x1="8" y1="12" x2="21" y2="12" />
+        <line x1="8" y1="18" x2="21" y2="18" />
+        <line x1="3" y1="6" x2="3.01" y2="6" />
+        <line x1="3" y1="12" x2="3.01" y2="12" />
+        <line x1="3" y1="18" x2="3.01" y2="18" />
+      </svg>
+    </button>
+    <button
+      type="button"
+      class:is-active={view == "grid"}
+      onclick={() => (view = "grid")}
+      title="Grid view"
+      aria-label="Grid view"
+      aria-pressed={view == "grid"}
+    >
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="3" y="3" width="7" height="7" />
+        <rect x="14" y="3" width="7" height="7" />
+        <rect x="3" y="14" width="7" height="7" />
+        <rect x="14" y="14" width="7" height="7" />
+      </svg>
+    </button>
+  </div>
 </div>
 
-<div class="ch-table-wrap">
-  <table class="ch-table">
-    <thead>
-      <tr>
-        <th class="ch-th-check"></th>
-        <th class="ch-th-icon"></th>
-        <th>Name</th>
-        <th class="ch-th-date">Updated</th>
-        <th class="ch-th-date">Created</th>
-      </tr>
-    </thead>
-    <tbody>
-      {#if pathContents == null || pathContents.length == 0}
+{#if view == "list"}
+  <div class="ch-table-wrap">
+    <table class="ch-table">
+      <thead>
         <tr>
-          <td colspan="5" class="ch-empty-folder">This folder is empty.</td>
+          <th class="ch-th-check"></th>
+          <th class="ch-th-icon"></th>
+          <th>Name</th>
+          <th class="ch-th-date">Updated</th>
+          <th class="ch-th-date">Created</th>
         </tr>
-      {:else}
-        {#each pathContents as item (item.id)}
-          {#if item.type == "file"}
-            <File
-              {item}
-              onSelect={(selected) => (selectedFiles[item.chartRef] = selected)}
-              selected={selectedFiles[item.chartRef] == true}
-              link="/editor/chart/{item.chartRef}"
-              onDragStart={() => (isDragging = true)}
-              onDragEnd={() => (isDragging = false)}
-            />
-          {:else if item.type == "folder"}
-            <File
-              {item}
-              onSelect={(selected) => (selectedFolders[item.id] = selected)}
-              selected={selectedFolders[item.id] == true}
-              onChangeFolder={() => onChangeFolder()}
-              onMoveItems={(id) => moveTo(id)}
-              onDragStart={() => (isDragging = true)}
-              onDragEnd={() => (isDragging = false)}
-              link={basePath + "/" + [...path, ""].join("/") + item.id}
-              {isDragging}
-            />
-          {/if}
-        {/each}
+      </thead>
+      <tbody>
+        {#if pathContents == null || pathContents.length == 0}
+          <tr>
+            <td colspan="5" class="ch-empty-folder">This folder is empty.</td>
+          </tr>
+        {:else}
+          {#each pathContents as item (item.id)}
+            {#if item.type == "file"}
+              <File
+                {item}
+                onSelect={(selected) => (selectedFiles[item.chartRef] = selected)}
+                selected={selectedFiles[item.chartRef] == true}
+                link="/editor/chart/{item.chartRef}"
+                onDragStart={() => (isDragging = true)}
+                onDragEnd={() => (isDragging = false)}
+              />
+            {:else if item.type == "folder"}
+              <File
+                {item}
+                onSelect={(selected) => (selectedFolders[item.id] = selected)}
+                selected={selectedFolders[item.id] == true}
+                onChangeFolder={() => onChangeFolder()}
+                onMoveItems={(id) => moveTo(id)}
+                onDragStart={() => (isDragging = true)}
+                onDragEnd={() => (isDragging = false)}
+                link={basePath + "/" + [...path, ""].join("/") + item.id}
+                {isDragging}
+              />
+            {/if}
+          {/each}
+        {/if}
+      </tbody>
+    </table>
+  </div>
+{:else if pathContents == null || pathContents.length == 0}
+  <div class="ch-empty-folder ch-empty-folder--grid">This folder is empty.</div>
+{:else}
+  <div class="ch-grid">
+    {#each pathContents as item (item.id)}
+      {#if item.type == "file"}
+        <FileCard {item} link="/editor/chart/{item.chartRef}" />
+      {:else if item.type == "folder"}
+        <FileCard
+          {item}
+          link={basePath + "/" + [...path, ""].join("/") + item.id}
+          onChangeFolder={() => onChangeFolder()}
+        />
       {/if}
-    </tbody>
-  </table>
-</div>
+    {/each}
+  </div>
+{/if}
 
 <style>
   .ch-crumbs {
@@ -267,8 +343,50 @@
 
   .ch-list-actions {
     display: flex;
+    align-items: center;
     gap: 8px;
     margin-bottom: 12px;
+  }
+  .ch-list-actions-spacer {
+    flex: 1;
+  }
+
+  .ch-view-toggle {
+    display: inline-flex;
+    background: var(--bg-sunken);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 2px;
+  }
+  .ch-view-toggle button {
+    width: 32px;
+    height: 30px;
+    border: 0;
+    background: transparent;
+    color: var(--fg-tertiary);
+    border-radius: calc(var(--radius-md) - 2px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ch-view-toggle button.is-active {
+    background: var(--bg-surface);
+    color: var(--fg-primary);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  }
+
+  .ch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+  }
+  .ch-empty-folder--grid {
+    padding: 32px 14px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
   }
 
   .ch-table-wrap {

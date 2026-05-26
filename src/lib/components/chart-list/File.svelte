@@ -10,6 +10,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { formatDate, formatRelativeTime } from "$lib/utils";
+  import FileTags from "./FileTags.svelte";
   import type { FolderItem } from "./types";
 
   /* eslint-disable svelte/no-navigation-without-resolve */
@@ -39,16 +40,6 @@
   }: Props = $props();
 
   let dropOver = $state(false);
-  let tagsExpanded = $state(false);
-
-  const MAX_VISIBLE_TAGS = 3;
-  const visibleTags = $derived.by(() => {
-    if (item.type != "file" || !item.tags) return [];
-    return tagsExpanded ? item.tags : item.tags.slice(0, MAX_VISIBLE_TAGS);
-  });
-  const hiddenTagCount = $derived(
-    item.type == "file" && item.tags ? Math.max(0, item.tags.length - MAX_VISIBLE_TAGS) : 0,
-  );
 
   const ondragstart = (e: DragEvent & { currentTarget: EventTarget & HTMLTableRowElement }) => {
     e.dataTransfer?.setData("application/id", item.id);
@@ -150,35 +141,8 @@
         </span>
       {:else}
         <a href={link}>{item.name}</a>
-        {#if item.tags && item.tags.length > 0}
-          <span class="ch-row-tags">
-            {#each visibleTags as tag (tag.id)}
-              <span class="ch-row-tag" style:--tag-color={tag.color} title={tag.category}>
-                <span class="ch-tag-k">{tag.key}</span>
-                {#if tag.val}
-                  <span class="ch-tag-sep">:</span>
-                  <span class="ch-tag-v">{tag.val}</span>
-                {/if}
-              </span>
-            {/each}
-            {#if hiddenTagCount > 0 && !tagsExpanded}
-              <button
-                type="button"
-                class="ch-row-tag-more"
-                title={item.tags
-                  .slice(MAX_VISIBLE_TAGS)
-                  .map((t) => t.key + (t.val ? ":" + t.val : ""))
-                  .join(", ")}
-                onclick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  tagsExpanded = true;
-                }}
-              >
-                +{hiddenTagCount}
-              </button>
-            {/if}
-          </span>
+        {#if item.tags}
+          <FileTags tags={item.tags} />
         {/if}
       {/if}
     </div>
@@ -273,65 +237,6 @@
     font-size: 0.72rem;
     color: var(--fg-tertiary);
     margin-left: 4px;
-  }
-
-  .ch-row-tags {
-    display: inline-flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-left: 4px;
-    min-width: 0;
-  }
-  /* The tint comes from each tag's --tag-color custom prop (FileTag.color);
-     it's mixed with the surface so the pill stays legible on either theme.
-     Fallback (no color set) uses the neutral sunken background. */
-  .ch-row-tag {
-    display: inline-flex;
-    align-items: center;
-    padding: 1px 7px;
-    border-radius: var(--radius-pill);
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
-    background: var(--tag-color, var(--bg-sunken));
-    color: var(--fg-secondary);
-    border: 1px solid transparent;
-    cursor: default;
-  }
-  .ch-row-tag:hover {
-    border-color: var(--border-default);
-    color: var(--fg-primary);
-  }
-  .ch-row-tag .ch-tag-k {
-    color: var(--tag-color);
-    filter: brightness(0.5);
-    font-weight: 500;
-  }
-  .ch-row-tag .ch-tag-k {
-    color: var(--tag-color);
-    filter: brightness(0.3);
-  }
-  .ch-row-tag .ch-tag-sep {
-    color: var(--fg-tertiary);
-    margin: 0 1px;
-  }
-  .ch-row-tag-more {
-    font-family: var(--font-body);
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--fg-tertiary);
-    padding: 1px 6px;
-    border-radius: var(--radius-pill);
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-  }
-  .ch-row-tag-more:hover {
-    color: var(--fg-primary);
-    background: var(--bg-sunken);
   }
 
   .ch-row-date {
