@@ -119,11 +119,11 @@
     onCreateFolder={(parentId) => onAddFolder("New folder", teamId, parentId)}
     onUpdate={() => updateTeam(teamId)}
     onAddChart={(id) => newGraphic(true, id)}
+    onImportChart={() => (promptSpec = true)}
     basePath={`/org/${page.params["organizationId"]}/team/${teamId}/charts`}
     path={folderPath}
   />
 
-  <button onclick={() => (promptSpec = true)}>Import chart</button>
   <Popup show={promptSpec} onDismiss={() => (promptSpec = false)}>
     <h1>Import chart</h1>
     <p>Paste exported JSON here</p>

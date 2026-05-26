@@ -118,7 +118,7 @@
 
       /* Brand Interactive */
       --accent-primary: var(--color-terra-500);
-      --accent-primary-hover: var(--color-terra-50);
+      --accent-primary-hover: var(--color-terra-600);
       --accent-primary-press: var(--color-terra-700);
       --accent-primary-subtle: var(--color-terra-100);
 
@@ -448,7 +448,8 @@
       opacity: 0.5;
     }
     button.btn-primary {
-      color: var(--accent-primary);
+      background: var(--accent-primary);
+      color: var(--fg-on-accent);
       border-color: var(--accent-primary);
     }
     button.btn-primary:hover {

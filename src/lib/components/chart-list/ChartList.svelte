@@ -2,6 +2,8 @@
 
 <script lang="ts">
   import { editChartInfo, editFolder } from "$lib/api";
+  import DropdownButton from "$lib/components/DropdownButton.svelte";
+  import DropdownItem from "$lib/components/DropdownItem.svelte";
   import File from "./File.svelte";
   import type { FolderItem } from "./types";
   import { getLogger } from "$lib/log.js";
@@ -14,12 +16,16 @@
     contents: FolderItem[];
     onCreateFolder?: (parentId?: string) => void;
     onAddChart: (folderId?: string) => void;
+    onImportChart?: (folderId?: string) => void;
     onUpdate: () => void;
     path: string[];
     basePath: string;
   }
 
-  let { contents, onAddChart, onCreateFolder, onUpdate, path, basePath }: Props = $props();
+  let { contents, onAddChart, onCreateFolder, onImportChart, onUpdate, path, basePath }: Props =
+    $props();
+
+  const currentFolderId = $derived(path.length == 0 ? undefined : path[path.length - 1]);
 
   let selectedFiles: { [key: string]: boolean } = $state({});
   let selectedFolders: { [key: string]: boolean } = $state({});
@@ -136,16 +142,51 @@
 
 <div class="ch-list-actions">
   {#if typeof onCreateFolder == "function"}
-    <button onclick={() => onCreateFolder(path.length == 0 ? undefined : path[path.length - 1])}>
-      + Folder
-    </button>
+    <button onclick={() => onCreateFolder(currentFolderId)}> + Folder </button>
   {/if}
-  <button
-    class="btn-primary"
-    onclick={() => onAddChart(path.length == 0 ? undefined : path[path.length - 1])}
+  <DropdownButton
+    label="New chart"
+    onClick={() => onAddChart(currentFolderId)}
+    chevronAriaLabel="More ways to create a chart"
   >
-    + Chart
-  </button>
+    {#snippet leadingIcon()}
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14" />
+        <path d="M5 12h14" />
+      </svg>
+    {/snippet}
+    {#if typeof onImportChart == "function"}
+      <DropdownItem label="Import JSON…" onClick={() => onImportChart(currentFolderId)}>
+        {#snippet icon()}
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 3v12" />
+            <path d="M7 8l5-5 5 5" />
+            <path d="M5 21h14" />
+          </svg>
+        {/snippet}
+      </DropdownItem>
+    {/if}
+  </DropdownButton>
 </div>
 
 <div class="ch-table-wrap">
