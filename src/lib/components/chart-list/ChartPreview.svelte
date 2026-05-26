@@ -4,7 +4,7 @@
   import type { Root } from "$lib/chart";
   import type { File } from "./types";
   import type { EditorChartData, ViewerMessage } from "$lib/viewerData";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   interface Props {
     item: File;
@@ -14,8 +14,11 @@
 
   const ZOOM = 1.5;
 
+  let holder: HTMLDivElement | undefined = $state();
   let viewerFrame: HTMLIFrameElement | undefined = $state();
   let holderWidth: number = $state(100);
+  // Gates the iframe + data fetch until the card scrolls into view.
+  let isVisible = $state(false);
 
   let data: Root | "pending" | undefined;
 
@@ -42,9 +45,27 @@
         .then((res) => res.json())
         .then((d) => {
           data = d.chart;
-          updateViewer();
+          if (isVisible) updateViewer();
         });
     }
+  });
+
+  onMount(() => {
+    if (!holder) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            isVisible = true;
+            io.disconnect();
+            return;
+          }
+        }
+      },
+      { rootMargin: "800px" },
+    );
+    io.observe(holder);
+    return () => io.disconnect();
   });
 
   const onMessage = (event: MessageEvent<ViewerMessage>) => {
@@ -73,18 +94,21 @@
   });
 </script>
 
-<div class="holder" bind:clientWidth={holderWidth}>
-  <div style:scale={1 / ZOOM}>
-    <iframe
-      bind:this={viewerFrame}
-      src={env.PUBLIC_VIEWER_ORIGIN + "/view/chart/?"}
-      title="Chart preview"
-      width="{holderWidth * ZOOM}px"
-      height="{300 * ZOOM}px"
-    >
-      Viewer content...
-    </iframe>
-  </div>
+<div class="holder" bind:this={holder} bind:clientWidth={holderWidth}>
+  {#if isVisible}
+    <div style:scale={1 / ZOOM}>
+      <iframe
+        bind:this={viewerFrame}
+        src={env.PUBLIC_VIEWER_ORIGIN + "/view/chart/?"}
+        title="Chart preview"
+        width="{holderWidth * ZOOM}px"
+        height="{300 * ZOOM}px"
+        loading="lazy"
+      >
+        Viewer content...
+      </iframe>
+    </div>
+  {/if}
 </div>
 
 <style>
