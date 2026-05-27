@@ -14,6 +14,8 @@
 
   let { dataStore, idPrefix = "" }: Props = $props();
 
+  let transposeOpen = $state(false);
+
   const TYPE_BADGES: Record<string, { label: string; cls: string }> = {
     number: { label: "123", cls: "badge-num" },
     text: { label: "ABC", cls: "badge-text" },
@@ -185,22 +187,62 @@
       </div>
     {/if}
 
-    <EditorCollapsible key="transpose-{idPrefix}" label="Columns to rows (transpose)" lvl={2}>
-      <p class="editor-sub-section-description">
-        Use this if your year values or category names are column headers instead of row values —
-        transpose flips them into rows so they can be plotted.
-      </p>
-      {#each dataStore.data.transpose as transpose, i (transpose.toKey)}
-        <DataSetTransposeEditor {dataStore} {transpose} {i} idPrefix="{idPrefix}t{i}-" />
-      {/each}
+    <h4 class="editor-sub-section">Transpose</h4>
+    <div class="ed-transpose">
       <button
-        onclick={() =>
-          typeof dataStore.data != "undefined" &&
-          dataStore.addTranspose(dataStore.data.transpose.length)}
+        type="button"
+        class="ed-transpose-head"
+        onclick={() => (transposeOpen = !transposeOpen)}
+        aria-expanded={transposeOpen}
       >
-        + Add transpose
+        <span class="ed-transpose-chev">{transposeOpen ? "▾" : "▸"}</span>
+        <span class="ed-transpose-title">Columns to rows (transpose)</span>
+        <span class="ed-transpose-summary" data-empty={dataStore.data.transpose.length === 0}>
+          {#if dataStore.data.transpose.length === 0}
+            <span class="ed-tp-sum-empty">none configured</span>
+          {:else}
+            <span class="ed-tp-sum-count">
+              {dataStore.data.transpose.length}
+              {dataStore.data.transpose.length === 1 ? "transpose" : "transposes"}
+            </span>
+            {#each dataStore.data.transpose as t, i (i)}
+              <span class="ed-tp-sum-chip" title={`From: ${t.from.join(", ") || "—"}`}>
+                {t.toKey || "key"}<span class="ed-tp-sum-slash">/</span>{t.toValue || "value"}
+                {#if t.from.length > 0}<span class="ed-tp-sum-n">·{t.from.length}</span>{/if}
+              </span>
+            {/each}
+          {/if}
+        </span>
       </button>
-    </EditorCollapsible>
+      {#if transposeOpen}
+        <div class="ed-transpose-body">
+          <p class="ed-transpose-desc">
+            Use this when years, categories or other values appear as
+            <em>column headers</em>
+            instead of row cells. Transpose pivots a <strong>wide</strong>
+            table into a <strong>long</strong> one so it can be plotted.
+          </p>
+
+          {#if dataStore.data.transpose.length === 0}
+            <div class="ed-tp-empty">No transposes yet. Add one if your data is in wide form.</div>
+          {/if}
+
+          {#each dataStore.data.transpose as transpose, i (i)}
+            <DataSetTransposeEditor {dataStore} {transpose} {i} idPrefix="{idPrefix}t{i}-" />
+          {/each}
+
+          <button
+            type="button"
+            class="ed-btn-add"
+            onclick={() =>
+              typeof dataStore.data != "undefined" &&
+              dataStore.addTranspose(dataStore.data.transpose.length)}
+          >
+            ＋ Add transpose
+          </button>
+        </div>
+      {/if}
+    </div>
   </EditorCollapsible>
 {/if}
 
@@ -323,5 +365,136 @@
   .ed-date-hint-link:hover {
     text-decoration: underline;
     color: var(--fg-on-deep);
+  }
+
+  /* Transpose block */
+  .ed-transpose {
+    width: 100%;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    background: var(--bg-surface);
+    overflow: hidden;
+    margin-bottom: 8px;
+    margin-top: 8px;
+  }
+  button.ed-transpose-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    height: auto;
+    min-height: var(--space-8);
+    padding: 10px 12px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--fg-primary);
+  }
+  button.ed-transpose-head:hover {
+    background: var(--bg-sunken);
+  }
+  .ed-transpose-chev {
+    font-size: 0.8rem;
+    color: var(--fg-tertiary);
+    width: 14px;
+  }
+  .ed-transpose-title {
+    font-weight: 500;
+  }
+  .ed-transpose-body {
+    padding: 4px 14px 14px 14px;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .ed-transpose-desc {
+    font-size: 0.85rem;
+    color: var(--fg-secondary);
+    line-height: 1.55;
+    margin: 10px 0 12px;
+  }
+  .ed-transpose-desc em {
+    font-style: italic;
+    color: var(--fg-primary);
+  }
+  .ed-transpose-desc strong {
+    font-weight: 600;
+    color: var(--fg-primary);
+  }
+
+  /* Summary chips visible when block is collapsed */
+  .ed-transpose-summary {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 60%;
+  }
+  .ed-tp-sum-empty {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--fg-tertiary);
+    letter-spacing: 0.04em;
+  }
+  .ed-tp-sum-count {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--fg-tertiary);
+    font-weight: 500;
+  }
+  .ed-tp-sum-chip {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 2px 7px;
+    background: var(--accent-primary-subtle);
+    color: var(--accent-primary);
+    border-radius: 999px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .ed-tp-sum-slash {
+    opacity: 0.5;
+    padding: 0 3px;
+    font-weight: 400;
+  }
+  .ed-tp-sum-n {
+    margin-left: 5px;
+    opacity: 0.6;
+    font-weight: 500;
+  }
+
+  .ed-tp-empty {
+    font-size: 0.85rem;
+    color: var(--fg-tertiary);
+    background: var(--bg-base);
+    border: 1px dashed var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  button.ed-btn-add {
+    height: var(--space-8);
+    padding: 0 14px;
+    border: 1.5px dashed var(--accent-primary);
+    background: transparent;
+    color: var(--accent-primary);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: background var(--duration-micro) var(--ease-standard);
+  }
+  button.ed-btn-add:hover {
+    background: var(--accent-primary-subtle);
+    color: var(--accent-primary);
   }
 </style>
