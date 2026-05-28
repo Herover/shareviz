@@ -29,7 +29,10 @@ export async function GET({ params, locals }) {
     return json({ message: "invalid token" }, { status: 400 });
   }
 
-  // TODO: Check if user has access to team
+  const userTeams = await db.getUserTeams(user.id);
+  if (userTeams.findIndex((t) => t.teams.id == params.id) == -1) {
+    return json({ message: "unauthorized" }, { status: 403 });
+  }
 
   const team = await db.getTeam(params.id);
   const members = await db.getTeamMembers(params.id);
