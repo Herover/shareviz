@@ -15,8 +15,14 @@ export async function POST({ request, locals }) {
   if (typeof name != "string") {
     return json({ message: "invalid name" }, { status: 400 });
   }
+  if (typeof organizationId != "string") {
+    return json({ message: "invalid organizationId" }, { status: 400 });
+  }
 
-  // TODO: check if user has access to organization
+  const organizations = await db.getUserOrganizations(user.id);
+  if (organizations.findIndex((o) => o.organizations.id == organizationId) == -1) {
+    return json({ message: "unauthorized" }, { status: 403 });
+  }
 
   const teamId = await db.addTeam(name, organizationId);
   await db.addUserTeamsRelation(teamId, user.id, TEAM_ROLES.ADMIN);

@@ -37,6 +37,13 @@ export async function POST({ request, locals }) {
   }: { teamId?: string; folderId?: string; data?: string; isUserChart?: boolean } =
     await request.json();
 
+  if (typeof teamId == "string" && teamId.length > 0) {
+    const teams = await db.getUserTeams(user.id);
+    if (teams.findIndex((t) => t.teams.id == teamId) == -1) {
+      return json({ message: "unauthorized" }, { status: 403 });
+    }
+  }
+
   let docData: Root;
   try {
     docData = typeof data == "string" ? (JSON.parse(data) as Root) : defDoc;
