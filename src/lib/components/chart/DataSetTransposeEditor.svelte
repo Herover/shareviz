@@ -4,6 +4,7 @@
   import type { TransposedColumn } from "$lib/chart";
   import type { DataSetStore } from "$lib/chartStores/dataSet.svelte";
   import { valueParsers } from "$lib/utils";
+  import DateFormatInput from "./DateFormatInput.svelte";
 
   const TP_TYPES = Object.keys(valueParsers);
 
@@ -187,6 +188,12 @@
           {/each}
         </select>
       </div>
+      {#if transpose.keyType == "date"}
+        <DateFormatInput
+          value={transpose.keyDateFormat}
+          onValueChange={(next) => dataStore.setTransposeKeyDateFormat(i, next)}
+        />
+      {/if}
     </div>
   </div>
 
@@ -215,6 +222,12 @@
           {/each}
         </select>
       </div>
+      {#if transpose.valueType == "date"}
+        <DateFormatInput
+          value={transpose.valueDateFormat}
+          onValueChange={(next) => dataStore.setTransposeValueDateFormat(i, next)}
+        />
+      {/if}
     </div>
   </div>
 

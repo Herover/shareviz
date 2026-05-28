@@ -108,6 +108,8 @@ export class DataSetStore {
           toValue: "",
           valueType: "text",
           keyType: "text",
+          keyDateFormat: "",
+          valueDateFormat: "",
         },
       },
     ]);
@@ -156,6 +158,28 @@ export class DataSetStore {
       "transpose",
       transposeIndex,
       "keyType",
+      { r: 0, i: value },
+    ]);
+  }
+  setTransposeKeyDateFormat(transposeIndex: number, value: string) {
+    this.#doc.submitOp([
+      "data",
+      "sets",
+      this.#index,
+      "transpose",
+      transposeIndex,
+      "keyDateFormat",
+      { r: 0, i: value },
+    ]);
+  }
+  setTransposeValueDateFormat(transposeIndex: number, value: string) {
+    this.#doc.submitOp([
+      "data",
+      "sets",
+      this.#index,
+      "transpose",
+      transposeIndex,
+      "valueDateFormat",
       { r: 0, i: value },
     ]);
   }

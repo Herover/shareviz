@@ -5,6 +5,7 @@
   import type { DataSetStore } from "$lib/chartStores/dataSet.svelte";
   import { orDefault, valueParsers } from "$lib/utils";
   import DataSetTransposeEditor from "./DataSetTransposeEditor.svelte";
+  import DateFormatInput from "./DateFormatInput.svelte";
   import EditorCollapsible from "./EditorCollapsible.svelte";
 
   interface Props {
@@ -25,13 +26,6 @@
     date: { label: "DAT", cls: "badge-date" },
   };
 
-  const DATE_FORMAT_HINTS: [string, string][] = [
-    ["YYYY-MM-DD", "2025-02-10"],
-    ["YY/M/D", "25/2/10"],
-    ["HH:mm:s", "13:02:30"],
-    ["hh a", "2 pm"],
-    ["YYYY[Q]Q", "2025Q1"],
-  ];
   const rawDataHint = "column1\tcolumn2\nvalue1\tvalue2\nvalue3\tvalue4\n...";
 
   const getBadge = (type: string) => TYPE_BADGES[type] ?? TYPE_BADGES.text;
@@ -157,29 +151,10 @@
             </div>
             {#if column.type == "date"}
               <div class="ed-col-date">
-                <input
-                  type="text"
-                  placeholder="e.g. YYYY-MM-DD"
+                <DateFormatInput
                   value={column.dateFormat}
-                  onchange={(e) => dataStore.setColumnDateFormat(i, e.currentTarget.value)}
-                  onkeyup={(e) => dataStore.setColumnDateFormat(i, e.currentTarget.value)}
+                  onValueChange={(next) => dataStore.setColumnDateFormat(i, next)}
                 />
-                <div class="ed-date-hint">
-                  {#each DATE_FORMAT_HINTS as [fmt, ex] (fmt)}
-                    <div class="ed-date-hint-row">
-                      <span class="ed-date-fmt">{fmt}</span>
-                      <span class="ed-date-ex">→ {ex}</span>
-                    </div>
-                  {/each}
-                  <a
-                    href="https://day.js.org/docs/en/parse/string-format"
-                    class="ed-date-hint-link"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    See all formats at Day.js docs →
-                  </a>
-                </div>
               </div>
             {/if}
           </div>
@@ -316,55 +291,11 @@
     font-size: 0.85rem;
   }
 
-  /* Date format expansion */
+  /* Date format wrapper — provides indent + divider matching the column row layout */
   .ed-col-date {
-    padding: 8px 12px 12px 50px;
+    padding: 0 12px 4px 50px;
     border-top: 1px dashed var(--border-subtle);
     background: var(--bg-base);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .ed-col-date input[type="text"] {
-    height: 28px;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    max-width: 220px;
-  }
-  .ed-date-hint {
-    background: var(--bg-deep);
-    border-radius: var(--radius-sm);
-    padding: 10px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    max-width: 280px;
-  }
-  .ed-date-hint-row {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-  }
-  .ed-date-fmt {
-    color: var(--accent-primary);
-    font-weight: 500;
-    min-width: 90px;
-  }
-  .ed-date-ex {
-    color: var(--fg-on-deep-muted);
-  }
-  .ed-date-hint-link {
-    margin-top: 6px;
-    font-family: var(--font-body);
-    font-size: 0.85rem;
-    color: var(--fg-on-deep-muted);
-    text-decoration: none;
-  }
-  .ed-date-hint-link:hover {
-    text-decoration: underline;
-    color: var(--fg-on-deep);
   }
 
   /* Transpose block */

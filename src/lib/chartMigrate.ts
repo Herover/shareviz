@@ -461,4 +461,30 @@ export const migrate = (
     // console.log(JSON.stringify(doc.data, null, 0), JSON.stringify(op, null, 2));
     doc.submitOp(op);
   }
+
+  if (doc.data.m.v == 6 && doc.data.m.v < toVersion) {
+    const op = (doc.data as Root).data.sets
+      .map((set, si) =>
+        (set.transpose ?? []).flatMap((transpose, ti) => {
+          const fieldOps: any[] = [];
+          if (typeof transpose.keyDateFormat != "string") {
+            fieldOps.push(["data", "sets", si, "transpose", ti, "keyDateFormat", { i: "" }]);
+          }
+          if (typeof transpose.valueDateFormat != "string") {
+            fieldOps.push(["data", "sets", si, "transpose", ti, "valueDateFormat", { i: "" }]);
+          }
+          return fieldOps;
+        }),
+      )
+      .flat()
+      .reduce((acc, op) => json1.type.compose(acc, op), [
+        "m",
+        "v",
+        {
+          r: 0,
+          i: 7,
+        },
+      ] as any);
+    doc.submitOp(op);
+  }
 };

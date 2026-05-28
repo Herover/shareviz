@@ -42,6 +42,10 @@ export interface TransposedColumn {
   valueType: string;
   /** Data type for keys in from */
   keyType: string;
+  /** Date parse format for keys (only used when keyType is a date variant) */
+  keyDateFormat: string;
+  /** Date parse format for values (only used when valueType is a date variant) */
+  valueDateFormat: string;
 }
 
 export interface Row {

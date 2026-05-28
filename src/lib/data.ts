@@ -48,8 +48,10 @@ export const computeData = (chartSpec?: Root) =>
               set.forEach((row) => {
                 const row2 = {
                   ...row,
-                  [transpose.toValue]: valueParser.fn(row[key], {}),
-                  [transpose.toKey]: keyParser.fn(key, {}),
+                  [transpose.toValue]: valueParser.fn(row[key], {
+                    dateFormat: transpose.valueDateFormat,
+                  }),
+                  [transpose.toKey]: keyParser.fn(key, { dateFormat: transpose.keyDateFormat }),
                 };
                 set2.push(row2);
               });
