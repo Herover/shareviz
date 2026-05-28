@@ -44,7 +44,7 @@
   });
   $effect(() => {
     if (folderPath.length == 1 && folderPath[0] == "f") {
-      goto(resolve("(app)/(main)/me", {}));
+      goto(resolve("/(app)/(main)/me", {}));
     }
   });
 
@@ -83,6 +83,6 @@
   contents={directory}
   onUpdate={() => updateFolders()}
   onAddChart={(id) => newGraphic(id)}
-  basePath={resolve("(app)/(main)/me/f/", {})}
+  basePath={resolve("/(app)/(main)/me/f/", {})}
   path={folderPath}
 />
