@@ -18,6 +18,7 @@ const authorizeOrRejectUserOnChart = (userId, chartId) => {
   return new Promise((resolve, reject) => {
     if (!userId) {
       reject("unauthorized");
+      return;
     }
     db.getUserTeamCharts(userId, chartId)
       .then((charts) => {
@@ -579,12 +580,10 @@ export function startServer(server) {
             ctx.agent.custom.session = result[0].session;
             ctx.agent.custom.logger = ctx.req.__logger.getLogger({ uid: result[0].user.id });
             // TODO: respect session.expires and close user connection after this timestamp.
-            return result[0];
+            next();
+            return;
           }
           next(new Error("session not found"));
-        })
-        .then(() => {
-          next();
         })
         .catch((e) => {
           ctx.req.__logger.error("error", { error: e });
