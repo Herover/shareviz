@@ -633,7 +633,6 @@ export function startServer(server) {
           next();
         })
         .catch((e) => next(e));
-      next();
     } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.presenceSubscribe) {
       const chartId = ctx.data.ch.slice("presence-".length);
       authorizeOrRejectUserOnChart(ctx.agent.custom.user?.id, chartId)
@@ -641,7 +640,6 @@ export function startServer(server) {
           next();
         })
         .catch((e) => next(e));
-      next();
     } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.presence) {
       const chartId = ctx.data.ch.slice("presence-".length);
       authorizeOrRejectUserOnChart(ctx.agent.custom.user?.id, chartId)
