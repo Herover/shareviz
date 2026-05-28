@@ -183,15 +183,15 @@
       --font-mono: "IBM Plex Mono", "Fira Code", "Courier New", monospace;
 
       /* Type Scale (Major Third × 1.25, base 16px) */
-      --text-xs: 0.64rem; /*  ~10.2px */
-      --text-sm: 0.8rem; /*  ~12.8px */
-      --text-base: 1rem; /*  16px    */
-      --text-md: 1.25rem; /*  20px    */
-      --text-lg: 1.5625rem; /*  25px    */
-      --text-xl: 1.953rem; /*  ~31px   */
-      --text-2xl: 2.441rem; /*  ~39px   */
-      --text-3xl: 3.052rem; /*  ~49px   */
-      --text-4xl: 3.815rem; /*  ~61px   */
+      --text-xs: 0.64rem;
+      --text-sm: 0.8rem;
+      --text-base: 1rem;
+      --text-md: 1.15rem;
+      --text-lg: 1.5625rem;
+      --text-xl: 1.953rem;
+      --text-2xl: 2.441rem;
+      --text-3xl: 3.052rem;
+      --text-4xl: 3.815rem;
 
       /* Line Heights */
       --leading-tight: 1.2;
@@ -234,7 +234,7 @@
       --h3-leading: var(--leading-snug);
 
       --h4-font: var(--font-body);
-      --h4-size: var(--text-md);
+      --h4-size: var(--text-base);
       --h4-weight: var(--weight-semibold);
       --h4-leading: var(--leading-snug);
 
@@ -377,6 +377,10 @@
       font-size: var(--h4-size);
       font-weight: var(--h4-weight);
       line-height: var(--leading-snug);
+      margin: 18px 0 8px;
+      color: var(--fg-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
     p {
       font-size: var(--body-size);

@@ -4,10 +4,6 @@
   font-size: 1.1rem;
   color: var(--fg-secondary);
 }
-.editor .editor-sub-section {
-  margin-bottom: 1em;
-  margin-top: 2em;
-}
 .editor-column-label-description,
 .editor-sub-section-description {
   color: var(--fg-secondary);
