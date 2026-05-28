@@ -19,7 +19,14 @@ export async function POST({ request, locals }) {
 
   const teams = await db.getUserTeams(user.id);
   if (teams.findIndex((t) => t.teams.id == teamId) == -1) {
-    return json({ message: "unauthorized" }, { status: 401 });
+    return json({ message: "unauthorized" }, { status: 403 });
+  }
+
+  if (typeof parentId == "string" && parentId.length > 0) {
+    const parent = await db.getFolder(parentId).catch(() => null);
+    if (!parent || parent.teamId != teamId) {
+      return json({ message: "invalid parentId" }, { status: 400 });
+    }
   }
 
   const id = await db.addFolder(name, teamId, parentId);
