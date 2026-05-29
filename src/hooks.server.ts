@@ -8,6 +8,7 @@ import { SESSION_COOKIE_KEY } from "$lib/../../server_lib/auth";
 import { migrate } from "$lib/chartMigrate";
 import { formatVersion } from "$lib/initialDoc";
 import { getLogger } from "$lib/log.js";
+import { env } from "$env/dynamic/public";
 
 const logger = getLogger();
 
@@ -63,6 +64,18 @@ const newAuthHandle: Handle = async ({ event, resolve }) => {
     }
   } else {
     event.locals.session = null;
+  }
+
+  event.setHeaders({
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+  });
+
+  if (event.url.origin == env.PUBLIC_ORIGIN) {
+    event.setHeaders({
+      "Content-Security-Policy": "frame-ancestors 'self'",
+    });
   }
 
   const response = await resolve(event);
