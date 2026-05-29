@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
+import path from "node:path";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
@@ -46,7 +47,8 @@ export const ORGANIZATION_ROLES = {
   ADMIN: 2,
 };
 
-const sqlite = new Database("data/db.sqlite");
+const dataDir = process.env.DATA_DIR || "data";
+const sqlite = new Database(path.join(dataDir, "db.sqlite"));
 export const drizzledb = drizzle({ client: sqlite, logger: new DrizzleLogger() });
 
 export const db = {

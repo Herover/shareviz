@@ -24,6 +24,7 @@ Before you commit code, you also have to run the commands
 
 - `npm run format` for automatic formatting of code.
 - `npm run lint` for best linting. Most rules comes from existing best practice definitaions, but it's allowed to ignore rules when really required.
+- `npm run test:e2e` tests important user flows that are easy to forget. You may need to run `npx playwright install chromium && npx playwright install-deps chromium` the first time.
 
 ## Running the code
 

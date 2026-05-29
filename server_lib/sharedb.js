@@ -9,8 +9,10 @@ const logger = getLogger();
 // @ts-expect-error because sharedb-json doesn't export ts types
 import { JSONDB } from "sharedb-json";
 
+const documentDir = process.env.DATA_DIR || "data";
+
 ShareDB.types.register(json1.type);
-export const backend = new ShareDB({ presence: true, db: new JSONDB({}) });
+export const backend = new ShareDB({ presence: true, db: new JSONDB({ documentDir }) });
 export const connection = backend.connect();
 
 connection.on("error", (err) => logger.error("ShareDB error", err));
