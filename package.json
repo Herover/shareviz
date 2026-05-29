@@ -5,6 +5,7 @@
   "license": "MPL-2.0",
   "scripts": {
     "test": "vitest",
+    "test:e2e": "node e2e/setup.mjs && playwright test",
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
@@ -15,6 +16,7 @@
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.4",
+    "@playwright/test": "^1.60.0",
     "@sveltejs/adapter-auto": "^6.0.1",
     "@sveltejs/adapter-node": "^5.5.1",
     "@sveltejs/kit": "^2.61.1",
@@ -27,6 +29,7 @@
     "@types/d3-scale": "^4.0.8",
     "@types/d3-shape": "^3.1.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.9.1",
     "@types/sharedb": "^3.3.9",
     "@types/ws": "^8.5.10",
     "drizzle-kit": "^0.31.5",
