@@ -504,33 +504,30 @@ export const db = {
   },
 
   addUserOrganizationRelation: async (/** @type {string} */ code, /** @type {string} */ userId) => {
-    return drizzledb.transaction(async (tx) => {
-      const invite = await tx
-        .select()
-        .from(organizationInvites)
-        .where(and(eq(organizationInvites.code, code), isNull(organizationInvites.used)));
-      if (invite.length != 1) {
-        tx.rollback();
-        return 0;
+    // This should be a transaction, but drizzle better-sqlite3 dont support it
+    const invite = await drizzledb
+      .select()
+      .from(organizationInvites)
+      .where(and(eq(organizationInvites.code, code), isNull(organizationInvites.used)));
+    if (invite.length != 1) {
+      throw new Error("invite not found");
+    }
+    if (invite[0].expires != null) {
+      const expires = new Date(invite[0].expires);
+      if (expires.getTime() < Date.now()) {
+        throw new Error("invite expired");
       }
-      if (invite[0].expires != null) {
-        const expires = new Date(invite[0].expires);
-        if (expires.getTime() < Date.now()) {
-          tx.rollback();
-          return 0;
-        }
-      }
-      await tx
-        .update(organizationInvites)
-        .set({ used: new Date().toISOString() })
-        .where(eq(organizationInvites.code, code));
-      const res = await tx.insert(usersOrganizations).values({
-        organizationId: invite[0].organizationId,
-        userId,
-        role: invite[0].role,
-      });
-      return res.changes == 1;
+    }
+    await drizzledb
+      .update(organizationInvites)
+      .set({ used: new Date().toISOString() })
+      .where(eq(organizationInvites.code, code));
+    const res = await drizzledb.insert(usersOrganizations).values({
+      organizationId: invite[0].organizationId,
+      userId,
+      role: invite[0].role,
     });
+    return res.changes == 1;
   },
 
   addFolder: async (
