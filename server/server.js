@@ -3,14 +3,18 @@
 import { WebSocketServer } from "ws";
 import WebSocketJSONStream from "@teamwork/websocket-json-stream";
 import json1 from "ot-json1";
+import { parse as parseCookie } from "cookie";
 import { db } from "../server_lib/user.js";
 import { backend, connection } from "../server_lib/sharedb.js";
 import sharedb from "sharedb";
 import { users, userSessions } from "../server_lib/drizzle/schema.js";
-import { eq, gt } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { getLogger } from "../src/lib/log.js";
 import { drizzledb } from "../server_lib/sqlite.js";
 import { SESSION_COOKIE_KEY } from "../server_lib/auth.js";
+
+const MAX_WS_PAYLOAD_BYTES = 4 * 1024 * 1024;
+const HEARTBEAT_INTERVAL_MS = 30_000;
 
 const logger = getLogger();
 
@@ -49,7 +53,7 @@ export function createDoc(callback) {
       const defaultChart = {
         meta: {
           publicRead: true,
-          access: [{ userId: 1, write: true, read: true }],
+          access: [],
         },
         data: {
           sets: [
@@ -539,28 +543,42 @@ export function startServer(server) {
   /* logger.log("STARTSERVER",server) */
   // Create a web server to serve files and listen to WebSocket connections
   // Connect any incoming WebSocket connection to ShareDB
-  var wss = new WebSocketServer({ server, path: "/sharedb" });
+  var wss = new WebSocketServer({
+    server,
+    path: "/sharedb",
+    maxPayload: MAX_WS_PAYLOAD_BYTES,
+  });
   wss.on("connection", function (ws, req) {
+    ws.isAlive = true;
+    ws.on("pong", () => {
+      ws.isAlive = true;
+    });
+
     var stream = new WebSocketJSONStream(ws);
 
     stream.on("error", (error) => {
       logger.log("stream error", { error });
     });
 
-    const cookies = req.headers.cookie
-      ? req.headers.cookie.split(";").reduce((acc, part) => {
-          const [key, value] = part.trim().split("=");
-          acc[key] = value;
-          return acc;
-        }, {})
-      : {};
+    const cookies = req.headers.cookie ? parseCookie(req.headers.cookie) : {};
     req.__sharevizAuthJSToken = cookies[SESSION_COOKIE_KEY];
-    req.__logger = logger.getLogger({
-      ip: req.headers["X-Forwarded-For"] ?? req.socket.remoteAddress,
-    });
+    req.__sharevizUserAgent = req.headers["user-agent"];
+    req.__logger = logger.getLogger({ ip: req.socket.remoteAddress });
 
     backend.listen(stream, req);
   });
+
+  const heartbeat = setInterval(() => {
+    wss.clients.forEach((ws) => {
+      if (ws.isAlive === false) {
+        ws.terminate();
+        return;
+      }
+      ws.isAlive = false;
+      ws.ping();
+    });
+  }, HEARTBEAT_INTERVAL_MS);
+  wss.on("close", () => clearInterval(heartbeat));
 
   backend.use("connect", function (ctx, next) {
     ctx.req.__logger.log("connect");
@@ -569,21 +587,31 @@ export function startServer(server) {
       drizzledb
         .select()
         .from(userSessions)
-        .where(
-          eq(userSessions.sessionToken, ctx.req.__sharevizAuthJSToken),
-          gt(userSessions.expires, new Date().toISOString()),
-        )
+        .where(eq(userSessions.sessionToken, ctx.req.__sharevizAuthJSToken))
         .leftJoin(users, eq(userSessions.userId, users.id))
         .then((result) => {
-          if (typeof result != "undefined" && result.length == 1) {
-            ctx.agent.custom.user = result[0].user;
-            ctx.agent.custom.session = result[0].session;
-            ctx.agent.custom.logger = ctx.req.__logger.getLogger({ uid: result[0].user.id });
-            // TODO: respect session.expires and close user connection after this timestamp.
-            next();
+          if (typeof result == "undefined" || result.length != 1) {
+            next(new Error("session not found"));
             return;
           }
-          next(new Error("session not found"));
+          const session = result[0].user_session;
+          if (Date.now() >= session.expires.getTime()) {
+            ctx.req.__logger.log("session expired");
+            next(new Error("session expired"));
+            return;
+          }
+          const storedAgent = session.agent;
+          const reqAgent = ctx.req.__sharevizUserAgent;
+          if (storedAgent && reqAgent && storedAgent !== reqAgent) {
+            ctx.req.__logger.log("session agent mismatch");
+            next(new Error("session agent mismatch"));
+            return;
+          }
+          ctx.agent.custom.user = result[0].user;
+          ctx.agent.custom.session = session;
+          ctx.agent.custom.logger = ctx.req.__logger.getLogger({ uid: result[0].user.id });
+          // TODO: close user connection when session.expires elapses mid-connection
+          next();
         })
         .catch((e) => {
           ctx.req.__logger.error("error", { error: e });
@@ -606,12 +634,9 @@ export function startServer(server) {
     );
 
     if (ctx.data.a == sharedb.MESSAGE_ACTIONS.subscribe && ctx.data.c == "examples") {
-      // TODO: add authentication using "ctx.agent.custom.userId"
-      // if (false) {
-      //   ctx.agent.custom.logger.log("unauthorized")
-      //   return next("unauthorized");
-      // }
-      next();
+      authorizeOrRejectUserOnChart(ctx.agent.custom.user?.id, ctx.data.d)
+        .then(() => next())
+        .catch((e) => next(e));
     } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.pingPong) {
       next();
     } else if (ctx.data.a == sharedb.MESSAGE_ACTIONS.op && ctx.agent.custom.user) {
@@ -699,52 +724,32 @@ export function startServer(server) {
       next();
       return;
     }
-    db.getUserTeamCharts(ctx.agent.custom.user.id, ctx.id)
-      .then((charts) => {
-        // TODO: get rid of hard coded constant
-        if (charts.length != 0 && (charts[0].relationType === 1 || charts[0].teamId !== null)) {
-          next();
-        } else {
-          ctx.agent.custom.logger.log("unauthorized submit", {
-            collection: ctx.collection,
-            id: ctx.id,
-          });
-          next("unauthorized");
-        }
-      })
-      .catch((e) => next(e));
-    // const entry = ctx.snapshot?.data?.meta?.access?.find(e => e.userId === ctx.agent.custom.userId);
-    // if (entry?.write) {
-    //   next();
-    // } else {
-    //   ctx.agent.custom.logger.log(`unauthorized submit on ${ctx.collection} ${ctx.id}`);
-    //   next("unauthorized");
-    // }
+    if (!ctx.agent.custom.user) {
+      next("unauthorized");
+      return;
+    }
+    authorizeOrRejectUserOnChart(ctx.agent.custom.user.id, ctx.id)
+      .then(() => next())
+      .catch(() => {
+        ctx.agent.custom.logger.log("unauthorized submit", {
+          collection: ctx.collection,
+          id: ctx.id,
+        });
+        next("unauthorized");
+      });
   });
   backend.use("apply", function (ctx, next) {
     ctx.agent.custom.logger.log("apply" /* ctx.agent.custom.userId, ctx */);
     ctx.extra.oldMeta = ctx.snapshot?.data?.meta;
 
-    if (typeof ctx.op.create == "object" && typeof ctx.snapshot?.data != "object") {
-      // When creating a new chart, always add current user to access list
-      ctx.op.create.data.meta = {
-        publicRead: false,
-        access: [{ userId: ctx.agent.custom.user.id, read: true, write: true }],
-      };
-
-      // db.addChart(ctx.id, "Chart name", ctx.agent.custom.user.id)
-      //   .then(() => next())
-      //   .catch((e) => next(e));
-      next();
-    } else if (typeof ctx.snapshot == "object") {
-      authorizeOrRejectUserOnChart(ctx.agent.custom.user.id, ctx.id)
+    if (typeof ctx.snapshot == "object") {
+      authorizeOrRejectUserOnChart(ctx.agent.custom.user?.id, ctx.id)
         .then(() => next())
         .catch((e) => next(e));
     } else {
       ctx.agent.custom.logger.log("unknown apply", { collection: ctx.collection, id: ctx.id });
       next("unauthorized");
     }
-    // next();
   });
   backend.use("commit", function (ctx, next) {
     ctx.agent.custom.logger.log("commit" /* , ctx.snapshot */);

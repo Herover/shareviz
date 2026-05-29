@@ -52,10 +52,13 @@ const newAuthHandle: Handle = async ({ event, resolve }) => {
   const sessionCookie = event.cookies.get(SESSION_COOKIE_KEY);
   if (typeof sessionCookie == "string") {
     const userSession = await db.getUserBySession(sessionCookie);
-    if (userSession && Date.now() < userSession.user_session.expires.getTime()) {
+    const storedAgent = userSession?.user_session.agent;
+    const reqAgent = event.request.headers.get("user-agent");
+    const agentMatches = !storedAgent || !reqAgent || storedAgent === reqAgent;
+    if (userSession && Date.now() < userSession.user_session.expires.getTime() && agentMatches) {
       event.locals.session = userSession;
     } else {
-      // Expired session
+      // Expired session or agent mismatch
       event.cookies.delete(SESSION_COOKIE_KEY, { path: "/" });
     }
   } else {
