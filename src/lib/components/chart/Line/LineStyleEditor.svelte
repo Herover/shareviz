@@ -49,7 +49,10 @@
     const parsed = type == "number" ? Number.parseInt(value) : new Date(value).getTime();
     const proposed = flatValues
       .find((e) => e.key == style.data.k)
-      ?.value.map((d) => ({ d: Math.abs(parsed - d.x), x: d.x, y: d.y }))
+      ?.value.map((d) => {
+        const dx = d.x instanceof Date ? d.x.getTime() : d.x;
+        return { d: Math.abs(parsed - dx), x: d.x, y: d.y };
+      })
       .sort((a, b) => a.d - b.d)[0] || { x: 0, y: 0 };
     const proposedY = flatValues
       .find((e) => e.key == style.data.k)
