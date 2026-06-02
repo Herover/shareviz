@@ -72,11 +72,11 @@ const newAuthHandle: Handle = async ({ event, resolve }) => {
     "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
   });
 
-  // if (event.url.origin == env.PUBLIC_ORIGIN) {
-  //   event.setHeaders({
-  //     "Content-Security-Policy": `frame-ancestors '${env.PUBLIC_VIEWER_ORIGIN}'`,
-  //   });
-  // }
+  if (event.url.href.startsWith("https://" + env.PUBLIC_ORIGIN + "/") || event.url.href.startsWith("http://" + env.PUBLIC_ORIGIN + "/") ) {
+    event.setHeaders({
+      "Content-Security-Policy": `frame-ancestors '${env.PUBLIC_VIEWER_ORIGIN}'`,
+    });
+  }
 
   const response = await resolve(event);
 
