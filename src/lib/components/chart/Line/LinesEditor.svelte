@@ -16,6 +16,7 @@
   import CategoryList from "../CategoryList.svelte";
   import equal from "fast-deep-equal";
   import { chartToEditor } from "$lib/chartToEditorStore.svelte";
+  import { untrack } from "svelte";
 
   interface Props {
     chartColors: ResponsiveColor[];
@@ -28,7 +29,7 @@
 
   let selected: { [key: string]: boolean } = $state({});
   let defaultSelected = $state(false);
-  let defaultStyle = lineStore.defaultLineStyle();
+  let defaultStyle = untrack(() => lineStore.defaultLineStyle());
   let selectedIndexes = $derived(
     Object.keys(selected)
       .filter((k) => selected[k] !== false)

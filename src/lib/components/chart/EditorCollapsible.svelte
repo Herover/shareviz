@@ -5,6 +5,8 @@
 </script>
 
 <script lang="ts">
+  import { untrack } from "svelte";
+
   // In the template, `!open` errors which doesn't make any sense.
   interface Props {
     group?: string | number;
@@ -18,15 +20,14 @@
 
   let { group, key, label, startOpen = false, lvl = 1, actions, children }: Props = $props();
 
-  let open = $state(startOpen);
+  let open = $state(untrack(() => startOpen));
 
-  if (group) {
-    if (typeof groups[group] == "undefined") {
-      groups[group] = startOpen ? key : "";
-    } else {
+  // Seed this item's accordion state once on init from the initial props.
+  untrack(() => {
+    if (group) {
       groups[group] = startOpen ? key : "";
     }
-  }
+  });
 
   $effect(() => {
     if (group) {

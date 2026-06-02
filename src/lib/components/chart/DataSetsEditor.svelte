@@ -5,6 +5,7 @@
   import { type ShareDBConnection } from "$lib/chartStores/data.svelte";
   import { DataSetsStore, DataSetStore } from "$lib/chartStores/dataSet.svelte";
   import DataSetEditor from "./DataSetEditor.svelte";
+  import { untrack } from "svelte";
 
   interface Props {
     chartData: Data;
@@ -13,7 +14,7 @@
 
   let { chartData, connection }: Props = $props();
 
-  let dataSetStore = new DataSetsStore(connection);
+  let dataSetStore = untrack(() => new DataSetsStore(connection));
 
   const addDataSet = () => {
     dataSetStore.addDataSet(chartData.sets.length);

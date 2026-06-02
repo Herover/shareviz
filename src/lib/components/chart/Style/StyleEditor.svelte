@@ -4,6 +4,7 @@
   import { ChartStore } from "$lib/chartStores/chart.svelte";
   import { StyleStore } from "$lib/chartStores/style.svelte";
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
+  import { untrack } from "svelte";
 
   interface Props {
     connection: ShareDBConnection;
@@ -11,8 +12,8 @@
 
   let { connection }: Props = $props();
 
-  let chartStore = new ChartStore(connection);
-  let styletStore = new StyleStore(connection);
+  let chartStore = untrack(() => new ChartStore(connection));
+  let styletStore = untrack(() => new StyleStore(connection));
 
   const cssExample = `.chart {
   --background-color: #ffffff;

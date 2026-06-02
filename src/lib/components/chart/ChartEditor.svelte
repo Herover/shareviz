@@ -8,6 +8,7 @@
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
   import { ChartStore } from "$lib/chartStores/chart.svelte";
   import type { ComputedData } from "$lib/data";
+  import { untrack } from "svelte";
 
   interface Props {
     spec: Root;
@@ -17,7 +18,7 @@
 
   let { spec, chartData, connection }: Props = $props();
 
-  let chartStore = new ChartStore(connection);
+  let chartStore = untrack(() => new ChartStore(connection));
 
   const removeElement = (i: number) => {
     chartStore.removeChartElement(i);

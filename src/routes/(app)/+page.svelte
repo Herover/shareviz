@@ -10,17 +10,7 @@
   import { resolve } from "$app/paths";
 
   let { data }: PageProps = $props();
-  let returnURL = data.returnURL?.startsWith("/") ? data.returnURL : null;
-
-  if (data.session?.user) {
-    goto(resolve("/(app)/(main)/me", {}));
-  }
-
-  if (data.msg) {
-    notifications.addError(
-      data.msg == "password_error" ? "Check if username and password is correct" : "",
-    );
-  }
+  let returnURL = $derived(data.returnURL?.startsWith("/") ? data.returnURL : null);
 
   const newGraphic = async (synced: boolean) => {
     const docId = await db.create(synced);
@@ -28,7 +18,19 @@
   };
 
   let charts: ReturnType<typeof db.getLocal> | undefined = $state();
-  onMount(() => (charts = db.getLocal()));
+  onMount(() => {
+    charts = db.getLocal();
+
+    if (data.session?.user) {
+      goto(resolve("/(app)/(main)/me", {}));
+    }
+
+    if (data.msg) {
+      notifications.addError(
+        data.msg == "password_error" ? "Check if username and password is correct" : "",
+      );
+    }
+  });
 </script>
 
 <main>

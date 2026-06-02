@@ -12,6 +12,7 @@
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
   import type { ComputedData } from "$lib/data";
   import chroma from "chroma-js";
+  import { untrack } from "svelte";
 
   interface Props {
     spec: Root;
@@ -23,7 +24,7 @@
 
   let { spec, chartData, id, connection }: Props = $props();
 
-  let hbarStore = new HBarStore(connection, id);
+  let hbarStore = untrack(() => new HBarStore(connection, id));
 
   let colorScale = $derived(hbarStore.colors());
 

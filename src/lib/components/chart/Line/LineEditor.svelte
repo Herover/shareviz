@@ -10,6 +10,7 @@
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
   import { LineStore } from "$lib/chartStores/line.svelte";
   import type { ComputedData } from "$lib/data";
+  import { untrack } from "svelte";
 
   interface Props {
     spec: Root;
@@ -21,7 +22,7 @@
 
   let { spec, chartData, index, connection, id }: Props = $props();
 
-  let lineStore = new LineStore(connection, id);
+  let lineStore = untrack(() => new LineStore(connection, id));
 
   let dataSet = $derived(spec.data.sets.find((set) => set.id == lineStore.data.dataSet));
 
