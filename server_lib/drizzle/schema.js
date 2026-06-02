@@ -115,6 +115,7 @@ export const organizations = sqliteTable("organizations", {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
+  description: text("description").notNull().default(""),
 });
 
 export const teams = sqliteTable("teams", {
@@ -122,6 +123,7 @@ export const teams = sqliteTable("teams", {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
+  description: text("description").notNull().default(""),
   organizationId: text("organizationId")
     .notNull()
     .references(() => organizations.id, { onDelete: "cascade" }),

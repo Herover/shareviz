@@ -18,6 +18,7 @@ export type TeamResponse = {
   }[];
   folders: Awaited<ReturnType<typeof db.getFolders>>;
   name: string;
+  description: string;
   organizationId: string;
 };
 
@@ -44,6 +45,7 @@ export async function GET({ params, locals }) {
       members: members.map((e) => ({ user: e.user, role: e.usersTeams.role })),
       folders,
       name: team.name,
+      description: team.description,
       organizationId: team.organizationId,
     } satisfies TeamResponse,
     { status: 200 },
@@ -67,12 +69,17 @@ export async function PUT({ request, locals, params }) {
     return json({ message: "unauthorized" }, { status: 403 });
   }
 
-  const { name } = await request.json();
+  const { name, description } = await request.json();
   if (typeof name != "string" || name.length == 0) {
     return json({ message: "invalid name" }, { status: 400 });
   }
+  if (typeof description != "undefined" && typeof description != "string") {
+    return json({ message: "invalid description" }, { status: 400 });
+  }
 
-  await db.updateTeam(params.id, { name });
+  const details: { name: string; description?: string } = { name };
+  if (typeof description == "string") details.description = description;
+  await db.updateTeam(params.id, details);
 
   return json({
     message: "ok",

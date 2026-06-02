@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import { setContext, type Snippet } from "svelte";
+  import Icon from "./Icon.svelte";
 
   interface Props {
     label: string;
@@ -84,21 +85,9 @@
         aria-expanded={open}
         onclick={toggle}
       >
-        <svg
-          class="dropdown-chev"
-          class:open
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.4"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M6 9l6 6 6-6" />
-        </svg>
+        <span class="dropdown-chev" class:open>
+          <Icon name="chevronDown" size={12} stroke={2.4} />
+        </span>
       </button>
     </div>
   {:else}
@@ -111,21 +100,9 @@
     >
       {#if leadingIcon}{@render leadingIcon()}{/if}
       <span>{label}</span>
-      <svg
-        class="dropdown-chev"
-        class:open
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.4"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M6 9l6 6 6-6" />
-      </svg>
+      <span class="dropdown-chev" class:open>
+        <Icon name="chevronDown" size={12} stroke={2.4} />
+      </span>
     </button>
   {/if}
   {#if open}
@@ -211,6 +188,7 @@
   }
 
   .dropdown-chev {
+    display: inline-flex;
     transition: transform var(--duration-micro) var(--ease-standard);
   }
   .dropdown-chev.open {

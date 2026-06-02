@@ -6,6 +6,7 @@
   import { page } from "$app/state";
   import { addTeam } from "$lib/api";
   import NavDropdown from "$lib/components/NavDropdown.svelte";
+  import Icon from "$lib/components/Icon.svelte";
   import { notifications } from "$lib/notificationStore";
 
   interface Props {
@@ -118,20 +119,7 @@
               {/each}
               <div class="ch-pop-divider"></div>
               <button class="ch-pop-cta" onclick={() => addNewTeam()}>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M12 5v14" />
-                  <path d="M5 12h14" />
-                </svg>
+                <Icon name="plus" size={14} stroke={2.2} />
                 New team
               </button>
             {/if}
@@ -236,8 +224,7 @@
     box-sizing: border-box;
     max-width: var(--width-wide);
     margin: auto;
-    padding-left: 1em;
-    padding-right: 1em;
+    padding: 32px 0 96px;
   }
 
   .ch-pop {

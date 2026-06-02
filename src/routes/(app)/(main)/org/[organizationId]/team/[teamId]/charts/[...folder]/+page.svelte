@@ -11,6 +11,7 @@
   import type { FolderItem } from "$lib/components/chart-list/types";
   import type { PageProps } from "./$types";
   import Popup from "$lib/components/Popup.svelte";
+  import PageHead from "$lib/components/PageHead.svelte";
   import { resolve } from "$app/paths";
   import { getLogger } from "$lib/log.js";
 
@@ -110,10 +111,13 @@
   };
 
   const folderPath = $derived((page.params["folder"] ?? "").split("/").filter((e) => e != ""));
+
+  const orgName = $derived(page.data.organization?.organizations?.name ?? "");
+  const teamName = $derived(data.team?.teams?.name ?? "");
 </script>
 
 <div class="holder">
-  <h3>{data.team?.teams?.name || "Your charts"}</h3>
+  <PageHead overline={orgName} title={teamName || "Your charts"} />
   <ChartList
     contents={directory}
     onCreateFolder={(parentId) => onAddFolder("New folder", teamId, parentId)}

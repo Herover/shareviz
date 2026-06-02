@@ -4,6 +4,7 @@
   import { formatRelativeTime } from "$lib/utils";
   import ChartPreview from "./ChartPreview.svelte";
   import FileTags from "./FileTags.svelte";
+  import Icon from "$lib/components/Icon.svelte";
   import type { FolderItem } from "./types";
 
   /* eslint-disable svelte/no-navigation-without-resolve */
@@ -25,19 +26,7 @@
 >
   <div class="ch-grid-preview">
     {#if item.type == "folder"}
-      <svg
-        width="48"
-        height="48"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.25"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-      </svg>
+      <Icon name="folder" size={48} stroke={1.25} />
     {:else}
       <div class="ch-grid-preview-placeholder" aria-hidden="true">
         <ChartPreview {item} />

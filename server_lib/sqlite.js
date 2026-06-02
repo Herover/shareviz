@@ -401,8 +401,18 @@ export const db = {
     return res[0];
   },
 
-  updateTeam: async (/** @type {string} */ teamId, /** @type {{ name: string }} */ details) => {
+  updateTeam: async (
+    /** @type {string} */ teamId,
+    /** @type {{ name?: string; description?: string }} */ details,
+  ) => {
     return drizzledb.update(teams).set(details).where(eq(teams.id, teamId));
+  },
+
+  updateOrganization: async (
+    /** @type {string} */ organizationId,
+    /** @type {{ name?: string; description?: string }} */ details,
+  ) => {
+    return drizzledb.update(organizations).set(details).where(eq(organizations.id, organizationId));
   },
 
   getTeamCharts: async (/** @type {string} */ id) => {

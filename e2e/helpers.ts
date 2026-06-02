@@ -9,6 +9,9 @@ const STATE_FILE = path.resolve(".e2e-data/state.json");
 export interface E2EState {
   bootstrapOrgId: string;
   bootstrapInviteCode: string;
+  settingsOrgId: string;
+  settingsInviteCode: string;
+  settingsMemberInviteCode: string;
 }
 
 export function readState(): E2EState {

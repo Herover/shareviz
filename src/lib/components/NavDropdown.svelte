@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
+  import Icon from "./Icon.svelte";
+
   interface Props {
     children: import("svelte").Snippet;
     ariaLabel?: string;
@@ -53,23 +55,7 @@
     aria-expanded={open}
     onclick={() => toggleOpen()}
   >
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2.2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      {#if open}
-        <path d="M18 15l-6-6-6 6" />
-      {:else}
-        <path d="M6 9l6 6 6-6" />
-      {/if}
-    </svg>
+    <Icon name={open ? "chevronUp" : "chevronDown"} size={12} stroke={2.2} />
   </button>
   {#if open}
     <div bind:this={container} class="nav-dropdown-view">

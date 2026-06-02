@@ -16,10 +16,11 @@ test.describe("invite + team flow", () => {
     await page.goto(`/org/${bootstrapOrgId}`);
     await page.getByRole("button", { name: "New invite" }).click();
 
-    // The new invite code is rendered into a text input next to the button.
-    const inviteInput = page.locator("input").first();
-    await expect(inviteInput).toHaveValue(/[0-9a-f-]{36}/);
-    const memberInviteCode = await inviteInput.inputValue();
+    // The new invite code is rendered into the invites table; the freshly
+    // created row is highlighted with `.is-new`.
+    const inviteCodeCell = page.locator("tr.is-new .code");
+    await expect(inviteCodeCell).toHaveText(/[0-9a-f-]{36}/);
+    const memberInviteCode = (await inviteCodeCell.textContent())?.trim() ?? "";
     expect(memberInviteCode).not.toEqual(bootstrapInviteCode);
 
     // --- Admin creates a team via the API the UI normally calls ---
@@ -57,6 +58,7 @@ test.describe("invite + team flow", () => {
     await signOut(page);
     await signIn(page, memberEmail);
     await page.goto(`/org/${bootstrapOrgId}/team/${teamId}`);
-    await expect(page.getByRole("heading", { name: "QA Team" })).toBeVisible();
+    // The team name is shown in the (read-only, for non-admins) name field.
+    await expect(page.locator("#ts-name")).toHaveValue("QA Team");
   });
 });

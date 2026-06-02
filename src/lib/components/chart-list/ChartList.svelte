@@ -4,6 +4,7 @@
   import { editChartInfo, editFolder } from "$lib/api";
   import DropdownButton from "$lib/components/DropdownButton.svelte";
   import DropdownItem from "$lib/components/DropdownItem.svelte";
+  import Icon from "$lib/components/Icon.svelte";
   import File from "./File.svelte";
   import FileCard from "./FileCard.svelte";
   import type { FolderItem } from "./types";
@@ -152,39 +153,12 @@
     chevronAriaLabel="More ways to create a chart"
   >
     {#snippet leadingIcon()}
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.4"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M12 5v14" />
-        <path d="M5 12h14" />
-      </svg>
+      <Icon name="plus" size={14} stroke={2.4} />
     {/snippet}
     {#if typeof onImportChart == "function"}
       <DropdownItem label="Import JSON…" onClick={() => onImportChart(currentFolderId)}>
         {#snippet icon()}
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.75"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M12 3v12" />
-            <path d="M7 8l5-5 5 5" />
-            <path d="M5 21h14" />
-          </svg>
+          <Icon name="upload" size={16} />
         {/snippet}
       </DropdownItem>
     {/if}
@@ -201,24 +175,7 @@
       aria-label="List view"
       aria-pressed={view == "list"}
     >
-      <svg
-        width="15"
-        height="15"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <line x1="8" y1="6" x2="21" y2="6" />
-        <line x1="8" y1="12" x2="21" y2="12" />
-        <line x1="8" y1="18" x2="21" y2="18" />
-        <line x1="3" y1="6" x2="3.01" y2="6" />
-        <line x1="3" y1="12" x2="3.01" y2="12" />
-        <line x1="3" y1="18" x2="3.01" y2="18" />
-      </svg>
+      <Icon name="list" size={15} stroke={2} />
     </button>
     <button
       type="button"
@@ -228,22 +185,7 @@
       aria-label="Grid view"
       aria-pressed={view == "grid"}
     >
-      <svg
-        width="15"
-        height="15"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <rect x="3" y="3" width="7" height="7" />
-        <rect x="14" y="3" width="7" height="7" />
-        <rect x="3" y="14" width="7" height="7" />
-        <rect x="14" y="14" width="7" height="7" />
-      </svg>
+      <Icon name="grid" size={15} stroke={2} />
     </button>
   </div>
 </div>
