@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { sveltekit } from "@sveltejs/kit/vite";
-import { defineConfig } from "vite";
+import { defineConfig, configDefaults } from "vitest/config";
 import { webSocketDevServer } from "./server/dev";
 
 export default defineConfig({
@@ -15,4 +15,8 @@ export default defineConfig({
         conditions: ["browser"],
       }
     : undefined,
+  test: {
+    // Playwright specs in e2e/ are run via `npm run test:e2e`, not vitest
+    exclude: [...configDefaults.exclude, "e2e/**"],
+  },
 });
