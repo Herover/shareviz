@@ -11,6 +11,11 @@ import path from "node:path";
 const E2E_DATA_DIR = path.resolve(".e2e-data");
 const E2E_PORT = Number(process.env.E2E_PORT || 5174);
 const E2E_ORIGIN = `http://localhost:${E2E_PORT}`;
+// PUBLIC_VIEWER_ORIGIN must differ from PUBLIC_ORIGIN. `hooks.server.ts`
+// redirects 308 from any URL on the viewer origin (other than /view/...) to
+// PUBLIC_ORIGIN — if they share a host, the redirect points back to itself
+// and any request loops until something gives up.
+const E2E_VIEWER_ORIGIN = `http://view.localhost:${E2E_PORT}`;
 
 export default defineConfig({
   testDir: "e2e",
@@ -48,7 +53,7 @@ export default defineConfig({
     env: {
       DATA_DIR: E2E_DATA_DIR,
       PUBLIC_ORIGIN: E2E_ORIGIN,
-      PUBLIC_VIEWER_ORIGIN: E2E_ORIGIN,
+      PUBLIC_VIEWER_ORIGIN: E2E_VIEWER_ORIGIN,
       ORIGIN: E2E_ORIGIN,
       AUTH_SECRET: "e2e-secret-do-not-use-in-prod",
       AUTH_TRUST_HOST: "true",
