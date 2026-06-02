@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
-import type { Handle, ServerInit } from "@sveltejs/kit";
+import { redirect, type Handle, type ServerInit } from "@sveltejs/kit";
 import { db } from "../server_lib/user";
 import { init as initDB } from "../server_lib/sqlite";
 import { connection } from "$lib/../../server_lib/sharedb";
@@ -72,10 +72,21 @@ const newAuthHandle: Handle = async ({ event, resolve }) => {
     "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
   });
 
-  if (event.url.href.startsWith("https://" + env.PUBLIC_ORIGIN + "/") || event.url.href.startsWith("http://" + env.PUBLIC_ORIGIN + "/") ) {
+  if (
+    event.url.href.startsWith("https://" + env.PUBLIC_ORIGIN + "/") ||
+    event.url.href.startsWith("http://" + env.PUBLIC_ORIGIN + "/")
+  ) {
     event.setHeaders({
       "Content-Security-Policy": `frame-ancestors '${env.PUBLIC_VIEWER_ORIGIN}'`,
     });
+  }
+
+  // If the user is accessing the viewer domain, but trying to access other parts of the
+  if (
+    event.url.href.startsWith(env.PUBLIC_VIEWER_ORIGIN + "/") &&
+    !event.url.pathname.startsWith("/view/")
+  ) {
+    return redirect(308, env.PUBLIC_ORIGIN);
   }
 
   const response = await resolve(event);
