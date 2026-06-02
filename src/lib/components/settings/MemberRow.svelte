@@ -54,7 +54,7 @@
     border-bottom: 0;
   }
   .member:hover {
-    background: var(--color-warm-100);
+    background: var(--bg-base);
   }
   .member-id {
     min-width: 0;
@@ -104,9 +104,9 @@
     font-weight: 500;
   }
   .role-pill.is-admin {
-    color: var(--accent-primary);
-    border-color: var(--accent-primary-subtle);
-    background-color: var(--accent-primary-subtle);
+    color: var(--fg-on-accent);
+    border-color: var(--accent-primary);
+    background-color: var(--accent-primary);
   }
   .member-remove {
     width: 30px;

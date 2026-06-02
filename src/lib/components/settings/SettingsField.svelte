@@ -75,13 +75,11 @@
     font-size: 0.95rem;
     outline: none;
     transition:
-      border-color var(--duration-micro) var(--ease-standard),
-      box-shadow var(--duration-micro) var(--ease-standard);
+      border-color var(--duration-micro) var(--ease-standard);
   }
   .control :global(input[type="text"]:focus),
   .control :global(textarea:focus) {
     border-color: var(--border-focus);
-    box-shadow: 0 0 0 3px var(--accent-primary-subtle);
   }
   .control :global(input[type="text"]:disabled),
   .control :global(textarea:disabled) {

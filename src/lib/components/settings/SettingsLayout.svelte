@@ -161,8 +161,8 @@
     color: var(--fg-primary);
   }
   .sidenav a.is-active {
-    background: var(--accent-primary-subtle);
-    color: var(--accent-primary);
+    background: var(--accent-primary);
+    color: var(--fg-on-accent);
     font-weight: 600;
   }
   .sidenav-icon {
