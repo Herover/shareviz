@@ -224,7 +224,7 @@
     box-sizing: border-box;
     max-width: var(--width-wide);
     margin: auto;
-    padding: 32px 0 96px;
+    padding: 32px 16px 96px;
   }
 
   .ch-pop {
