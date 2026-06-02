@@ -8,6 +8,7 @@
   import { formatData } from "./data";
   import { max } from "d3-array";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
+  import PresenceField from "../PresenceField.svelte";
   import { HBarStore } from "$lib/chartStores/hbar.svelte";
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
   import type { ComputedData } from "$lib/data";
@@ -308,12 +309,20 @@
                 onchange={(s) => colorScale.setColorScaleColor(i, s)}
               />
             </td>
-            <td
-              ><input
-                value={color.legend}
-                onchange={(e) => colorScale.setColorScaleLegend(i, e.currentTarget.value)}
-                onkeyup={(e) => colorScale.setColorScaleLegend(i, e.currentTarget.value)}
-              />
+            <td>
+              <PresenceField
+                address={["chart", "elements", id, "d", "colors", "byKey", i, "legend"]}
+                {connection}
+              >
+                {#snippet field({ locked })}
+                  <input
+                    value={color.legend}
+                    readonly={locked}
+                    onchange={(e) => colorScale.setColorScaleLegend(i, e.currentTarget.value)}
+                    onkeyup={(e) => colorScale.setColorScaleLegend(i, e.currentTarget.value)}
+                  />
+                {/snippet}
+              </PresenceField>
             </td>
             <td>
               <button onclick={() => deleteColor(i)}> Delete </button>

@@ -18,6 +18,20 @@ const HEARTBEAT_INTERVAL_MS = 30_000;
 
 const logger = getLogger();
 
+/**
+ * Deterministic, stable presence color for a user id, so the same person keeps
+ * the same color across sessions/devices. Returns an HSL string.
+ */
+const colorFromId = (id) => {
+  let hash = 0;
+  const str = String(id);
+  for (let i = 0; i < str.length; i++) {
+    hash = (Math.imul(31, hash) + str.charCodeAt(i)) | 0;
+  }
+  const hue = ((hash % 360) + 360) % 360;
+  return `hsl(${hue} 70% 60%)`;
+};
+
 const authorizeOrRejectUserOnChart = (userId, chartId) => {
   return new Promise((resolve, reject) => {
     if (!userId) {
@@ -668,10 +682,12 @@ export function startServer(server) {
       const chartId = ctx.data.ch.slice("presence-".length);
       authorizeOrRejectUserOnChart(ctx.agent.custom.user?.id, chartId)
         .then(() => {
-          // Include verified user info in response
-          ctx.data.p.name = ctx.agent.custom.user.name;
-          ctx.data.p.id = ctx.agent.custom.user.id;
-          ctx.data.p.image = ctx.agent.custom.user.image;
+          if (ctx.data.p) {
+            ctx.data.p.name = ctx.agent.custom.user.name;
+            ctx.data.p.id = ctx.agent.custom.user.id;
+            ctx.data.p.image = ctx.agent.custom.user.image;
+            ctx.data.p.color = colorFromId(ctx.agent.custom.user.id);
+          }
           next();
         })
         .catch((e) => next(e));

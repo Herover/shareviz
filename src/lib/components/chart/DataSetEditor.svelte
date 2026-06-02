@@ -7,6 +7,7 @@
   import DataSetTransposeEditor from "./DataSetTransposeEditor.svelte";
   import DateFormatInput from "./DateFormatInput.svelte";
   import EditorCollapsible from "./EditorCollapsible.svelte";
+  import PresenceField from "./PresenceField.svelte";
 
   interface Props {
     dataStore: DataSetStore;
@@ -83,13 +84,21 @@
         <label for="{idPrefix}dataset-name">Name</label>
       </div>
       <div>
-        <input
-          id="{idPrefix}dataset-name"
-          type="text"
-          value={dataStore.data.name}
-          onchange={(e) => dataStore.setName(e.currentTarget.value)}
-          onkeyup={(e) => dataStore.setName(e.currentTarget.value)}
-        />
+        <PresenceField
+          address={["data", "sets", dataStore.data.id, "name"]}
+          connection={dataStore.connection}
+        >
+          {#snippet field({ locked })}
+            <input
+              id="{idPrefix}dataset-name"
+              type="text"
+              value={dataStore.data?.name}
+              readonly={locked}
+              onchange={(e) => dataStore.setName(e.currentTarget.value)}
+              onkeyup={(e) => dataStore.setName(e.currentTarget.value)}
+            />
+          {/snippet}
+        </PresenceField>
       </div>
     </div>
 
@@ -98,13 +107,21 @@
         <label for="{idPrefix}dataset-raw">Raw data</label>
       </div>
       <div>
-        <textarea
-          id="{idPrefix}dataset-raw"
-          value={dataStore.data.raw}
-          onchange={(e) => updateColumns(e.currentTarget.value)}
-          rows="6"
-          placeholder={rawDataHint}
-        ></textarea>
+        <PresenceField
+          address={["data", "sets", dataStore.data.id, "raw"]}
+          connection={dataStore.connection}
+        >
+          {#snippet field({ locked })}
+            <textarea
+              id="{idPrefix}dataset-raw"
+              value={dataStore.data?.raw}
+              readonly={locked}
+              onchange={(e) => updateColumns(e.currentTarget.value)}
+              rows="6"
+              placeholder={rawDataHint}
+            ></textarea>
+          {/snippet}
+        </PresenceField>
       </div>
     </div>
 

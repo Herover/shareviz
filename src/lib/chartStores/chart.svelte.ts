@@ -35,6 +35,10 @@ export class ChartStore {
     return this.#version;
   }
 
+  get connection(): ShareDBConnection | undefined {
+    return this.#connection;
+  }
+
   scopeElement(index: number) {
     const pathPrefix = ["chart", "elements", index, "d"];
     return {

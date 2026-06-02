@@ -2,7 +2,7 @@
 
 import ReconnectingWebSocket from "reconnecting-websocket";
 import * as json1 from "ot-json1";
-import ShareDB, { Presence } from "sharedb/lib/client";
+import ShareDB, { Presence, LocalPresence } from "sharedb/lib/client";
 import { WebSocket } from "ws";
 import { migrate } from "../chartMigrate";
 import { getLocalDoc, localPrefix } from "../chartStore";
@@ -12,10 +12,19 @@ import { getLogger } from "$lib/log.js";
 
 const logger = getLogger();
 
-interface PresenceData {
+export type PresenceAddress = (string | number)[];
+
+/** Stable string key for a presence address; used for map lookups and as the wire value. */
+export const serializeAddress = (address: PresenceAddress): string => JSON.stringify(address);
+
+export interface PresenceData {
+  /** Serialized {@link PresenceAddress} of the focused field, or "" when idle. */
   selected: string;
+  // name/color/id/image are stamped server-side from the authenticated session.
   color: string;
   name: string;
+  id: string;
+  image?: string;
 }
 
 export class ShareDBConnection {
@@ -29,6 +38,9 @@ export class ShareDBConnection {
   #connection?: ShareDB.Connection;
   #socket?: ReconnectingWebSocket;
   #presence?: Presence<PresenceData>;
+  #localPresence?: LocalPresence<PresenceData>;
+  #localPresenceId?: string;
+  #lastSelected = "";
 
   #pinger?: NodeJS.Timeout;
 
@@ -37,7 +49,23 @@ export class ShareDBConnection {
   missing = $derived(typeof this.#doc?.data == "undefined");
   mode: "synced" | "local" | "invalid" = "invalid";
   presences: { [key: string]: PresenceData } = $state({});
-  presenceTargets: { [key: string]: string } = $state({});
+
+  /** Remote editors grouped by the serialized address they are focused on (excludes our session). */
+  editorsByAddress: Record<string, PresenceData[]> = $derived.by(() => {
+    const byAddress: Record<string, PresenceData[]> = {};
+    for (const [presenceId, presence] of Object.entries(this.presences)) {
+      if (presenceId === this.#localPresenceId || !presence.selected) {
+        continue;
+      }
+      const list = byAddress[presence.selected];
+      if (list) {
+        list.push(presence);
+      } else {
+        byAddress[presence.selected] = [presence];
+      }
+    }
+    return byAddress;
+  });
 
   constructor() {
     this.#events = new EventTarget();
@@ -72,6 +100,9 @@ export class ShareDBConnection {
     }
     if (this.#presence) {
       this.#presence.unsubscribe();
+      this.#localPresence = undefined;
+      this.#localPresenceId = undefined;
+      this.#lastSelected = "";
     }
     if (this.#socket) {
       this.#socket.removeEventListener("error", this.#onSocketError);
@@ -115,39 +146,28 @@ export class ShareDBConnection {
       this.#presence = this.#connection.getPresence("presence-" + docId);
       this.#presence.subscribe((e: any) => logger.error("presence subscribe callback", e));
       const presences: { [key: string]: PresenceData } = {};
-      const presenceTargets: { [key: string]: string } = {};
-      this.#presence.on("receive", (presenceId: string, data: any) => {
+      this.#presence.on("receive", (presenceId: string, data: PresenceData | null) => {
         if (data === null) {
-          delete presenceTargets[presences[presenceId].selected];
           delete presences[presenceId];
-          this.presences = presences;
-          this.presenceTargets = presenceTargets;
         } else {
-          if (
-            typeof presences[presenceId] != "undefined" &&
-            typeof presenceTargets[presences[presenceId].selected] != "undefined"
-          ) {
-            delete presenceTargets[presences[presenceId].selected];
-          }
           presences[presenceId] = {
-            selected: data.selected,
-            color: data.color,
-            name: data.name,
+            selected: data.selected ?? "",
+            color: data.color ?? "",
+            name: data.name ?? "",
+            id: data.id ?? "",
+            image: data.image,
           };
-          presenceTargets[data.selected] = presenceId;
-          this.presences = presences;
-          this.presenceTargets = presenceTargets;
         }
+        this.presences = { ...presences };
       });
       this.#presence.on("error", (e: any) => {
         logger.error("presence error", e);
       });
-      const localPresence = this.#presence.create();
-      localPresence.submit({
-        color: `hsl(${Math.random() * 360} 70% 60%)`,
-        selected: "",
-        name: "",
-      });
+      // Identity (name/color/id/image) is stamped server-side from the authenticated
+      // session, so the client only ever announces which field it is focused on.
+      this.#localPresence = this.#presence.create();
+      this.#localPresenceId = this.#localPresence.presenceId;
+      this.#localPresence.submit({ selected: "" } as PresenceData);
     }
     const onData = (e?: any) => {
       if (e && typeof e.message == "string") {
@@ -173,6 +193,28 @@ export class ShareDBConnection {
     }
 
     this.#doc = doc;
+  }
+
+  /** Remote editors currently focused on the given address (excludes our session). */
+  editorsAt(address: PresenceAddress): PresenceData[] {
+    return this.editorsByAddress[serializeAddress(address)] ?? [];
+  }
+
+  /** Announce which field this session is editing, or pass null to clear. */
+  setLocalSelection(address: PresenceAddress | null) {
+    if (!this.#localPresence) {
+      return;
+    }
+    const selected = address ? serializeAddress(address) : "";
+    if (selected === this.#lastSelected) {
+      return;
+    }
+    this.#lastSelected = selected;
+    this.#localPresence.submit({ selected } as PresenceData, (err) => {
+      if (err) {
+        logger.error("presence submit", err);
+      }
+    });
   }
 
   create(synced: boolean, teamId?: string, folderId?: string) {

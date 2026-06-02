@@ -231,6 +231,10 @@ export class DataSetStore {
     ]);
   }
 
+  get connection(): ShareDBConnection | undefined {
+    return this.#connection;
+  }
+
   get data(): Set | undefined {
     return this.#data;
   }
