@@ -2,7 +2,7 @@
 
 import { expect, test } from "vitest";
 import { migrate } from "./chartMigrate";
-import { createLocalDoc } from "./chartStore";
+import { createLocalDoc } from "./localShareDBDoc";
 
 test("0", () => {
   const doc = createLocalDoc("test", "1", {

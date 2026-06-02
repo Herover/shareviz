@@ -166,7 +166,12 @@
 
   let xType = $derived(
     orDefault(
-      valueParsers[orDefault(columns.find((r) => r.key == lineSpec.x.key)?.type, "")]?.type,
+      valueParsers[
+        orDefault(
+          columns.find((r) => r.key == lineSpec.x.key)?.type,
+          "",
+        ) as keyof typeof valueParsers
+      ]?.type,
       "" as valueKinds,
     ),
   );

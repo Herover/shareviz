@@ -64,7 +64,7 @@
   let disconnect: undefined | (() => void);
 
   let store = new ShareDBConnection();
-  let chartStore: ChartStore;
+  let chartStore: ChartStore | undefined = $state();
 
   const updateViewer = (data?: Root) => {
     viewerFrame?.contentWindow?.window.postMessage(
@@ -138,6 +138,7 @@
   let canEdit = $derived(chartSpec != null);
 
   let edit = $derived((e: { k: string; v: any }) => {
+    if (!chartStore) return;
     switch (e.k) {
       case "title":
         chartStore.setConfigTitle(e.v);
@@ -320,7 +321,7 @@
           {:else if visibleSection == "publish"}
             <PublishTab
               {publications}
-              version={chartStore.version}
+              version={chartStore?.version}
               viewerOrigin={env.PUBLIC_VIEWER_ORIGIN}
               {chartSpec}
               bind:imageScale

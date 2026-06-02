@@ -48,7 +48,7 @@
     }
   };
 
-  let box: { width: number; height: number } = $state();
+  let box = $state({ width: 0, height: 0 });
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->

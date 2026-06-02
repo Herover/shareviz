@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Config } from "vizzu";
-  import type { TableByRecords } from "vizzu/dist/types/data";
+  import type { Data } from "vizzu";
 
   import { db } from "$lib/sharedbVizzu";
   import { createScope } from "$lib/dataScope";
@@ -9,7 +9,7 @@
 
   interface Props {
     configChart: ReturnType<typeof createScope<Config.Chart>>;
-    configData: TableByRecords | undefined;
+    configData: Data.TableByRecords | undefined;
     index: number;
   }
 

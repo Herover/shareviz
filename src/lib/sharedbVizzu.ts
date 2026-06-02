@@ -64,7 +64,7 @@ export const db = (function createDB() {
       );
 
       ShareDB.types.register(json1.type);
-      const connection: /* Connection */ any = new ShareDB.Connection(socket);
+      const connection: /* Connection */ any = new ShareDB.Connection(socket as any);
 
       // Create local Doc instance mapped to 'examples' collection document with id 'counter'
       doc = connection.get("examples", id);

@@ -112,8 +112,6 @@
   .line-unselected:hover {
     background-color: #eeeeee;
   }
-  .line-text {
-  }
   .line-buttons {
     margin-left: auto;
     height: 16px;

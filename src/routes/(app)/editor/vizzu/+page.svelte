@@ -9,13 +9,13 @@
   // @ts-ignore
   import VizzuModule from "$lib/../../node_modules/vizzu/dist/cvizzu.wasm?url";
   import Config from "$lib/components/vizzu/Config.svelte";
-  import type { TableByRecords } from "vizzu/dist/types/data";
+  import type { Data } from "vizzu";
 
   const disconnect = db.connect("1");
 
   let specs = $derived($db.doc ? $db.doc.specs : []);
   // $: data = $db.doc ? $db.doc.data.sets["Test"] : null;
-  const data = createScope<TableByRecords>(db, "doc.data.sets.Test");
+  const data = createScope<Data.TableByRecords>(db, "doc.data.sets.Test");
   let specIndex = $state(0);
   let currentSpec = $derived(createScope<any>(db, "doc.specs." + specIndex));
   run(() => {
@@ -28,12 +28,12 @@
     console.log("data", $data?.series);
   });
 
-  let vizzuEl: HTMLElement = $state();
+  let vizzuEl = $state<HTMLElement>();
   Vizzu.options({ wasmUrl: VizzuModule });
 
   let chart: Vizzu | null = $state(null);
   onMount(() => {
-    chart = new Vizzu(vizzuEl);
+    chart = new Vizzu(vizzuEl!);
   });
 
   let i = $state(0);

@@ -4,17 +4,16 @@
 </script>
 
 <script lang="ts">
-  import type { Config } from "vizzu";
+  import type { Config, Data } from "vizzu";
 
   import { db } from "$lib/sharedbVizzu";
-  import type { TableByRecords } from "vizzu/dist/types/data";
   import TextInput from "../TextInput.svelte";
   import RadioInput from "../RadioInput.svelte";
   import { orNumber } from "$lib/utils";
 
   interface Props {
     configChannel?: Config.Channel;
-    configData: TableByRecords | undefined;
+    configData: Data.TableByRecords | undefined;
     title?: string;
     configScope: ReturnType<typeof db.channelScope>;
   }

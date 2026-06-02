@@ -201,8 +201,6 @@
   .line-unselected:hover {
     background-color: var(--bg-sunken);
   }
-  .line-text {
-  }
   .line-buttons {
     margin-left: auto;
     height: 16px;
