@@ -196,7 +196,7 @@
     color: var(--fg-primary);
   }
   .line-selected {
-    background-color: var(--accent-primary-subtle);
+    background-color: var(--bg-sunken);
   }
   .line-unselected:hover {
     background-color: var(--bg-sunken);
