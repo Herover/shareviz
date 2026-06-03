@@ -58,7 +58,7 @@
   {#if editors.length > 0}
     <div class="presence-badges" title={editors.map((e) => e.name).join(", ")}>
       {#each editors as editor (editor.id)}
-        <span class="presence-badge" style:background-color={editor.color}>
+        <span class="presence-badge" style:background-color={editor.color} title={editor.name}>
           {#if editor.image}
             <img src={editor.image} alt={editor.name} />
           {:else}
@@ -86,23 +86,21 @@
   }
   .presence-badges {
     position: absolute;
-    top: -0.5em;
-    right: 0.25em;
+    top: -0.7em;
+    left: 0em;
     display: flex;
-    align-items: center;
-    gap: 0.2em;
+    align-items: left;
     z-index: 2;
     pointer-events: none;
   }
   .presence-badge {
-    box-sizing: border-box;
     width: 1.4em;
     height: 1.4em;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.7em;
+    font-size: 0.9em;
     font-weight: 600;
     color: var(--fg-on-accent);
     border: 1px solid var(--bg-surface);
@@ -122,5 +120,10 @@
     background-color: var(--bg-surface);
     color: var(--fg-secondary);
     cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--duration-standard);
+  }
+  .presence-field:hover .presence-override {
+    opacity: 1;
   }
 </style>

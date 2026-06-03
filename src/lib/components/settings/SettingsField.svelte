@@ -74,8 +74,7 @@
     font-family: var(--font-body);
     font-size: 0.95rem;
     outline: none;
-    transition:
-      border-color var(--duration-micro) var(--ease-standard);
+    transition: border-color var(--duration-micro) var(--ease-standard);
   }
   .control :global(input[type="text"]:focus),
   .control :global(textarea:focus) {
