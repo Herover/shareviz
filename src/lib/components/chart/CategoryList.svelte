@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
+  import type { PresenceAddress, ShareDBConnection } from "$lib/chartStores/data.svelte";
 
   interface Props {
     values: { k: string; d: unknown }[];
@@ -12,10 +13,25 @@
     moveUp: (k: string, i: number) => void;
     moveDown: (k: string, i: number) => void;
     onSelectedChanged: (values: { [key: string]: boolean }, indexes: number[]) => void;
+    /** Optional presence: shows who else is currently editing each item. */
+    connection?: ShareDBConnection | undefined;
+    addressFor?: (item: { k: string; d: unknown }) => PresenceAddress;
   }
 
-  let { values, title, onfocus, onblur, searchFn, moveUp, moveDown, onSelectedChanged }: Props =
-    $props();
+  let {
+    values,
+    title,
+    onfocus,
+    onblur,
+    searchFn,
+    moveUp,
+    moveDown,
+    onSelectedChanged,
+    connection,
+    addressFor,
+  }: Props = $props();
+
+  const initial = (name: string) => (name.trim()[0] ?? "?").toUpperCase();
 
   let selected: { [key: string]: boolean } = $state({});
 
@@ -128,6 +144,7 @@
   <div class="line-box">
     {#each filteredValues as line, i (line.k)}
       {#if line}
+        {@const editors = connection && addressFor ? connection.editorsUnder(addressFor(line)) : []}
         <div
           onclick={(e) => toggleSelect(e, null, line.k, i)}
           onkeydown={(e) => toggleSelect(null, e, line.k, i)}
@@ -144,6 +161,23 @@
           <div class="line-text">
             {@render title(line)}
           </div>
+          {#if editors.length > 0}
+            <div class="line-presence" title={editors.map((e) => e.name).join(", ")}>
+              {#each editors as editor (editor.id)}
+                <span
+                  class="line-presence-badge"
+                  style:background-color={editor.color}
+                  title={editor.name}
+                >
+                  {#if editor.image}
+                    <img src={editor.image} alt={editor.name} />
+                  {:else}
+                    {initial(editor.name)}
+                  {/if}
+                </span>
+              {/each}
+            </div>
+          {/if}
           <div class="line-buttons">
             <span
               role="button"
@@ -211,5 +245,30 @@
   .line-buttons span {
     padding: 4px 6px;
     font-size: 0.7rem;
+  }
+  .line-presence {
+    display: flex;
+    align-items: center;
+    gap: 0.15em;
+    margin-left: 6px;
+  }
+  .line-presence-badge {
+    box-sizing: border-box;
+    width: 1.3em;
+    height: 1.3em;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    font-weight: 600;
+    color: var(--fg-on-accent);
+    border: 1px solid var(--bg-surface);
+    overflow: hidden;
+  }
+  .line-presence-badge img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 </style>

@@ -10,8 +10,9 @@
   import CategoryList from "../CategoryList.svelte";
   import type { EditorComponentProps } from "../chartComponents";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
+  import PresenceField from "../PresenceField.svelte";
 
-  let { spec, chartSpec, chartData, connection, store }: EditorComponentProps<RangeElement> =
+  let { spec, chartSpec, chartData, connection, store, id }: EditorComponentProps<RangeElement> =
     $props();
 
   // Check if the data appears to have changed in a way where new range points have been added/removed
@@ -230,6 +231,14 @@
       ]);
     });
   };
+
+  // Stable key of the singly-selected line/point, used for the shared presence address.
+  let selLineKey = $derived(
+    selectedLines.length === 1 ? chartSpec.categoryKeys[selectedLines[0]]?.k : undefined,
+  );
+  let selPointKey = $derived(
+    selectedPoints.length === 1 ? chartSpec.rangeCategoryKeys[selectedPoints[0]]?.k : undefined,
+  );
 </script>
 
 <h3 class="editor-sub-section">General</h3>
@@ -239,16 +248,21 @@
     <label for="range-data-set">Data set</label>
   </div>
   <div>
-    <select
-      id="range-data-set"
-      value={chartSpec.dataSet}
-      onchange={(e) => setDataSet(e.currentTarget.value)}
-    >
-      <option></option>
-      {#each spec.data.sets as set (set.id)}
-        <option value={set.id}>{set.name}</option>
-      {/each}
-    </select>
+    <PresenceField address={["chart", "elements", id, "d", "dataSet"]} {connection}>
+      {#snippet field({ locked })}
+        <select
+          id="range-data-set"
+          value={chartSpec.dataSet}
+          disabled={locked}
+          onchange={(e) => setDataSet(e.currentTarget.value)}
+        >
+          <option></option>
+          {#each spec.data.sets as set (set.id)}
+            <option value={set.id}>{set.name}</option>
+          {/each}
+        </select>
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -258,16 +272,21 @@
       <label for="range-line-for-every">One line for every</label>
     </div>
     <div>
-      <select
-        id="range-line-for-every"
-        value={chartSpec.categories}
-        onchange={(e) => setCategories(e.currentTarget.value)}
-      >
-        <option></option>
-        {#each chartData[chartSpec.dataSet].rows as row (row.key)}
-          <option>{row.key}</option>
-        {/each}
-      </select>
+      <PresenceField address={["chart", "elements", id, "d", "categories"]} {connection}>
+        {#snippet field({ locked })}
+          <select
+            id="range-line-for-every"
+            value={chartSpec.categories}
+            disabled={locked}
+            onchange={(e) => setCategories(e.currentTarget.value)}
+          >
+            <option></option>
+            {#each chartData[chartSpec.dataSet].rows as row (row.key)}
+              <option>{row.key}</option>
+            {/each}
+          </select>
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
@@ -286,6 +305,8 @@
     searchFn={lineSearch}
     title={lineTitle}
     values={chartSpec.categoryKeys.map((d) => ({ k: d.k, d }))}
+    {connection}
+    addressFor={(item) => ["chart", "elements", id, "d", "categoryKeys", item.k]}
   />
 
   <div class="editor-row">
@@ -293,15 +314,22 @@
       <label for="range-line-label">Label</label>
     </div>
     <div>
-      <input
-        id="range-line-label"
-        type="text"
-        value={selectedLines.length == 1
-          ? (chartSpec.categoryKeys[selectedLines[0]]?.label.text ?? "")
-          : ""}
-        onkeyup={(e) => setLineLabelText(e.currentTarget.value)}
-        disabled={selectedLines.length == 0}
-      />
+      <PresenceField
+        address={["chart", "elements", id, "d", "categoryKeys", selLineKey ?? ""]}
+        connection={selLineKey ? connection : undefined}
+      >
+        {#snippet field({ locked })}
+          <input
+            id="range-line-label"
+            type="text"
+            value={selectedLines.length == 1
+              ? (chartSpec.categoryKeys[selectedLines[0]]?.label.text ?? "")
+              : ""}
+            onkeyup={(e) => setLineLabelText(e.currentTarget.value)}
+            disabled={selectedLines.length == 0 || locked}
+          />
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
@@ -310,16 +338,21 @@
       <label for="range-point-for-every">One point for every</label>
     </div>
     <div>
-      <select
-        id="range-point-for-every"
-        value={chartSpec.pointLabel}
-        onchange={(e) => setPointLabel(e.currentTarget.value)}
-      >
-        <option></option>
-        {#each chartData[chartSpec.dataSet].rows as row (row.key)}
-          <option>{row.key}</option>
-        {/each}
-      </select>
+      <PresenceField address={["chart", "elements", id, "d", "pointLabel"]} {connection}>
+        {#snippet field({ locked })}
+          <select
+            id="range-point-for-every"
+            value={chartSpec.pointLabel}
+            disabled={locked}
+            onchange={(e) => setPointLabel(e.currentTarget.value)}
+          >
+            <option></option>
+            {#each chartData[chartSpec.dataSet].rows as row (row.key)}
+              <option>{row.key}</option>
+            {/each}
+          </select>
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
@@ -328,16 +361,21 @@
       <label for="range-point-value">Point value</label>
     </div>
     <div>
-      <select
-        id="range-point-value"
-        value={chartSpec.pointValue}
-        onchange={(e) => setPointValue(e.currentTarget.value)}
-      >
-        <option></option>
-        {#each chartData[chartSpec.dataSet].rows as row (row.key)}
-          <option>{row.key}</option>
-        {/each}
-      </select>
+      <PresenceField address={["chart", "elements", id, "d", "pointValue"]} {connection}>
+        {#snippet field({ locked })}
+          <select
+            id="range-point-value"
+            value={chartSpec.pointValue}
+            disabled={locked}
+            onchange={(e) => setPointValue(e.currentTarget.value)}
+          >
+            <option></option>
+            {#each chartData[chartSpec.dataSet].rows as row (row.key)}
+              <option>{row.key}</option>
+            {/each}
+          </select>
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
@@ -351,6 +389,8 @@
     searchFn={pointSearch}
     title={pointTitle}
     values={chartSpec.rangeCategoryKeys.map((d) => ({ k: d.k, d }))}
+    {connection}
+    addressFor={(item) => ["chart", "elements", id, "d", "rangeCategoryKeys", item.k]}
   />
 
   <div class="editor-row">
@@ -358,15 +398,30 @@
       <label for="range-point-label">Label</label>
     </div>
     <div>
-      <input
-        id="range-point-label"
-        type="text"
-        value={selectedPoints.length == 1
-          ? (chartSpec.rangeCategoryKeys[selectedPoints[0]]?.label.text ?? "")
-          : ""}
-        onkeyup={(e) => setPointLabelText(e.currentTarget.value)}
-        disabled={selectedPoints.length == 0}
-      />
+      <PresenceField
+        address={[
+          "chart",
+          "elements",
+          id,
+          "d",
+          "rangeCategoryKeys",
+          selPointKey ?? "",
+          "pointLabelText",
+        ]}
+        connection={selPointKey ? connection : undefined}
+      >
+        {#snippet field({ locked })}
+          <input
+            id="range-point-label"
+            type="text"
+            value={selectedPoints.length == 1
+              ? (chartSpec.rangeCategoryKeys[selectedPoints[0]]?.label.text ?? "")
+              : ""}
+            onkeyup={(e) => setPointLabelText(e.currentTarget.value)}
+            disabled={selectedPoints.length == 0 || locked}
+          />
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
@@ -375,13 +430,28 @@
       <span>Color</span>
     </div>
     <div>
-      <ColorPicker
-        color={selectedPoints.length == 1
-          ? (chartSpec.rangeCategoryKeys[selectedPoints[0]]?.color.light.v ?? "")
-          : ""}
-        disabled={selectedPoints.length == 0}
-        onchange={(e) => setPointColor(e)}
-      />
+      <PresenceField
+        address={[
+          "chart",
+          "elements",
+          id,
+          "d",
+          "rangeCategoryKeys",
+          selPointKey ?? "",
+          "pointColor",
+        ]}
+        connection={selPointKey ? connection : undefined}
+      >
+        {#snippet field({ locked })}
+          <ColorPicker
+            color={selectedPoints.length == 1
+              ? (chartSpec.rangeCategoryKeys[selectedPoints[0]]?.color.light.v ?? "")
+              : ""}
+            disabled={selectedPoints.length == 0 || locked}
+            onchange={(e) => setPointColor(e)}
+          />
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
@@ -390,22 +460,29 @@
       <label for="range-repeat-for-every">Repeat for every</label>
     </div>
     <div>
-      <select
-        id="range-repeat-for-every"
-        value={chartSpec.repeat}
-        onchange={(e) => setRepeat(e.currentTarget.value)}
-      >
-        <option></option>
-        {#each chartData[chartSpec.dataSet].rows as row (row.key)}
-          <option>{row.key}</option>
-        {/each}
-      </select>
+      <PresenceField address={["chart", "elements", id, "d", "repeat"]} {connection}>
+        {#snippet field({ locked })}
+          <select
+            id="range-repeat-for-every"
+            value={chartSpec.repeat}
+            disabled={locked}
+            onchange={(e) => setRepeat(e.currentTarget.value)}
+          >
+            <option></option>
+            {#each chartData[chartSpec.dataSet].rows as row (row.key)}
+              <option>{row.key}</option>
+            {/each}
+          </select>
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
   <h3 class="editor-sub-section">Axis</h3>
   <AxisEditor
     conf={new AxisStore(connection, chartSpec.axis, [...store.pathPrefix(), "axis"])}
+    {connection}
+    address={["chart", "elements", id, "d", "axis"]}
     showRepeatControl={true}
     idPrefix="range-"
   />

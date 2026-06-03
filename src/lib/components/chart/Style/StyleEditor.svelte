@@ -4,6 +4,7 @@
   import { ChartStore } from "$lib/chartStores/chart.svelte";
   import { StyleStore } from "$lib/chartStores/style.svelte";
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
+  import PresenceField from "../PresenceField.svelte";
   import { untrack } from "svelte";
 
   interface Props {
@@ -36,13 +37,18 @@
     <label for="editor-title">Title</label>
   </div>
   <div>
-    <textarea
-      id="editor-title"
-      value={chartStore.data?.title}
-      onkeyup={(e) => chartStore.setConfigTitle(e.currentTarget.value)}
-      class="control"
-      style:height="60px"
-    ></textarea>
+    <PresenceField address={["chart", "title"]} {connection}>
+      {#snippet field({ locked })}
+        <textarea
+          id="editor-title"
+          value={chartStore.data?.title}
+          readonly={locked}
+          onkeyup={(e) => chartStore.setConfigTitle(e.currentTarget.value)}
+          class="control"
+          style:height="60px"
+        ></textarea>
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -51,13 +57,18 @@
     <label for="editor-subtitle">Sub title</label>
   </div>
   <div>
-    <textarea
-      id="editor-subtitle"
-      value={chartStore.data?.subTitle}
-      onkeyup={(e) => chartStore.setConfigSubTitle(e.currentTarget.value)}
-      class="control"
-      style:height="60px"
-    ></textarea>
+    <PresenceField address={["chart", "subTitle"]} {connection}>
+      {#snippet field({ locked })}
+        <textarea
+          id="editor-subtitle"
+          value={chartStore.data?.subTitle}
+          readonly={locked}
+          onkeyup={(e) => chartStore.setConfigSubTitle(e.currentTarget.value)}
+          class="control"
+          style:height="60px"
+        ></textarea>
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -66,13 +77,18 @@
     <label for="editor-source-text-left">Source text (left)</label>
   </div>
   <div>
-    <input
-      id="editor-source-text-left"
-      value={chartStore.data?.sourceTextLeft}
-      onkeyup={(e) => chartStore.setSourceTextLeft(e.currentTarget.value)}
-      type="text"
-      class="control"
-    />
+    <PresenceField address={["chart", "sourceTextLeft"]} {connection}>
+      {#snippet field({ locked })}
+        <input
+          id="editor-source-text-left"
+          value={chartStore.data?.sourceTextLeft}
+          readonly={locked}
+          onkeyup={(e) => chartStore.setSourceTextLeft(e.currentTarget.value)}
+          type="text"
+          class="control"
+        />
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -81,13 +97,18 @@
     <label for="editor-source-link-left">Source link (left)</label>
   </div>
   <div>
-    <input
-      id="editor-source-link-left"
-      value={chartStore.data?.sourceTextLeftLink}
-      onkeyup={(e) => chartStore.setSourceTextLeftLink(e.currentTarget.value)}
-      type="text"
-      class="control"
-    />
+    <PresenceField address={["chart", "sourceTextLeftLink"]} {connection}>
+      {#snippet field({ locked })}
+        <input
+          id="editor-source-link-left"
+          value={chartStore.data?.sourceTextLeftLink}
+          readonly={locked}
+          onkeyup={(e) => chartStore.setSourceTextLeftLink(e.currentTarget.value)}
+          type="text"
+          class="control"
+        />
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -96,13 +117,18 @@
     <label for="editor-source-text-right">Source text (right)</label>
   </div>
   <div>
-    <input
-      id="editor-source-text-right"
-      value={chartStore.data?.sourceTextRight}
-      onkeyup={(e) => chartStore.setSourceTextRight(e.currentTarget.value)}
-      type="text"
-      class="control"
-    />
+    <PresenceField address={["chart", "sourceTextRight"]} {connection}>
+      {#snippet field({ locked })}
+        <input
+          id="editor-source-text-right"
+          value={chartStore.data?.sourceTextRight}
+          readonly={locked}
+          onkeyup={(e) => chartStore.setSourceTextRight(e.currentTarget.value)}
+          type="text"
+          class="control"
+        />
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -111,13 +137,18 @@
     <label for="editor-source-link-right">Source link (right)</label>
   </div>
   <div>
-    <input
-      id="editor-source-link-right"
-      value={chartStore.data?.sourceTextRightLink}
-      onkeyup={(e) => chartStore.setSourceTextRightLink(e.currentTarget.value)}
-      type="text"
-      class="control"
-    />
+    <PresenceField address={["chart", "sourceTextRightLink"]} {connection}>
+      {#snippet field({ locked })}
+        <input
+          id="editor-source-link-right"
+          value={chartStore.data?.sourceTextRightLink}
+          readonly={locked}
+          onkeyup={(e) => chartStore.setSourceTextRightLink(e.currentTarget.value)}
+          type="text"
+          class="control"
+        />
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -126,14 +157,19 @@
     <label for="style-height">Height</label>
   </div>
   <div>
-    <input
-      id="style-height"
-      value={chartStore.data?.height}
-      onkeyup={(e) => chartStore.setConfigHeight(Number.parseInt(e.currentTarget.value))}
-      onchange={(e) => chartStore.setConfigHeight(Number.parseInt(e.currentTarget.value))}
-      type="number"
-      class="control"
-    />
+    <PresenceField address={["chart", "height"]} {connection}>
+      {#snippet field({ locked })}
+        <input
+          id="style-height"
+          value={chartStore.data?.height}
+          readonly={locked}
+          onkeyup={(e) => chartStore.setConfigHeight(Number.parseInt(e.currentTarget.value))}
+          onchange={(e) => chartStore.setConfigHeight(Number.parseInt(e.currentTarget.value))}
+          type="number"
+          class="control"
+        />
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -142,14 +178,19 @@
     <label for="style-width">Width</label>
   </div>
   <div>
-    <input
-      id="style-width"
-      value={chartStore.data?.width}
-      onkeyup={(e) => chartStore.setConfigWidth(Number.parseInt(e.currentTarget.value))}
-      onchange={(e) => chartStore.setConfigWidth(Number.parseInt(e.currentTarget.value))}
-      type="number"
-      class="control"
-    />
+    <PresenceField address={["chart", "width"]} {connection}>
+      {#snippet field({ locked })}
+        <input
+          id="style-width"
+          value={chartStore.data?.width}
+          readonly={locked}
+          onkeyup={(e) => chartStore.setConfigWidth(Number.parseInt(e.currentTarget.value))}
+          onchange={(e) => chartStore.setConfigWidth(Number.parseInt(e.currentTarget.value))}
+          type="number"
+          class="control"
+        />
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -158,12 +199,17 @@
 <p><label for="style-overrides">Style overrides</label></p>
 <p class="editor-sub-section-description">Override css, use on own risk!</p>
 <pre class="editor-sub-section-description">{cssExample}</pre>
-<textarea
-  id="style-overrides"
-  rows="10"
-  onchange={(e) => styletStore.setCSS(e.currentTarget.value)}
-  onkeyup={(e) => styletStore.setCSS(e.currentTarget.value)}>{styletStore.data?.css}</textarea
->
+<PresenceField address={["style", "css"]} {connection}>
+  {#snippet field({ locked })}
+    <textarea
+      id="style-overrides"
+      rows="10"
+      readonly={locked}
+      onchange={(e) => styletStore.setCSS(e.currentTarget.value)}
+      onkeyup={(e) => styletStore.setCSS(e.currentTarget.value)}>{styletStore.data?.css}</textarea
+    >
+  {/snippet}
+</PresenceField>
 
 <style>
   .control {

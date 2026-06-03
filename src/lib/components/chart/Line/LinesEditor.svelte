@@ -14,6 +14,8 @@
   import type { formatData } from "./data";
   import type { LineStore } from "$lib/chartStores/line.svelte";
   import CategoryList from "../CategoryList.svelte";
+  import PresenceField from "../PresenceField.svelte";
+  import type { PresenceAddress } from "$lib/chartStores/data.svelte";
   import equal from "fast-deep-equal";
   import { chartToEditor } from "$lib/chartToEditorStore.svelte";
   import { untrack } from "svelte";
@@ -45,6 +47,26 @@
   let nonEditable = $derived(
     !defaultSelected &&
       (selectedIndexes.length == 0 || selectedIndexes.findIndex((e) => e.i == -1) != -1),
+  );
+
+  // Presence: when exactly one style (a single key, or the default) is selected, share a
+  // stable address so collaborators editing the same line style see/lock each other.
+  let presenceConnection = $derived(lineStore.connection);
+  let elementId = $derived(lineStore.d?.id ?? "");
+  let selStyleAddress: PresenceAddress | undefined = $derived.by(() => {
+    if (defaultSelected && selectedIndexes.length === 0) {
+      return ["chart", "elements", elementId, "d", "style", "default"];
+    }
+    if (!defaultSelected && selectedIndexes.length === 1) {
+      return ["chart", "elements", elementId, "d", "style", "byKey", selectedIndexes[0].k];
+    }
+    return undefined;
+  });
+  let styleConnection = $derived(selStyleAddress ? presenceConnection : undefined);
+  // Base address of the selected style; each field appends its own sub-path so collaborators
+  // can edit different attributes of the same style without locking each other.
+  let styleBase: PresenceAddress = $derived(
+    selStyleAddress ?? ["chart", "elements", elementId, "d", "style"],
   );
   const chooseSelectedStyle = <T,>(merged: T, next: T): T | undefined =>
     typeof merged == "undefined" ? next : merged == next ? merged : undefined;
@@ -280,6 +302,8 @@
   moveDown={(_k, i) => lineStore.lineStyle(i).moveDown()}
   onfocus={(k) => chartToEditor.setHighlight(["elements", index, k])}
   onblur={() => chartToEditor.setHighlight([])}
+  connection={presenceConnection}
+  addressFor={(item) => ["chart", "elements", elementId, "d", "style", "byKey", item.k]}
 />
 
 <div class="editor-row">
@@ -287,14 +311,18 @@
     <label for="lines-label">Label</label>
   </div>
   <div>
-    <input
-      id="lines-label"
-      value={typeof mergedStyle.label.text == "undefined" ? "" : mergedStyle.label.text}
-      disabled={nonEditable && selectedIndexes.length != 1}
-      onchange={(e) => setLineLabel(e.currentTarget.value)}
-      onkeyup={(e) => setLineLabel(e.currentTarget.value)}
-      type="text"
-    />
+    <PresenceField address={[...styleBase, "label", "text"]} connection={styleConnection} inline>
+      {#snippet field({ locked })}
+        <input
+          id="lines-label"
+          value={typeof mergedStyle.label.text == "undefined" ? "" : mergedStyle.label.text}
+          disabled={(nonEditable && selectedIndexes.length != 1) || locked}
+          onchange={(e) => setLineLabel(e.currentTarget.value)}
+          onkeyup={(e) => setLineLabel(e.currentTarget.value)}
+          type="text"
+        />
+      {/snippet}
+    </PresenceField>
     <button disabled={selectedIndexes.length == 0} onclick={() => setLabelToKey()}>Auto</button>
   </div>
 </div>
@@ -304,12 +332,16 @@
     <span>Line color</span>
   </div>
   <div>
-    <ColorPicker
-      color={typeof mergedStyle.color == "undefined" ? "#ffffff" : mergedStyle.color.light.c}
-      chartColors={chartColors.map((c) => c.light.v)}
-      disabled={nonEditable}
-      onchange={(s) => setLineColor(s)}
-    />
+    <PresenceField address={[...styleBase, "color"]} connection={styleConnection}>
+      {#snippet field({ locked })}
+        <ColorPicker
+          color={typeof mergedStyle.color == "undefined" ? "#ffffff" : mergedStyle.color.light.c}
+          chartColors={chartColors.map((c) => c.light.v)}
+          disabled={nonEditable || locked}
+          onchange={(s) => setLineColor(s)}
+        />
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -318,14 +350,18 @@
     <span>Text color</span>
   </div>
   <div>
-    <ColorPicker
-      color={typeof mergedStyle.label.color == "undefined"
-        ? "#ffffff"
-        : mergedStyle.label.color.light.c}
-      chartColors={chartColors.map((c) => c.light.v)}
-      disabled={nonEditable}
-      onchange={(s) => setTextColor(s)}
-    />
+    <PresenceField address={[...styleBase, "label", "color"]} connection={styleConnection}>
+      {#snippet field({ locked })}
+        <ColorPicker
+          color={typeof mergedStyle.label.color == "undefined"
+            ? "#ffffff"
+            : mergedStyle.label.color.light.c}
+          chartColors={chartColors.map((c) => c.light.v)}
+          disabled={nonEditable || locked}
+          onchange={(s) => setTextColor(s)}
+        />
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -334,14 +370,18 @@
     <span>Context color</span>
   </div>
   <div>
-    <ColorPicker
-      color={typeof mergedStyle.contextColor == "undefined"
-        ? "#ffffff"
-        : mergedStyle.contextColor.light.c}
-      chartColors={chartColors.map((c) => c.light.v)}
-      disabled={nonEditable}
-      onchange={(s) => setContextColor(s)}
-    />
+    <PresenceField address={[...styleBase, "contextColor"]} connection={styleConnection}>
+      {#snippet field({ locked })}
+        <ColorPicker
+          color={typeof mergedStyle.contextColor == "undefined"
+            ? "#ffffff"
+            : mergedStyle.contextColor.light.c}
+          chartColors={chartColors.map((c) => c.light.v)}
+          disabled={nonEditable || locked}
+          onchange={(s) => setContextColor(s)}
+        />
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -350,13 +390,17 @@
     <label for="lines-width">Width</label>
   </div>
   <div>
-    <input
-      id="lines-width"
-      value={typeof mergedStyle.width == "undefined" ? "" : mergedStyle.width}
-      disabled={nonEditable}
-      onchange={(e) => setWidth(Number.parseInt(e.currentTarget.value))}
-      type="number"
-    />
+    <PresenceField address={[...styleBase, "width"]} connection={styleConnection}>
+      {#snippet field({ locked })}
+        <input
+          id="lines-width"
+          value={typeof mergedStyle.width == "undefined" ? "" : mergedStyle.width}
+          disabled={nonEditable || locked}
+          onchange={(e) => setWidth(Number.parseInt(e.currentTarget.value))}
+          type="number"
+        />
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -365,42 +409,58 @@
     <label for="lines-location">Location</label>
   </div>
   <div>
-    <select
-      id="lines-location"
-      value={typeof mergedStyle.label.location == "undefined" ? "" : mergedStyle.label.location}
-      disabled={nonEditable}
-      onchange={(e) => setLabelLocation(e.currentTarget.value)}
-    >
-      {#each Object.values(LabelLocation) as location (location)}
-        <option>{location}</option>
-      {/each}
-    </select>
+    <PresenceField address={[...styleBase, "label", "location"]} connection={styleConnection}>
+      {#snippet field({ locked })}
+        <select
+          id="lines-location"
+          value={typeof mergedStyle.label.location == "undefined" ? "" : mergedStyle.label.location}
+          disabled={nonEditable || locked}
+          onchange={(e) => setLabelLocation(e.currentTarget.value)}
+        >
+          {#each Object.values(LabelLocation) as location (location)}
+            <option>{location}</option>
+          {/each}
+        </select>
+      {/snippet}
+    </PresenceField>
     {#if mergedStyle.label.location == "float"}
       <br />
       <p>
         <label
           >X-value
-          <input
-            value={typeof mergedStyle.label.x == "undefined" ? "" : mergedStyle.label.x}
-            disabled={nonEditable || defaultSelected}
-            onchange={(e) => setLabelX(e.currentTarget.value)}
-            type="number"
-            style="width: 80px;"
-          />
+          <PresenceField address={[...styleBase, "label", "x"]} connection={styleConnection} inline>
+            {#snippet field({ locked })}
+              <input
+                value={typeof mergedStyle.label.x == "undefined" ? "" : mergedStyle.label.x}
+                disabled={nonEditable || defaultSelected || locked}
+                onchange={(e) => setLabelX(e.currentTarget.value)}
+                type="number"
+                style="width: 80px;"
+              />
+            {/snippet}
+          </PresenceField>
         </label>
         <label>
           Line
-          <input
-            checked={typeof mergedStyle.label.line == "undefined"
-              ? false
-              : mergedStyle.label.line == LabelStyleLine.Line}
-            onchange={(e) =>
-              setLabelLineStyle(
-                e.currentTarget.checked ? LabelStyleLine.Line : LabelStyleLine.None,
-              )}
-            disabled={nonEditable || defaultSelected}
-            type="checkbox"
-          />
+          <PresenceField
+            address={[...styleBase, "label", "line"]}
+            connection={styleConnection}
+            inline
+          >
+            {#snippet field({ locked })}
+              <input
+                checked={typeof mergedStyle.label.line == "undefined"
+                  ? false
+                  : mergedStyle.label.line == LabelStyleLine.Line}
+                onchange={(e) =>
+                  setLabelLineStyle(
+                    e.currentTarget.checked ? LabelStyleLine.Line : LabelStyleLine.None,
+                  )}
+                disabled={nonEditable || defaultSelected || locked}
+                type="checkbox"
+              />
+            {/snippet}
+          </PresenceField>
         </label>
       </p>
     {/if}
@@ -412,16 +472,20 @@
     <label for="lines-symbols">Symbols</label>
   </div>
   <div>
-    <select
-      id="lines-symbols"
-      value={typeof mergedStyle.symbols == "undefined" ? "" : mergedStyle.symbols}
-      disabled={nonEditable}
-      onchange={(e) => setSymbols(e.currentTarget.value)}
-    >
-      {#each Object.values(LineSymbol) as symbol (symbol)}
-        <option>{symbol}</option>
-      {/each}
-    </select>
+    <PresenceField address={[...styleBase, "symbols"]} connection={styleConnection}>
+      {#snippet field({ locked })}
+        <select
+          id="lines-symbols"
+          value={typeof mergedStyle.symbols == "undefined" ? "" : mergedStyle.symbols}
+          disabled={nonEditable || locked}
+          onchange={(e) => setSymbols(e.currentTarget.value)}
+        >
+          {#each Object.values(LineSymbol) as symbol (symbol)}
+            <option>{symbol}</option>
+          {/each}
+        </select>
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -430,15 +494,19 @@
     <label for="lines-missing-data">Missing data</label>
   </div>
   <div>
-    <select
-      id="lines-missing-data"
-      value={typeof mergedStyle.missingStyle == "undefined" ? "" : mergedStyle.missingStyle}
-      disabled={nonEditable}
-      onchange={(e) => setMissingStyle(e.currentTarget.value)}
-    >
-      {#each Object.values(LineMissingStyle) as style (style)}
-        <option>{style}</option>
-      {/each}
-    </select>
+    <PresenceField address={[...styleBase, "missingStyle"]} connection={styleConnection}>
+      {#snippet field({ locked })}
+        <select
+          id="lines-missing-data"
+          value={typeof mergedStyle.missingStyle == "undefined" ? "" : mergedStyle.missingStyle}
+          disabled={nonEditable || locked}
+          onchange={(e) => setMissingStyle(e.currentTarget.value)}
+        >
+          {#each Object.values(LineMissingStyle) as style (style)}
+            <option>{style}</option>
+          {/each}
+        </select>
+      {/snippet}
+    </PresenceField>
   </div>
 </div>

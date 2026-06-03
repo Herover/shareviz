@@ -200,6 +200,29 @@ export class ShareDBConnection {
     return this.editorsByAddress[serializeAddress(address)] ?? [];
   }
 
+  /** Remote editors focused on the given address or any address nested beneath it. */
+  editorsUnder(prefix: PresenceAddress): PresenceData[] {
+    const result: PresenceData[] = [];
+    for (const [presenceId, presence] of Object.entries(this.presences)) {
+      if (presenceId === this.#localPresenceId || !presence.selected) {
+        continue;
+      }
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(presence.selected);
+      } catch {
+        continue;
+      }
+      if (!Array.isArray(parsed) || parsed.length < prefix.length) {
+        continue;
+      }
+      if (prefix.every((segment, i) => parsed[i] === segment)) {
+        result.push(presence);
+      }
+    }
+    return result;
+  }
+
   /** Announce which field this session is editing, or pass null to clear. */
   setLocalSelection(address: PresenceAddress | null) {
     if (!this.#localPresence) {

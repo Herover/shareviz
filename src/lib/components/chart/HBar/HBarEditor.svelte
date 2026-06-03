@@ -136,16 +136,21 @@
     <label for="hbar-data-set">Data set</label>
   </div>
   <div>
-    <select
-      id="hbar-data-set"
-      value={hbarStore.data.dataSet}
-      onchange={(e) => hbarStore.setDataSet(e.currentTarget.value)}
-    >
-      <option></option>
-      {#each spec.data.sets as set (set.id)}
-        <option value={set.id}>{set.name}</option>
-      {/each}
-    </select>
+    <PresenceField address={["chart", "elements", id, "d", "dataSet"]} {connection}>
+      {#snippet field({ locked })}
+        <select
+          id="hbar-data-set"
+          value={hbarStore.data.dataSet}
+          disabled={locked}
+          onchange={(e) => hbarStore.setDataSet(e.currentTarget.value)}
+        >
+          <option></option>
+          {#each spec.data.sets as set (set.id)}
+            <option value={set.id}>{set.name}</option>
+          {/each}
+        </select>
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -154,13 +159,18 @@
     <label for="hbar-label-width">Label width</label>
   </div>
   <div>
-    <input
-      id="hbar-label-width"
-      value={hbarStore.data.labelWidth}
-      onkeyup={(e) => hbarStore.setLabelWidth(Number.parseInt(e.currentTarget.value))}
-      onchange={(e) => hbarStore.setLabelWidth(Number.parseInt(e.currentTarget.value))}
-      type="number"
-    />
+    <PresenceField address={["chart", "elements", id, "d", "labelWidth"]} {connection}>
+      {#snippet field({ locked })}
+        <input
+          id="hbar-label-width"
+          value={hbarStore.data.labelWidth}
+          readonly={locked}
+          onkeyup={(e) => hbarStore.setLabelWidth(Number.parseInt(e.currentTarget.value))}
+          onchange={(e) => hbarStore.setLabelWidth(Number.parseInt(e.currentTarget.value))}
+          type="number"
+        />
+      {/snippet}
+    </PresenceField>
   </div>
 </div>
 
@@ -170,16 +180,21 @@
       <label for="hbar-categories">Categories from</label>
     </div>
     <div>
-      <select
-        id="hbar-categories"
-        value={hbarStore.data.categories}
-        onchange={(e) => hbarStore.setCategories(e.currentTarget.value)}
-      >
-        <option></option>
-        {#each columns as column (column.key)}
-          <option>{column.key}</option>
-        {/each}
-      </select>
+      <PresenceField address={["chart", "elements", id, "d", "categories"]} {connection}>
+        {#snippet field({ locked })}
+          <select
+            id="hbar-categories"
+            value={hbarStore.data.categories}
+            disabled={locked}
+            onchange={(e) => hbarStore.setCategories(e.currentTarget.value)}
+          >
+            <option></option>
+            {#each columns as column, i (i)}
+              <option>{column.key}</option>
+            {/each}
+          </select>
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
@@ -188,16 +203,21 @@
       <label for="hbar-sub-categories">Sub categories from</label>
     </div>
     <div>
-      <select
-        id="hbar-sub-categories"
-        value={hbarStore.data.subCategories}
-        onchange={(e) => hbarStore.setSubCategories(e.currentTarget.value)}
-      >
-        <option></option>
-        {#each columns as column (column.key)}
-          <option>{column.key}</option>
-        {/each}
-      </select>
+      <PresenceField address={["chart", "elements", id, "d", "subCategories"]} {connection}>
+        {#snippet field({ locked })}
+          <select
+            id="hbar-sub-categories"
+            value={hbarStore.data.subCategories}
+            disabled={locked}
+            onchange={(e) => hbarStore.setSubCategories(e.currentTarget.value)}
+          >
+            <option></option>
+            {#each columns as column, i (i)}
+              <option>{column.key}</option>
+            {/each}
+          </select>
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
@@ -206,12 +226,17 @@
       <label for="hbar-stack-sub-categories">Stack sub categories</label>
     </div>
     <div>
-      <input
-        id="hbar-stack-sub-categories"
-        checked={hbarStore.data.stackSubCategories}
-        onchange={(e) => hbarStore.setStackSubCategories(e.currentTarget.checked)}
-        type="checkbox"
-      />
+      <PresenceField address={["chart", "elements", id, "d", "stackSubCategories"]} {connection}>
+        {#snippet field({ locked })}
+          <input
+            id="hbar-stack-sub-categories"
+            checked={hbarStore.data.stackSubCategories}
+            disabled={locked}
+            onchange={(e) => hbarStore.setStackSubCategories(e.currentTarget.checked)}
+            type="checkbox"
+          />
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
@@ -221,12 +246,20 @@
         <label for="hbar-total">Total</label>
       </div>
       <div>
-        <input
-          id="hbar-total"
-          checked={hbarStore.data.portionSubCategories}
-          onchange={(e) => hbarStore.setPortionSubCategories(e.currentTarget.checked)}
-          type="checkbox"
-        />
+        <PresenceField
+          address={["chart", "elements", id, "d", "portionSubCategories"]}
+          {connection}
+        >
+          {#snippet field({ locked })}
+            <input
+              id="hbar-total"
+              checked={hbarStore.data.portionSubCategories}
+              disabled={locked}
+              onchange={(e) => hbarStore.setPortionSubCategories(e.currentTarget.checked)}
+              type="checkbox"
+            />
+          {/snippet}
+        </PresenceField>
       </div>
     </div>
   {/if}
@@ -236,16 +269,21 @@
       <label for="hbar-values-from">Values from</label>
     </div>
     <div>
-      <select
-        id="hbar-values-from"
-        value={hbarStore.data.value}
-        onchange={(e) => hbarStore.setValue(e.currentTarget.value)}
-      >
-        <option></option>
-        {#each columns.filter((r) => r.type == "number") as row (row.key)}
-          <option>{row.key}</option>
-        {/each}
-      </select>
+      <PresenceField address={["chart", "elements", id, "d", "value"]} {connection}>
+        {#snippet field({ locked })}
+          <select
+            id="hbar-values-from"
+            value={hbarStore.data.value}
+            disabled={locked}
+            onchange={(e) => hbarStore.setValue(e.currentTarget.value)}
+          >
+            <option></option>
+            {#each columns.filter((r) => r.type == "number") as row, i (i)}
+              <option>{row.key}</option>
+            {/each}
+          </select>
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
@@ -263,10 +301,18 @@
             <input value={colorScale.data.default.light.c} disabled />
           </td>
           <td>
-            <ColorPicker
-              color={colorScale.data.default.light.v}
-              onchange={(s) => colorScale.setColorScaleDefaultColor(s)}
-            />
+            <PresenceField
+              address={["chart", "elements", id, "d", "colors", "default"]}
+              {connection}
+            >
+              {#snippet field({ locked })}
+                <ColorPicker
+                  color={colorScale.data.default.light.v}
+                  disabled={locked}
+                  onchange={(s) => colorScale.setColorScaleDefaultColor(s)}
+                />
+              {/snippet}
+            </PresenceField>
           </td>
           <td> </td>
           <td> </td>
@@ -286,28 +332,44 @@
               >
             </td>
             <td>
-              <select
-                value={color.k}
-                onchange={(e) => colorScale.setColorScaleKey(i, e.currentTarget.value)}
+              <PresenceField
+                address={["chart", "elements", id, "d", "colors", "byKey", i, "k"]}
+                {connection}
               >
-                <option></option>
-                {#if color.k}
-                  <option>{color.k}</option>
-                {/if}
-                {#each unusedGroups as k (k)}
-                  <option>{k}</option>
-                {/each}
-              </select>
+                {#snippet field({ locked })}
+                  <select
+                    value={color.k}
+                    disabled={locked}
+                    onchange={(e) => colorScale.setColorScaleKey(i, e.currentTarget.value)}
+                  >
+                    <option></option>
+                    {#if color.k}
+                      <option>{color.k}</option>
+                    {/if}
+                    {#each unusedGroups as k (k)}
+                      <option>{k}</option>
+                    {/each}
+                  </select>
+                {/snippet}
+              </PresenceField>
             </td>
             <td>
               <input value={color.c.light.c} disabled />
             </td>
             <td>
-              <ColorPicker
-                color={color.c.light.c}
-                chartColors={colorScale.data.byKey.map((c) => c.c?.light.c).filter((c) => c)}
-                onchange={(s) => colorScale.setColorScaleColor(i, s)}
-              />
+              <PresenceField
+                address={["chart", "elements", id, "d", "colors", "byKey", i, "c"]}
+                {connection}
+              >
+                {#snippet field({ locked })}
+                  <ColorPicker
+                    color={color.c.light.c}
+                    chartColors={colorScale.data.byKey.map((c) => c.c?.light.c).filter((c) => c)}
+                    disabled={locked}
+                    onchange={(s) => colorScale.setColorScaleColor(i, s)}
+                  />
+                {/snippet}
+              </PresenceField>
             </td>
             <td>
               <PresenceField
@@ -341,12 +403,17 @@
       <label for="hbar-rect-labels">Rectangle labels</label>
     </div>
     <div>
-      <input
-        id="hbar-rect-labels"
-        checked={hbarStore.data.rectLabels}
-        onchange={(e) => hbarStore.setRectLabels(e.currentTarget.checked)}
-        type="checkbox"
-      />
+      <PresenceField address={["chart", "elements", id, "d", "rectLabels"]} {connection}>
+        {#snippet field({ locked })}
+          <input
+            id="hbar-rect-labels"
+            checked={hbarStore.data.rectLabels}
+            disabled={locked}
+            onchange={(e) => hbarStore.setRectLabels(e.currentTarget.checked)}
+            type="checkbox"
+          />
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
@@ -369,16 +436,21 @@
       <label for="hbar-repeat-for-each">Repeat for each</label>
     </div>
     <div>
-      <select
-        id="hbar-repeat-for-each"
-        value={hbarStore.data.repeat}
-        onchange={(e) => hbarStore.setRepeat(e.currentTarget.value)}
-      >
-        <option></option>
-        {#each columns as row (row.key)}
-          <option>{row.key}</option>
-        {/each}
-      </select>
+      <PresenceField address={["chart", "elements", id, "d", "repeat"]} {connection}>
+        {#snippet field({ locked })}
+          <select
+            id="hbar-repeat-for-each"
+            value={hbarStore.data.repeat}
+            disabled={locked}
+            onchange={(e) => hbarStore.setRepeat(e.currentTarget.value)}
+          >
+            <option></option>
+            {#each columns as row, i (i)}
+              <option>{row.key}</option>
+            {/each}
+          </select>
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 {/if}
@@ -386,6 +458,8 @@
 <b>Axis</b>
 <AxisEditor
   conf={hbarStore.axis()}
+  {connection}
+  address={["chart", "elements", id, "d", "axis"]}
   showRepeatControl={hbarStore.data.repeat != ""}
   idPrefix="hbar-"
 />

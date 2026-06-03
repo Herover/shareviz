@@ -106,21 +106,21 @@
       </g>
 
       <g transform="translate(0, {topMargin + 15})">
-        {#each chart.d as line, i (chart.k + line.key)}
+        {#each chart.d as line, ii (chart.k + line.key)}
           <!-- <b>{line.label}</b> -->
           <text
-            y={rangeHeight * i}
+            y={rangeHeight * ii}
             dominant-baseline="middle"
             bind:contentRect={rangeLabelWidths[line.i]}>{line.label}</text
           >
           <path
             d="m {rangeLabelWidths[line.i]?.width ?? 0},{rangeHeight *
-              i} L {realWidth}, {rangeHeight * i}"
+              ii} L {realWidth}, {rangeHeight * ii}"
             stroke-width="1"
             stroke="var(--axis-line-color)"
           />
-          <g transform="translate({rangeLabelSpace}, {rangeHeight * i})">
-            {#each line.value as p (chart.k + line.key + p.s?.k)}
+          <g transform="translate({rangeLabelSpace}, {rangeHeight * ii})">
+            {#each line.value as p, iii (iii + "." + chart.k + line.key + p.s?.k)}
               <circle cx={xScale(p.v)} r={radius} fill={p.s?.color.light.c ?? ""}>
                 <title>{p.s?.label.text}: {p.v}</title>
               </circle>

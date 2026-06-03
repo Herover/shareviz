@@ -14,9 +14,11 @@
     connection: ShareDBConnection | undefined;
     /** Renders the actual input; `locked` is true while a remote editor occupies the field. */
     field: Snippet<[{ locked: boolean; editors: PresenceData[] }]>;
+    /** Use inline-block so the wrapper sits inline among other controls in a row. */
+    inline?: boolean;
   }
 
-  let { address, connection, field }: Props = $props();
+  let { address, connection, field, inline = false }: Props = $props();
 
   let editors = $derived(connection?.editorsAt(address) ?? []);
   // Identity of the current occupant set; changes when editors join or leave.
@@ -49,6 +51,7 @@
 <div
   class="presence-field"
   class:is-occupied={editors.length > 0}
+  class:inline
   style:--presence-color={lockColor}
   {onfocusin}
   {onfocusout}
@@ -78,6 +81,9 @@
 <style>
   .presence-field {
     position: relative;
+  }
+  .presence-field.inline {
+    display: inline-block;
   }
   .presence-field.is-occupied {
     outline: 2px solid var(--presence-color);
