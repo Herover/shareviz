@@ -16,6 +16,7 @@
 
   let { dataStore, idPrefix = "" }: Props = $props();
 
+  let setId = $derived(dataStore.data?.id ?? "");
   let transposeOpen = $state(false);
 
   const TYPE_BADGES: Record<string, { label: string; cls: string }> = {
@@ -130,15 +131,23 @@
         <label for="{idPrefix}dataset-format">Format</label>
       </div>
       <div>
-        <select
-          id="{idPrefix}dataset-format"
-          value={dataStore.data.type}
-          onchange={(e) => dataStore.setType(e.currentTarget.value)}
+        <PresenceField
+          address={["data", "sets", dataStore.data.id, "format"]}
+          connection={dataStore.connection}
         >
-          {#each ["tsv"] as row (row)}
-            <option>{row}</option>
-          {/each}
-        </select>
+          {#snippet field({ locked })}
+            <select
+              id="{idPrefix}dataset-format"
+              value={dataStore.data?.type}
+              onchange={(e) => dataStore.setType(e.currentTarget.value)}
+              disabled={locked}
+            >
+              {#each ["tsv"] as row (row)}
+                <option>{row}</option>
+              {/each}
+            </select>
+          {/snippet}
+        </PresenceField>
       </div>
     </div>
 
@@ -155,23 +164,39 @@
               <span class="ed-col-name" class:is-empty={!column.key}>
                 {column.key ? `"${column.key}"` : "(empty)"}
               </span>
-              <select
-                class="ed-col-select"
-                id="{idPrefix}col-{i}"
-                value={column.type}
-                onchange={(e) => dataStore.setColumnType(i, e.currentTarget.value)}
+              <PresenceField
+                address={["data", "sets", setId, "rows", i, "type"]}
+                connection={dataStore.connection}
               >
-                {#each Object.keys(valueParsers) as type (type)}
-                  <option>{type}</option>
-                {/each}
-              </select>
+                {#snippet field({ locked })}
+                  <select
+                    class="ed-col-select"
+                    id="{idPrefix}col-{i}"
+                    value={column.type}
+                    disabled={locked}
+                    onchange={(e) => dataStore.setColumnType(i, e.currentTarget.value)}
+                  >
+                    {#each Object.keys(valueParsers) as type (type)}
+                      <option>{type}</option>
+                    {/each}
+                  </select>
+                {/snippet}
+              </PresenceField>
             </div>
             {#if column.type == "date"}
               <div class="ed-col-date">
-                <DateFormatInput
-                  value={column.dateFormat}
-                  onValueChange={(next) => dataStore.setColumnDateFormat(i, next)}
-                />
+                <PresenceField
+                  address={["data", "sets", setId, "rows", i, "dateFormat"]}
+                  connection={dataStore.connection}
+                >
+                  {#snippet field({ locked })}
+                    <DateFormatInput
+                      value={column.dateFormat}
+                      readonly={locked}
+                      onValueChange={(next) => dataStore.setColumnDateFormat(i, next)}
+                    />
+                  {/snippet}
+                </PresenceField>
               </div>
             {/if}
           </div>
@@ -258,6 +283,7 @@
     align-items: center;
     gap: 10px;
     padding: 8px 10px;
+    flex-shrink: 0;
   }
   .ed-col-badge {
     flex-shrink: 0;

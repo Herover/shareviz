@@ -5,9 +5,10 @@
     value: string;
     onValueChange: (next: string) => void;
     id?: string;
+    readonly?: boolean;
   }
 
-  let { value, onValueChange, id }: Props = $props();
+  let { value, onValueChange, id, readonly = false }: Props = $props();
 
   const DATE_FORMAT_HINTS: [string, string][] = [
     ["YYYY-MM-DD", "2025-02-10"],
@@ -24,6 +25,7 @@
     type="text"
     placeholder="e.g. YYYY-MM-DD"
     {value}
+    {readonly}
     onchange={(e) => onValueChange(e.currentTarget.value)}
     onkeyup={(e) => onValueChange(e.currentTarget.value)}
   />

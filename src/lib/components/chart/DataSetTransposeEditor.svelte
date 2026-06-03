@@ -5,6 +5,7 @@
   import type { DataSetStore } from "$lib/chartStores/dataSet.svelte";
   import { valueParsers } from "$lib/utils";
   import DateFormatInput from "./DateFormatInput.svelte";
+  import PresenceField from "./PresenceField.svelte";
 
   const TP_TYPES = Object.keys(valueParsers);
 
@@ -16,6 +17,8 @@
   }
 
   let { dataStore, transpose, i, idPrefix = "" }: Props = $props();
+
+  let setId = $derived(dataStore.data?.id ?? "");
 
   let lastIdx = $state<number | null>(null);
   let filter = $state("");
@@ -95,67 +98,81 @@
         Their headers will become row values; their cells become a single value column.
       </div>
 
-      <div class="ed-tp-chipgroup">
-        {#if colNames.length > 0}
-          <div class="ed-tp-chip-toolbar">
-            <span class="ed-tp-chip-count">
-              <strong>{transpose.from.length}</strong> of {colNames.length} selected
-            </span>
-            <button
-              type="button"
-              class="ed-tp-chip-act"
-              onclick={() => setSelected(allSelected ? [] : colNames.slice())}
-            >
-              {allSelected ? "Clear all" : "Select all"}
-            </button>
-            {#if anySelected && !allSelected}
-              <button type="button" class="ed-tp-chip-act" onclick={() => setSelected([])}>
-                Clear
-              </button>
+      <PresenceField
+        address={["data", "sets", setId, "transpose", i, "from"]}
+        connection={dataStore.connection}
+      >
+        {#snippet field({ locked })}
+          <div class="ed-tp-chipgroup">
+            {#if colNames.length > 0}
+              <div class="ed-tp-chip-toolbar">
+                <span class="ed-tp-chip-count">
+                  <strong>{transpose.from.length}</strong> of {colNames.length} selected
+                </span>
+                <button
+                  type="button"
+                  class="ed-tp-chip-act"
+                  disabled={locked}
+                  onclick={() => setSelected(allSelected ? [] : colNames.slice())}
+                >
+                  {allSelected ? "Clear all" : "Select all"}
+                </button>
+                {#if anySelected && !allSelected}
+                  <button
+                    type="button"
+                    class="ed-tp-chip-act"
+                    disabled={locked}
+                    onclick={() => setSelected([])}
+                  >
+                    Clear
+                  </button>
+                {/if}
+              </div>
+            {/if}
+
+            {#if showFilter}
+              <input
+                class="ed-tp-chip-filter"
+                id="{idPrefix}transpose-filter"
+                type="text"
+                placeholder="Filter {colNames.length} columns…"
+                bind:value={filter}
+              />
+            {/if}
+
+            <div class="ed-tp-chiprow">
+              {#if colNames.length === 0}
+                <span class="ed-tp-chip-empty">No columns in this dataset yet.</span>
+              {/if}
+              {#each visibleChips as chip (chip.name)}
+                {@const isSel = transpose.from.includes(chip.name)}
+                <button
+                  type="button"
+                  class="ed-tp-chip"
+                  class:is-on={isSel}
+                  disabled={locked}
+                  onclick={(e) => handleChipClick(e, chip.idx, chip.name)}
+                  aria-pressed={isSel}
+                  title={chip.name}
+                >
+                  <span class="ed-tp-chip-box" aria-hidden="true">{isSel ? "✓" : ""}</span>
+                  <span class="ed-tp-chip-name">{chip.name}</span>
+                </button>
+              {/each}
+              {#if filterText && visibleChips.length === 0}
+                <span class="ed-tp-chip-empty">No columns match “{filter}”.</span>
+              {/if}
+            </div>
+
+            {#if colNames.length > 1}
+              <div class="ed-tp-chip-tip">
+                <kbd class="ed-tp-kbd">Shift</kbd>
+                <span>+ click to select a range</span>
+              </div>
             {/if}
           </div>
-        {/if}
-
-        {#if showFilter}
-          <input
-            class="ed-tp-chip-filter"
-            id="{idPrefix}transpose-filter"
-            type="text"
-            placeholder="Filter {colNames.length} columns…"
-            bind:value={filter}
-          />
-        {/if}
-
-        <div class="ed-tp-chiprow">
-          {#if colNames.length === 0}
-            <span class="ed-tp-chip-empty">No columns in this dataset yet.</span>
-          {/if}
-          {#each visibleChips as chip (chip.name)}
-            {@const isSel = transpose.from.includes(chip.name)}
-            <button
-              type="button"
-              class="ed-tp-chip"
-              class:is-on={isSel}
-              onclick={(e) => handleChipClick(e, chip.idx, chip.name)}
-              aria-pressed={isSel}
-              title={chip.name}
-            >
-              <span class="ed-tp-chip-box" aria-hidden="true">{isSel ? "✓" : ""}</span>
-              <span class="ed-tp-chip-name">{chip.name}</span>
-            </button>
-          {/each}
-          {#if filterText && visibleChips.length === 0}
-            <span class="ed-tp-chip-empty">No columns match “{filter}”.</span>
-          {/if}
-        </div>
-
-        {#if colNames.length > 1}
-          <div class="ed-tp-chip-tip">
-            <kbd class="ed-tp-kbd">Shift</kbd>
-            <span>+ click to select a range</span>
-          </div>
-        {/if}
-      </div>
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
@@ -169,30 +186,54 @@
             {/if}<code class="ed-tp-codename">{f}</code>{/each}{/if}.
       </div>
       <div class="ed-tp-pair">
-        <input
-          id="{idPrefix}transpose-keys"
-          type="text"
-          placeholder="e.g. year"
-          value={transpose.toKey}
-          onchange={(e) => dataStore.setTransposeToKey(i, e.currentTarget.value)}
-          onkeyup={(e) => dataStore.setTransposeToKey(i, e.currentTarget.value)}
-        />
-        <select
-          id="{idPrefix}transpose-key-type"
-          aria-label="Label column type"
-          value={transpose.keyType}
-          onchange={(e) => dataStore.setTransposeKeyType(i, e.currentTarget.value)}
+        <PresenceField
+          address={["data", "sets", setId, "transpose", i, "toKey"]}
+          connection={dataStore.connection}
         >
-          {#each TP_TYPES as type (type)}
-            <option>{type}</option>
-          {/each}
-        </select>
+          {#snippet field({ locked })}
+            <input
+              id="{idPrefix}transpose-keys"
+              type="text"
+              placeholder="e.g. year"
+              value={transpose.toKey}
+              readonly={locked}
+              onchange={(e) => dataStore.setTransposeToKey(i, e.currentTarget.value)}
+              onkeyup={(e) => dataStore.setTransposeToKey(i, e.currentTarget.value)}
+            />
+          {/snippet}
+        </PresenceField>
+        <PresenceField
+          address={["data", "sets", setId, "transpose", i, "keyType"]}
+          connection={dataStore.connection}
+        >
+          {#snippet field({ locked })}
+            <select
+              id="{idPrefix}transpose-key-type"
+              aria-label="Label column type"
+              value={transpose.keyType}
+              disabled={locked}
+              onchange={(e) => dataStore.setTransposeKeyType(i, e.currentTarget.value)}
+            >
+              {#each TP_TYPES as type (type)}
+                <option>{type}</option>
+              {/each}
+            </select>
+          {/snippet}
+        </PresenceField>
       </div>
       {#if transpose.keyType == "date"}
-        <DateFormatInput
-          value={transpose.keyDateFormat}
-          onValueChange={(next) => dataStore.setTransposeKeyDateFormat(i, next)}
-        />
+        <PresenceField
+          address={["data", "sets", setId, "transpose", i, "keyDateFormat"]}
+          connection={dataStore.connection}
+        >
+          {#snippet field({ locked })}
+            <DateFormatInput
+              value={transpose.keyDateFormat}
+              readonly={locked}
+              onValueChange={(next) => dataStore.setTransposeKeyDateFormat(i, next)}
+            />
+          {/snippet}
+        </PresenceField>
       {/if}
     </div>
   </div>
@@ -203,30 +244,54 @@
       <div class="ed-tp-step-lbl">Name the new value column</div>
       <div class="ed-tp-step-hint">Holds the numbers (or text) that lived in those cells.</div>
       <div class="ed-tp-pair">
-        <input
-          id="{idPrefix}transpose-values"
-          type="text"
-          placeholder="e.g. population"
-          value={transpose.toValue}
-          onchange={(e) => dataStore.setTransposeToValue(i, e.currentTarget.value)}
-          onkeyup={(e) => dataStore.setTransposeToValue(i, e.currentTarget.value)}
-        />
-        <select
-          id="{idPrefix}transpose-value-type"
-          aria-label="Value column type"
-          value={transpose.valueType}
-          onchange={(e) => dataStore.setTransposeValueType(i, e.currentTarget.value)}
+        <PresenceField
+          address={["data", "sets", setId, "transpose", i, "toValue"]}
+          connection={dataStore.connection}
         >
-          {#each TP_TYPES as type (type)}
-            <option>{type}</option>
-          {/each}
-        </select>
+          {#snippet field({ locked })}
+            <input
+              id="{idPrefix}transpose-values"
+              type="text"
+              placeholder="e.g. population"
+              value={transpose.toValue}
+              readonly={locked}
+              onchange={(e) => dataStore.setTransposeToValue(i, e.currentTarget.value)}
+              onkeyup={(e) => dataStore.setTransposeToValue(i, e.currentTarget.value)}
+            />
+          {/snippet}
+        </PresenceField>
+        <PresenceField
+          address={["data", "sets", setId, "transpose", i, "valueType"]}
+          connection={dataStore.connection}
+        >
+          {#snippet field({ locked })}
+            <select
+              id="{idPrefix}transpose-value-type"
+              aria-label="Value column type"
+              value={transpose.valueType}
+              disabled={locked}
+              onchange={(e) => dataStore.setTransposeValueType(i, e.currentTarget.value)}
+            >
+              {#each TP_TYPES as type (type)}
+                <option>{type}</option>
+              {/each}
+            </select>
+          {/snippet}
+        </PresenceField>
       </div>
       {#if transpose.valueType == "date"}
-        <DateFormatInput
-          value={transpose.valueDateFormat}
-          onValueChange={(next) => dataStore.setTransposeValueDateFormat(i, next)}
-        />
+        <PresenceField
+          address={["data", "sets", setId, "transpose", i, "valueDateFormat"]}
+          connection={dataStore.connection}
+        >
+          {#snippet field({ locked })}
+            <DateFormatInput
+              value={transpose.valueDateFormat}
+              readonly={locked}
+              onValueChange={(next) => dataStore.setTransposeValueDateFormat(i, next)}
+            />
+          {/snippet}
+        </PresenceField>
       {/if}
     </div>
   </div>
