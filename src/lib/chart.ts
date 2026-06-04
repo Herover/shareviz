@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
+import type { DeltaOp as RichTextOp } from "rich-text";
+
+export type { RichTextOp };
+
 export interface Root {
   m: Meta;
   data: Data;
@@ -54,9 +58,35 @@ export interface Row {
   dateFormat: string;
 }
 
+/**
+ * Collaboratively-edited rich text, stored as a Quill Delta document (only `insert` ops).
+ * Merged via the embedded `rich-text` ot-json1 subtype so concurrent edits don't clobber.
+ * Used for `title`/`subTitle` (converted from plain strings in format version 8).
+ */
+export interface RichText {
+  ops: RichTextOp[];
+}
+
+/**
+ * Flatten a rich-text value to plain text. Tolerates the legacy plain-string shape
+ * (un-migrated synced docs) as well as the Delta shape, so list/filename call sites are safe.
+ */
+export const deltaToPlainText = (value: string | RichText | undefined): string => {
+  if (value == null) {
+    return "";
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  return (value.ops ?? [])
+    .map((op) => (typeof op.insert === "string" ? op.insert : ""))
+    .join("")
+    .replace(/\n+$/, "");
+};
+
 export interface Chart {
-  title: string;
-  subTitle: string;
+  title: RichText;
+  subTitle: RichText;
   width: number;
   height: number;
   chartType: string;

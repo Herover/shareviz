@@ -5,6 +5,7 @@
   import { StyleStore } from "$lib/chartStores/style.svelte";
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
   import PresenceField from "../PresenceField.svelte";
+  import RichTextField from "../RichTextField.svelte";
   import { untrack } from "svelte";
 
   interface Props {
@@ -34,41 +35,20 @@
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <label for="editor-title">Title</label>
+    <span>Title</span>
   </div>
   <div>
-    <PresenceField address={["chart", "title"]} {connection}>
-      {#snippet field({ locked })}
-        <textarea
-          id="editor-title"
-          value={chartStore.data?.title}
-          readonly={locked}
-          onkeyup={(e) => chartStore.setConfigTitle(e.currentTarget.value)}
-          class="control"
-          style:height="60px"
-        ></textarea>
-      {/snippet}
-    </PresenceField>
+    <!-- Rich text: merges concurrent edits instead of locking, unlike the fields below. -->
+    <RichTextField {connection} path={["chart", "title"]} />
   </div>
 </div>
 
 <div class="editor-row">
   <div class="editor-column-label">
-    <label for="editor-subtitle">Sub title</label>
+    <span>Sub title</span>
   </div>
   <div>
-    <PresenceField address={["chart", "subTitle"]} {connection}>
-      {#snippet field({ locked })}
-        <textarea
-          id="editor-subtitle"
-          value={chartStore.data?.subTitle}
-          readonly={locked}
-          onkeyup={(e) => chartStore.setConfigSubTitle(e.currentTarget.value)}
-          class="control"
-          style:height="60px"
-        ></textarea>
-      {/snippet}
-    </PresenceField>
+    <RichTextField {connection} path={["chart", "subTitle"]} />
   </div>
 </div>
 

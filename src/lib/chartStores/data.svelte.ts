@@ -2,6 +2,7 @@
 
 import ReconnectingWebSocket from "reconnecting-websocket";
 import * as json1 from "ot-json1";
+import * as richText from "rich-text";
 import ShareDB, { Presence, LocalPresence } from "sharedb/lib/client";
 import { WebSocket } from "ws";
 import { migrate } from "../chartMigrate";
@@ -83,6 +84,9 @@ export class ShareDBConnection {
     socket.addEventListener("open", this.#onSocketOpen.bind(this));
     socket.addEventListener("close", this.#onSocketClose.bind(this));
 
+    // Embed the rich-text (Quill Delta) OT type inside json1 so prose fields like the
+    // chart description can be edited concurrently and merged instead of clobbered.
+    json1.type.registerSubtype(richText);
     ShareDB.types.register(json1.type);
 
     this.#connection = new ShareDB.Connection(socket as any);
@@ -221,6 +225,41 @@ export class ShareDBConnection {
       }
     }
     return result;
+  }
+
+  /** Read the raw value stored at a document path, or undefined if it doesn't exist. */
+  #valueAt(path: PresenceAddress): unknown {
+    let node: unknown = this.#doc.data;
+    for (const segment of path) {
+      if (node == null || typeof node !== "object") {
+        return undefined;
+      }
+      node = (node as Record<string | number, unknown>)[segment];
+    }
+    return node;
+  }
+
+  /**
+   * Submit a rich-text (Quill Delta) change at `path`. The change is expressed relative to
+   * the field's current Delta. A field that is absent is lazily created with an `insertOp`,
+   * a field still holding a legacy plain string is converted in place with a `replaceOp`,
+   * and an existing Delta field merges via an `editOp`.
+   */
+  submitRichTextChange(path: PresenceAddress, change: richText.Delta) {
+    if (change.ops.length === 0) {
+      return;
+    }
+    const current = this.#valueAt(path);
+    if (current === undefined) {
+      const initial = new richText.Delta().compose(change);
+      this.#doc.submitOp(json1.insertOp(path, { ops: initial.ops } as any));
+    } else if (typeof current === "string") {
+      const base = new richText.Delta(current ? [{ insert: current }] : []);
+      const initial = base.compose(change);
+      this.#doc.submitOp(json1.replaceOp(path, current, { ops: initial.ops } as any));
+    } else {
+      this.#doc.submitOp(json1.editOp(path, "rich-text", change.ops));
+    }
   }
 
   /** Announce which field this session is editing, or pass null to clear. */

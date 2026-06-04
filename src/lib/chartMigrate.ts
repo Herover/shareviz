@@ -487,4 +487,25 @@ export const migrate = (
       ] as any);
     doc.submitOp(op);
   }
+
+  if (doc.data.m.v == 7 && doc.data.m.v < toVersion) {
+    // Title and subtitle become collaborative rich-text (Quill Delta) fields. Convert the
+    // existing plain strings into a Delta document (empty string -> empty Delta).
+    const toDelta = (value: unknown) => ({
+      ops: typeof value === "string" && value ? [{ insert: value }] : [],
+    });
+    const chart = (doc.data as Root).chart;
+    const op = [
+      ["chart", "subTitle", { r: 0, i: toDelta(chart.subTitle) }],
+      ["chart", "title", { r: 0, i: toDelta(chart.title) }],
+    ].reduce((acc, op) => json1.type.compose(acc, op), [
+      "m",
+      "v",
+      {
+        r: 0,
+        i: 8,
+      },
+    ] as any);
+    doc.submitOp(op);
+  }
 };

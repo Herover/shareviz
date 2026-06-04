@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import type { Root } from "$lib/chart.d.ts";
+  import { deltaToPlainText } from "$lib/chart";
   import ChartViewer from "$lib/components/chart/ChartViewer.svelte";
   import { onDestroy, onMount, tick } from "svelte";
   import { computeData } from "$lib/data.js";
@@ -107,7 +108,8 @@
         const link = document.createElement("a");
         link.href = canvas.toDataURL("image/png");
         link.download =
-          (event.data.data.name || chartSpec?.chart.title || data.id || "chart") + ".png";
+          (event.data.data.name || deltaToPlainText(chartSpec?.chart.title) || data.id || "chart") +
+          ".png";
         link.click();
       } catch (err) {
         logger.error("unable to create image", err);

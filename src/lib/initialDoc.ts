@@ -2,7 +2,7 @@
 
 import type { Root } from "./chart";
 
-export const formatVersion = 7;
+export const formatVersion = 8;
 
 export const defDoc: Root = {
   m: {
@@ -10,8 +10,8 @@ export const defDoc: Root = {
   },
   data: { sets: [] },
   chart: {
-    title: "TITLE GOES HERE",
-    subTitle: "AND SUBTITLE GOES HERE",
+    title: { ops: [{ insert: "TITLE GOES HERE" }] },
+    subTitle: { ops: [{ insert: "AND SUBTITLE GOES HERE" }] },
     width: 390,
     height: 500,
     sourceTextLeft: "Source: <YOUR SOURCE>",

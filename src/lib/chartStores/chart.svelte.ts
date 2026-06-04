@@ -49,12 +49,6 @@ export class ChartStore {
     };
   }
 
-  setConfigTitle(value: string) {
-    this.#doc.submitOp(["chart", "title", { r: 0, i: value }]);
-  }
-  setConfigSubTitle(value: string) {
-    this.#doc.submitOp(["chart", "subTitle", { r: 0, i: value }]);
-  }
   setConfigHeight(value: number) {
     this.#doc.submitOp(["chart", "height", { r: 0, i: value }]);
   }

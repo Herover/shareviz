@@ -3,6 +3,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { db } from "$lib/chartStore";
+  import { deltaToPlainText } from "$lib/chart";
   import { onMount } from "svelte";
   import type { PageProps } from "./$types";
   import { settings } from "$lib/settingsStore.svelte";
@@ -76,7 +77,7 @@
       <ul>
         <li>
           <a href={resolve("/(app)/editor/chart/[id]", { id: chart.id })}
-            >{chart?.data?.chart?.title || "Unnamed chart"}</a
+            >{deltaToPlainText(chart?.data?.chart?.title) || "Unnamed chart"}</a
           >
         </li>
       </ul>

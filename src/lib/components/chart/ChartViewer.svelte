@@ -5,6 +5,7 @@
   import { migrate } from "$lib/chartMigrate";
   import { createLocalDoc } from "$lib/localShareDBDoc";
   import { getComponent } from "$lib/components/chart/chartComponents";
+  import DeltaView from "$lib/components/chart/DeltaView.svelte";
   import type { ComputedData } from "$lib/data";
   import { formatVersion } from "$lib/initialDoc";
 
@@ -115,32 +116,10 @@
   <style bind:innerText={css} contenteditable=""></style>
   <div class="chart" style:width={chartWidth ? chartWidth + "px" : undefined} data-theme={themeKey}>
     <h1 class="title" dir="auto">
-      {#if editor}
-        <span
-          bind:innerText={chartSpec.chart.title}
-          contenteditable="true"
-          spellcheck="false"
-          onblur={(e) => editText("title", e)}
-          role="textbox"
-          tabindex="0"
-        ></span>
-      {:else}
-        {chartSpec.chart.title}
-      {/if}
+      <DeltaView delta={chartSpec.chart.title} />
     </h1>
     <p class="subtitle" dir="auto">
-      {#if editor}
-        <span
-          bind:innerText={chartSpec.chart.subTitle}
-          contenteditable="true"
-          spellcheck="false"
-          onblur={(e) => editText("subTitle", e)}
-          role="textbox"
-          tabindex="0"
-        ></span>
-      {:else}
-        {chartSpec.chart.subTitle}
-      {/if}
+      <DeltaView delta={chartSpec.chart.subTitle} />
     </p>
     {#each chartSpec.chart.elements as element, i (element.id)}
       {#await getComponent(element.type) then component}

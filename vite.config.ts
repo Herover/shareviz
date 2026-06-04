@@ -8,6 +8,9 @@ export default defineConfig({
   plugins: [sveltekit(), webSocketDevServer()],
   server: {
     hmr: { port: 5111 },
+    // Let the dev server serve the e2e fixtures so browser tests can import them as
+    // real modules (SvelteKit appends its own src/node_modules entries to this list).
+    fs: { allow: ["e2e"] },
   },
   // Tell Vitest to use the `browser` entry points in `package.json` files, even though it's running in Node
   resolve: process.env.VITEST

@@ -140,14 +140,6 @@
   let edit = $derived((e: { k: string; v: any }) => {
     if (!chartStore) return;
     switch (e.k) {
-      case "title":
-        chartStore.setConfigTitle(e.v);
-        break;
-
-      case "subTitle":
-        chartStore.setConfigSubTitle(e.v);
-        break;
-
       case "sourceLeft":
         chartStore.setSourceTextLeft(e.v);
         break;
