@@ -39,7 +39,7 @@
   </div>
   <div>
     <!-- Rich text: merges concurrent edits instead of locking, unlike the fields below. -->
-    <RichTextField {connection} path={["chart", "title"]} />
+    <RichTextField {connection} path={["chart", "title"]} defaultBlock="h1" />
   </div>
 </div>
 
@@ -48,7 +48,7 @@
     <span>Sub title</span>
   </div>
   <div>
-    <RichTextField {connection} path={["chart", "subTitle"]} />
+    <RichTextField {connection} path={["chart", "subTitle"]} defaultBlock="p" />
   </div>
 </div>
 

@@ -4,6 +4,7 @@ import type { Root } from "./chart";
 import type { Doc } from "sharedb/lib/client";
 import * as json1 from "ot-json1";
 import { formatVersion } from "./initialDoc";
+import { normalizeDelta, toDelta, type BlockType } from "./components/chart/richText";
 
 /**
  * Applies operations requred to upgrade a chart specification.
@@ -504,6 +505,28 @@ export const migrate = (
       {
         r: 0,
         i: 8,
+      },
+    ] as any);
+    doc.submitOp(op);
+  }
+
+  if (doc.data.m.v == 8 && doc.data.m.v < toVersion) {
+    // Lines gain a block type, stored on each line's terminating newline (Quill convention)
+    // with a forced trailing newline. Normalize the existing title/subtitle deltas to that
+    // canonical shape so stored data is consistent: title defaults to h1, subtitle to p.
+    const chart = (doc.data as Root).chart;
+    const normalized = (value: unknown, block: BlockType) => ({
+      ops: normalizeDelta(toDelta(value), block).ops,
+    });
+    const op = [
+      ["chart", "subTitle", { r: 0, i: normalized(chart.subTitle, "p") }],
+      ["chart", "title", { r: 0, i: normalized(chart.title, "h1") }],
+    ].reduce((acc, op) => json1.type.compose(acc, op), [
+      "m",
+      "v",
+      {
+        r: 0,
+        i: 9,
       },
     ] as any);
     doc.submitOp(op);

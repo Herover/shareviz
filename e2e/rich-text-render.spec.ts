@@ -5,58 +5,121 @@ import { expect, test } from "@playwright/test";
 import type { RichText } from "../src/lib/chart";
 import type { Rendered } from "./fixtures/richTextRender";
 
-// The editor (`renderDelta`) and the read-only viewer (`DeltaView`) render rich text
-// with deliberately different markup but must stay semantically identical, since both
-// now derive their lines/runs from the shared `deltaToLines`. We render a battery of
-// Deltas through both in a real browser (renderDelta needs a live DOM, DeltaView needs
-// mounting) and assert their canonical line/run forms match. See the fixture for how
-// the two markup models are reduced to a common form.
+// The editor (`renderDelta`) and the read-only viewer (`DeltaView`) render rich text with
+// deliberately different inline markup (semantic <strong>/<em>/<u> vs <span class="rt-*">),
+// but both now emit one block element (h1/h2/p) per line via the shared `deltaToLines`. We
+// render a battery of Deltas through both in a real browser and assert their canonical
+// block/run forms match. We also round-trip each through the editor's DOM↔Delta serialization
+// to confirm it's a fixed point. See the fixture for how the markup is reduced to a common form.
 
-const CASES: { name: string; delta: RichText }[] = [
-  { name: "empty", delta: { ops: [] } },
+const CASES: { name: string; delta: RichText; defaultBlock?: BlockTypeName }[] = [
   { name: "plain text", delta: { ops: [{ insert: "Hello world" }] } },
   {
-    name: "bold run followed by plain",
+    name: "bold run followed by plain (one line)",
     delta: { ops: [{ insert: "Hello ", attributes: { bold: true } }, { insert: "world" }] },
   },
   {
-    name: "all three formats on one run",
-    delta: { ops: [{ insert: "x", attributes: { bold: true, italic: true, underline: true } }] },
+    name: "single h1 line",
+    delta: { ops: [{ insert: "Heading" }, { insert: "\n", attributes: { block: "h1" } }] },
   },
-  { name: "multiple lines", delta: { ops: [{ insert: "first\nsecond\nthird" }] } },
-  { name: "blank line in the middle", delta: { ops: [{ insert: "a\n\nb" }] } },
   {
-    name: "formatting spanning a line break",
+    name: "mixed h1 / h2 / p blocks",
     delta: {
       ops: [
-        { insert: "Title ", attributes: { bold: true } },
-        { insert: "sub\n" },
-        { insert: "under", attributes: { underline: true } },
+        { insert: "Title" },
+        { insert: "\n", attributes: { block: "h1" } },
+        { insert: "Subhead" },
+        { insert: "\n", attributes: { block: "h2" } },
+        { insert: "body" },
+        { insert: "\n", attributes: { block: "p" } },
       ],
     },
   },
+  { name: "multiple plain lines", delta: { ops: [{ insert: "first\nsecond\nthird" }] } },
+  { name: "blank line in the middle", delta: { ops: [{ insert: "a\n\nb" }] } },
+  {
+    name: "inline formatting spanning a block break",
+    delta: {
+      ops: [
+        { insert: "Title ", attributes: { bold: true } },
+        { insert: "sub" },
+        { insert: "\n", attributes: { block: "h1" } },
+        { insert: "under", attributes: { underline: true } },
+        { insert: "\n", attributes: { block: "p" } },
+      ],
+    },
+  },
+  {
+    name: "legacy line falls back to defaultBlock (h1)",
+    delta: { ops: [{ insert: "Legacy title" }] },
+    defaultBlock: "h1",
+  },
 ];
 
-// `/@fs/<abs>` is served by Vite (e2e is added to its fs allow-list in vite.config),
-// which lets the fixture resolve its bare `svelte`/`rich-text` imports as real modules.
+// Local alias so the case table doesn't need to import the union from app code.
+type BlockTypeName = "h1" | "h2" | "p";
+
+// `/@fs/<abs>` is served by Vite (e2e is added to its fs allow-list in vite.config), which
+// lets the fixture resolve its bare `svelte`/`rich-text` imports as real modules.
 const fixtureUrl = `/@fs${path.resolve("e2e/fixtures/richTextRender.ts")}`;
 
 test.describe("rich-text rendering parity", () => {
-  for (const { name, delta } of CASES) {
+  for (const { name, delta, defaultBlock } of CASES) {
     test(`renderDelta and DeltaView agree: ${name}`, async ({ page }) => {
-      // Any page on the dev origin works; we only need Vite to serve the fixture module.
       await page.goto("/");
-
-      const result = await page.evaluate<Rendered, [string, RichText]>(
-        async ([url, d]) => {
+      const result = await page.evaluate<Rendered, [string, RichText, BlockTypeName]>(
+        async ([url, d, db]) => {
           const { renderBoth } = await import(/* @vite-ignore */ url);
-          return renderBoth(d);
+          return renderBoth(d, db);
         },
-        [fixtureUrl, delta],
+        [fixtureUrl, delta, defaultBlock ?? "p"],
       );
-
-      console.log(result.inline, result.blocks);
       expect(result.inline).toEqual(result.blocks);
     });
+
+    test(`editor round-trip is stable: ${name}`, async ({ page }) => {
+      await page.goto("/");
+      const [first, second] = await page.evaluate<
+        [RichText, RichText],
+        [string, RichText, BlockTypeName]
+      >(
+        async ([url, d, db]) => {
+          const { roundTrip } = await import(/* @vite-ignore */ url);
+          return roundTrip(d, db);
+        },
+        [fixtureUrl, delta, defaultBlock ?? "p"],
+      );
+      // The serialized form is a fixed point, and always ends with a (block-attributed) newline.
+      expect(second).toEqual(first);
+      expect(first.ops.at(-1)).toMatchObject({ insert: expect.stringContaining("\n") });
+    });
   }
+
+  for (const block of ["h1", "h2", "p"] as const) {
+    test(`toolbar formatBlock sets block type: ${block}`, async ({ page }) => {
+      await page.goto("/");
+      const result = await page.evaluate<RichText, [string, BlockTypeName]>(
+        async ([url, b]) => {
+          const { applyFormatBlock } = await import(/* @vite-ignore */ url);
+          return applyFormatBlock("Hello", b);
+        },
+        [fixtureUrl, block],
+      );
+      expect(result.ops).toEqual([{ insert: "Hello" }, { insert: "\n", attributes: { block } }]);
+    });
+  }
+
+  test("empty input: editor renders one block, viewer renders nothing", async ({ page }) => {
+    await page.goto("/");
+    const result = await page.evaluate<Rendered, [string, RichText, BlockTypeName]>(
+      async ([url, d, db]) => {
+        const { renderBoth } = await import(/* @vite-ignore */ url);
+        return renderBoth(d, db);
+      },
+      [fixtureUrl, { ops: [] }, "h1"],
+    );
+    // The contenteditable always needs a focusable line; the viewer intentionally shows nothing.
+    expect(result.blocks).toEqual([{ block: "h1", segments: [] }]);
+    expect(result.inline).toEqual([]);
+  });
 });

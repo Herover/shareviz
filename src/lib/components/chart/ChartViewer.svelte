@@ -115,12 +115,12 @@
 <div>
   <style bind:innerText={css} contenteditable=""></style>
   <div class="chart" style:width={chartWidth ? chartWidth + "px" : undefined} data-theme={themeKey}>
-    <h1 class="title" dir="auto">
-      <DeltaView delta={chartSpec.chart.title} />
-    </h1>
-    <p class="subtitle" dir="auto">
-      <DeltaView delta={chartSpec.chart.subTitle} />
-    </p>
+    <div class="title" dir="auto">
+      <DeltaView delta={chartSpec.chart.title} defaultBlock="h1" />
+    </div>
+    <div class="subtitle" dir="auto">
+      <DeltaView delta={chartSpec.chart.subTitle} defaultBlock="p" />
+    </div>
     {#each chartSpec.chart.elements as element, i (element.id)}
       {#await getComponent(element.type) then component}
         {@const SvelteComponent = component}
@@ -213,12 +213,9 @@
   .source-left {
     text-align: left;
   }
-  h1.title {
-    margin-top: 0px;
-    font-size: 2em;
-    font-weight: normal;
-  }
-  p.subtitle {
-    font-size: 1.1em;
+  /* `.title`/`.subtitle` are now plain containers; per-line block elements (h1/h2/p) are
+     rendered and sized by DeltaView. Keep the title flush with the top of the chart. */
+  .title {
+    margin-top: 0;
   }
 </style>

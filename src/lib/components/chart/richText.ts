@@ -2,17 +2,38 @@
 
 // DOM <-> Quill-Delta helpers for the hand-rolled collaborative rich-text editor.
 //
-// Model: the contenteditable holds one block element (`<div>`) per line; inline
-// formatting is `<strong>`/`<em>`/`<u>`. The document Delta is the inline text with
-// lines joined by "\n" (no forced trailing newline). The serialize/render pair is a
-// round-trip identity for the deltas we produce, and the caret index counting used by
-// `readEditor` matches the placement done by `placeCaret`, so the caret survives a
-// remote re-render after being transformed through the incoming change.
+// Model: the contenteditable holds one block element per line — `<h1>`/`<h2>`/`<p>` (the
+// `BlockType`), with `<div>` from the browser treated as the field default. Inline formatting
+// is `<strong>`/`<em>`/`<u>`. The document Delta is the inline text with each line terminated
+// by a "\n" that carries the line's block type as an attribute (Quill convention), so the
+// document always ends with a newline. The serialize/render pair is a round-trip identity for
+// the deltas we produce, and the caret index counting used by `readEditor` matches the
+// placement done by `placeCaret`, so the caret survives a remote re-render after being
+// transformed through the incoming change.
 
 import { Delta } from "rich-text";
-import type { DeltaOp } from "rich-text";
 
-type Attrs = { bold?: true; italic?: true; underline?: true };
+export type Attrs = { bold?: true; italic?: true; underline?: true };
+
+/** Block-level type of a line. Stored on the line's terminating newline (Quill convention). */
+export type BlockType = "h1" | "h2" | "p";
+
+const isBlockType = (value: unknown): value is BlockType =>
+  value === "h1" || value === "h2" || value === "p";
+
+/** Map a block element to its `BlockType`, falling back to the field default for div/unknown. */
+const tagToBlock = (el: Element, fallback: BlockType): BlockType => {
+  switch (el.tagName) {
+    case "H1":
+      return "h1";
+    case "H2":
+      return "h2";
+    case "P":
+      return "p";
+    default:
+      return fallback; // DIV (browser default block) / anything else → field default
+  }
+};
 
 /**
  * Coerce a stored field value into a Delta. Tolerates the Delta shape, the legacy
@@ -26,8 +47,7 @@ export const toDelta = (value: unknown): Delta => {
   return new Delta(Array.isArray(ops) ? ops : []);
 };
 
-const isBlock = (el: Element): boolean =>
-  el.tagName === "DIV" || el.tagName === "P" || el.tagName === "LI";
+const isBlock = (el: Element): boolean => ["DIV", "P", "H1", "H2", "H3", "LI"].includes(el.tagName);
 
 /** Extend the active inline attributes for an element (tag- or inline-style-based). */
 const extend = (attrs: Attrs, el: HTMLElement): Attrs => {
@@ -48,30 +68,6 @@ const extend = (attrs: Attrs, el: HTMLElement): Attrs => {
   return next;
 };
 
-const lastIsNewline = (delta: Delta): boolean => {
-  const ops = delta.ops;
-  if (ops.length === 0) {
-    return true;
-  }
-  const last = ops[ops.length - 1].insert;
-  return typeof last === "string" && last.endsWith("\n");
-};
-
-/** Remove a single trailing newline added by the block model. */
-const trimTrailingNewline = (delta: Delta): Delta => {
-  const ops: DeltaOp[] = delta.ops.map((op) => ({ ...op }));
-  const last = ops[ops.length - 1];
-  if (last && typeof last.insert === "string" && last.insert.endsWith("\n")) {
-    const trimmed = last.insert.slice(0, -1);
-    if (trimmed === "") {
-      ops.pop();
-    } else {
-      last.insert = trimmed;
-    }
-  }
-  return new Delta(ops);
-};
-
 export interface EditorRead {
   delta: Delta;
   /** Document character index of the selection's start, or null if no/outside selection. */
@@ -82,7 +78,11 @@ export interface EditorRead {
  * Serialize the contenteditable into a document Delta. If `selection` is supplied and its
  * start lies within `root`, also returns the caret as a document character index.
  */
-export const readEditor = (root: HTMLElement, selection?: Selection | null): EditorRead => {
+export const readEditor = (
+  root: HTMLElement,
+  selection?: Selection | null,
+  defaultBlock: BlockType = "p",
+): EditorRead => {
   const delta = new Delta();
   let length = 0;
   let caret: number | null = null;
@@ -102,8 +102,8 @@ export const readEditor = (root: HTMLElement, selection?: Selection | null): Edi
     delta.insert(text, Object.keys(attrs).length ? attrs : undefined);
     length += text.length;
   };
-  const insertNewline = () => {
-    delta.insert("\n");
+  const insertNewline = (block?: BlockType) => {
+    delta.insert("\n", block ? { block } : undefined);
     length += 1;
   };
 
@@ -124,13 +124,14 @@ export const readEditor = (root: HTMLElement, selection?: Selection | null): Edi
       if (caret == null && node === stopNode) {
         caret = length;
       }
-      insertNewline();
+      // A trailing <br> is the browser's empty-block filler — the enclosing block emits the
+      // line's own (block-attributed) newline. A <br> with a following sibling is a real break.
+      if (el.nextSibling) {
+        insertNewline();
+      }
       return;
     }
     const block = isBlock(el);
-    if (block && !lastIsNewline(delta)) {
-      insertNewline();
-    }
     const childAttrs = extend(attrs, el);
     const children = Array.from(el.childNodes);
     children.forEach((child, i) => {
@@ -142,8 +143,10 @@ export const readEditor = (root: HTMLElement, selection?: Selection | null): Edi
     if (caret == null && node === stopNode && stopOffset >= children.length) {
       caret = length;
     }
-    if (block && !lastIsNewline(delta)) {
-      insertNewline();
+    // Each block emits exactly one terminating newline carrying its block type, including the
+    // last block — so the document always ends with a newline (the anchor for block attrs).
+    if (block) {
+      insertNewline(tagToBlock(el, defaultBlock));
     }
   };
 
@@ -158,11 +161,10 @@ export const readEditor = (root: HTMLElement, selection?: Selection | null): Edi
     caret = length;
   }
 
-  const trimmed = trimTrailingNewline(delta);
   if (caret != null) {
-    caret = Math.min(caret, trimmed.length());
+    caret = Math.min(caret, delta.length());
   }
-  return { delta: trimmed, caret };
+  return { delta, caret };
 };
 
 /** One run of text sharing the same inline formatting. */
@@ -173,32 +175,50 @@ export interface Segment {
   underline: boolean;
 }
 
+/** A line: its block type plus the inline runs it contains. */
+export interface Line {
+  block: BlockType;
+  segments: Segment[];
+}
+
 /**
- * Split a document Delta into lines (split on "\n") of formatted inline segments.
- * Shared by the contenteditable renderer here and the read-only `DeltaView` component,
- * so both interpret the Delta the same way.
+ * Split a document Delta into lines (split on "\n"), each carrying its block type and its
+ * formatted inline segments. The block type is read from the line's terminating-newline
+ * `block` attribute (Quill convention), falling back to `defaultBlock`. Shared by the
+ * contenteditable renderer here and the read-only `DeltaView` component, so both interpret
+ * the Delta the same way.
  */
-export const deltaToLines = (delta: Delta): Segment[][] => {
-  const lines: Segment[][] = [[]];
+export const deltaToLines = (delta: Delta, defaultBlock: BlockType = "p"): Line[] => {
+  const lines: Line[] = [{ block: defaultBlock, segments: [] }];
   for (const op of delta.ops) {
     if (typeof op.insert !== "string") {
       continue; // embeds unsupported in v1
     }
     const attrs = op.attributes ?? {};
-    const segments = op.insert.split("\n");
-    segments.forEach((segment, i) => {
+    const inline = {
+      bold: attrs.bold === true,
+      italic: attrs.italic === true,
+      underline: attrs.underline === true,
+    };
+    const parts = op.insert.split("\n");
+    parts.forEach((part, i) => {
       if (i > 0) {
-        lines.push([]);
+        // Crossing a newline closes the current line; its block type lives on this op.
+        const current = lines[lines.length - 1];
+        if (isBlockType(attrs.block)) {
+          current.block = attrs.block;
+        }
+        lines.push({ block: defaultBlock, segments: [] });
       }
-      if (segment) {
-        lines[lines.length - 1].push({
-          text: segment,
-          bold: attrs.bold === true,
-          italic: attrs.italic === true,
-          underline: attrs.underline === true,
-        });
+      if (part) {
+        lines[lines.length - 1].segments.push({ text: part, ...inline });
       }
     });
+  }
+  // The forced trailing newline leaves one dangling empty line; drop it (but keep a lone
+  // empty line so an empty document still renders one block).
+  if (lines.length > 1 && lines[lines.length - 1].segments.length === 0) {
+    lines.pop();
   }
   return lines;
 };
@@ -223,22 +243,53 @@ const makeInline = (segment: Segment): Node => {
   return node;
 };
 
-/** Render a document Delta into the contenteditable as one `<div>` block per line. */
-export const renderDelta = (root: HTMLElement, delta: Delta): void => {
-  const lines = deltaToLines(delta);
+/** Render a document Delta into the contenteditable as one block element per line. */
+export const renderDelta = (
+  root: HTMLElement,
+  delta: Delta,
+  defaultBlock: BlockType = "p",
+): void => {
+  const lines = deltaToLines(delta, defaultBlock);
 
   root.replaceChildren();
   for (const line of lines) {
-    const div = document.createElement("div");
-    if (line.length === 0) {
-      div.appendChild(document.createElement("br"));
+    const el = document.createElement(line.block);
+    if (line.segments.length === 0) {
+      el.appendChild(document.createElement("br"));
     } else {
-      for (const segment of line) {
-        div.appendChild(makeInline(segment));
+      for (const segment of line.segments) {
+        el.appendChild(makeInline(segment));
       }
     }
-    root.appendChild(div);
+    root.appendChild(el);
   }
+};
+
+/**
+ * Canonicalize a stored Delta into the editor's model: every line terminated by a newline
+ * that carries an explicit `block` attribute (defaulting to `defaultBlock`). Makes the
+ * in-memory baseline identical to what `readEditor` produces, so loading legacy data (no
+ * trailing newline / no block attrs) doesn't create a spurious first-edit diff.
+ */
+export const normalizeDelta = (delta: Delta, defaultBlock: BlockType = "p"): Delta => {
+  const out = new Delta();
+  for (const line of deltaToLines(delta, defaultBlock)) {
+    for (const segment of line.segments) {
+      const attrs: Attrs = {};
+      if (segment.bold) {
+        attrs.bold = true;
+      }
+      if (segment.italic) {
+        attrs.italic = true;
+      }
+      if (segment.underline) {
+        attrs.underline = true;
+      }
+      out.insert(segment.text, Object.keys(attrs).length ? attrs : undefined);
+    }
+    out.insert("\n", { block: line.block });
+  }
+  return out;
 };
 
 /** Place the caret at a document character index, mirroring `readEditor`'s counting. */
