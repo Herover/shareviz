@@ -27,6 +27,7 @@
   import type { PageProps, PageServerData } from "./$types";
   import { getLogger } from "$lib/log.js";
   import { scale } from "svelte/transition";
+  import UserBadge from "$lib/components/chart/UserBadge.svelte";
 
   /* eslint-disable svelte/no-navigation-without-resolve */
 
@@ -281,7 +282,7 @@
             class="user-presence"
             title={store.presences[presence].name}
           >
-            {store.presences[presence].name.slice(0, 1)}
+            <UserBadge user={store.presences[presence]} fill />
           </div>
         {/each}
       </div>

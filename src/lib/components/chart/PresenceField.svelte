@@ -7,6 +7,7 @@
     PresenceData,
     ShareDBConnection,
   } from "$lib/chartStores/data.svelte";
+  import UserBadge from "./UserBadge.svelte";
 
   interface Props {
     /** Stable, id-based address of the field this wrapper guards. */
@@ -44,8 +45,6 @@
       connection?.setLocalSelection(null);
     }
   };
-
-  const initial = (name: string) => (name.trim()[0] ?? "?").toUpperCase();
 </script>
 
 <div
@@ -61,13 +60,7 @@
   {#if editors.length > 0}
     <div class="presence-badges" title={editors.map((e) => e.name).join(", ")}>
       {#each editors as editor (editor.id)}
-        <span class="presence-badge" style:background-color={editor.color} title={editor.name}>
-          {#if editor.image}
-            <img src={editor.image} alt={editor.name} />
-          {:else}
-            {initial(editor.name)}
-          {/if}
-        </span>
+        <UserBadge user={editor} />
       {/each}
       {#if locked}
         <button type="button" class="presence-override" onclick={() => (overriddenKey = editorKey)}>
@@ -98,24 +91,6 @@
     align-items: left;
     z-index: 2;
     pointer-events: none;
-  }
-  .presence-badge {
-    width: 1.4em;
-    height: 1.4em;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9em;
-    font-weight: 600;
-    color: var(--fg-on-accent);
-    border: 1px solid var(--bg-surface);
-    overflow: hidden;
-  }
-  .presence-badge img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
   }
   .presence-override {
     pointer-events: auto;
