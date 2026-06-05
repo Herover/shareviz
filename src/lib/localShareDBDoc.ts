@@ -17,6 +17,7 @@ export const createLocalDoc = (
     create: (data: any, type: any, cb: (error: Error | undefined) => any) => any;
     submitOp: (op: any) => any;
     on: (ev: string, listener: (a: any) => any) => any;
+    removeListener: (ev: string, listener: (a: any) => any) => any;
     subscribe: (listener: (d: any) => any) => any;
     kind: "local" | "synced";
   };
@@ -45,6 +46,16 @@ export const createLocalDoc = (
     switch (ev) {
       case "op":
         onOp = listener;
+        break;
+
+      default:
+        break;
+    }
+  };
+  doc.removeListener = (ev: string, _listener: (a?: any) => any) => {
+    switch (ev) {
+      case "op":
+        onOp = () => {};
         break;
 
       default:
