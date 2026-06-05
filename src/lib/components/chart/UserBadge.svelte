@@ -4,17 +4,36 @@
       id: string;
       name: string;
       image?: string;
-      color: string;
+      color?: string;
     };
     fill?: boolean;
   }
 
   let { user, fill }: Props = $props();
 
+  const palette = [
+    "var(--color-slate-500)",
+    "var(--color-terra-500)",
+    "var(--color-sage-500)",
+    "var(--color-amber-500)",
+    "var(--color-slate-300)",
+    "var(--color-terra-300)",
+    "var(--color-sage-300)",
+    "var(--color-amber-300)",
+  ];
+  const color = $derived.by(() => {
+    if (user.color) {
+      return user.color;
+    }
+    let hash = 0;
+    for (let i = 0; i < user.id.length; i++) hash = (hash * 31 + user.id.charCodeAt(i)) | 0;
+    return palette[Math.abs(hash) % palette.length];
+  });
+
   const initial = (name: string) => (name.trim()[0] ?? "?").toUpperCase();
 </script>
 
-<div class="badge" class:fill style:background-color={user.color} title={user.name}>
+<div class="badge" class:fill style:background-color={color} title={user.image ? null : user.name}>
   {#if user.image}
     <!-- There's already a explaining title attribute on the parent -->
     <!-- svelte-ignore a11y_missing_attribute -->

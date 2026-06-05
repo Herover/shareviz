@@ -276,12 +276,7 @@
 
       <div class="presence">
         {#each Object.keys(store.presences) as presence (presence)}
-          <div
-            style:border="2px solid {store.presences[presence].color}"
-            transition:scale
-            class="user-presence"
-            title={store.presences[presence].name}
-          >
+          <div transition:scale class="user-presence" title={store.presences[presence].name}>
             <UserBadge user={store.presences[presence]} fill />
           </div>
         {/each}
@@ -502,15 +497,11 @@
     align-items: center;
   }
   .user-presence {
-    color: var(--fg-primary);
-    background-color: var(--bg-base);
-    border-radius: 50%;
-    height: 2em;
-    width: 2em;
+    height: 32px;
+    width: 32px;
     display: flex;
-    align-items: center;
-    justify-content: center;
     margin: 0.2em;
+    font-size: 20px;
   }
   input[type="text"] {
     width: 100%;

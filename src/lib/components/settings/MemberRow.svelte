@@ -4,8 +4,8 @@
      Rows are meant to be stacked directly inside a flush card body. -->
 
 <script lang="ts">
-  import Avatar from "./Avatar.svelte";
   import Icon from "../Icon.svelte";
+  import UserBadge from "../chart/UserBadge.svelte";
 
   interface Props {
     id: string;
@@ -20,7 +20,10 @@
 </script>
 
 <div class="member" class:removable={onRemove}>
-  <Avatar {name} {id} />
+  <!-- <Avatar {name} {id} /> -->
+  <div class="avatar">
+    <UserBadge user={{ id, name: name ?? "" }} fill />
+  </div>
   <div class="member-id">
     <div class="member-name">
       {name ?? "Unknown user"}
@@ -134,5 +137,10 @@
   .member-remove:hover {
     background: var(--state-error-bg);
     color: var(--state-error);
+  }
+  .avatar {
+    height: 38px;
+    width: 38px;
+    font-size: 24px;
   }
 </style>

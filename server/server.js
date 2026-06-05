@@ -29,7 +29,7 @@ const colorFromId = (id) => {
     hash = (Math.imul(31, hash) + str.charCodeAt(i)) | 0;
   }
   const hue = ((hash % 360) + 360) % 360;
-  return `hsl(${hue} 70% 60%)`;
+  return `hsl(${hue} 50% 40%)`;
 };
 
 const authorizeOrRejectUserOnChart = (userId, chartId) => {
