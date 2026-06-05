@@ -16,6 +16,7 @@
     type Attrs,
     type BlockType,
   } from "./richText";
+  import UserBadge from "./UserBadge.svelte";
 
   interface Props {
     connection: ShareDBConnection;
@@ -48,7 +49,6 @@
   // Presence is reused only to show who else is here — this field is never locked,
   // since concurrent editing is the whole point.
   let editors = $derived<PresenceData[]>(connection.editorsAt(path));
-  const initial = (name: string) => (name.trim()[0] ?? "?").toUpperCase();
 
   /** Read the current document Delta for this field straight from the doc snapshot. */
   const readDoc = (): Delta => {
@@ -212,15 +212,42 @@
   });
 </script>
 
-<div class="rich-text-field" {onfocusin} {onfocusout}>
-  <div class="rich-text-toolbar">
+<!-- The whole field gets a colored border + glow while a remote collaborator is in it
+     (`--rt-presence` = their color); otherwise it falls back to the focus ring. -->
+<div
+  class="rich-text-field"
+  class:has-remote={editors.length > 0}
+  style:--rt-presence={editors[0]?.color ?? "transparent"}
+  {onfocusin}
+  {onfocusout}
+>
+  <div class="rich-text-head">
     {#if label}
       <span class="rich-text-label">{label}</span>
     {/if}
-    <div class="rich-text-blocks">
+    <div class="rich-text-presence" title={editors.map((e) => e.name).join(", ")}>
+      {#if editors.length > 0}
+        {#each editors as editor (editor.id)}
+          <UserBadge user={editor} />
+        {/each}
+        <span class="rich-text-presence-who">{editors[0].name}</span>
+        {#if editors.length > 1}
+          <span class="rich-text-presence-more">+{editors.length - 1}</span>
+        {/if}
+        <span class="rich-text-presence-verb">
+          {editors.length > 1 ? "are editing" : "is editing"}
+        </span>
+        <span class="rich-text-typing" aria-hidden="true"><i></i><i></i><i></i></span>
+      {/if}
+    </div>
+  </div>
+
+  <div class="rich-text-toolbar" role="toolbar" aria-label={label ?? "Formatting"}>
+    <div class="rich-text-group">
       {#each blockOptions as option (option.value)}
         <button
           type="button"
+          class="rich-text-btn block"
           title={option.label}
           class:active={currentBlock === option.value}
           aria-pressed={currentBlock === option.value}
@@ -229,49 +256,40 @@
         >
       {/each}
     </div>
-    <button
-      type="button"
-      title="Bold"
-      class:active={currentFormat.bold}
-      aria-pressed={currentFormat.bold}
-      onmousedown={(e) => e.preventDefault()}
-      onclick={() => format("bold")}><b>B</b></button
-    >
-    <button
-      type="button"
-      title="Italic"
-      class:active={currentFormat.italic}
-      aria-pressed={currentFormat.italic}
-      onmousedown={(e) => e.preventDefault()}
-      onclick={() => format("italic")}><i>I</i></button
-    >
-    <button
-      type="button"
-      title="Underline"
-      class:active={currentFormat.underline}
-      aria-pressed={currentFormat.underline}
-      onmousedown={(e) => e.preventDefault()}
-      onclick={() => format("underline")}><u>U</u></button
-    >
-
-    {#if editors.length > 0}
-      <div class="rich-text-badges" title={editors.map((e) => e.name).join(", ")}>
-        {#each editors as editor (editor.id)}
-          <span class="rich-text-badge" style:background-color={editor.color} title={editor.name}>
-            {#if editor.image}
-              <img src={editor.image} alt={editor.name} />
-            {:else}
-              {initial(editor.name)}
-            {/if}
-          </span>
-        {/each}
-      </div>
-    {/if}
+    <div class="rich-text-group">
+      <button
+        type="button"
+        class="rich-text-btn"
+        title="Bold"
+        class:active={currentFormat.bold}
+        aria-pressed={currentFormat.bold}
+        onmousedown={(e) => e.preventDefault()}
+        onclick={() => format("bold")}><b>B</b></button
+      >
+      <button
+        type="button"
+        class="rich-text-btn"
+        title="Italic"
+        class:active={currentFormat.italic}
+        aria-pressed={currentFormat.italic}
+        onmousedown={(e) => e.preventDefault()}
+        onclick={() => format("italic")}><i>I</i></button
+      >
+      <button
+        type="button"
+        class="rich-text-btn"
+        title="Underline"
+        class:active={currentFormat.underline}
+        aria-pressed={currentFormat.underline}
+        onmousedown={(e) => e.preventDefault()}
+        onclick={() => format("underline")}><u>U</u></button
+      >
+    </div>
   </div>
 
   <div
     bind:this={editorEl}
-    class="rich-text-editor control"
+    class="rich-text-editor"
     contenteditable="true"
     role="textbox"
     tabindex="0"
@@ -288,105 +306,210 @@
 <style>
   .rich-text-field {
     position: relative;
+    border: 1.5px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface);
+    margin-bottom: 14px;
+    transition:
+      border-color var(--duration-standard) var(--ease-standard),
+      box-shadow var(--duration-standard) var(--ease-standard);
   }
+  /* A remote collaborator is editing here: glow in their color. */
+  .rich-text-field.has-remote {
+    border-color: var(--rt-presence);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--rt-presence) 18%, transparent);
+  }
+  /* You are editing (and nobody remote is): the usual focus ring. */
+  .rich-text-field:focus-within:not(.has-remote) {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--border-focus) 22%, transparent);
+  }
+
+  /* Head: label + presence pill */
+  .rich-text-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px 8px;
+  }
+  .rich-text-label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--fg-secondary);
+  }
+
+  /* Presence pill — "X is editing" with avatar and animated typing dots. */
+  .rich-text-presence {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px 3px 3px;
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklab, var(--rt-presence) 12%, var(--bg-surface));
+    border: 1px solid color-mix(in oklab, var(--rt-presence) 35%, transparent);
+    font-size: 11.5px;
+    line-height: 1;
+    font-weight: var(--weight-medium);
+    color: var(--fg-primary);
+  }
+  .rich-text-presence-who {
+    color: var(--fg-primary);
+  }
+  .rich-text-presence-more {
+    color: var(--fg-secondary);
+    font-weight: var(--weight-regular);
+  }
+  .rich-text-presence-verb {
+    color: var(--fg-secondary);
+    font-weight: var(--weight-regular);
+    font-size: 11px;
+  }
+  .rich-text-typing {
+    display: inline-flex;
+    gap: 2px;
+    margin-left: 2px;
+  }
+  .rich-text-typing i {
+    width: 3px;
+    height: 3px;
+    border-radius: var(--radius-pill);
+    background: var(--rt-presence);
+    animation: rich-text-blip 1.2s infinite ease-in-out both;
+  }
+  .rich-text-typing i:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .rich-text-typing i:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  @keyframes rich-text-blip {
+    0%,
+    80%,
+    100% {
+      opacity: 0.3;
+      transform: translateY(0);
+    }
+    40% {
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+  }
+
+  /* Toolbar — its own band between head and editor, with grouped controls. */
   .rich-text-toolbar {
     display: flex;
     align-items: center;
-    gap: 0.25em;
-    margin-bottom: 4px;
+    gap: 2px;
+    padding: 4px 10px;
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    background: color-mix(in oklab, var(--bg-sunken) 50%, var(--bg-surface));
   }
-  .rich-text-label {
-    margin-right: auto;
-    color: var(--fg-secondary);
-  }
-  .rich-text-toolbar button {
-    width: 1.8em;
-    height: 1.8em;
-    padding: 0;
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-sm);
-    background-color: var(--bg-surface);
-    color: var(--fg-primary);
-    cursor: pointer;
-    line-height: 1;
-  }
-  .rich-text-toolbar button:hover {
-    background-color: var(--bg-sunken);
-  }
-  .rich-text-toolbar button.active {
-    background-color: var(--accent-primary);
-    color: var(--fg-on-accent);
-    border-color: var(--accent-primary);
-  }
-  .rich-text-blocks {
+  .rich-text-group {
     display: flex;
-    gap: 0.25em;
-    margin-right: 0.25em;
+    gap: 2px;
+    padding: 0 4px;
   }
-  .rich-text-blocks button {
-    width: auto;
-    min-width: 1.8em;
-    padding: 0 0.35em;
-    font-size: 0.85em;
+  .rich-text-group + .rich-text-group {
+    border-left: 1px solid var(--border-subtle);
   }
+  .rich-text-btn {
+    height: 26px;
+    min-width: 26px;
+    padding: 0 7px;
+    border: 0;
+    border-radius: 5px;
+    background: none;
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    line-height: 1;
+    color: var(--fg-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background var(--duration-micro) var(--ease-standard),
+      color var(--duration-micro) var(--ease-standard);
+  }
+  .rich-text-btn:hover {
+    background: var(--bg-sunken);
+    color: var(--fg-primary);
+  }
+  .rich-text-btn.active {
+    background: var(--bg-surface);
+    color: var(--fg-primary);
+    box-shadow: 0 0 0 1px var(--border-default);
+  }
+  .rich-text-btn.block {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.02em;
+  }
+  .rich-text-btn b {
+    font-weight: var(--weight-bold);
+  }
+  .rich-text-btn i {
+    font-style: italic;
+    font-family: var(--font-display);
+  }
+  .rich-text-btn u {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* Editor area */
   .rich-text-editor {
-    min-height: 60px;
+    padding: 14px 18px 16px;
+    min-height: 110px;
     width: 100%;
     box-sizing: border-box;
     overflow-y: auto;
     cursor: text;
     text-align: left;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--fg-primary);
+    outline: none;
   }
   /* Block hierarchy inside the contenteditable (renderDelta builds the elements imperatively,
      so they need :global to be styled). Mirrors DeltaView so editing is WYSIWYG-ish. */
   .rich-text-editor :global(h1),
-  .rich-text-editor :global(h2),
-  .rich-text-editor :global(p) {
-    font-weight: normal;
-    margin: 0.3em 0;
+  .rich-text-editor :global(h2) {
+    font-family: var(--font-display);
+    font-weight: var(--weight-regular);
   }
   .rich-text-editor :global(:first-child) {
     margin-top: 0;
   }
   .rich-text-editor :global(h1) {
-    font-size: 2em;
+    font-size: 26px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin: 6px 0 4px;
   }
   .rich-text-editor :global(h2) {
-    font-size: 1.5em;
+    font-size: 20px;
+    line-height: 1.15;
+    margin: 8px 0 4px;
   }
   .rich-text-editor :global(p) {
-    font-size: 1em;
+    margin: 4px 0;
   }
   .rich-text-editor :global(ul),
   .rich-text-editor :global(ol) {
-    margin: 0.3em 0;
-    padding-left: 1.5em;
-    font-size: 1em;
+    margin: 4px 0;
+    padding-left: 22px;
   }
   .rich-text-editor :global(li) {
-    margin: 0;
+    margin: 2px 0;
   }
-  .rich-text-badges {
-    display: flex;
-    align-items: center;
-    gap: 0.15em;
+  .rich-text-editor :global(em) {
+    font-style: italic;
   }
-  .rich-text-badge {
-    width: 1.4em;
-    height: 1.4em;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8em;
-    font-weight: 600;
-    color: var(--fg-on-accent);
-    border: 1px solid var(--bg-surface);
-    overflow: hidden;
-  }
-  .rich-text-badge img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  .rich-text-editor :global(strong) {
+    font-weight: var(--weight-semibold);
   }
 </style>
