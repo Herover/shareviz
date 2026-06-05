@@ -54,6 +54,64 @@ const CASES: { name: string; delta: RichText; defaultBlock?: BlockTypeName }[] =
     delta: { ops: [{ insert: "Legacy title" }] },
     defaultBlock: "h1",
   },
+  {
+    name: "bulleted list",
+    delta: {
+      ops: [
+        { insert: "one" },
+        { insert: "\n", attributes: { block: "ul" } },
+        { insert: "two" },
+        { insert: "\n", attributes: { block: "ul" } },
+      ],
+    },
+  },
+  {
+    name: "numbered list",
+    delta: {
+      ops: [
+        { insert: "first" },
+        { insert: "\n", attributes: { block: "ol" } },
+        { insert: "second" },
+        { insert: "\n", attributes: { block: "ol" } },
+      ],
+    },
+  },
+  {
+    name: "list between paragraphs",
+    delta: {
+      ops: [
+        { insert: "intro" },
+        { insert: "\n", attributes: { block: "p" } },
+        { insert: "a" },
+        { insert: "\n", attributes: { block: "ul" } },
+        { insert: "b" },
+        { insert: "\n", attributes: { block: "ul" } },
+        { insert: "outro" },
+        { insert: "\n", attributes: { block: "p" } },
+      ],
+    },
+  },
+  {
+    name: "adjacent bulleted then numbered lists",
+    delta: {
+      ops: [
+        { insert: "bullet" },
+        { insert: "\n", attributes: { block: "ul" } },
+        { insert: "number" },
+        { insert: "\n", attributes: { block: "ol" } },
+      ],
+    },
+  },
+  {
+    name: "list item with inline bold",
+    delta: {
+      ops: [
+        { insert: "bold", attributes: { bold: true } },
+        { insert: " item" },
+        { insert: "\n", attributes: { block: "ul" } },
+      ],
+    },
+  },
 ];
 
 // Local alias so the case table doesn't need to import the union from app code.
@@ -106,6 +164,20 @@ test.describe("rich-text rendering parity", () => {
         [fixtureUrl, block],
       );
       expect(result.ops).toEqual([{ insert: "Hello" }, { insert: "\n", attributes: { block } }]);
+    });
+  }
+
+  for (const block of ["ul", "ol"] as const) {
+    test(`toolbar list command sets block type: ${block}`, async ({ page }) => {
+      await page.goto("/");
+      const result = await page.evaluate<RichText, [string, "ul" | "ol"]>(
+        async ([url, b]) => {
+          const { applyListCommand } = await import(/* @vite-ignore */ url);
+          return applyListCommand("Item", b);
+        },
+        [fixtureUrl, block],
+      );
+      expect(result.ops).toEqual([{ insert: "Item" }, { insert: "\n", attributes: { block } }]);
     });
   }
 

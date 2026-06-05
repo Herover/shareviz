@@ -15,11 +15,17 @@ import { Delta } from "rich-text";
 
 export type Attrs = { bold?: true; italic?: true; underline?: true };
 
-/** Block-level type of a line. Stored on the line's terminating newline (Quill convention). */
-export type BlockType = "h1" | "h2" | "p";
+/**
+ * Block-level type of a line, stored on the line's terminating newline (Quill convention).
+ * `ul`/`ol` lines are list items; consecutive same-value list lines render as one list.
+ */
+export type BlockType = "h1" | "h2" | "p" | "ul" | "ol";
 
+const BLOCK_TYPES: BlockType[] = ["h1", "h2", "p", "ul", "ol"];
 const isBlockType = (value: unknown): value is BlockType =>
-  value === "h1" || value === "h2" || value === "p";
+  BLOCK_TYPES.includes(value as BlockType);
+
+const isList = (block: BlockType): block is "ul" | "ol" => block === "ul" || block === "ol";
 
 /** Map a block element to its `BlockType`, falling back to the field default for div/unknown. */
 const tagToBlock = (el: Element, fallback: BlockType): BlockType => {
@@ -30,6 +36,9 @@ const tagToBlock = (el: Element, fallback: BlockType): BlockType => {
       return "h2";
     case "P":
       return "p";
+    case "LI":
+      // A list item's kind comes from its parent <ul>/<ol>.
+      return el.parentElement?.tagName === "OL" ? "ol" : "ul";
     default:
       return fallback; // DIV (browser default block) / anything else → field default
   }
@@ -107,7 +116,13 @@ export const readEditor = (
     length += 1;
   };
 
-  const visit = (node: Node, attrs: Attrs) => {
+  // True if a block merely *wraps* a list — e.g. the `<p><ul>…</ul></p>` some browsers leave
+  // behind after a list command. Such a block stays transparent so its <li>s are the lines.
+  const wrapsList = (el: Element) => el.querySelector("ul, ol, li") !== null;
+
+  // `inLine` tracks whether we're already inside the current line's block, so nested blocks
+  // (e.g. an <h1> the browser leaves inside an <li>) flatten into it instead of starting a line.
+  const visit = (node: Node, attrs: Attrs, inLine: boolean) => {
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.nodeValue ?? "";
       if (caret == null && node === stopNode) {
@@ -131,21 +146,24 @@ export const readEditor = (
       }
       return;
     }
-    const block = isBlock(el);
+    // What counts as a line: an <li> always is (regardless of nesting); a non-list block is one
+    // when it's a leaf (not wrapping a list) and not already inside a line. <ul>/<ol>, inline
+    // tags, list-wrapping blocks and nested blocks are all transparent (recursed through).
+    const startsLine = el.tagName === "LI" || (isBlock(el) && !inLine && !wrapsList(el));
     const childAttrs = extend(attrs, el);
     const children = Array.from(el.childNodes);
     children.forEach((child, i) => {
       if (caret == null && node === stopNode && i === stopOffset) {
         caret = length;
       }
-      visit(child, childAttrs);
+      visit(child, childAttrs, inLine || startsLine);
     });
     if (caret == null && node === stopNode && stopOffset >= children.length) {
       caret = length;
     }
-    // Each block emits exactly one terminating newline carrying its block type, including the
-    // last block — so the document always ends with a newline (the anchor for block attrs).
-    if (block) {
+    // Each line emits exactly one terminating newline carrying its block type, including the
+    // last line — so the document always ends with a newline (the anchor for block attrs).
+    if (startsLine) {
       insertNewline(tagToBlock(el, defaultBlock));
     }
   };
@@ -155,7 +173,7 @@ export const readEditor = (
     if (caret == null && root === stopNode && i === stopOffset) {
       caret = length;
     }
-    visit(child, {});
+    visit(child, {}, false);
   });
   if (caret == null && root === stopNode && stopOffset >= topChildren.length) {
     caret = length;
@@ -180,6 +198,28 @@ export interface Line {
   block: BlockType;
   segments: Segment[];
 }
+
+/**
+ * A render group: either a standalone line (h1/h2/p) or a run of consecutive same-kind list
+ * lines that collapse into a single `<ul>`/`<ol>`. Shared by both renderers so they stay in sync.
+ */
+export type Group = { list: null; line: Line } | { list: "ul" | "ol"; items: Line[] };
+
+/** Collapse consecutive same-value `ul`/`ol` lines into list groups; others stay standalone. */
+export const groupLines = (lines: Line[]): Group[] => {
+  const groups: Group[] = [];
+  for (const line of lines) {
+    const last = groups[groups.length - 1];
+    if (isList(line.block) && last && last.list === line.block) {
+      last.items.push(line);
+    } else if (isList(line.block)) {
+      groups.push({ list: line.block, items: [line] });
+    } else {
+      groups.push({ list: null, line });
+    }
+  }
+  return groups;
+};
 
 /**
  * Split a document Delta into lines (split on "\n"), each carrying its block type and its
@@ -243,25 +283,41 @@ const makeInline = (segment: Segment): Node => {
   return node;
 };
 
-/** Render a document Delta into the contenteditable as one block element per line. */
+/** Fill a line element with its inline runs (or an empty-line `<br>` placeholder). */
+const appendInline = (el: HTMLElement, line: Line): void => {
+  if (line.segments.length === 0) {
+    el.appendChild(document.createElement("br"));
+  } else {
+    for (const segment of line.segments) {
+      el.appendChild(makeInline(segment));
+    }
+  }
+};
+
+/**
+ * Render a document Delta into the contenteditable: one block element per line, with runs of
+ * list lines collapsed into a single `<ul>`/`<ol>` of `<li>` items.
+ */
 export const renderDelta = (
   root: HTMLElement,
   delta: Delta,
   defaultBlock: BlockType = "p",
 ): void => {
-  const lines = deltaToLines(delta, defaultBlock);
-
   root.replaceChildren();
-  for (const line of lines) {
-    const el = document.createElement(line.block);
-    if (line.segments.length === 0) {
-      el.appendChild(document.createElement("br"));
-    } else {
-      for (const segment of line.segments) {
-        el.appendChild(makeInline(segment));
+  for (const group of groupLines(deltaToLines(delta, defaultBlock))) {
+    if (group.list) {
+      const list = document.createElement(group.list);
+      for (const line of group.items) {
+        const li = document.createElement("li");
+        appendInline(li, line);
+        list.appendChild(li);
       }
+      root.appendChild(list);
+    } else {
+      const el = document.createElement(group.line.block);
+      appendInline(el, group.line);
+      root.appendChild(el);
     }
-    root.appendChild(el);
   }
 };
 
@@ -333,7 +389,10 @@ export const placeCaret = (root: HTMLElement, index: number): void => {
     selection.addRange(range);
   };
 
-  const blocks = Array.from(root.children);
+  // Each line is one block; <ul>/<ol> are containers, so flatten them to their <li> lines.
+  const blocks = Array.from(root.children).flatMap((child) =>
+    child.tagName === "UL" || child.tagName === "OL" ? Array.from(child.children) : [child],
+  );
   if (blocks.length === 0) {
     setAt(root, 0);
     return;

@@ -41,6 +41,8 @@
     { value: "h1", label: "Title", short: "H1" },
     { value: "h2", label: "Heading", short: "H2" },
     { value: "p", label: "Normal", short: "¶" },
+    { value: "ul", label: "Bulleted list", short: "•" },
+    { value: "ol", label: "Numbered list", short: "1." },
   ];
 
   // Presence is reused only to show who else is here — this field is never locked,
@@ -120,6 +122,7 @@
 
       el = el.parentElement;
     }
+    // For list items the climb stops at the <ul>/<ol> container (its parent is the editor).
     currentBlock =
       el?.tagName === "H1"
         ? "h1"
@@ -127,7 +130,11 @@
           ? "h2"
           : el?.tagName === "P"
             ? "p"
-            : defaultBlock;
+            : el?.tagName === "UL"
+              ? "ul"
+              : el?.tagName === "OL"
+                ? "ol"
+                : defaultBlock;
   };
 
   const onOp = (_ops: [unknown], source: unknown) => {
@@ -172,9 +179,15 @@
   /** Set the block type of the line(s) in the current selection. */
   const applyBlock = (block: BlockType) => {
     editorEl.focus();
-    document.execCommand("formatBlock", false, `<${block}>`);
-    currentBlock = block;
+    if (block === "ul") {
+      document.execCommand("insertUnorderedList", false); // toggles off if already a bullet list
+    } else if (block === "ol") {
+      document.execCommand("insertOrderedList", false);
+    } else {
+      document.execCommand("formatBlock", false, `<${block}>`);
+    }
     commitLocal();
+    syncCurrentBlock(); // reflect the actual resulting block (a list toggle may revert to default)
   };
 
   const onfocusin = () => connection.setLocalSelection(path);
@@ -343,6 +356,15 @@
   }
   .rich-text-editor :global(p) {
     font-size: 1em;
+  }
+  .rich-text-editor :global(ul),
+  .rich-text-editor :global(ol) {
+    margin: 0.3em 0;
+    padding-left: 1.5em;
+    font-size: 1em;
+  }
+  .rich-text-editor :global(li) {
+    margin: 0;
   }
   .rich-text-badges {
     display: flex;

@@ -2,7 +2,7 @@
 
 import { expect, test } from "vitest";
 import { Delta } from "rich-text";
-import { deltaToLines, normalizeDelta } from "./richText";
+import { deltaToLines, groupLines, normalizeDelta } from "./richText";
 
 // deltaToLines / normalizeDelta are pure (no DOM); the DOM-bound renderDelta, readEditor and
 // placeCaret are covered by the e2e parity/round-trip specs instead.
@@ -69,4 +69,36 @@ test("normalizeDelta produces a trailing newline with an explicit block attr", (
 test("normalizeDelta is idempotent", () => {
   const canonical = new Delta([{ insert: "hi" }, { insert: "\n", attributes: { block: "h2" } }]);
   expect(normalizeDelta(canonical, "p").ops).toEqual(canonical.ops);
+});
+
+const listDelta = (...items: [string, "ul" | "ol" | "p"][]) =>
+  new Delta(
+    items.flatMap(([text, block]) => [{ insert: text }, { insert: "\n", attributes: { block } }]),
+  );
+
+test("list newlines map to ul/ol block lines", () => {
+  expect(deltaToLines(listDelta(["one", "ul"], ["two", "ul"])).map((l) => l.block)).toEqual([
+    "ul",
+    "ul",
+  ]);
+});
+
+test("groupLines collapses consecutive same-kind list lines into one group", () => {
+  const groups = groupLines(deltaToLines(listDelta(["a", "ul"], ["b", "ul"])));
+  expect(groups).toHaveLength(1);
+  const [group] = groups;
+  expect(group.list).toBe("ul");
+  if (group.list) {
+    expect(group.items.map((i) => i.segments[0]?.text)).toEqual(["a", "b"]);
+  }
+});
+
+test("groupLines keeps adjacent ul and ol as separate lists", () => {
+  const groups = groupLines(deltaToLines(listDelta(["a", "ul"], ["b", "ol"])));
+  expect(groups.map((g) => g.list)).toEqual(["ul", "ol"]);
+});
+
+test("groupLines splits a list interrupted by a paragraph", () => {
+  const groups = groupLines(deltaToLines(listDelta(["a", "ul"], ["mid", "p"], ["b", "ul"])));
+  expect(groups.map((g) => g.list)).toEqual(["ul", null, "ul"]);
 });

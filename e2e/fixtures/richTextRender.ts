@@ -5,10 +5,11 @@
 // specifiers and dedupe Svelte to a single runtime instance shared with the mounted
 // component (importing `mount` separately at runtime yields a second, incompatible instance).
 //
-// Both renderers now emit one block element (h1/h2/p) per line, but with different inline
-// markup: `renderDelta` uses semantic `<strong>`/`<em>`/`<u>`, `DeltaView` uses
-// `<span class="rt-*">`. The shared `canon` walker understands both, reducing each DOM to the
-// same `{ block, segments }[]` form so the spec can assert semantic equivalence.
+// Both renderers emit one block element per line (with list lines collapsed into <ul>/<ol>),
+// but with different inline markup: `renderDelta` uses semantic `<strong>`/`<em>`/`<u>`,
+// `DeltaView` uses `<span class="rt-*">`. The shared `canon` walker understands both and
+// flattens lists back to per-<li> lines, reducing each DOM to the same `{ block, segments }[]`
+// form so the spec can assert semantic equivalence.
 
 import { mount, unmount } from "svelte";
 import { Delta } from "rich-text";
@@ -28,37 +29,49 @@ interface Line {
   segments: Run[];
 }
 
-/** Reduce a rendered DOM (either renderer) to block-typed lines of inline runs. */
+const cls = (el: HTMLElement, name: string) => el.classList.contains(name);
+
+/** Collect the inline runs of a single line element (text + active formatting). */
+const segmentsOf = (line: Element): Run[] => {
+  const segments: Run[] = [];
+  const walk = (node: Node, fmt: Omit<Run, "text">) => {
+    for (const child of Array.from(node.childNodes)) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        if (child.nodeValue) {
+          segments.push({ text: child.nodeValue, ...fmt });
+        }
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        const el = child as HTMLElement;
+        if (el.tagName === "BR") {
+          continue; // empty-line placeholder, no text
+        }
+        walk(el, {
+          bold: fmt.bold || el.tagName === "STRONG" || el.tagName === "B" || cls(el, "rt-bold"),
+          italic: fmt.italic || el.tagName === "EM" || el.tagName === "I" || cls(el, "rt-italic"),
+          underline: fmt.underline || el.tagName === "U" || cls(el, "rt-underline"),
+        });
+      }
+    }
+  };
+  walk(line, { bold: false, italic: false, underline: false });
+  return segments;
+};
+
+/** Reduce a rendered DOM (either renderer) to block-typed lines, flattening <ul>/<ol>. */
 const canon = (root: HTMLElement): Line[] => {
   const lines: Line[] = [];
-  for (const block of Array.from(root.children)) {
-    const segments: Run[] = [];
-    const walk = (node: Node, fmt: Omit<Run, "text">) => {
-      for (const child of Array.from(node.childNodes)) {
-        if (child.nodeType === Node.TEXT_NODE) {
-          if (child.nodeValue) {
-            segments.push({ text: child.nodeValue, ...fmt });
-          }
-        } else if (child.nodeType === Node.ELEMENT_NODE) {
-          const el = child as HTMLElement;
-          if (el.tagName === "BR") {
-            continue; // empty-line placeholder, no text
-          }
-          walk(el, {
-            bold: fmt.bold || el.tagName === "STRONG" || el.tagName === "B" || cls(el, "rt-bold"),
-            italic: fmt.italic || el.tagName === "EM" || el.tagName === "I" || cls(el, "rt-italic"),
-            underline: fmt.underline || el.tagName === "U" || cls(el, "rt-underline"),
-          });
-        }
+  for (const child of Array.from(root.children)) {
+    if (child.tagName === "UL" || child.tagName === "OL") {
+      const block = child.tagName.toLowerCase() as BlockType;
+      for (const li of Array.from(child.children)) {
+        lines.push({ block, segments: segmentsOf(li) });
       }
-    };
-    walk(block, { bold: false, italic: false, underline: false });
-    lines.push({ block: block.tagName.toLowerCase() as BlockType, segments });
+    } else {
+      lines.push({ block: child.tagName.toLowerCase() as BlockType, segments: segmentsOf(child) });
+    }
   }
   return lines;
 };
-
-const cls = (el: HTMLElement, name: string) => el.classList.contains(name);
 
 export interface Rendered {
   blocks: Line[];
@@ -119,6 +132,29 @@ export const applyFormatBlock = (text: string, block: BlockType): RichText => {
   selection?.addRange(range);
 
   document.execCommand("formatBlock", false, `<${block}>`);
+  const out = readEditor(el, null, "p").delta;
+  el.remove();
+  return { ops: out.ops };
+};
+
+/**
+ * Exercise the toolbar's real `insertUnorderedList`/`insertOrderedList` path on a single line,
+ * then serialize — confirms the browser list command + readEditor produce the expected `block`.
+ */
+export const applyListCommand = (text: string, block: "ul" | "ol"): RichText => {
+  const el = document.createElement("div");
+  el.contentEditable = "true";
+  document.body.appendChild(el);
+  renderDelta(el, new Delta([{ insert: text }]), "p");
+
+  el.focus();
+  const range = document.createRange();
+  range.selectNodeContents(el.firstChild as Node);
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+
+  document.execCommand(block === "ul" ? "insertUnorderedList" : "insertOrderedList", false);
   const out = readEditor(el, null, "p").delta;
   el.remove();
   return { ops: out.ops };
