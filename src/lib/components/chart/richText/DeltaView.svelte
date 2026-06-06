@@ -3,6 +3,7 @@
 <script lang="ts">
   import type { RichText } from "$lib/chart";
   import { deltaToLines, groupLines, toDelta, type BlockType, type Line } from "./richText";
+  import { tagFor } from "./marks/inline";
 
   interface Props {
     /** A document Delta (only insert ops). */
@@ -21,12 +22,16 @@
   let hasContent = $derived(lines.some((line) => line.segments.length > 0));
 </script>
 
+{#snippet marked(text: string, marks: string[], i: number)}{#if i < marks.length}<svelte:element
+      this={tagFor(marks[i])}>{@render marked(text, marks, i + 1)}</svelte:element
+    >{:else}{text}{/if}{/snippet}
+
 {#snippet inline(line: Line)}{#if line.segments.length === 0}<br
-    />{:else}{#each line.segments as segment, j (j)}<span
-        class:rt-bold={segment.bold}
-        class:rt-italic={segment.italic}
-        class:rt-underline={segment.underline}>{segment.text}</span
-      >{/each}{/if}{/snippet}
+    />{:else}{#each line.segments as segment, j (j)}{@render marked(
+        segment.text,
+        segment.marks,
+        0,
+      )}{/each}{/if}{/snippet}
 
 {#if hasContent}
   <!-- One block element per line; runs of list lines collapse into one <ul>/<ol>. -->
@@ -76,13 +81,6 @@
     margin: 0;
     font-size: 1em;
   }
-  .rt-bold {
-    font-weight: bold;
-  }
-  .rt-italic {
-    font-style: italic;
-  }
-  .rt-underline {
-    text-decoration: underline;
-  }
+  /* Inline marks render as semantic elements (strong/em/u/s), so their default browser styling
+     applies — no per-mark CSS needed here. */
 </style>

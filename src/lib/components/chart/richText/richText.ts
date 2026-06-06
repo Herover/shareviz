@@ -12,8 +12,7 @@
 // transformed through the incoming change.
 
 import { Delta } from "rich-text";
-
-export type Attrs = { bold?: true; italic?: true; underline?: true };
+import { inlineMarks, tagFor } from "./marks/inline";
 
 /**
  * Block-level type of a line, stored on the line's terminating newline (Quill convention).
@@ -58,21 +57,19 @@ export const toDelta = (value: unknown): Delta => {
 
 const isBlock = (el: Element): boolean => ["DIV", "P", "H1", "H2", "H3", "LI"].includes(el.tagName);
 
-/** Extend the active inline attributes for an element (tag- or inline-style-based). */
-const extend = (attrs: Attrs, el: HTMLElement): Attrs => {
-  const next: Attrs = { ...attrs };
-  const tag = el.tagName;
-  const style = el.style;
-  const weight = style.fontWeight;
-  if (tag === "B" || tag === "STRONG" || weight === "bold" || Number(weight) >= 700) {
-    next.bold = true;
-  }
-  if (tag === "I" || tag === "EM" || style.fontStyle === "italic") {
-    next.italic = true;
-  }
-  const decoration = `${style.textDecoration} ${style.textDecorationLine}`;
-  if (tag === "U" || decoration.includes("underline")) {
-    next.underline = true;
+/**
+ * Add to `marks` every inline mark implied by `el` — by tag (`<strong>`, `<em>`, …) or by inline
+ * style (execCommand styleWithCSS output, pasted content). Registry-driven, so it covers any
+ * registered mark. Shared by `readEditor` (descending the tree) and the editor toolbar
+ * (ascending from the caret), keeping detection identical in both directions.
+ */
+export const extendMarks = (marks: Set<string>, el: HTMLElement): Set<string> => {
+  const next = new Set(marks);
+  for (const mark of inlineMarks) {
+    const tags = mark.matchTags ?? [mark.tag.toUpperCase()];
+    if (tags.includes(el.tagName) || mark.matchStyle?.(el.style)) {
+      next.add(mark.attr);
+    }
   }
   return next;
 };
@@ -104,11 +101,15 @@ export const readEditor = (
     stopOffset = range.startOffset;
   }
 
-  const insertText = (text: string, attrs: Attrs) => {
+  const insertText = (text: string, marks: Set<string>) => {
     if (!text) {
       return;
     }
-    delta.insert(text, Object.keys(attrs).length ? attrs : undefined);
+    const attributes: Record<string, true> = {};
+    for (const mark of marks) {
+      attributes[mark] = true;
+    }
+    delta.insert(text, marks.size ? attributes : undefined);
     length += text.length;
   };
   const insertNewline = (block?: BlockType) => {
@@ -122,13 +123,13 @@ export const readEditor = (
 
   // `inLine` tracks whether we're already inside the current line's block, so nested blocks
   // (e.g. an <h1> the browser leaves inside an <li>) flatten into it instead of starting a line.
-  const visit = (node: Node, attrs: Attrs, inLine: boolean) => {
+  const visit = (node: Node, marks: Set<string>, inLine: boolean) => {
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.nodeValue ?? "";
       if (caret == null && node === stopNode) {
         caret = length + Math.min(stopOffset, text.length);
       }
-      insertText(text, attrs);
+      insertText(text, marks);
       return;
     }
     if (node.nodeType !== Node.ELEMENT_NODE) {
@@ -150,13 +151,13 @@ export const readEditor = (
     // when it's a leaf (not wrapping a list) and not already inside a line. <ul>/<ol>, inline
     // tags, list-wrapping blocks and nested blocks are all transparent (recursed through).
     const startsLine = el.tagName === "LI" || (isBlock(el) && !inLine && !wrapsList(el));
-    const childAttrs = extend(attrs, el);
+    const childMarks = extendMarks(marks, el);
     const children = Array.from(el.childNodes);
     children.forEach((child, i) => {
       if (caret == null && node === stopNode && i === stopOffset) {
         caret = length;
       }
-      visit(child, childAttrs, inLine || startsLine);
+      visit(child, childMarks, inLine || startsLine);
     });
     if (caret == null && node === stopNode && stopOffset >= children.length) {
       caret = length;
@@ -173,7 +174,7 @@ export const readEditor = (
     if (caret == null && root === stopNode && i === stopOffset) {
       caret = length;
     }
-    visit(child, {}, false);
+    visit(child, new Set(), false);
   });
   if (caret == null && root === stopNode && stopOffset >= topChildren.length) {
     caret = length;
@@ -185,12 +186,10 @@ export const readEditor = (
   return { delta, caret };
 };
 
-/** One run of text sharing the same inline formatting. */
+/** One run of text sharing the same inline formatting (mark `attr`s, in registry order). */
 export interface Segment {
   text: string;
-  bold: boolean;
-  italic: boolean;
-  underline: boolean;
+  marks: string[];
 }
 
 /** A line: its block type plus the inline runs it contains. */
@@ -235,11 +234,7 @@ export const deltaToLines = (delta: Delta, defaultBlock: BlockType = "p"): Line[
       continue; // embeds unsupported in v1
     }
     const attrs = op.attributes ?? {};
-    const inline = {
-      bold: attrs.bold === true,
-      italic: attrs.italic === true,
-      underline: attrs.underline === true,
-    };
+    const marks = inlineMarks.filter((m) => attrs[m.attr] === true).map((m) => m.attr);
     const parts = op.insert.split("\n");
     parts.forEach((part, i) => {
       if (i > 0) {
@@ -251,7 +246,7 @@ export const deltaToLines = (delta: Delta, defaultBlock: BlockType = "p"): Line[
         lines.push({ block: defaultBlock, segments: [] });
       }
       if (part) {
-        lines[lines.length - 1].segments.push({ text: part, ...inline });
+        lines[lines.length - 1].segments.push({ text: part, marks });
       }
     });
   }
@@ -265,20 +260,11 @@ export const deltaToLines = (delta: Delta, defaultBlock: BlockType = "p"): Line[
 
 const makeInline = (segment: Segment): Node => {
   let node: Node = document.createTextNode(segment.text);
-  if (segment.underline) {
-    const u = document.createElement("u");
-    u.appendChild(node);
-    node = u;
-  }
-  if (segment.italic) {
-    const em = document.createElement("em");
-    em.appendChild(node);
-    node = em;
-  }
-  if (segment.bold) {
-    const strong = document.createElement("strong");
-    strong.appendChild(node);
-    node = strong;
+  // Wrap inner→outer so the first registered mark (registry order) ends up outermost.
+  for (let i = segment.marks.length - 1; i >= 0; i--) {
+    const wrap = document.createElement(tagFor(segment.marks[i]));
+    wrap.appendChild(node);
+    node = wrap;
   }
   return node;
 };
@@ -331,17 +317,11 @@ export const normalizeDelta = (delta: Delta, defaultBlock: BlockType = "p"): Del
   const out = new Delta();
   for (const line of deltaToLines(delta, defaultBlock)) {
     for (const segment of line.segments) {
-      const attrs: Attrs = {};
-      if (segment.bold) {
-        attrs.bold = true;
+      const attributes: Record<string, true> = {};
+      for (const mark of segment.marks) {
+        attributes[mark] = true;
       }
-      if (segment.italic) {
-        attrs.italic = true;
-      }
-      if (segment.underline) {
-        attrs.underline = true;
-      }
-      out.insert(segment.text, Object.keys(attrs).length ? attrs : undefined);
+      out.insert(segment.text, segment.marks.length ? attributes : undefined);
     }
     out.insert("\n", { block: line.block });
   }

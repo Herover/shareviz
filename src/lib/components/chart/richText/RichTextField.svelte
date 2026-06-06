@@ -9,14 +9,15 @@
     ShareDBConnection,
   } from "$lib/chartStores/data.svelte";
   import {
+    extendMarks,
     placeCaret,
     readEditor,
     renderDelta,
     toDelta,
-    type Attrs,
     type BlockType,
   } from "./richText";
-  import UserBadge from "./UserBadge.svelte";
+  import { inlineMarks, type InlineMark } from "./marks/inline";
+  import UserBadge from "../UserBadge.svelte";
 
   interface Props {
     connection: ShareDBConnection;
@@ -34,9 +35,9 @@
   let currentDelta = new Delta();
   let composing = false;
   let pendingRemote = false;
-  // Block type at the caret, reflected in the toolbar selector (initialized in onMount).
+  // Block type and active inline marks at the caret, reflected in the toolbar.
   let currentBlock = $state<BlockType>("p");
-  let currentFormat = $state<Attrs>({});
+  let currentMarks = $state<string[]>([]);
 
   const blockOptions: { value: BlockType; label: string; short: string }[] = [
     { value: "h1", label: "Title", short: "H1" },
@@ -94,8 +95,8 @@
     currentDelta = next;
   };
 
-  /** Reflect the block type at the caret in the toolbar selector. */
-  const syncCurrentBlock = () => {
+  /** Reflect the block type and active inline marks at the caret in the toolbar. */
+  const syncToolbar = () => {
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) {
       return;
@@ -105,23 +106,16 @@
       return; // selection isn't in this editor
     }
 
-    currentFormat = {};
-
+    // Climb from the caret to the line's block, collecting inline marks on the way (same
+    // detection as readEditor, via the shared registry-driven `extendMarks`).
+    let marks = new Set<string>();
     let el: HTMLElement | null =
       start.nodeType === Node.ELEMENT_NODE ? (start as HTMLElement) : start.parentElement;
     while (el && el.parentElement !== editorEl) {
-      if (el.tagName == "STRONG" || el.tagName == "B") {
-        currentFormat.bold = true;
-      }
-      if (el.tagName == "EM" || el.tagName == "I") {
-        currentFormat.italic = true;
-      }
-      if (el.tagName == "U") {
-        currentFormat.underline = true;
-      }
-
+      marks = extendMarks(marks, el);
       el = el.parentElement;
     }
+    currentMarks = [...marks];
     // For list items the climb stops at the <ul>/<ol> container (its parent is the editor).
     currentBlock =
       el?.tagName === "H1"
@@ -169,11 +163,11 @@
     }
   };
 
-  const format = (command: "bold" | "italic" | "underline") => {
+  const toggleMark = (mark: InlineMark) => {
     editorEl.focus();
-    document.execCommand(command, false);
-    currentFormat[command] = currentFormat[command] ? undefined : true;
+    document.execCommand(mark.command, false);
     commitLocal();
+    syncToolbar(); // re-read active marks from the DOM after toggling
   };
 
   /** Set the block type of the line(s) in the current selection. */
@@ -187,7 +181,7 @@
       document.execCommand("formatBlock", false, `<${block}>`);
     }
     commitLocal();
-    syncCurrentBlock(); // reflect the actual resulting block (a list toggle may revert to default)
+    syncToolbar(); // reflect the actual resulting block (a list toggle may revert to default)
   };
 
   const onfocusin = () => connection.setLocalSelection(path);
@@ -203,12 +197,12 @@
     currentDelta = readDoc();
     renderDelta(editorEl, currentDelta, defaultBlock);
     connection.doc.on("op", onOp);
-    document.addEventListener("selectionchange", syncCurrentBlock);
+    document.addEventListener("selectionchange", syncToolbar);
   });
   onDestroy(() => {
     connection.doc.removeListener("op", onOp);
     connection.setLocalSelection(null);
-    document.removeEventListener("selectionchange", syncCurrentBlock);
+    document.removeEventListener("selectionchange", syncToolbar);
   });
 </script>
 
@@ -257,33 +251,18 @@
       {/each}
     </div>
     <div class="rich-text-group">
-      <button
-        type="button"
-        class="rich-text-btn"
-        title="Bold"
-        class:active={currentFormat.bold}
-        aria-pressed={currentFormat.bold}
-        onmousedown={(e) => e.preventDefault()}
-        onclick={() => format("bold")}><b>B</b></button
-      >
-      <button
-        type="button"
-        class="rich-text-btn"
-        title="Italic"
-        class:active={currentFormat.italic}
-        aria-pressed={currentFormat.italic}
-        onmousedown={(e) => e.preventDefault()}
-        onclick={() => format("italic")}><i>I</i></button
-      >
-      <button
-        type="button"
-        class="rich-text-btn"
-        title="Underline"
-        class:active={currentFormat.underline}
-        aria-pressed={currentFormat.underline}
-        onmousedown={(e) => e.preventDefault()}
-        onclick={() => format("underline")}><u>U</u></button
-      >
+      {#each inlineMarks as mark (mark.attr)}
+        <button
+          type="button"
+          class="rich-text-btn"
+          title={mark.button.title}
+          class:active={currentMarks.includes(mark.attr)}
+          aria-pressed={currentMarks.includes(mark.attr)}
+          onmousedown={(e) => e.preventDefault()}
+          onclick={() => toggleMark(mark)}
+          ><svelte:element this={mark.tag}>{mark.button.label}</svelte:element></button
+        >
+      {/each}
     </div>
   </div>
 

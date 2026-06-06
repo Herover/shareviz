@@ -5,12 +5,11 @@ import { expect, test } from "@playwright/test";
 import type { RichText } from "../src/lib/chart";
 import type { Rendered } from "./fixtures/richTextRender";
 
-// The editor (`renderDelta`) and the read-only viewer (`DeltaView`) render rich text with
-// deliberately different inline markup (semantic <strong>/<em>/<u> vs <span class="rt-*">),
-// but both now emit one block element (h1/h2/p) per line via the shared `deltaToLines`. We
-// render a battery of Deltas through both in a real browser and assert their canonical
-// block/run forms match. We also round-trip each through the editor's DOM↔Delta serialization
-// to confirm it's a fixed point. See the fixture for how the markup is reduced to a common form.
+// The editor (`renderDelta`) and the read-only viewer (`DeltaView`) both render rich text from
+// the shared `deltaToLines`/mark registry — one block element per line, semantic inline tags
+// (strong/em/u/s). We render a battery of Deltas through both in a real browser and assert their
+// canonical block/marks forms match, and round-trip each through the editor's DOM↔Delta
+// serialization to confirm it's a fixed point. See the fixture for the canonical form.
 
 const CASES: { name: string; delta: RichText; defaultBlock?: BlockTypeName }[] = [
   { name: "plain text", delta: { ops: [{ insert: "Hello world" }] } },
@@ -53,6 +52,14 @@ const CASES: { name: string; delta: RichText; defaultBlock?: BlockTypeName }[] =
     name: "legacy line falls back to defaultBlock (h1)",
     delta: { ops: [{ insert: "Legacy title" }] },
     defaultBlock: "h1",
+  },
+  {
+    name: "strikethrough run followed by plain",
+    delta: { ops: [{ insert: "struck", attributes: { strike: true } }, { insert: " ok" }] },
+  },
+  {
+    name: "bold + strikethrough combined",
+    delta: { ops: [{ insert: "x", attributes: { bold: true, strike: true } }] },
   },
   {
     name: "bulleted list",
@@ -178,6 +185,28 @@ test.describe("rich-text rendering parity", () => {
         [fixtureUrl, block],
       );
       expect(result.ops).toEqual([{ insert: "Item" }, { insert: "\n", attributes: { block } }]);
+    });
+  }
+
+  for (const { command, attr } of [
+    { command: "bold", attr: "bold" },
+    { command: "italic", attr: "italic" },
+    { command: "underline", attr: "underline" },
+    { command: "strikeThrough", attr: "strike" },
+  ] as const) {
+    test(`toolbar inline command sets mark: ${attr}`, async ({ page }) => {
+      await page.goto("/");
+      const result = await page.evaluate<RichText, [string, string]>(
+        async ([url, c]) => {
+          const { applyInlineCommand } = await import(/* @vite-ignore */ url);
+          return applyInlineCommand("Word", c);
+        },
+        [fixtureUrl, command],
+      );
+      expect(result.ops).toEqual([
+        { insert: "Word", attributes: { [attr]: true } },
+        { insert: "\n", attributes: { block: "p" } },
+      ]);
     });
   }
 

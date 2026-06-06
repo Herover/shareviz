@@ -5,55 +5,62 @@
 // specifiers and dedupe Svelte to a single runtime instance shared with the mounted
 // component (importing `mount` separately at runtime yields a second, incompatible instance).
 //
-// Both renderers emit one block element per line (with list lines collapsed into <ul>/<ol>),
-// but with different inline markup: `renderDelta` uses semantic `<strong>`/`<em>`/`<u>`,
-// `DeltaView` uses `<span class="rt-*">`. The shared `canon` walker understands both and
-// flattens lists back to per-<li> lines, reducing each DOM to the same `{ block, segments }[]`
-// form so the spec can assert semantic equivalence.
+// Both renderers emit one block element per line (with list lines collapsed into <ul>/<ol>) and
+// the same semantic inline tags (<strong>/<em>/<u>/<s>) from the shared mark registry. The
+// `canon` walker flattens lists back to per-<li> lines and maps inline tags to mark `attr`s,
+// reducing each DOM to the same `{ block, segments:{text,marks} }[]` form for equivalence checks.
 
 import { mount, unmount } from "svelte";
 import { Delta } from "rich-text";
 import type { RichText } from "../../src/lib/chart";
-import { type BlockType } from "../../src/lib/components/chart/richText";
-import DeltaView from "../../src/lib/components/chart/DeltaView.svelte";
-import { readEditor, renderDelta } from "../../src/lib/components/chart/richText";
+import { type BlockType } from "../../src/lib/components/chart/richText/richText";
+import { inlineMarks } from "../../src/lib/components/chart/richText/marks/inline";
+import DeltaView from "../../src/lib/components/chart/richText/DeltaView.svelte";
+import { readEditor, renderDelta } from "../../src/lib/components/chart/richText/richText";
 
 interface Run {
   text: string;
-  bold: boolean;
-  italic: boolean;
-  underline: boolean;
+  marks: string[];
 }
 interface Line {
   block: BlockType;
   segments: Run[];
 }
 
-const cls = (el: HTMLElement, name: string) => el.classList.contains(name);
+// Upper-case tag name -> mark attr, from the registry.
+const markByTag = new Map<string, string>();
+for (const mark of inlineMarks) {
+  for (const tag of mark.matchTags ?? [mark.tag.toUpperCase()]) {
+    markByTag.set(tag, mark.attr);
+  }
+}
+const orderMarks = (active: Set<string>): string[] =>
+  inlineMarks.filter((m) => active.has(m.attr)).map((m) => m.attr);
 
-/** Collect the inline runs of a single line element (text + active formatting). */
+/** Collect the inline runs of a single line element (text + active marks, in registry order). */
 const segmentsOf = (line: Element): Run[] => {
   const segments: Run[] = [];
-  const walk = (node: Node, fmt: Omit<Run, "text">) => {
+  const walk = (node: Node, active: Set<string>) => {
     for (const child of Array.from(node.childNodes)) {
       if (child.nodeType === Node.TEXT_NODE) {
         if (child.nodeValue) {
-          segments.push({ text: child.nodeValue, ...fmt });
+          segments.push({ text: child.nodeValue, marks: orderMarks(active) });
         }
       } else if (child.nodeType === Node.ELEMENT_NODE) {
         const el = child as HTMLElement;
         if (el.tagName === "BR") {
           continue; // empty-line placeholder, no text
         }
-        walk(el, {
-          bold: fmt.bold || el.tagName === "STRONG" || el.tagName === "B" || cls(el, "rt-bold"),
-          italic: fmt.italic || el.tagName === "EM" || el.tagName === "I" || cls(el, "rt-italic"),
-          underline: fmt.underline || el.tagName === "U" || cls(el, "rt-underline"),
-        });
+        const next = new Set(active);
+        const attr = markByTag.get(el.tagName);
+        if (attr) {
+          next.add(attr);
+        }
+        walk(el, next);
       }
     }
   };
-  walk(line, { bold: false, italic: false, underline: false });
+  walk(line, new Set());
   return segments;
 };
 
@@ -155,6 +162,30 @@ export const applyListCommand = (text: string, block: "ul" | "ol"): RichText => 
   selection?.addRange(range);
 
   document.execCommand(block === "ul" ? "insertUnorderedList" : "insertOrderedList", false);
+  const out = readEditor(el, null, "p").delta;
+  el.remove();
+  return { ops: out.ops };
+};
+
+/**
+ * Exercise an inline mark's real `execCommand` (bold/italic/underline/strikeThrough) on a
+ * selected line, then serialize — confirms the browser command + readEditor produce the
+ * expected inline attribute.
+ */
+export const applyInlineCommand = (text: string, command: string): RichText => {
+  const el = document.createElement("div");
+  el.contentEditable = "true";
+  document.body.appendChild(el);
+  renderDelta(el, new Delta([{ insert: text }]), "p");
+
+  el.focus();
+  const range = document.createRange();
+  range.selectNodeContents(el.firstChild as Node);
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+
+  document.execCommand(command, false);
   const out = readEditor(el, null, "p").delta;
   el.remove();
   return { ops: out.ops };

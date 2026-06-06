@@ -4,7 +4,7 @@ import type { Root } from "./chart";
 import type { Doc } from "sharedb/lib/client";
 import * as json1 from "ot-json1";
 import { formatVersion } from "./initialDoc";
-import { normalizeDelta, toDelta, type BlockType } from "./components/chart/richText";
+import { normalizeDelta, toDelta, type BlockType } from "./components/chart/richText/richText";
 
 /**
  * Applies operations requred to upgrade a chart specification.

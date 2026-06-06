@@ -5,7 +5,7 @@
   import { StyleStore } from "$lib/chartStores/style.svelte";
   import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
   import PresenceField from "../PresenceField.svelte";
-  import RichTextField from "../RichTextField.svelte";
+  import RichTextField from "../richText/RichTextField.svelte";
   import { untrack } from "svelte";
 
   interface Props {

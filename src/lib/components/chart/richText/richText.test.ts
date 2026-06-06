@@ -9,7 +9,7 @@ import { deltaToLines, groupLines, normalizeDelta } from "./richText";
 
 test("plain single line falls back to the default block", () => {
   expect(deltaToLines(new Delta([{ insert: "Hello" }]), "h1")).toEqual([
-    { block: "h1", segments: [{ text: "Hello", bold: false, italic: false, underline: false }] },
+    { block: "h1", segments: [{ text: "Hello", marks: [] }] },
   ]);
 });
 
@@ -25,9 +25,7 @@ test("block type is read from the line-terminating newline", () => {
 
 test("forced trailing newline does not produce a dangling empty line", () => {
   const delta = new Delta([{ insert: "a" }, { insert: "\n", attributes: { block: "h2" } }]);
-  expect(deltaToLines(delta)).toEqual([
-    { block: "h2", segments: [{ text: "a", bold: false, italic: false, underline: false }] },
-  ]);
+  expect(deltaToLines(delta)).toEqual([{ block: "h2", segments: [{ text: "a", marks: [] }] }]);
 });
 
 test("intentional blank middle line is preserved", () => {
@@ -49,14 +47,26 @@ test("empty delta yields one empty line at the default block", () => {
   expect(deltaToLines(new Delta([]), "h1")).toEqual([{ block: "h1", segments: [] }]);
 });
 
-test("inline formatting is carried onto segments", () => {
+test("inline marks are carried onto segments in registry order", () => {
   const delta = new Delta([
-    { insert: "x", attributes: { bold: true, underline: true } },
+    { insert: "x", attributes: { underline: true, bold: true } },
     { insert: "\n", attributes: { block: "p" } },
   ]);
-  expect(deltaToLines(delta)[0].segments).toEqual([
-    { text: "x", bold: true, italic: false, underline: true },
+  // Registry order is bold, italic, underline, strike — regardless of attribute order.
+  expect(deltaToLines(delta)[0].segments).toEqual([{ text: "x", marks: ["bold", "underline"] }]);
+});
+
+test("strikethrough is a first-class mark", () => {
+  const delta = new Delta([
+    { insert: "gone", attributes: { strike: true, bold: true } },
+    { insert: "\n", attributes: { block: "p" } },
   ]);
+  expect(deltaToLines(delta)[0].segments).toEqual([{ text: "gone", marks: ["bold", "strike"] }]);
+  // Round-trips back to attributes through normalizeDelta.
+  expect(normalizeDelta(delta).ops[0]).toEqual({
+    insert: "gone",
+    attributes: { bold: true, strike: true },
+  });
 });
 
 test("normalizeDelta produces a trailing newline with an explicit block attr", () => {
