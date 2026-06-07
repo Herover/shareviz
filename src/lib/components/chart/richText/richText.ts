@@ -3,8 +3,9 @@
 // DOM <-> Quill-Delta helpers for the hand-rolled collaborative rich-text editor.
 //
 // Model: the contenteditable holds one block element per line — `<h1>`/`<h2>`/`<p>` (the
-// `BlockType`), with `<div>` from the browser treated as the field default. Inline formatting
-// is `<strong>`/`<em>`/`<u>`. The document Delta is the inline text with each line terminated
+// `BlockType`), with `<div>` from the browser treated as the field default. Inline formatting is
+// driven by the mark registry (`./marks/inline`): toggle marks (`<strong>`/`<em>`/`<u>`/`<s>`) and
+// color marks (styled `<span>`s). The document Delta is the inline text with each line terminated
 // by a "\n" that carries the line's block type as an attribute (Quill convention), so the
 // document always ends with a newline. The serialize/render pair is a round-trip identity for
 // the deltas we produce, and the caret index counting used by `readEditor` matches the
@@ -12,7 +13,28 @@
 // transformed through the incoming change.
 
 import { Delta } from "rich-text";
-import { inlineMarks, tagFor } from "./marks/inline";
+import chroma from "chroma-js";
+import { inlineMarks } from "./marks/inline";
+
+/**
+ * A mark's value on a segment: `true` for toggle marks (bold/…), a CSS color string for color
+ * marks (text color / highlight). Mirrors the Delta attribute value.
+ */
+export type MarkValue = true | string;
+
+/**
+ * Normalize a CSS color to a safe hex string, or `null` if it is invalid or fully transparent.
+ * Sanitizes stored values before they reach the DOM (no CSS injection) and defines whether a
+ * color mark is considered present.
+ */
+export const safeColor = (value: string): string | null => {
+  try {
+    const color = chroma(value);
+    return color.alpha() > 0 ? color.hex() : null;
+  } catch {
+    return null;
+  }
+};
 
 /**
  * Block-level type of a line, stored on the line's terminating newline (Quill convention).
@@ -63,12 +85,22 @@ const isBlock = (el: Element): boolean => ["DIV", "P", "H1", "H2", "H3", "LI"].i
  * registered mark. Shared by `readEditor` (descending the tree) and the editor toolbar
  * (ascending from the caret), keeping detection identical in both directions.
  */
-export const extendMarks = (marks: Set<string>, el: HTMLElement): Set<string> => {
-  const next = new Set(marks);
+export const extendMarks = (
+  marks: Record<string, MarkValue>,
+  el: HTMLElement,
+): Record<string, MarkValue> => {
+  const next = { ...marks };
   for (const mark of inlineMarks) {
-    const tags = mark.matchTags ?? [mark.tag.toUpperCase()];
-    if (tags.includes(el.tagName) || mark.matchStyle?.(el.style)) {
-      next.add(mark.attr);
+    if (mark.color) {
+      const value = safeColor(el.style.getPropertyValue(mark.color.css));
+      if (value) {
+        next[mark.attr] = value;
+      }
+    } else {
+      const tags = mark.matchTags ?? (mark.tag ? [mark.tag.toUpperCase()] : []);
+      if (tags.includes(el.tagName) || mark.matchStyle?.(el.style)) {
+        next[mark.attr] = true;
+      }
     }
   }
   return next;
@@ -101,15 +133,13 @@ export const readEditor = (
     stopOffset = range.startOffset;
   }
 
-  const insertText = (text: string, marks: Set<string>) => {
+  const insertText = (text: string, marks: Record<string, MarkValue>) => {
     if (!text) {
       return;
     }
-    const attributes: Record<string, true> = {};
-    for (const mark of marks) {
-      attributes[mark] = true;
-    }
-    delta.insert(text, marks.size ? attributes : undefined);
+    // `marks` already holds the per-mark value (true for toggles, a color string for color marks),
+    // i.e. exactly the Delta attributes for this run.
+    delta.insert(text, Object.keys(marks).length ? { ...marks } : undefined);
     length += text.length;
   };
   const insertNewline = (block?: BlockType) => {
@@ -123,7 +153,7 @@ export const readEditor = (
 
   // `inLine` tracks whether we're already inside the current line's block, so nested blocks
   // (e.g. an <h1> the browser leaves inside an <li>) flatten into it instead of starting a line.
-  const visit = (node: Node, marks: Set<string>, inLine: boolean) => {
+  const visit = (node: Node, marks: Record<string, MarkValue>, inLine: boolean) => {
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.nodeValue ?? "";
       if (caret == null && node === stopNode) {
@@ -174,7 +204,7 @@ export const readEditor = (
     if (caret == null && root === stopNode && i === stopOffset) {
       caret = length;
     }
-    visit(child, new Set(), false);
+    visit(child, {}, false);
   });
   if (caret == null && root === stopNode && stopOffset >= topChildren.length) {
     caret = length;
@@ -186,10 +216,10 @@ export const readEditor = (
   return { delta, caret };
 };
 
-/** One run of text sharing the same inline formatting (mark `attr`s, in registry order). */
+/** One run of text sharing the same inline formatting: mark `attr` → value (true or a color). */
 export interface Segment {
   text: string;
-  marks: string[];
+  marks: Record<string, MarkValue>;
 }
 
 /** A line: its block type plus the inline runs it contains. */
@@ -234,7 +264,18 @@ export const deltaToLines = (delta: Delta, defaultBlock: BlockType = "p"): Line[
       continue; // embeds unsupported in v1
     }
     const attrs = op.attributes ?? {};
-    const marks = inlineMarks.filter((m) => attrs[m.attr] === true).map((m) => m.attr);
+    const marks: Record<string, MarkValue> = {};
+    for (const mark of inlineMarks) {
+      const value = attrs[mark.attr];
+      if (mark.color) {
+        const color = typeof value === "string" ? safeColor(value) : null;
+        if (color) {
+          marks[mark.attr] = color;
+        }
+      } else if (value === true) {
+        marks[mark.attr] = true;
+      }
+    }
     const parts = op.insert.split("\n");
     parts.forEach((part, i) => {
       if (i > 0) {
@@ -258,13 +299,55 @@ export const deltaToLines = (delta: Delta, defaultBlock: BlockType = "p"): Line[
   return lines;
 };
 
+/** A render wrapper for one active mark (semantic tag, or a styled `<span>` for color marks). */
+export interface Wrap {
+  tag: string;
+  bg?: string;
+  fg?: string;
+}
+
+/**
+ * Ordered wrappers for a segment's marks, registry order = outermost first. Shared by the editor
+ * (`makeInline`) and the viewer (`DeltaView`) so nesting + color sanitization match exactly.
+ */
+export const inlineWraps = (marks: Record<string, MarkValue>): Wrap[] => {
+  const wraps: Wrap[] = [];
+  for (const mark of inlineMarks) {
+    const value = marks[mark.attr];
+    if (value === undefined) {
+      continue;
+    }
+    if (mark.color) {
+      const color = typeof value === "string" ? safeColor(value) : null;
+      if (color) {
+        wraps.push(
+          mark.color.css === "background-color"
+            ? { tag: "span", bg: color }
+            : { tag: "span", fg: color },
+        );
+      }
+    } else if (mark.tag) {
+      wraps.push({ tag: mark.tag });
+    }
+  }
+  return wraps;
+};
+
 const makeInline = (segment: Segment): Node => {
   let node: Node = document.createTextNode(segment.text);
-  // Wrap inner→outer so the first registered mark (registry order) ends up outermost.
-  for (let i = segment.marks.length - 1; i >= 0; i--) {
-    const wrap = document.createElement(tagFor(segment.marks[i]));
-    wrap.appendChild(node);
-    node = wrap;
+  const wraps = inlineWraps(segment.marks);
+  // Wrap inner→outer so wraps[0] (first registered mark) ends up outermost.
+  for (let i = wraps.length - 1; i >= 0; i--) {
+    const w = wraps[i];
+    const el = document.createElement(w.tag);
+    if (w.bg) {
+      el.style.setProperty("background-color", w.bg);
+    }
+    if (w.fg) {
+      el.style.setProperty("color", w.fg);
+    }
+    el.appendChild(node);
+    node = el;
   }
   return node;
 };
@@ -317,11 +400,8 @@ export const normalizeDelta = (delta: Delta, defaultBlock: BlockType = "p"): Del
   const out = new Delta();
   for (const line of deltaToLines(delta, defaultBlock)) {
     for (const segment of line.segments) {
-      const attributes: Record<string, true> = {};
-      for (const mark of segment.marks) {
-        attributes[mark] = true;
-      }
-      out.insert(segment.text, segment.marks.length ? attributes : undefined);
+      const attributes = { ...segment.marks };
+      out.insert(segment.text, Object.keys(attributes).length ? attributes : undefined);
     }
     out.insert("\n", { block: line.block });
   }

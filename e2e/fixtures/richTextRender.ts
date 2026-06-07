@@ -6,61 +6,51 @@
 // component (importing `mount` separately at runtime yields a second, incompatible instance).
 //
 // Both renderers emit one block element per line (with list lines collapsed into <ul>/<ol>) and
-// the same semantic inline tags (<strong>/<em>/<u>/<s>) from the shared mark registry. The
-// `canon` walker flattens lists back to per-<li> lines and maps inline tags to mark `attr`s,
-// reducing each DOM to the same `{ block, segments:{text,marks} }[]` form for equivalence checks.
+// the same inline markup from the shared mark registry — semantic tags for toggles, styled
+// `<span>`s for color marks. The `canon` walker flattens lists to per-<li> lines and reuses the
+// editor's own `extendMarks` to read each run's marks (incl. color values), reducing both DOMs to
+// the same `{ block, segments:{text,marks} }[]` form for equivalence checks.
 
 import { mount, unmount } from "svelte";
 import { Delta } from "rich-text";
 import type { RichText } from "../../src/lib/chart";
-import { type BlockType } from "../../src/lib/components/chart/richText/richText";
-import { inlineMarks } from "../../src/lib/components/chart/richText/marks/inline";
+import {
+  extendMarks,
+  readEditor,
+  renderDelta,
+  type BlockType,
+  type MarkValue,
+} from "../../src/lib/components/chart/richText/richText";
 import DeltaView from "../../src/lib/components/chart/richText/DeltaView.svelte";
-import { readEditor, renderDelta } from "../../src/lib/components/chart/richText/richText";
 
 interface Run {
   text: string;
-  marks: string[];
+  marks: Record<string, MarkValue>;
 }
 interface Line {
   block: BlockType;
   segments: Run[];
 }
 
-// Upper-case tag name -> mark attr, from the registry.
-const markByTag = new Map<string, string>();
-for (const mark of inlineMarks) {
-  for (const tag of mark.matchTags ?? [mark.tag.toUpperCase()]) {
-    markByTag.set(tag, mark.attr);
-  }
-}
-const orderMarks = (active: Set<string>): string[] =>
-  inlineMarks.filter((m) => active.has(m.attr)).map((m) => m.attr);
-
-/** Collect the inline runs of a single line element (text + active marks, in registry order). */
+/** Collect the inline runs of a single line element, accumulating marks exactly like readEditor. */
 const segmentsOf = (line: Element): Run[] => {
   const segments: Run[] = [];
-  const walk = (node: Node, active: Set<string>) => {
+  const walk = (node: Node, marks: Record<string, MarkValue>) => {
     for (const child of Array.from(node.childNodes)) {
       if (child.nodeType === Node.TEXT_NODE) {
         if (child.nodeValue) {
-          segments.push({ text: child.nodeValue, marks: orderMarks(active) });
+          segments.push({ text: child.nodeValue, marks: { ...marks } });
         }
       } else if (child.nodeType === Node.ELEMENT_NODE) {
         const el = child as HTMLElement;
         if (el.tagName === "BR") {
           continue; // empty-line placeholder, no text
         }
-        const next = new Set(active);
-        const attr = markByTag.get(el.tagName);
-        if (attr) {
-          next.add(attr);
-        }
-        walk(el, next);
+        walk(el, extendMarks(marks, el));
       }
     }
   };
-  walk(line, new Set());
+  walk(line, {});
   return segments;
 };
 
@@ -186,6 +176,31 @@ export const applyInlineCommand = (text: string, command: string): RichText => {
   selection?.addRange(range);
 
   document.execCommand(command, false);
+  const out = readEditor(el, null, "p").delta;
+  el.remove();
+  return { ops: out.ops };
+};
+
+/**
+ * Exercise a color mark's real `foreColor`/`hiliteColor` path (with styleWithCSS) on a selected
+ * line, then serialize — confirms the browser command + readEditor capture the color attribute.
+ */
+export const applyColorCommand = (text: string, command: string, color: string): RichText => {
+  const el = document.createElement("div");
+  el.contentEditable = "true";
+  document.body.appendChild(el);
+  renderDelta(el, new Delta([{ insert: text }]), "p");
+
+  el.focus();
+  const range = document.createRange();
+  range.selectNodeContents(el.firstChild as Node);
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+
+  document.execCommand("styleWithCSS", false, "true");
+  document.execCommand(command, false, color);
+  document.execCommand("styleWithCSS", false, "false");
   const out = readEditor(el, null, "p").delta;
   el.remove();
   return { ops: out.ops };

@@ -15,8 +15,10 @@
     renderDelta,
     toDelta,
     type BlockType,
+    type MarkValue,
   } from "./richText";
   import { inlineMarks, type InlineMark } from "./marks/inline";
+  import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import UserBadge from "../UserBadge.svelte";
 
   interface Props {
@@ -37,7 +39,14 @@
   let pendingRemote = false;
   // Block type and active inline marks at the caret, reflected in the toolbar.
   let currentBlock = $state<BlockType>("p");
-  let currentMarks = $state<string[]>([]);
+  let currentMarks = $state<Record<string, MarkValue>>({});
+  // The editor selection, captured while it's in this editor, so a color can still be applied
+  // after the ColorPicker popout steals focus.
+  let savedRange: Range | null = null;
+
+  // Default colors offered before anything is set (also the swatch shown when none is active).
+  const defaultColor = (mark: InlineMark) =>
+    mark.color?.css === "background-color" ? "#fef08a" : "#111111";
 
   const blockOptions: { value: BlockType; label: string; short: string }[] = [
     { value: "h1", label: "Title", short: "H1" },
@@ -101,21 +110,24 @@
     if (!selection || selection.rangeCount === 0) {
       return;
     }
-    const start = selection.getRangeAt(0).startContainer;
+    const range = selection.getRangeAt(0);
+    const start = range.startContainer;
     if (!editorEl.contains(start)) {
       return; // selection isn't in this editor
     }
+    // Remember the in-editor selection so a color can be applied after the ColorPicker takes focus.
+    savedRange = range.cloneRange();
 
     // Climb from the caret to the line's block, collecting inline marks on the way (same
     // detection as readEditor, via the shared registry-driven `extendMarks`).
-    let marks = new Set<string>();
+    let marks: Record<string, MarkValue> = {};
     let el: HTMLElement | null =
       start.nodeType === Node.ELEMENT_NODE ? (start as HTMLElement) : start.parentElement;
     while (el && el.parentElement !== editorEl) {
       marks = extendMarks(marks, el);
       el = el.parentElement;
     }
-    currentMarks = [...marks];
+    currentMarks = marks;
     // For list items the climb stops at the <ul>/<ol> container (its parent is the editor).
     currentBlock =
       el?.tagName === "H1"
@@ -164,11 +176,37 @@
   };
 
   const toggleMark = (mark: InlineMark) => {
+    if (!mark.command) {
+      return;
+    }
     editorEl.focus();
     document.execCommand(mark.command, false);
     commitLocal();
     syncToolbar(); // re-read active marks from the DOM after toggling
   };
+
+  /** Apply a color mark (text color / highlight) to the saved selection. */
+  const applyColor = (mark: InlineMark, color: string) => {
+    if (!mark.color) {
+      return;
+    }
+    editorEl.focus();
+    if (savedRange) {
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(savedRange);
+    }
+    // styleWithCSS makes foreColor/hiliteColor emit `<span style=…>` (not `<font>`); restore it
+    // afterwards so the toggle marks keep emitting semantic tags.
+    document.execCommand("styleWithCSS", false, "true");
+    document.execCommand(mark.color.command, false, color);
+    document.execCommand("styleWithCSS", false, "false");
+    commitLocal();
+    syncToolbar();
+  };
+
+  /** Clear a color mark by setting it transparent (treated as absent on serialize). */
+  const clearColor = (mark: InlineMark) => applyColor(mark, "transparent");
 
   /** Set the block type of the line(s) in the current selection. */
   const applyBlock = (block: BlockType) => {
@@ -252,16 +290,35 @@
     </div>
     <div class="rich-text-group">
       {#each inlineMarks as mark (mark.attr)}
-        <button
-          type="button"
-          class="rich-text-btn"
-          title={mark.button.title}
-          class:active={currentMarks.includes(mark.attr)}
-          aria-pressed={currentMarks.includes(mark.attr)}
-          onmousedown={(e) => e.preventDefault()}
-          onclick={() => toggleMark(mark)}
-          ><svelte:element this={mark.tag}>{mark.button.label}</svelte:element></button
-        >
+        {#if mark.color}
+          <div class="rich-text-color" title={mark.button.title}>
+            <span class="rich-text-color-label" aria-hidden="true">{mark.button.label}</span>
+            <ColorPicker
+              color={typeof currentMarks[mark.attr] === "string"
+                ? (currentMarks[mark.attr] as string)
+                : defaultColor(mark)}
+              onchange={(c) => applyColor(mark, c.c)}
+            />
+            <button
+              type="button"
+              class="rich-text-btn"
+              title="Remove {mark.button.title.toLowerCase()}"
+              onmousedown={(e) => e.preventDefault()}
+              onclick={() => clearColor(mark)}>×</button
+            >
+          </div>
+        {:else}
+          <button
+            type="button"
+            class="rich-text-btn"
+            title={mark.button.title}
+            class:active={currentMarks[mark.attr] !== undefined}
+            aria-pressed={currentMarks[mark.attr] !== undefined}
+            onmousedown={(e) => e.preventDefault()}
+            onclick={() => toggleMark(mark)}
+            ><svelte:element this={mark.tag ?? "span"}>{mark.button.label}</svelte:element></button
+          >
+        {/if}
       {/each}
     </div>
   </div>
@@ -392,6 +449,17 @@
   }
   .rich-text-group + .rich-text-group {
     border-left: 1px solid var(--border-subtle);
+  }
+  /* Color mark control: label glyph + ColorPicker swatch + remove. */
+  .rich-text-color {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .rich-text-color-label {
+    font-size: 12.5px;
+    line-height: 1;
+    color: var(--fg-secondary);
   }
   .rich-text-btn {
     height: 26px;

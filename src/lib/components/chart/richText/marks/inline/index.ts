@@ -5,16 +5,13 @@ import bold from "./bold";
 import italic from "./italic";
 import underline from "./underline";
 import strike from "./strike";
+import textColor from "./textColor";
+import highlight from "./highlight";
 
 /**
  * The registered inline marks. Array order is the wrap/nesting order (first = outermost) and the
- * toolbar order. To add a mark (e.g. highlight): write one file next to these and add it here.
+ * toolbar order. To add a mark: write one file next to these and add it here.
  */
-export const inlineMarks: InlineMark[] = [bold, italic, underline, strike];
-
-const tagByAttr = new Map(inlineMarks.map((m) => [m.attr, m.tag]));
-
-/** The render element for a mark's `attr` (e.g. "bold" → "strong"). */
-export const tagFor = (attr: string): string => tagByAttr.get(attr) ?? "span";
+export const inlineMarks: InlineMark[] = [bold, italic, underline, strike, textColor, highlight];
 
 export type { InlineMark };

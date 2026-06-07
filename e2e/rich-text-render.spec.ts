@@ -62,6 +62,20 @@ const CASES: { name: string; delta: RichText; defaultBlock?: BlockTypeName }[] =
     delta: { ops: [{ insert: "x", attributes: { bold: true, strike: true } }] },
   },
   {
+    name: "highlight (background color)",
+    delta: {
+      ops: [{ insert: "marked", attributes: { background: "#ffff00" } }, { insert: " ok" }],
+    },
+  },
+  {
+    name: "text color",
+    delta: { ops: [{ insert: "red", attributes: { color: "#ff0000" } }] },
+  },
+  {
+    name: "bold + highlight combined",
+    delta: { ops: [{ insert: "x", attributes: { bold: true, background: "#00ff00" } }] },
+  },
+  {
     name: "bulleted list",
     delta: {
       ops: [
@@ -205,6 +219,26 @@ test.describe("rich-text rendering parity", () => {
       );
       expect(result.ops).toEqual([
         { insert: "Word", attributes: { [attr]: true } },
+        { insert: "\n", attributes: { block: "p" } },
+      ]);
+    });
+  }
+
+  for (const { command, attr } of [
+    { command: "foreColor", attr: "color" },
+    { command: "hiliteColor", attr: "background" },
+  ] as const) {
+    test(`toolbar color command sets mark: ${attr}`, async ({ page }) => {
+      await page.goto("/");
+      const result = await page.evaluate<RichText, [string, string]>(
+        async ([url, c]) => {
+          const { applyColorCommand } = await import(/* @vite-ignore */ url);
+          return applyColorCommand("Word", c, "#ff8800");
+        },
+        [fixtureUrl, command],
+      );
+      expect(result.ops).toEqual([
+        { insert: "Word", attributes: { [attr]: "#ff8800" } },
         { insert: "\n", attributes: { block: "p" } },
       ]);
     });

@@ -2,8 +2,15 @@
 
 <script lang="ts">
   import type { RichText } from "$lib/chart";
-  import { deltaToLines, groupLines, toDelta, type BlockType, type Line } from "./richText";
-  import { tagFor } from "./marks/inline";
+  import {
+    deltaToLines,
+    groupLines,
+    inlineWraps,
+    toDelta,
+    type BlockType,
+    type Line,
+    type Wrap,
+  } from "./richText";
 
   interface Props {
     /** A document Delta (only insert ops). */
@@ -22,14 +29,16 @@
   let hasContent = $derived(lines.some((line) => line.segments.length > 0));
 </script>
 
-{#snippet marked(text: string, marks: string[], i: number)}{#if i < marks.length}<svelte:element
-      this={tagFor(marks[i])}>{@render marked(text, marks, i + 1)}</svelte:element
+{#snippet marked(text: string, wraps: Wrap[], i: number)}{#if i < wraps.length}<svelte:element
+      this={wraps[i].tag}
+      style:background-color={wraps[i].bg}
+      style:color={wraps[i].fg}>{@render marked(text, wraps, i + 1)}</svelte:element
     >{:else}{text}{/if}{/snippet}
 
 {#snippet inline(line: Line)}{#if line.segments.length === 0}<br
     />{:else}{#each line.segments as segment, j (j)}{@render marked(
         segment.text,
-        segment.marks,
+        inlineWraps(segment.marks),
         0,
       )}{/each}{/if}{/snippet}
 
