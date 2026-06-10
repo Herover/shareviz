@@ -5,6 +5,7 @@
 
 <script lang="ts">
   import Icon from "../Icon.svelte";
+  import Pill from "../Pill.svelte";
   import UserBadge from "../chart/UserBadge.svelte";
 
   interface Props {
@@ -27,11 +28,15 @@
   <div class="member-id">
     <div class="member-name">
       {name ?? "Unknown user"}
-      {#if isYou}<span class="you-badge">You</span>{/if}
+      {#if isYou}<Pill mono uppercase tone="secondary">You</Pill>{/if}
     </div>
     {#if email}<div class="member-email">{email}</div>{/if}
   </div>
-  <span class="role-pill" class:is-admin={isAdmin}>{roleLabel}</span>
+  {#if isAdmin}
+    <Pill variant="solid" tone="primary" size="md">{roleLabel}</Pill>
+  {:else}
+    <Pill variant="outline" size="md">{roleLabel}</Pill>
+  {/if}
   {#if onRemove}
     <button
       class="member-remove"
@@ -72,17 +77,6 @@
     font-weight: 600;
     color: var(--fg-primary);
   }
-  .you-badge {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--accent-secondary);
-    background: var(--accent-secondary-subtle);
-    padding: 1px 6px;
-    border-radius: var(--radius-pill);
-  }
   .member-email {
     font-family: var(--font-mono);
     font-size: 0.78rem;
@@ -91,25 +85,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-  .role-pill {
-    flex-shrink: 0;
-    height: 30px;
-    display: inline-flex;
-    align-items: center;
-    padding: 0 12px;
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-pill);
-    background: var(--bg-surface);
-    color: var(--fg-secondary);
-    font-family: var(--font-body);
-    font-size: 0.82rem;
-    font-weight: 500;
-  }
-  .role-pill.is-admin {
-    color: var(--fg-on-accent);
-    border-color: var(--accent-primary);
-    background-color: var(--accent-primary);
   }
   .member-remove {
     width: 30px;
