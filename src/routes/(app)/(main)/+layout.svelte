@@ -7,6 +7,7 @@
   import { addTeam } from "$lib/api";
   import NavDropdown from "$lib/components/NavDropdown.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import Brand from "$lib/components/Brand.svelte";
   import { notifications } from "$lib/notificationStore";
 
   interface Props {
@@ -32,42 +33,9 @@
 </script>
 
 <header class="ch-nav">
-  <a class="ch-nav-brand" href={resolve("/(app)/(main)/org", {})}>
-    <svg width="22" height="22" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-      <ellipse
-        cx="24"
-        cy="24"
-        rx="18"
-        ry="12"
-        fill="var(--color-warm-100)"
-        stroke="var(--accent-primary)"
-        stroke-width="1.5"
-      />
-      <path
-        d="M8 20 Q24 14 40 20"
-        stroke="var(--accent-primary)"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        fill="none"
-      />
-      <path
-        d="M8 24 Q24 18 40 24"
-        stroke="var(--accent-primary)"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        fill="none"
-      />
-      <path
-        d="M8 28 Q24 22 40 28"
-        stroke="var(--accent-primary)"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        fill="none"
-      />
-      <circle cx="24" cy="24" r="2.5" fill="var(--accent-primary)" />
-    </svg>
-    <span>Data<span class="b-tortilla">Tortilla</span></span>
-  </a>
+  <div class="ch-nav-brand">
+    <Brand href={resolve("/(app)/(main)/org", {})} />
+  </div>
 
   <div class="ch-nav-items">
     {#if page.params.organizationId}
@@ -174,18 +142,9 @@
   .ch-nav-brand {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    color: var(--fg-primary);
-    text-decoration: none;
-    letter-spacing: -0.01em;
     padding-right: 24px;
     border-right: 1px solid var(--border-subtle);
     margin-right: 4px;
-  }
-  .ch-nav-brand .b-tortilla {
-    color: var(--accent-primary);
   }
   .ch-nav-items {
     display: flex;

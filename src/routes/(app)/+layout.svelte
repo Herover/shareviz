@@ -157,6 +157,16 @@
       --badge-date-bg: var(--color-sage-100);
       --badge-date-fg: var(--color-sage-600);
 
+      /* Data-viz categorical palette (6-step) — chart series & brand marks.
+         Use these named tokens (not raw scale colors) so series stay legible
+         in both themes; dark variants are set in body.dark-mode below. */
+      --data-cat-1: var(--color-terra-500);
+      --data-cat-2: var(--color-slate-500);
+      --data-cat-3: var(--color-amber-400);
+      --data-cat-4: var(--color-sage-400);
+      --data-cat-5: #8c5f9e;
+      --data-cat-6: #3a8fa8;
+
       /* Deep inset panel (e.g. format hint) — intentionally dark in both themes */
       --bg-deep: var(--color-warm-900);
       --fg-on-deep: var(--color-warm-50);
@@ -320,6 +330,14 @@
       --badge-text-fg: var(--fg-secondary);
       --badge-date-bg: var(--color-sage-600);
       --badge-date-fg: var(--color-sage-100);
+
+      /* Data-viz categorical palette — dark variants (brighter for dark bg) */
+      --data-cat-1: var(--color-terra-400);
+      --data-cat-2: var(--color-slate-300);
+      --data-cat-3: var(--color-amber-300);
+      --data-cat-4: var(--color-sage-300);
+      --data-cat-5: #b190c0;
+      --data-cat-6: #7ab7cb;
     }
 
     @font-face {
