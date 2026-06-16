@@ -15,7 +15,6 @@
   let expanded = $state(false);
 
   const visible = $derived(expanded ? tags : tags.slice(0, MAX_VISIBLE_TAGS));
-  $inspect(visible)
   const hiddenCount = $derived(Math.max(0, tags.length - MAX_VISIBLE_TAGS));
   const hiddenPreview = $derived(
     tags
