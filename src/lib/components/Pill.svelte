@@ -10,9 +10,11 @@
     /** Fill style. */
     variant?: "soft" | "outline" | "solid";
     /** Color family applied to the chosen variant. */
-    tone?: "neutral" | "primary" | "secondary";
+    tone?: "neutral" | "primary" | "secondary" | "warning";
     /** Size preset. */
     size?: "sm" | "md";
+    /** Squared-off corners instead of a fully rounded pill. */
+    square?: boolean;
     /** Monospace font (for tags / codes). */
     mono?: boolean;
     /** Uppercase label styling (tracking + heavier weight). */
@@ -29,6 +31,7 @@
     variant = "soft",
     tone = "neutral",
     size = "sm",
+    square = false,
     mono = false,
     uppercase = false,
     color,
@@ -39,6 +42,7 @@
 
 <span
   class="pill {variant} {tone} {size}"
+  class:square
   class:mono
   class:uppercase
   class:interactive
@@ -59,6 +63,9 @@
     font-weight: 500;
     line-height: 1;
     white-space: nowrap;
+  }
+  .pill.square {
+    border-radius: var(--radius-sm);
   }
   .pill.mono {
     font-family: var(--font-mono);
@@ -92,6 +99,16 @@
   .pill.soft.secondary {
     background: var(--accent-secondary-subtle);
     color: var(--accent-secondary);
+  }
+  .pill.soft.warning {
+    background: var(--color-amber-100);
+    border-color: color-mix(in oklab, var(--color-amber-500) 25%, transparent);
+    color: var(--color-amber-700);
+  }
+  :global(body.dark-mode) .pill.soft.warning {
+    background: color-mix(in oklab, var(--color-amber-700) 35%, transparent);
+    border-color: color-mix(in oklab, var(--color-amber-300) 25%, transparent);
+    color: var(--color-amber-200);
   }
 
   /* outline — bordered surface */

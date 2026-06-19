@@ -4,13 +4,16 @@
   import type { Root } from "$lib/chart";
   import type { File } from "./types";
   import type { EditorChartData, ViewerMessage } from "$lib/viewerData";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, untrack } from "svelte";
 
   interface Props {
     item: File;
+    /** Chart to render directly (e.g. local/example charts). When omitted, the
+        chart data is fetched from the API using `item.id` (synced charts). */
+    chart?: Root;
   }
 
-  let { item }: Props = $props();
+  let { item, chart }: Props = $props();
 
   const ZOOM = 1.5;
 
@@ -20,7 +23,9 @@
   // Gates the iframe + data fetch until the card scrolls into view.
   let isVisible = $state(false);
 
-  let data: Root | "pending" | undefined;
+  // Capture the provided chart's initial value (it doesn't change per card);
+  // when absent, `data` is fetched from the API below.
+  let data: Root | "pending" | undefined = untrack(() => chart);
 
   const updateViewer = () => {
     if (!data || data == "pending") {
@@ -31,7 +36,7 @@
       {
         type: "CHART_DATA",
         data: {
-          chart: data,
+          chart: $state.snapshot(data),
         },
       } as EditorChartData,
       env.PUBLIC_VIEWER_ORIGIN,

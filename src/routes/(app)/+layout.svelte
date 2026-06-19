@@ -4,6 +4,7 @@
   import { run } from "svelte/legacy";
 
   import "$lib/common.css";
+  import { browser } from "$app/environment";
   import { page } from "$app/stores";
   import { user } from "$lib/userStore";
   import { settings } from "$lib/settingsStore.svelte";
@@ -29,7 +30,9 @@
   });
 
   // TODO: UI
-  (window as any).setTheme = (theme: typeof settings.theme) => (settings.theme = theme);
+  if (browser) {
+    (window as any).setTheme = (theme: typeof settings.theme) => (settings.theme = theme);
+  }
 </script>
 
 <NotificationArea />

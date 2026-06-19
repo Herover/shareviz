@@ -17,7 +17,15 @@ import { createLocalDoc } from "./localShareDBDoc";
 
 const logger = getLogger();
 
+export interface LocalChartMeta {
+  created: number;
+  updated: number;
+  chartRef: string;
+  id: string;
+}
+
 export const localPrefix = "local-";
+export const localMetaPrefix = "localmeta-";
 
 export const getLocalDoc = (collection: string, id: string): Doc => {
   const initial = localStorage.getItem(collection + "-" + id);
@@ -26,11 +34,29 @@ export const getLocalDoc = (collection: string, id: string): Doc => {
   });
 };
 
-export const getLocalDocs = () => {
-  return Object.keys(localStorage).map((id) => ({
-    id: id.substring("examples-".length),
-    data: JSON.parse(localStorage[id]),
-  }));
+export const getLocalDocs = (): (LocalChartMeta & { data: Root })[] => {
+  return Object.keys(localStorage)
+    .filter((id) => id.startsWith("examples-" + localPrefix))
+    .map((id) => {
+      const data: Root = JSON.parse(localStorage[id]);
+      const metaId = localMetaPrefix + id;
+
+      let metaStr = localStorage.getItem(metaId);
+      let meta: LocalChartMeta;
+      if (!metaStr) {
+        meta = {
+          created: Date.now(),
+          updated: Date.now(),
+          chartRef: id.slice("examples-".length),
+          id: id.slice("examples-".length),
+        };
+        metaStr = JSON.stringify(meta);
+        localStorage.setItem(metaId, metaStr);
+      }
+      meta = JSON.parse(metaStr);
+
+      return { ...meta, data };
+    });
 };
 
 export const db = (function createDB() {
@@ -161,6 +187,18 @@ export const db = (function createDB() {
           doc.create(typeof data == "string" ? data : defDoc, json1.type.uri, () => resolve(docId));
         }
       });
+    },
+
+    /**
+     * Create a new local draft seeded with existing chart data (e.g. a copy of
+     * an example chart) and return its local id. Persists straight to
+     * localStorage via the local doc, so the editor can open it like any draft.
+     */
+    createLocalFrom: (chartData: Root): string => {
+      const docId = localPrefix + crypto.randomUUID();
+      const localDoc = getLocalDoc("examples", docId);
+      localDoc.create(chartData, json1.type.uri, () => {});
+      return docId;
     },
 
     getRecent: (): Promise<any> => {

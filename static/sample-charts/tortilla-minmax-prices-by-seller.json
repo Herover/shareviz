@@ -1,0 +1,228 @@
+{
+  "m": { "v": 9 },
+  "data": {
+    "sets": [
+      {
+        "id": "51817a6d-616e-48c3-b4ab-761f0624d212",
+        "type": "tsv",
+        "transpose": [
+          {
+            "keyType": "text",
+            "keyDateFormat": "",
+            "valueDateFormat": "",
+            "from": ["Max - Price per kilogram", "Min - Price per kilogram"],
+            "toKey": "minmax",
+            "toValue": "price",
+            "valueType": "number"
+          }
+        ],
+        "name": "richave/tortilla-prices-in-mexico",
+        "raw": "Store type\tYear\tMax - Price per kilogram\tMin - Price per kilogram\nBig Retail Store\t2007\t8.5\t3.87\nBig Retail Store\t2008\t6.9\t4.03\nBig Retail Store\t2009\t8.1\t-\nBig Retail Store\t2010\t8.5\t5.07\nBig Retail Store\t2011\t9.67\t5.8\nBig Retail Store\t2012\t11.5\t7.33\nBig Retail Store\t2013\t11.7\t7.33\nBig Retail Store\t2014\t11.57\t7.5\nBig Retail Store\t2015\t11.56\t7.5\nBig Retail Store\t2016\t12.4\t7.5\nBig Retail Store\t2017\t12.8\t7.5\nBig Retail Store\t2018\t12.93\t9.2\nBig Retail Store\t2019\t16\t9.33\nBig Retail Store\t2020\t16\t9.5\nBig Retail Store\t2021\t19\t9.63\nBig Retail Store\t2022\t19.6\t10.1\nBig Retail Store\t2023\t21.73\t10.5\nBig Retail Store\t2024\t20.97\t11.6\nBig Retail Store\t2025\t20.63\t11.63\nBig Retail Store\t2026\t20.13\t12.47\nMom and Pop Store\t2007\t12\t7.1\nMom and Pop Store\t2008\t13\t7.13\nMom and Pop Store\t2009\t13\t7\nMom and Pop Store\t2010\t13.8\t7.1\nMom and Pop Store\t2011\t15.5\t7.2\nMom and Pop Store\t2012\t16.5\t8.8\nMom and Pop Store\t2013\t17.33\t8.6\nMom and Pop Store\t2014\t17.4\t8.4\nMom and Pop Store\t2015\t18\t8.4\nMom and Pop Store\t2016\t19\t8.4\nMom and Pop Store\t2017\t19.83\t9.2\nMom and Pop Store\t2018\t20.17\t9.2\nMom and Pop Store\t2019\t21.17\t10.6\nMom and Pop Store\t2020\t22.67\t10.6\nMom and Pop Store\t2021\t25.33\t11.2\nMom and Pop Store\t2022\t30\t12.8\nMom and Pop Store\t2023\t30.83\t15\nMom and Pop Store\t2024\t31\t15.6\nMom and Pop Store\t2025\t32.14\t15.6\nMom and Pop Store\t2026\t33.29\t15.75\n",
+        "rows": [
+          { "key": "Store type", "type": "text", "dateFormat": "" },
+          { "key": "Year", "type": "number", "dateFormat": "" },
+          { "key": "Max - Price per kilogram", "type": "number", "dateFormat": "" },
+          { "key": "Min - Price per kilogram", "type": "number", "dateFormat": "" }
+        ]
+      }
+    ]
+  },
+  "chart": {
+    "title": {
+      "ops": [
+        { "insert": "Not a equal increase" },
+        { "insert": "\n", "attributes": { "block": "h1" } }
+      ]
+    },
+    "subTitle": {
+      "ops": [
+        {
+          "insert": "The cheapest big retail store sells tortillas for a third of the most expensive mom and pops store (Mexican pesos/kg.)"
+        },
+        { "insert": "\n", "attributes": { "block": "p" } }
+      ]
+    },
+    "height": 500,
+    "sourceTextRightLink": "",
+    "chartType": "hBar",
+    "scales": [
+      { "name": "x", "dataKey": "antal", "type": "linear", "dataRange": [0, 15000000] },
+      {
+        "name": "color",
+        "dataKey": "",
+        "type": "categoriesColor",
+        "colors": {
+          "default": { "light": { "c": "#888888", "v": "#888888" } },
+          "byKey": [
+            { "k": "2023", "c": { "light": { "c": "#aa2222", "v": "#aa2222" } }, "legend": "2023" },
+            { "k": "2022", "c": { "light": { "c": "#ff8888", "v": "#ff8888" } }, "legend": "2022" }
+          ]
+        }
+      },
+      { "name": "lineX", "dataKey": "tid", "type": "linear", "dataRange": [2010, 2023] },
+      { "name": "lineY", "dataKey": "antal", "type": "linear", "dataRange": [0, 15000000] }
+    ],
+    "elements": [
+      {
+        "type": "line",
+        "id": "b13e073d-b5a6-425c-a57f-8a6e8face465",
+        "d": {
+          "x": {
+            "scale": "lineX",
+            "axis": {
+              "location": "end",
+              "labelSpace": 8,
+              "orientation": "horizontal",
+              "repeat": "first",
+              "major": {
+                "grid": false,
+                "enabled": true,
+                "tickSize": 8,
+                "tickWidth": 1,
+                "labelDivide": 1,
+                "labelThousands": "",
+                "afterLabel": "",
+                "auto": { "from": "", "each": 10, "labels": true },
+                "ticks": []
+              },
+              "minor": {
+                "grid": false,
+                "enabled": true,
+                "tickSize": 4,
+                "tickWidth": 1,
+                "labelDivide": 1,
+                "labelThousands": "",
+                "afterLabel": "",
+                "auto": { "from": "", "each": 1, "labels": false },
+                "ticks": []
+              }
+            },
+            "key": "Year"
+          },
+          "y": {
+            "scale": "lineY",
+            "axis": {
+              "location": "end",
+              "labelSpace": 8,
+              "orientation": "vertical",
+              "repeat": "first",
+              "major": {
+                "grid": true,
+                "enabled": true,
+                "tickSize": 8,
+                "tickWidth": 1,
+                "labelDivide": 1,
+                "labelThousands": ",",
+                "afterLabel": "",
+                "auto": { "from": "", "each": 10, "labels": true },
+                "ticks": []
+              },
+              "minor": {
+                "grid": false,
+                "enabled": false,
+                "tickSize": 8,
+                "tickWidth": 1,
+                "labelDivide": 1,
+                "labelThousands": "",
+                "afterLabel": "",
+                "auto": { "from": "", "each": 1, "labels": false },
+                "ticks": []
+              }
+            },
+            "key": "price"
+          },
+          "fill": false,
+          "stack": false,
+          "heightRatio": 0.9,
+          "style": {
+            "default": {
+              "k": "",
+              "color": { "light": { "c": "#000", "v": "#000" } },
+              "contextColor": { "light": { "c": "#000", "v": "#000" } },
+              "width": 1,
+              "label": {
+                "text": "",
+                "location": "right",
+                "color": { "light": { "c": "#000", "v": "#000" } },
+                "x": 0,
+                "y": 0,
+                "rx": 0,
+                "ry": 0,
+                "line": "none"
+              },
+              "symbols": "none",
+              "missingStyle": "dashed"
+            },
+            "byKey": [
+              {
+                "k": "Max - Price per kilogram",
+                "contextColor": { "light": { "c": "#000000", "d": "#000000" } },
+                "label": {
+                  "color": { "light": { "c": "#000000", "d": "#000000" } },
+                  "x": 0,
+                  "y": 0,
+                  "rx": 0,
+                  "ry": -32,
+                  "line": "line",
+                  "location": "legend",
+                  "text": "Most expensive"
+                },
+                "missingStyle": "dashed",
+                "symbols": "none",
+                "color": { "light": { "c": "#e31a1c", "v": "#e31a1c" } },
+                "width": 3
+              },
+              {
+                "k": "Min - Price per kilogram",
+                "contextColor": { "light": { "c": "#000000", "d": "#000000" } },
+                "label": {
+                  "color": { "light": { "c": "#000000", "d": "#000000" } },
+                  "x": 0,
+                  "y": 0,
+                  "rx": 0,
+                  "ry": -32,
+                  "line": "line",
+                  "location": "legend",
+                  "text": "Cheapest"
+                },
+                "missingStyle": "dashed",
+                "symbols": "none",
+                "color": { "light": { "c": "#fb9a99", "v": "#fb9a99" } },
+                "width": 3
+              }
+            ]
+          },
+          "repeatSettings": {
+            "default": { "k": "", "title": "", "allCharts": false, "ownChart": false },
+            "byKey": [
+              { "k": "Mom and Pop Store", "title": "", "allCharts": false, "ownChart": true },
+              { "k": "Big Retail Store", "title": "", "allCharts": false, "ownChart": true }
+            ]
+          },
+          "dataSet": "51817a6d-616e-48c3-b4ab-761f0624d212",
+          "categories": "minmax",
+          "repeat": "Store type",
+          "repeatColumns": 2
+        }
+      }
+    ],
+    "sourceTextLeft": "Source: National Market Information and Integration System (SNIIM) via richave on Kaggle",
+    "sourceTextLeftLink": "https://www.kaggle.com/datasets/richave/tortilla-prices-in-mexico",
+    "sourceTextRight": "DataTortilla",
+    "width": 480
+  },
+  "style": {
+    "marginTop": 16,
+    "marginBottom": 16,
+    "marginLeft": 16,
+    "marginRight": 16,
+    "titleSize": 2,
+    "titleBold": true,
+    "subTitleSize": 1.1,
+    "subTitleBold": true,
+    "sourceMargin": 8,
+    "bgColor": "#ffffff",
+    "textColor": "#000000",
+    "css": ""
+  }
+}

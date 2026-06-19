@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
+import { browser } from "$app/environment";
 import { MediaQuery } from "svelte/reactivity";
 
 export type UserSettings = {
@@ -13,7 +14,8 @@ const defaultSettings: UserSettings = {
 };
 
 const getSettings = () => {
-  const settingsStr = localStorage.getItem(settingsStorageKey);
+  // localStorage is unavailable during SSR; fall back to defaults on the server.
+  const settingsStr = browser ? localStorage.getItem(settingsStorageKey) : null;
   if (typeof settingsStr == "string") {
     return JSON.parse(settingsStr);
   } else {
@@ -38,7 +40,9 @@ class Settings {
    * Call whenever something changes that needs remembering, eg. rawSettings is modified.
    */
   save() {
-    localStorage.setItem(settingsStorageKey, JSON.stringify(this.rawSettings));
+    if (browser) {
+      localStorage.setItem(settingsStorageKey, JSON.stringify(this.rawSettings));
+    }
   }
 
   cycleTheme() {

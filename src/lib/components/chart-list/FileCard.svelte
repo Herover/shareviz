@@ -5,6 +5,7 @@
   import ChartPreview from "./ChartPreview.svelte";
   import FileTags from "./FileTags.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import type { Root } from "$lib/chart";
   import type { FolderItem } from "./types";
 
   /* eslint-disable svelte/no-navigation-without-resolve */
@@ -13,9 +14,12 @@
     item: FolderItem;
     link: string;
     onChangeFolder?: (id: string) => void;
+    /** Chart data to render directly in the preview (local/example charts that
+        aren't backed by the synced chart API). */
+    chart?: Root;
   }
 
-  let { item, link, onChangeFolder }: Props = $props();
+  let { item, link, onChangeFolder, chart }: Props = $props();
 </script>
 
 <a
@@ -29,7 +33,7 @@
       <Icon name="folder" size={48} stroke={1.25} />
     {:else}
       <div class="ch-grid-preview-placeholder" aria-hidden="true">
-        <ChartPreview {item} />
+        <ChartPreview {item} {chart} />
       </div>
       <div class="ch-grid-preview-overlay"></div>
     {/if}
