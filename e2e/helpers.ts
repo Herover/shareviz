@@ -28,19 +28,20 @@ export const DEFAULT_PASSWORD = "test-password-1234";
 
 export async function signUp(page: Page, email: string, password = DEFAULT_PASSWORD) {
   await page.goto("/signup");
-  await page.getByLabel("E-mail").fill(email);
+  await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByLabel("Repeat password").fill(password);
-  await page.getByRole("button", { name: "Create user" }).click();
+  await page.getByRole("button", { name: "Create account" }).click();
   // Signup redirects to /me on success.
   await page.waitForURL(/\/me(\/|$|\?)/);
 }
 
 export async function signIn(page: Page, email: string, password = DEFAULT_PASSWORD) {
   await page.goto("/");
-  await page.getByLabel("Username").fill(email);
-  await page.getByLabel("Password").fill(password);
-  await page.getByRole("button", { name: "Login" }).click();
+  await page.getByLabel("Email").fill(email);
+  // exact: the page also has a "Show password" reveal button.
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Sign in" }).click();
   await page.waitForURL(/\/me(\/|$|\?)/);
 }
 

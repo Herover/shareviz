@@ -16,10 +16,10 @@ test.describe("auth", () => {
     await signOut(page);
 
     await page.goto("/signup");
-    await page.getByLabel("E-mail").fill(email);
+    await page.getByLabel("Email").fill(email);
     await page.getByLabel("Password", { exact: true }).fill(DEFAULT_PASSWORD);
     await page.getByLabel("Repeat password").fill(DEFAULT_PASSWORD);
-    await page.getByRole("button", { name: "Create user" }).click();
+    await page.getByRole("button", { name: "Create account" }).click();
 
     // Server redirects back to /signup?msg=email when the email is taken.
     await page.waitForURL(/\/signup\?msg=email/);
@@ -45,9 +45,10 @@ test.describe("auth", () => {
     await signOut(page);
 
     await page.goto("/");
-    await page.getByLabel("Username").fill(email);
-    await page.getByLabel("Password").fill("totally-wrong-password");
-    await page.getByRole("button", { name: "Login" }).click();
+    await page.getByLabel("Email").fill(email);
+    // exact: the page also has a "Show password" reveal button.
+    await page.getByLabel("Password", { exact: true }).fill("totally-wrong-password");
+    await page.getByRole("button", { name: "Sign in" }).click();
 
     // password_error redirect lands back on "/" with the msg flag.
     await page.waitForURL(/\/\?msg=password_error/);
