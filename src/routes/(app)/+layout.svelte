@@ -480,5 +480,150 @@
     button.btn-primary:hover {
       background-color: var(--accent-primary-hover);
     }
+
+    /* ============================================================
+    AUTH PAGES (login / signup) — shared full-screen shell + form kit.
+    Namespaced under .auth-shell so generic names (.input, .btn-primary,
+    .topbar) don't collide with the rest of the app. Add `auth-shell` to an
+    auth page's root element to opt in; page-specific layout stays in the page.
+    ============================================================ */
+    .auth-shell {
+      min-height: 100vh;
+      background: radial-gradient(
+          1200px 600px at 88% 110%,
+          color-mix(in oklab, var(--accent-primary) 7%, transparent),
+          transparent 60%
+        ),
+        radial-gradient(
+          900px 500px at 5% -10%,
+          color-mix(in oklab, var(--color-amber-300) 6%, transparent),
+          transparent 55%
+        ),
+        var(--bg-base);
+    }
+    .auth-shell .topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      height: 56px;
+      padding: 0 28px;
+      position: relative;
+      z-index: 5;
+    }
+    .auth-shell .top-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .auth-shell .auth-head {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .auth-shell .auth-head h2 {
+      font-family: var(--font-display);
+      font-size: 34px;
+      line-height: 1.05;
+      letter-spacing: -0.015em;
+      color: var(--fg-primary);
+      font-weight: 400;
+    }
+    .auth-shell .auth-head p {
+      font-size: 13.5px;
+      color: var(--fg-secondary);
+    }
+    .auth-shell .auth-head p a {
+      color: var(--color-link);
+      text-decoration: none;
+      border-bottom: 1px solid color-mix(in oklab, var(--color-link) 35%, transparent);
+    }
+    .auth-shell .auth-head p a:hover {
+      color: var(--color-link-hover);
+      border-color: var(--color-link-hover);
+    }
+    .auth-shell .form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .auth-shell .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .auth-shell .field-label {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--fg-secondary);
+      letter-spacing: 0.01em;
+    }
+    .auth-shell .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .auth-shell .input-wrap .input-ic {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      color: var(--fg-tertiary);
+      pointer-events: none;
+    }
+    .auth-shell .input {
+      width: 100%;
+      height: 40px;
+      padding: 0 14px 0 38px;
+      border: 1px solid var(--border-default);
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--fg-primary);
+      transition:
+        border-color var(--duration-micro) var(--ease-standard),
+        box-shadow var(--duration-micro) var(--ease-standard);
+    }
+    .auth-shell .input::placeholder {
+      color: var(--fg-tertiary);
+    }
+    .auth-shell .input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--border-focus) 22%, transparent);
+    }
+    .auth-shell .btn-primary {
+      height: 42px;
+      margin-top: 4px;
+      border-radius: var(--radius-md);
+      background: var(--accent-primary);
+      color: var(--fg-inverse);
+      border: 1px solid var(--accent-primary);
+      font-size: 14px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition:
+        background var(--duration-micro) var(--ease-standard),
+        border-color var(--duration-micro) var(--ease-standard),
+        transform var(--duration-micro) var(--ease-standard);
+    }
+    .auth-shell .btn-primary:hover:enabled {
+      background: var(--accent-primary-hover);
+      border-color: var(--accent-primary-hover);
+    }
+    .auth-shell .btn-primary:active:enabled {
+      transform: scale(0.985);
+      background: var(--accent-primary-press);
+    }
+    .auth-shell .btn-primary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
   }
 </style>

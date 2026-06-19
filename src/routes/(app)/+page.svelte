@@ -92,7 +92,7 @@
   });
 </script>
 
-<div class="page">
+<div class="page auth-shell">
   <!-- LEFT: topbar + editorial intro -->
   <div class="left">
     <header class="topbar">
@@ -283,18 +283,6 @@
   .page {
     display: grid;
     grid-template-columns: minmax(420px, 1fr) minmax(440px, 520px);
-    min-height: 100vh;
-    background: radial-gradient(
-        1200px 600px at 88% 110%,
-        color-mix(in oklab, var(--accent-primary) 7%, transparent),
-        transparent 60%
-      ),
-      radial-gradient(
-        900px 500px at 5% -10%,
-        color-mix(in oklab, var(--color-amber-300) 6%, transparent),
-        transparent 55%
-      ),
-      var(--bg-base);
   }
 
   .left {
@@ -302,23 +290,6 @@
     flex-direction: column;
     min-width: 0;
     border-right: 1px solid var(--border-subtle);
-  }
-
-  /* ===== Topbar ===== */
-  .topbar {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    height: 56px;
-    padding: 0 28px;
-    position: relative;
-    z-index: 5;
-  }
-  .top-right {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
   }
 
   /* Brand glyphs (Google/GitHub) remain inline SVGs and use this class. */
@@ -501,55 +472,11 @@
       transparent 80%
     );
   }
-  .auth-head {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .auth-head h2 {
-    font-family: var(--font-display);
-    font-size: 34px;
-    line-height: 1.05;
-    letter-spacing: -0.015em;
-    color: var(--fg-primary);
-    font-weight: 400;
-  }
-  .auth-head p {
-    font-size: 13.5px;
-    color: var(--fg-secondary);
-  }
-  .auth-head p a {
-    color: var(--color-link);
-    text-decoration: none;
-    border-bottom: 1px solid color-mix(in oklab, var(--color-link) 35%, transparent);
-  }
-  .auth-head p a:hover {
-    color: var(--color-link-hover);
-    border-color: var(--color-link-hover);
-  }
-
-  /* Form */
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .field-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
   .field-label-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-  }
-  .field-label {
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--fg-secondary);
-    letter-spacing: 0.01em;
   }
   .field-label-row a {
     font-size: 12px;
@@ -561,42 +488,6 @@
     text-decoration: underline;
   }
 
-  .input-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  .input-wrap .input-ic {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: inline-flex;
-    color: var(--fg-tertiary);
-    pointer-events: none;
-  }
-  .input {
-    width: 100%;
-    height: 40px;
-    padding: 0 14px 0 38px;
-    border: 1px solid var(--border-default);
-    background: var(--bg-surface);
-    border-radius: var(--radius-md);
-    font-family: var(--font-body);
-    font-size: 14px;
-    color: var(--fg-primary);
-    transition:
-      border-color var(--duration-micro) var(--ease-standard),
-      box-shadow var(--duration-micro) var(--ease-standard);
-  }
-  .input::placeholder {
-    color: var(--fg-tertiary);
-  }
-  .input:focus {
-    outline: none;
-    border-color: var(--border-focus);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--border-focus) 22%, transparent);
-  }
   .reveal {
     position: absolute;
     right: 8px;
@@ -665,34 +556,6 @@
   }
   .check.checked .check-tick {
     opacity: 1;
-  }
-
-  .btn-primary {
-    height: 42px;
-    border-radius: var(--radius-md);
-    background: var(--accent-primary);
-    color: var(--fg-inverse);
-    border: 1px solid var(--accent-primary);
-    font-size: 14px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    transition:
-      background var(--duration-micro) var(--ease-standard),
-      border-color var(--duration-micro) var(--ease-standard),
-      transform var(--duration-micro) var(--ease-standard);
-    margin-top: 4px;
-  }
-  .btn-primary:hover {
-    background: var(--accent-primary-hover);
-    border-color: var(--accent-primary-hover);
-  }
-  .btn-primary:active {
-    transform: scale(0.985);
-    background: var(--accent-primary-press);
   }
 
   /* Divider */
