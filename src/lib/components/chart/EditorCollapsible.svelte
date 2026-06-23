@@ -106,6 +106,7 @@
     position: sticky;
     top: var(--editor-header-height);
     background-color: var(--bg-base);
+    z-index: 1;
   }
   .content {
     width: 100%;
