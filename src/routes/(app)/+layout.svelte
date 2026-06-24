@@ -115,8 +115,8 @@
 
       /* Foregrounds */
       --fg-primary: var(--color-warm-900); /* primary text */
-      --fg-secondary: var(--color-warm-700); /* secondary / muted text */
-      --fg-tertiary: var(--color-warm-500); /* placeholder / disabled */
+      --fg-secondary: var(--color-warm-800); /* secondary / muted text */
+      --fg-tertiary: var(--color-warm-700); /* placeholder / disabled */
       --fg-inverse: var(--color-warm-50); /* text on dark bg */
 
       /* Brand Interactive */
