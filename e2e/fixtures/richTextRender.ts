@@ -23,6 +23,8 @@ import {
   type MarkValue,
 } from "../../src/lib/components/chart/richText/richText";
 import DeltaView from "../../src/lib/components/chart/richText/DeltaView.svelte";
+import RichTextField from "../../src/lib/components/chart/richText/RichTextField.svelte";
+import type { ShareDBConnection } from "../../src/lib/chartStores/data.svelte";
 
 interface Run {
   text: string;
@@ -268,4 +270,52 @@ export const applyColorCommand = (text: string, command: string, color: string):
   const out = readEditor(el, null, "p").delta;
   el.remove();
   return { ops: out.ops };
+};
+
+/**
+ * Mount the real `RichTextField` (with a minimal ShareDB stub) inside a fixed-width host and report
+ * how its toolbar splits between the visible bar and the overflow menu. Exercises the actual
+ * `measureToolbar` overflow logic against real browser layout. Opening the menu (when present)
+ * lets the test confirm the overflowed items render there.
+ */
+export const measureFieldOverflow = async (
+  width: number,
+): Promise<{ total: number; visible: number; hasOverflow: boolean; menu: number }> => {
+  const host = document.createElement("div");
+  host.style.width = `${width}px`;
+  document.body.appendChild(host);
+
+  const connection = {
+    doc: {
+      data: { text: { ops: [{ insert: "Hello" }, { insert: "\n", attributes: { block: "p" } }] } },
+      on: () => {},
+      removeListener: () => {},
+    },
+    editorsAt: () => [],
+    setLocalSelection: () => {},
+    submitRichTextChange: () => {},
+  } as unknown as ShareDBConnection;
+
+  const component = mount(RichTextField, {
+    target: host,
+    props: { connection, path: ["text"], label: "Body" },
+  });
+
+  // Let onMount + the rAF measurement pass settle.
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => r(null))));
+
+  const toolbar = host.querySelector(".rich-text-toolbar") as HTMLElement;
+  const visible = toolbar.querySelectorAll(".rich-text-toolbar-items > .rich-text-item").length;
+  const overflowBtn = toolbar.querySelector(".rich-text-overflow-btn") as HTMLElement | null;
+
+  let menu = 0;
+  if (overflowBtn) {
+    overflowBtn.click();
+    await new Promise((r) => requestAnimationFrame(() => r(null)));
+    menu = host.querySelectorAll(".rich-text-overflow-panel > .rich-text-item").length;
+  }
+
+  unmount(component);
+  host.remove();
+  return { total: visible + menu, visible, hasOverflow: !!overflowBtn, menu };
 };

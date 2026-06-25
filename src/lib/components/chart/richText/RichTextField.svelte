@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import { Delta } from "rich-text";
   import type {
     PresenceAddress,
@@ -58,6 +58,122 @@
     { value: "ul", label: "Bulleted list", short: "•" },
     { value: "ol", label: "Numbered list", short: "1." },
   ];
+
+  // --- Toolbar overflow ---
+  // The toolbar is one flat, ordered list of items rendered by a single snippet, so the same item
+  // renders identically whether it sits in the bar or the overflow menu. `group` drives the divider
+  // between the block controls and the inline marks.
+  type ToolbarItem =
+    | { group: "block"; block: (typeof blockOptions)[number] }
+    | { group: "inline"; mark: InlineMark };
+  const toolbarItems: ToolbarItem[] = [
+    ...blockOptions.map((block) => ({ group: "block", block }) as const),
+    ...inlineMarks.map((mark) => ({ group: "inline", mark }) as const),
+  ];
+  const itemKey = (item: ToolbarItem) =>
+    item.group === "block" ? `b:${item.block.value}` : `m:${item.mark.attr}`;
+  // A group divider precedes an item whose group differs from the one before it in the full list.
+  const startsGroup = (index: number) =>
+    index > 0 && toolbarItems[index].group !== toolbarItems[index - 1].group;
+
+  let toolbarEl = $state<HTMLDivElement>();
+  let itemsEl = $state<HTMLDivElement>();
+  let overflowEl = $state<HTMLDivElement>();
+  // How many leading items fit in the bar; the rest move to the overflow menu on the right.
+  let visibleCount = $state(toolbarItems.length);
+  let overflowOpen = $state(false);
+  // Cached natural width per item index. Item widths are stable, so we measure each while it's in
+  // the bar (every item is, on the first all-visible pass) and reuse the value once it overflows.
+  const itemWidths: number[] = [];
+
+  let visibleItems = $derived(toolbarItems.slice(0, visibleCount));
+  let overflowItems = $derived(toolbarItems.slice(visibleCount));
+  let hasOverflow = $derived(overflowItems.length > 0);
+
+  /** Re-measure widths of the items in the bar, then pick how many fit (reserving the menu button). */
+  const measureToolbar = () => {
+    if (!toolbarEl || !itemsEl) {
+      return;
+    }
+    const children = itemsEl.children;
+    for (let i = 0; i < children.length; i++) {
+      itemWidths[i] = (children[i] as HTMLElement).offsetWidth;
+    }
+    if (itemWidths.length < toolbarItems.length) {
+      return; // not every item measured yet (waiting for the first all-visible render)
+    }
+    const gap = parseFloat(getComputedStyle(itemsEl).columnGap) || 0;
+    const t = getComputedStyle(toolbarEl);
+    const avail =
+      toolbarEl.clientWidth - (parseFloat(t.paddingLeft) || 0) - (parseFloat(t.paddingRight) || 0);
+    const overflowW = overflowEl ? overflowEl.offsetWidth + gap : 34;
+
+    // Greedy: largest prefix of items whose total width (with gaps) stays within `limit`.
+    const countWithin = (limit: number) => {
+      let used = 0;
+      let n = 0;
+      while (n < toolbarItems.length) {
+        used += itemWidths[n] + (n > 0 ? gap : 0);
+        if (used > limit) {
+          break;
+        }
+        n++;
+      }
+      return n;
+    };
+    let count = countWithin(avail);
+    if (count < toolbarItems.length) {
+      count = countWithin(avail - overflowW); // need the menu button, so reserve its width
+    }
+    visibleCount = Math.max(1, count);
+    if (visibleCount >= toolbarItems.length) {
+      closeOverflow();
+    }
+  };
+
+  // Close the overflow menu on an outside click or Escape (mirrors the app's other dropdowns).
+  let overflowOpenedAt = 0;
+  const isInOverflow = (node: Node | null): boolean => {
+    for (let n = node; n; n = n.parentNode) {
+      if (n === overflowEl) {
+        return true;
+      }
+    }
+    return false;
+  };
+  const onOverflowDocClick = (e: MouseEvent) => {
+    if (overflowOpenedAt < Date.now() && !isInOverflow(e.target as Node)) {
+      closeOverflow();
+    }
+  };
+  const onOverflowDocKey = (e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      closeOverflow();
+    }
+  };
+  const openOverflow = () => {
+    overflowOpen = true;
+    overflowOpenedAt = Date.now() + 100;
+    document.addEventListener("click", onOverflowDocClick);
+    document.addEventListener("keyup", onOverflowDocKey);
+  };
+  function closeOverflow() {
+    if (!overflowOpen) {
+      return;
+    }
+    overflowOpen = false;
+    document.removeEventListener("click", onOverflowDocClick);
+    document.removeEventListener("keyup", onOverflowDocKey);
+  }
+  const toggleOverflow = () => (overflowOpen ? closeOverflow() : openOverflow());
+
+  // Created in onMount so it never runs during SSR (ResizeObserver is browser-only).
+  let resizeObserver: ResizeObserver | undefined;
+  // Re-measure when an item's width can change (the link's "remove" button toggles with the caret).
+  $effect(() => {
+    void currentMarks;
+    measureToolbar();
+  });
 
   // Presence is reused only to show who else is here — this field is never locked,
   // since concurrent editing is the whole point.
@@ -305,11 +421,23 @@
     renderDelta(editorEl, currentDelta, defaultBlock);
     connection.doc.on("op", onOp);
     document.addEventListener("selectionchange", syncToolbar);
+    resizeObserver = new ResizeObserver(() => measureToolbar());
+    if (toolbarEl) {
+      resizeObserver.observe(toolbarEl);
+    }
+    // Measure once the bar has laid out, then again next frame so the menu button's own width
+    // (and any late font metrics) are accounted for.
+    tick().then(() => {
+      measureToolbar();
+      requestAnimationFrame(measureToolbar);
+    });
   });
   onDestroy(() => {
     connection.doc.removeListener("op", onOp);
     connection.setLocalSelection(null);
     document.removeEventListener("selectionchange", syncToolbar);
+    resizeObserver?.disconnect();
+    closeOverflow();
   });
 </script>
 
@@ -343,72 +471,104 @@
     </div>
   </div>
 
-  <div class="rich-text-toolbar" role="toolbar" aria-label={label ?? "Formatting"}>
-    <div class="rich-text-group">
-      {#each blockOptions as option (option.value)}
+  <!-- One snippet renders an item the same way in the bar or the overflow menu. -->
+  {#snippet toolbarItem(item: ToolbarItem)}
+    {#if item.group === "block"}
+      <button
+        type="button"
+        class="rich-text-btn block"
+        title={item.block.label}
+        class:active={currentBlock === item.block.value}
+        aria-pressed={currentBlock === item.block.value}
+        onmousedown={(e) => e.preventDefault()}
+        onclick={() => applyBlock(item.block.value)}>{item.block.short}</button
+      >
+    {:else if item.mark.color}
+      <div class="rich-text-color" title={item.mark.button.title}>
+        <span class="rich-text-color-label" aria-hidden="true">{item.mark.button.label}</span>
+        <ColorPicker
+          color={typeof currentMarks[item.mark.attr] === "string"
+            ? (currentMarks[item.mark.attr] as string)
+            : defaultColor(item.mark)}
+          onchange={(c) => applyColor(item.mark, c.c)}
+        />
         <button
           type="button"
-          class="rich-text-btn block"
-          title={option.label}
-          class:active={currentBlock === option.value}
-          aria-pressed={currentBlock === option.value}
+          class="rich-text-btn"
+          title="Remove {item.mark.button.title.toLowerCase()}"
           onmousedown={(e) => e.preventDefault()}
-          onclick={() => applyBlock(option.value)}>{option.short}</button
+          onclick={() => clearColor(item.mark)}>×</button
         >
+      </div>
+    {:else if item.mark.link}
+      <button
+        type="button"
+        class="rich-text-btn"
+        title={item.mark.button.title}
+        class:active={currentMarks[item.mark.attr] !== undefined}
+        aria-pressed={currentMarks[item.mark.attr] !== undefined}
+        onmousedown={(e) => e.preventDefault()}
+        onclick={() => applyLink(item.mark)}><Icon name="link" /></button
+      >
+      {#if currentMarks[item.mark.attr] !== undefined}
+        <button
+          type="button"
+          class="rich-text-btn"
+          title="Remove {item.mark.button.title.toLowerCase()}"
+          onmousedown={(e) => e.preventDefault()}
+          onclick={() => removeLink(item.mark)}>×</button
+        >
+      {/if}
+    {:else}
+      <button
+        type="button"
+        class="rich-text-btn"
+        title={item.mark.button.title}
+        class:active={currentMarks[item.mark.attr] !== undefined}
+        aria-pressed={currentMarks[item.mark.attr] !== undefined}
+        onmousedown={(e) => e.preventDefault()}
+        onclick={() => toggleMark(item.mark)}
+        ><svelte:element this={item.mark.tag ?? "span"}>{item.mark.button.label}</svelte:element
+        ></button
+      >
+    {/if}
+  {/snippet}
+
+  <div
+    class="rich-text-toolbar"
+    role="toolbar"
+    aria-label={label ?? "Formatting"}
+    bind:this={toolbarEl}
+  >
+    <div class="rich-text-toolbar-items" bind:this={itemsEl}>
+      {#each visibleItems as item, i (itemKey(item))}
+        <div class="rich-text-item" class:sep={startsGroup(i)}>{@render toolbarItem(item)}</div>
       {/each}
     </div>
-    <div class="rich-text-group">
-      {#each inlineMarks as mark (mark.attr)}
-        {#if mark.color}
-          <div class="rich-text-color" title={mark.button.title}>
-            <span class="rich-text-color-label" aria-hidden="true">{mark.button.label}</span>
-            <ColorPicker
-              color={typeof currentMarks[mark.attr] === "string"
-                ? (currentMarks[mark.attr] as string)
-                : defaultColor(mark)}
-              onchange={(c) => applyColor(mark, c.c)}
-            />
-            <button
-              type="button"
-              class="rich-text-btn"
-              title="Remove {mark.button.title.toLowerCase()}"
-              onmousedown={(e) => e.preventDefault()}
-              onclick={() => clearColor(mark)}>×</button
-            >
+    {#if hasOverflow}
+      <div class="rich-text-overflow" bind:this={overflowEl}>
+        <button
+          type="button"
+          class="rich-text-btn rich-text-overflow-btn"
+          class:active={overflowOpen}
+          title="More formatting"
+          aria-label="More formatting"
+          aria-haspopup="menu"
+          aria-expanded={overflowOpen}
+          onmousedown={(e) => e.preventDefault()}
+          onclick={toggleOverflow}><Icon name="moreHorizontal" /></button
+        >
+        {#if overflowOpen}
+          <div class="rich-text-overflow-panel" role="menu" aria-label="More formatting">
+            {#each overflowItems as item, i (itemKey(item))}
+              <div class="rich-text-item" class:sep={i > 0 && startsGroup(visibleCount + i)}>
+                {@render toolbarItem(item)}
+              </div>
+            {/each}
           </div>
-        {:else if mark.link}
-          <button
-            type="button"
-            class="rich-text-btn"
-            title={mark.button.title}
-            class:active={currentMarks[mark.attr] !== undefined}
-            aria-pressed={currentMarks[mark.attr] !== undefined}
-            onmousedown={(e) => e.preventDefault()}
-            onclick={() => applyLink(mark)}><Icon name="link" /></button
-          >
-          {#if currentMarks[mark.attr] !== undefined}
-            <button
-              type="button"
-              class="rich-text-btn"
-              title="Remove {mark.button.title.toLowerCase()}"
-              onmousedown={(e) => e.preventDefault()}
-              onclick={() => removeLink(mark)}>×</button
-            >
-          {/if}
-        {:else}
-          <button
-            type="button"
-            class="rich-text-btn"
-            title={mark.button.title}
-            class:active={currentMarks[mark.attr] !== undefined}
-            aria-pressed={currentMarks[mark.attr] !== undefined}
-            onmousedown={(e) => e.preventDefault()}
-            onclick={() => toggleMark(mark)}
-            ><svelte:element this={mark.tag ?? "span"}>{mark.button.label}</svelte:element></button
-          >
         {/if}
-      {/each}
-    </div>
+      </div>
+    {/if}
   </div>
 
   <div
@@ -530,13 +690,50 @@
     border-bottom: 1px solid var(--border-subtle);
     background: color-mix(in oklab, var(--bg-sunken) 50%, var(--bg-surface));
   }
-  .rich-text-group {
+  /* The items that fit; clipped (never wrapped) so overflowing ones are hidden, not shown, until
+     `measureToolbar` moves them into the menu. */
+  .rich-text-toolbar-items {
     display: flex;
+    align-items: center;
     gap: 2px;
-    padding: 0 4px;
+    min-width: 0;
+    flex: 0 1 auto;
+    overflow: hidden;
   }
-  .rich-text-group + .rich-text-group {
+  .rich-text-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    flex: 0 0 auto;
+  }
+  /* Divider before the first item of a new group (block vs inline marks). Uses border + padding
+     only (both counted in offsetWidth) so `measureToolbar` stays accurate; no margin. */
+  .rich-text-item.sep {
     border-left: 1px solid var(--border-subtle);
+    padding-left: 7px;
+  }
+  /* Overflow menu, pinned to the right edge of the toolbar. */
+  .rich-text-overflow {
+    position: relative;
+    flex: 0 0 auto;
+    margin-left: auto;
+    display: inline-flex;
+  }
+  .rich-text-overflow-panel {
+    position: absolute;
+    top: calc(100% + 5px);
+    right: 0;
+    z-index: 25;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    max-width: 280px;
+    padding: 5px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-2);
   }
   /* Color mark control: label glyph + ColorPicker swatch + remove. */
   .rich-text-color {

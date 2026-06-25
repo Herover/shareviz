@@ -322,6 +322,38 @@ test.describe("rich-text rendering parity", () => {
     expect(result.ops).toEqual([{ insert: "site" }, { insert: "\n", attributes: { block: "p" } }]);
   });
 
+  type Overflow = { total: number; visible: number; hasOverflow: boolean; menu: number };
+  const measureFieldOverflow = (page: import("@playwright/test").Page, width: number) =>
+    page.evaluate<Overflow, [string, number]>(
+      async ([url, w]) => {
+        const { measureFieldOverflow } = await import(/* @vite-ignore */ url);
+        return measureFieldOverflow(w);
+      },
+      [fixtureUrl, width],
+    );
+
+  test("a wide toolbar shows every item with no overflow menu", async ({ page }) => {
+    await page.goto("/");
+    const r = await measureFieldOverflow(page, 1000);
+    expect(r.hasOverflow).toBe(false);
+    expect(r.visible).toBe(r.total);
+    expect(r.total).toBeGreaterThanOrEqual(12); // 5 blocks + 7 inline marks
+  });
+
+  test("a narrow toolbar moves the items that don't fit into the overflow menu", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const wide = await measureFieldOverflow(page, 1000);
+    const narrow = await measureFieldOverflow(page, 240);
+    expect(narrow.hasOverflow).toBe(true);
+    expect(narrow.visible).toBeGreaterThanOrEqual(1);
+    expect(narrow.visible).toBeLessThan(wide.total);
+    expect(narrow.menu).toBeGreaterThan(0);
+    // No item is lost or duplicated: bar + menu account for the full set.
+    expect(narrow.visible + narrow.menu).toBe(wide.total);
+  });
+
   test("empty input: editor renders one block, viewer renders nothing", async ({ page }) => {
     await page.goto("/");
     const result = await page.evaluate<Rendered, [string, RichText, BlockTypeName]>(
