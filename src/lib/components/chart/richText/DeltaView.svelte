@@ -27,10 +27,16 @@
   let groups = $derived(groupLines(lines));
 
   let hasContent = $derived(lines.some((line) => line.segments.length > 0));
+
+  // Attributes for a link wrapper (`href` is already sanitized by inlineWraps/safeUrl); spread so
+  // they only land on `<a>` wraps and pass svelte:element's generic-attribute type check.
+  const linkAttrs = (href?: string) =>
+    href ? { href, target: "_blank", rel: "noopener noreferrer nofollow" } : {};
 </script>
 
 {#snippet marked(text: string, wraps: Wrap[], i: number)}{#if i < wraps.length}<svelte:element
       this={wraps[i].tag}
+      {...linkAttrs(wraps[i].href)}
       style:background-color={wraps[i].bg}
       style:color={wraps[i].fg}>{@render marked(text, wraps, i + 1)}</svelte:element
     >{:else}{text}{/if}{/snippet}

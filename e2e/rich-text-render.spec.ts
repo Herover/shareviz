@@ -76,6 +76,16 @@ const CASES: { name: string; delta: RichText; defaultBlock?: BlockTypeName }[] =
     delta: { ops: [{ insert: "x", attributes: { bold: true, background: "#00ff00" } }] },
   },
   {
+    name: "link run followed by plain",
+    delta: {
+      ops: [{ insert: "site", attributes: { link: "https://example.com" } }, { insert: " ok" }],
+    },
+  },
+  {
+    name: "bold + link combined",
+    delta: { ops: [{ insert: "x", attributes: { bold: true, link: "https://example.com" } }] },
+  },
+  {
     name: "bulleted list",
     delta: {
       ops: [
@@ -243,6 +253,74 @@ test.describe("rich-text rendering parity", () => {
       ]);
     });
   }
+
+  test("toolbar link command sets the link mark", async ({ page }) => {
+    await page.goto("/");
+    const result = await page.evaluate<RichText, [string, string]>(
+      async ([url, link]) => {
+        const { applyLinkCommand } = await import(/* @vite-ignore */ url);
+        return applyLinkCommand("Word", link);
+      },
+      [fixtureUrl, "https://example.com"],
+    );
+    expect(result.ops).toEqual([
+      { insert: "Word", attributes: { link: "https://example.com" } },
+      { insert: "\n", attributes: { block: "p" } },
+    ]);
+  });
+
+  test("editing a link from a collapsed caret rewrites its href without inserting text", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const result = await page.evaluate<
+      { found: boolean; ops: RichText["ops"] },
+      [string, RichText, string]
+    >(
+      async ([url, line, newUrl]) => {
+        const { editLinkAtCaret } = await import(/* @vite-ignore */ url);
+        return editLinkAtCaret(line, newUrl);
+      },
+      [
+        fixtureUrl,
+        {
+          ops: [
+            { insert: "site", attributes: { link: "https://old.example.com" } },
+            { insert: "\n", attributes: { block: "p" } },
+          ],
+        },
+        "https://new.example.com",
+      ],
+    );
+    // The real selectEnclosingAnchor must report the caret is inside the link, and editing must
+    // rewrite the href on the same single run — no inserted URL text.
+    expect(result.found).toBe(true);
+    expect(result.ops).toEqual([
+      { insert: "site", attributes: { link: "https://new.example.com" } },
+      { insert: "\n", attributes: { block: "p" } },
+    ]);
+  });
+
+  test("a collapsed caret in plain text is not treated as inside a link", async ({ page }) => {
+    await page.goto("/");
+    const result = await page.evaluate<
+      { found: boolean; ops: RichText["ops"] },
+      [string, RichText, string]
+    >(
+      async ([url, line, newUrl]) => {
+        const { editLinkAtCaret } = await import(/* @vite-ignore */ url);
+        return editLinkAtCaret(line, newUrl);
+      },
+      [
+        fixtureUrl,
+        { ops: [{ insert: "site" }, { insert: "\n", attributes: { block: "p" } }] },
+        "https://new.example.com",
+      ],
+    );
+    // selectEnclosingAnchor returns false, leaving the document untouched (no link applied).
+    expect(result.found).toBe(false);
+    expect(result.ops).toEqual([{ insert: "site" }, { insert: "\n", attributes: { block: "p" } }]);
+  });
 
   test("empty input: editor renders one block, viewer renders nothing", async ({ page }) => {
     await page.goto("/");

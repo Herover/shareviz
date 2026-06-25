@@ -13,6 +13,8 @@
     placeCaret,
     readEditor,
     renderDelta,
+    safeUrl,
+    selectEnclosingAnchor,
     toDelta,
     type BlockType,
     type MarkValue,
@@ -20,6 +22,7 @@
   import { inlineMarks, type InlineMark } from "./marks/inline";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import UserBadge from "../UserBadge.svelte";
+  import Icon from "../../Icon.svelte";
 
   interface Props {
     connection: ShareDBConnection;
@@ -185,17 +188,25 @@
     syncToolbar(); // re-read active marks from the DOM after toggling
   };
 
-  /** Apply a color mark (text color / highlight) to the saved selection. */
-  const applyColor = (mark: InlineMark, color: string) => {
-    if (!mark.color) {
-      return;
-    }
+  /**
+   * Refocus the editor and restore the selection captured by `syncToolbar`, so a command applies
+   * to the user's text after a toolbar control (ColorPicker / link prompt) stole focus.
+   */
+  const restoreSelection = () => {
     editorEl.focus();
     if (savedRange) {
       const selection = window.getSelection();
       selection?.removeAllRanges();
       selection?.addRange(savedRange);
     }
+  };
+
+  /** Apply a color mark (text color / highlight) to the saved selection. */
+  const applyColor = (mark: InlineMark, color: string) => {
+    if (!mark.color) {
+      return;
+    }
+    restoreSelection();
     // styleWithCSS makes foreColor/hiliteColor emit `<span style=…>` (not `<font>`); restore it
     // afterwards so the toggle marks keep emitting semantic tags.
     document.execCommand("styleWithCSS", false, "true");
@@ -207,6 +218,64 @@
 
   /** Clear a color mark by setting it transparent (treated as absent on serialize). */
   const clearColor = (mark: InlineMark) => applyColor(mark, "transparent");
+
+  /**
+   * Prompt for a destination and link the saved selection. A collapsed caret inside an existing
+   * link just updates that link's destination; a collapsed caret elsewhere inserts the typed URL
+   * as the link's text. A blank/unsafe destination unlinks.
+   */
+  const applyLink = (mark: InlineMark) => {
+    if (!mark.link) {
+      return;
+    }
+    const current = currentMarks[mark.attr];
+    const existing = typeof current === "string" ? current : "";
+    const input = window.prompt("Link destination", existing || "https://");
+    if (input == null) {
+      return; // cancelled
+    }
+    restoreSelection();
+    const url = safeUrl(input);
+    if (!url) {
+      document.execCommand(mark.link.remove, false); // blank/unsafe → remove any link
+      commitLocal();
+      syncToolbar();
+      return;
+    }
+    const selection = window.getSelection();
+    // Collapsed caret: if it's inside a link, select that anchor so createLink rewrites its href;
+    // otherwise insert the typed text and select it back so createLink can wrap it.
+    if (selection?.isCollapsed && !selectEnclosingAnchor(selection, editorEl)) {
+      const text = input.trim();
+      document.execCommand("insertText", false, text);
+      const caret = selection.getRangeAt(0);
+      if (caret.startContainer.nodeType === Node.TEXT_NODE) {
+        const range = document.createRange();
+        range.setStart(caret.startContainer, Math.max(0, caret.startOffset - text.length));
+        range.setEnd(caret.startContainer, caret.startOffset);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    }
+    document.execCommand(mark.link.command, false, url);
+    commitLocal();
+    syncToolbar();
+  };
+
+  /** Remove the link mark, selecting the whole anchor first if the caret merely sits inside one. */
+  const removeLink = (mark: InlineMark) => {
+    if (!mark.link) {
+      return;
+    }
+    restoreSelection();
+    const selection = window.getSelection();
+    if (selection?.isCollapsed) {
+      selectEnclosingAnchor(selection, editorEl);
+    }
+    document.execCommand(mark.link.remove, false);
+    commitLocal();
+    syncToolbar();
+  };
 
   /** Set the block type of the line(s) in the current selection. */
   const applyBlock = (block: BlockType) => {
@@ -307,6 +376,25 @@
               onclick={() => clearColor(mark)}>×</button
             >
           </div>
+        {:else if mark.link}
+          <button
+            type="button"
+            class="rich-text-btn"
+            title={mark.button.title}
+            class:active={currentMarks[mark.attr] !== undefined}
+            aria-pressed={currentMarks[mark.attr] !== undefined}
+            onmousedown={(e) => e.preventDefault()}
+            onclick={() => applyLink(mark)}><Icon name="link" /></button
+          >
+          {#if currentMarks[mark.attr] !== undefined}
+            <button
+              type="button"
+              class="rich-text-btn"
+              title="Remove {mark.button.title.toLowerCase()}"
+              onmousedown={(e) => e.preventDefault()}
+              onclick={() => removeLink(mark)}>×</button
+            >
+          {/if}
         {:else}
           <button
             type="button"
@@ -558,5 +646,13 @@
   }
   .rich-text-editor :global(strong) {
     font-weight: var(--weight-semibold);
+  }
+  /* Links read as links while editing; the caret still lands inside them (contenteditable
+     places the caret rather than navigating on click). */
+  .rich-text-editor :global(a) {
+    color: var(--accent-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: text;
   }
 </style>

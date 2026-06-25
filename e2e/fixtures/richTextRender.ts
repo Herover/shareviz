@@ -18,6 +18,7 @@ import {
   extendMarks,
   readEditor,
   renderDelta,
+  selectEnclosingAnchor,
   type BlockType,
   type MarkValue,
 } from "../../src/lib/components/chart/richText/richText";
@@ -179,6 +180,69 @@ export const applyInlineCommand = (text: string, command: string): RichText => {
   const out = readEditor(el, null, "p").delta;
   el.remove();
   return { ops: out.ops };
+};
+
+/**
+ * Exercise the toolbar's real `createLink` path on a selected line, then serialize — confirms the
+ * browser command + readEditor capture the link attribute (URL sanitized by safeUrl on read).
+ */
+export const applyLinkCommand = (text: string, url: string): RichText => {
+  const el = document.createElement("div");
+  el.contentEditable = "true";
+  document.body.appendChild(el);
+  renderDelta(el, new Delta([{ insert: text }]), "p");
+
+  el.focus();
+  const range = document.createRange();
+  range.selectNodeContents(el.firstChild as Node);
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+
+  document.execCommand("createLink", false, url);
+  const out = readEditor(el, null, "p").delta;
+  el.remove();
+  return { ops: out.ops };
+};
+
+/**
+ * Drive RichTextField's real `selectEnclosingAnchor` from a collapsed caret (placed inside the
+ * single line's first text node, as clicking would), then — only if the helper reports the caret
+ * is in a link — rewrite the href via `createLink`. This is the exact decision the toolbar's "edit
+ * link" makes. Returns the helper's verdict plus the serialized Delta, so a test sees both that
+ * the shipped helper found (or didn't find) the anchor and that editing rewrites the href rather
+ * than inserting the URL as text.
+ */
+export const editLinkAtCaret = (
+  line: RichText,
+  newUrl: string,
+): { found: boolean; ops: RichText["ops"] } => {
+  const el = document.createElement("div");
+  el.contentEditable = "true";
+  document.body.appendChild(el);
+  renderDelta(el, new Delta(line.ops), "p");
+
+  el.focus();
+  const selection = window.getSelection();
+  if (!selection) {
+    el.remove();
+    return { found: false, ops: [] };
+  }
+  const textNode = (el.querySelector("a")?.firstChild ?? el.firstChild?.firstChild) as Node;
+  const caret = document.createRange();
+  caret.setStart(textNode, 1);
+  caret.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(caret);
+
+  const found = selectEnclosingAnchor(selection, el);
+  if (found) {
+    document.execCommand("createLink", false, newUrl);
+  }
+
+  const out = readEditor(el, null, "p").delta;
+  el.remove();
+  return { found, ops: out.ops };
 };
 
 /**

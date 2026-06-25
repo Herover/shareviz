@@ -2,7 +2,14 @@
 
 import { expect, test } from "vitest";
 import { Delta } from "rich-text";
-import { deltaToLines, groupLines, inlineWraps, normalizeDelta, safeColor } from "./richText";
+import {
+  deltaToLines,
+  groupLines,
+  inlineWraps,
+  normalizeDelta,
+  safeColor,
+  safeUrl,
+} from "./richText";
 
 // deltaToLines / normalizeDelta are pure (no DOM); the DOM-bound renderDelta, readEditor and
 // placeCaret are covered by the e2e parity/round-trip specs instead.
@@ -110,6 +117,54 @@ test("inlineWraps orders toggle + color marks and resolves colors", () => {
     { tag: "span", bg: "#ffff00" },
   ]);
   expect(inlineWraps({ color: "#ff0000" })).toEqual([{ tag: "span", fg: "#ff0000" }]);
+});
+
+test("safeUrl keeps safe schemes, defaults bare hosts to https, rejects dangerous ones", () => {
+  // Valid destinations are returned exactly as given (no trailing-slash normalization).
+  expect(safeUrl("https://example.com")).toBe("https://example.com");
+  expect(safeUrl("https://example.com/page")).toBe("https://example.com/page");
+  expect(safeUrl("mailto:a@b.com")).toBe("mailto:a@b.com");
+  expect(safeUrl("tel:+123")).toBe("tel:+123");
+  // No scheme → assumed https.
+  expect(safeUrl("example.com/path")).toBe("https://example.com/path");
+  // Dangerous schemes (any casing) and malformed input are rejected as null, never thrown.
+  expect(safeUrl("javascript:alert(1)")).toBeNull();
+  expect(safeUrl("JavaScript:alert(1)")).toBeNull();
+  expect(safeUrl("data:text/html,<script>")).toBeNull();
+  expect(safeUrl("java\nscript:alert(1)")).toBeNull();
+  expect(safeUrl("   ")).toBeNull();
+});
+
+test("link mark carries a sanitized url value and round-trips", () => {
+  const delta = new Delta([
+    { insert: "site", attributes: { link: "https://example.com" } },
+    { insert: "\n", attributes: { block: "p" } },
+  ]);
+  expect(deltaToLines(delta)[0].segments).toEqual([
+    { text: "site", marks: { link: "https://example.com" } },
+  ]);
+  // A bare host stored without a scheme is normalized to https on read.
+  expect(
+    deltaToLines(new Delta([{ insert: "x", attributes: { link: "example.com" } }]))[0].segments[0]
+      .marks,
+  ).toEqual({ link: "https://example.com" });
+  // Unsafe destinations are dropped (not a mark).
+  expect(
+    deltaToLines(new Delta([{ insert: "y", attributes: { link: "javascript:alert(1)" } }]))[0]
+      .segments[0].marks,
+  ).toEqual({});
+  // Round-trips back to a link attribute through normalizeDelta.
+  expect(normalizeDelta(delta).ops[0]).toEqual({
+    insert: "site",
+    attributes: { link: "https://example.com" },
+  });
+});
+
+test("inlineWraps renders a link as an <a href> innermost (after color marks)", () => {
+  expect(inlineWraps({ background: "#ffff00", link: "https://example.com" })).toEqual([
+    { tag: "span", bg: "#ffff00" },
+    { tag: "a", href: "https://example.com" },
+  ]);
 });
 
 test("normalizeDelta produces a trailing newline with an explicit block attr", () => {

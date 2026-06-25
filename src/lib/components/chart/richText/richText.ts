@@ -36,6 +36,26 @@ export const safeColor = (value: string): string | null => {
   }
 };
 
+const SAFE_URL_SCHEMES = ["http:", "https:", "mailto:", "tel:"];
+
+/**
+ * Validate a URL for use as a link destination, or `null` if it is blank/invalid or uses an
+ * unsafe scheme (e.g. `javascript:`). A scheme-less value is assumed to be `https`. The original
+ * string is returned unchanged when valid (no trailing-slash or other normalization).
+ */
+export const safeUrl = (value: string): string | null => {
+  try {
+    if (!SAFE_URL_SCHEMES.some((safe) => value.startsWith(safe))) {
+      value = "https://" + value;
+    }
+    // `new URL` is only used to validate the scheme/shape; we return `value` so the destination
+    // keeps the exact form the user typed.
+    return SAFE_URL_SCHEMES.some((safe) => new URL(value).protocol === safe) ? value : null;
+  } catch {
+    return null;
+  }
+};
+
 /**
  * Block-level type of a line, stored on the line's terminating newline (Quill convention).
  * `ul`/`ol` lines are list items; consecutive same-value list lines render as one list.
@@ -91,7 +111,14 @@ export const extendMarks = (
 ): Record<string, MarkValue> => {
   const next = { ...marks };
   for (const mark of inlineMarks) {
-    if (mark.color) {
+    if (mark.link) {
+      if (el.tagName === "A") {
+        const url = safeUrl(el.getAttribute("href") ?? "");
+        if (url) {
+          next[mark.attr] = url;
+        }
+      }
+    } else if (mark.color) {
       const value = safeColor(el.style.getPropertyValue(mark.color.css));
       if (value) {
         next[mark.attr] = value;
@@ -267,7 +294,12 @@ export const deltaToLines = (delta: Delta, defaultBlock: BlockType = "p"): Line[
     const marks: Record<string, MarkValue> = {};
     for (const mark of inlineMarks) {
       const value = attrs[mark.attr];
-      if (mark.color) {
+      if (mark.link) {
+        const url = typeof value === "string" ? safeUrl(value) : null;
+        if (url) {
+          marks[mark.attr] = url;
+        }
+      } else if (mark.color) {
         const color = typeof value === "string" ? safeColor(value) : null;
         if (color) {
           marks[mark.attr] = color;
@@ -299,11 +331,15 @@ export const deltaToLines = (delta: Delta, defaultBlock: BlockType = "p"): Line[
   return lines;
 };
 
-/** A render wrapper for one active mark (semantic tag, or a styled `<span>` for color marks). */
+/**
+ * A render wrapper for one active mark: a semantic tag, a styled `<span>` for color marks, or an
+ * `<a href>` for the link mark.
+ */
 export interface Wrap {
   tag: string;
   bg?: string;
   fg?: string;
+  href?: string;
 }
 
 /**
@@ -317,7 +353,12 @@ export const inlineWraps = (marks: Record<string, MarkValue>): Wrap[] => {
     if (value === undefined) {
       continue;
     }
-    if (mark.color) {
+    if (mark.link) {
+      const url = typeof value === "string" ? safeUrl(value) : null;
+      if (url) {
+        wraps.push({ tag: "a", href: url });
+      }
+    } else if (mark.color) {
       const color = typeof value === "string" ? safeColor(value) : null;
       if (color) {
         wraps.push(
@@ -345,6 +386,9 @@ const makeInline = (segment: Segment): Node => {
     }
     if (w.fg) {
       el.style.setProperty("color", w.fg);
+    }
+    if (w.href) {
+      el.setAttribute("href", w.href);
     }
     el.appendChild(node);
     node = el;
@@ -406,6 +450,27 @@ export const normalizeDelta = (delta: Delta, defaultBlock: BlockType = "p"): Del
     out.insert("\n", { block: line.block });
   }
   return out;
+};
+
+/**
+ * If the selection's caret sits inside an `<a>` within `root`, replace the selection with one
+ * spanning that whole anchor and return true; otherwise leave the selection unchanged and return
+ * false. Lets a collapsed caret edit or remove its enclosing link, since `createLink`/`unlink`
+ * act on the selected range, not a bare caret.
+ */
+export const selectEnclosingAnchor = (selection: Selection, root: HTMLElement): boolean => {
+  let node: Node | null = selection.anchorNode;
+  while (node && node !== root) {
+    if (node.nodeType === Node.ELEMENT_NODE && (node as HTMLElement).tagName === "A") {
+      const range = document.createRange();
+      range.selectNode(node);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      return true;
+    }
+    node = node.parentNode;
+  }
+  return false;
 };
 
 /** Place the caret at a document character index, mirroring `readEditor`'s counting. */
