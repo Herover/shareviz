@@ -12,6 +12,8 @@
   import SettingsCard from "$lib/components/settings/SettingsCard.svelte";
   import SettingsField from "$lib/components/settings/SettingsField.svelte";
   import MemberRow from "$lib/components/settings/MemberRow.svelte";
+  import Pill from "$lib/components/Pill.svelte";
+  import UserBadge from "$lib/components/chart/UserBadge.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
   let { data }: { data: PageData } = $props();
@@ -27,6 +29,7 @@
   const sections = [
     { id: "organization", label: "Organization", icon: "building" as const },
     { id: "members", label: "Members", icon: "users" as const },
+    { id: "teams", label: "Teams", icon: "grid" as const },
     { id: "invites", label: "Invites", icon: "mail" as const },
   ];
 
@@ -156,6 +159,66 @@
     {/each}
   </SettingsCard>
 
+  <!-- ──────────── TEAMS ──────────── -->
+  <SettingsCard
+    id="teams"
+    overline="Access"
+    title="Teams"
+    description={isOrgAdmin
+      ? "Every team in this organization and who belongs to each."
+      : "The teams you belong to in this organization and who else is on them."}
+    flush
+  >
+    {#snippet aside()}
+      <span class="member-count">
+        {data.teamCards.length}
+        {data.teamCards.length == 1 ? "team" : "teams"}
+      </span>
+    {/snippet}
+
+    {#if data.teamCards.length === 0}
+      <div class="empty">
+        <Icon name="grid" size={22} stroke={1.5} />
+        <p>No teams in this organization yet.</p>
+      </div>
+    {:else}
+      {#each data.teamCards as team (team.id)}
+        <div class="team-block">
+          <div class="team-block-head">
+            <h3 class="team-block-name">{team.name}</h3>
+            {#if !team.isMember}
+              <Pill mono uppercase tone="secondary">Not a member</Pill>
+            {/if}
+            <span class="team-block-count">
+              {team.members.length}
+              {team.members.length == 1 ? "member" : "members"}
+            </span>
+          </div>
+          {#if team.description}
+            <p class="team-block-desc">{team.description}</p>
+          {/if}
+          {#if team.members.length > 0}
+            <ul class="team-members">
+              {#each team.members as member (member.id)}
+                <li class="team-member" class:is-you={member.id == currentUserId}>
+                  <span class="team-member-avatar">
+                    <UserBadge user={{ id: member.id, name: member.name }} fill />
+                  </span>
+                  <span class="team-member-name">{member.name || "Unknown user"}</span>
+                  {#if member.isAdmin}
+                    <Pill mono uppercase size="sm" tone="primary">Admin</Pill>
+                  {/if}
+                </li>
+              {/each}
+            </ul>
+          {:else}
+            <p class="team-block-desc team-empty-members">This team has no members.</p>
+          {/if}
+        </div>
+      {/each}
+    {/if}
+  </SettingsCard>
+
   <!-- ──────────── INVITES ──────────── -->
   <SettingsCard
     id="invites"
@@ -235,6 +298,77 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
+  }
+
+  /* ════════ TEAMS ════════ */
+  .team-block {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .team-block:last-child {
+    border-bottom: 0;
+  }
+  .team-block-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .team-block-name {
+    font-family: var(--font-display);
+    font-size: 1.12rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--fg-primary);
+    margin: 0;
+  }
+  .team-block-count {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--fg-tertiary);
+    white-space: nowrap;
+  }
+  .team-block-desc {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--fg-secondary);
+    margin: 6px 0 0;
+    max-width: 60ch;
+  }
+  .team-members {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .team-member {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px 4px 4px;
+    background: var(--bg-sunken);
+    border-radius: var(--radius-pill);
+  }
+  .team-member.is-you {
+    background: var(--accent-primary-subtle);
+  }
+  .team-member-avatar {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    font-size: 15px;
+  }
+  .team-member-name {
+    font-family: var(--font-body);
+    font-size: 0.86rem;
+    font-weight: 500;
+    color: var(--fg-primary);
+  }
+  .team-empty-members {
+    font-style: italic;
+    color: var(--fg-tertiary);
   }
 
   /* ════════ INVITE TABLE ════════ */
