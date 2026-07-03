@@ -439,6 +439,10 @@ export const db = {
       .where(eq(usersTeams.teamId, id));
   },
 
+  getOrganizationTeams: async (/** @type {string} */ organizationId) => {
+    return drizzledb.select().from(teams).where(eq(teams.organizationId, organizationId));
+  },
+
   addUserTeamsRelation: async (
     /** @type {string} */ teamId,
     /** @type {string} */ userId,

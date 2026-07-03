@@ -2,6 +2,7 @@
 
 import { json } from "@sveltejs/kit";
 import { db, TEAM_ROLES } from "$lib/../../server_lib/sqlite";
+import { MAX_TEAMS_PER_ORGANIZATION } from "$lib/consts";
 
 export async function POST({ request, locals }) {
   const session = locals.session;
@@ -22,6 +23,14 @@ export async function POST({ request, locals }) {
   const organizations = await db.getUserOrganizations(user.id);
   if (organizations.findIndex((o) => o.organizations.id == organizationId) == -1) {
     return json({ message: "unauthorized" }, { status: 403 });
+  }
+
+  const existingTeams = await db.getOrganizationTeams(organizationId);
+  if (existingTeams.length >= MAX_TEAMS_PER_ORGANIZATION) {
+    return json(
+      { message: `An organization may have at most ${MAX_TEAMS_PER_ORGANIZATION} teams` },
+      { status: 409 },
+    );
   }
 
   const teamId = await db.addTeam(name, organizationId);

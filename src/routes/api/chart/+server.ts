@@ -6,6 +6,7 @@ import { db } from "$lib/../../server_lib/user.js";
 import { connection } from "$lib/../../server_lib/sharedb";
 import { defDoc, formatVersion } from "$lib/initialDoc.js";
 import type { Root } from "$lib/chart.js";
+import { MAX_CHARTS_PER_TEAM, MAX_CHARTS_PER_USER } from "$lib/consts";
 import { getLogger } from "../../../lib/log";
 
 const logger = getLogger();
@@ -41,6 +42,25 @@ export async function POST({ request, locals }) {
     const teams = await db.getUserTeams(user.id);
     if (teams.findIndex((t) => t.teams.id == teamId) == -1) {
       return json({ message: "unauthorized" }, { status: 403 });
+    }
+
+    const existingCharts = await db.getTeamCharts(teamId);
+    if (existingCharts.length >= MAX_CHARTS_PER_TEAM) {
+      return json(
+        { message: `A team may have at most ${MAX_CHARTS_PER_TEAM} charts` },
+        { status: 409 },
+      );
+    }
+  }
+
+  if (isUserChart) {
+    const userCharts = await db.getUserCharts(user.id);
+    const personalChartCount = userCharts.filter((c) => !c.teamId).length;
+    if (personalChartCount >= MAX_CHARTS_PER_USER) {
+      return json(
+        { message: `You may have at most ${MAX_CHARTS_PER_USER} personal charts` },
+        { status: 409 },
+      );
     }
   }
 

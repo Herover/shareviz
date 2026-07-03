@@ -2,6 +2,7 @@
 
 import { json } from "@sveltejs/kit";
 import { db } from "$lib/../../server_lib/user";
+import { MAX_FOLDERS_PER_TEAM } from "$lib/consts";
 
 export async function POST({ request, locals }) {
   const user = locals.session?.user;
@@ -20,6 +21,14 @@ export async function POST({ request, locals }) {
   const teams = await db.getUserTeams(user.id);
   if (teams.findIndex((t) => t.teams.id == teamId) == -1) {
     return json({ message: "unauthorized" }, { status: 403 });
+  }
+
+  const existingFolders = await db.getFolders(teamId);
+  if (existingFolders.length >= MAX_FOLDERS_PER_TEAM) {
+    return json(
+      { message: `A team may have at most ${MAX_FOLDERS_PER_TEAM} folders` },
+      { status: 409 },
+    );
   }
 
   if (typeof parentId == "string" && parentId.length > 0) {
