@@ -108,7 +108,7 @@
       SEMANTIC COLOR TOKENS
       ============================================================ */
       /* Backgrounds */
-      --bg-base: var(--color-warm-100); /* page background */
+      --bg-base: var(--color-warm-50); /* page background */
       --bg-surface: #ffffff; /* card / panel surface */
       --bg-sunken: var(--color-warm-200); /* inset / trough */
       --bg-overlay: rgba(247, 243, 238, 0.88); /* frosted overlay */
