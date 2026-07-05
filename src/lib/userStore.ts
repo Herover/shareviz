@@ -4,6 +4,7 @@ import { writable } from "svelte/store";
 
 import { notifications } from "./notificationStore";
 import { orDefault } from "./utils";
+import { browser } from "$app/environment";
 
 export const user = (function create() {
   const { subscribe, set } = writable<{
@@ -12,6 +13,7 @@ export const user = (function create() {
   }>({ teams: [], organizations: [] });
 
   const fetchLoggedIn = async () => {
+    if (!browser) return;
     const resp = await fetch("/api/user", {
       method: "GET",
     });
