@@ -35,6 +35,26 @@
 
   let selected: { [key: string]: boolean } = $state({});
 
+  // Selection is tracked by key but announced as indexes, so consumers acting
+  // on indexes go stale when items move or disappear. Announce through a
+  // fingerprint guard, and re-announce whenever the values order changes.
+  let lastAnnounced = "";
+  const announce = () => {
+    const indexes = Object.keys(selected)
+      .filter((k) => selected[k])
+      .map((k) => values.findIndex((v) => v.k == k))
+      .filter((i) => i != -1);
+    const fingerprint = indexes.join(",");
+    if (fingerprint == lastAnnounced) {
+      return;
+    }
+    lastAnnounced = fingerprint;
+    onSelectedChanged(selected, indexes);
+  };
+  $effect(() => {
+    announce();
+  });
+
   let searchString = $state("");
   const filteredValues: typeof values = $derived(
     values.filter((e) => (searchString.length == 0 ? true : searchFn(searchString, e))),
@@ -99,12 +119,7 @@
       }
 
       lastSelected = lineIndex;
-      onSelectedChanged(
-        selected,
-        Object.keys(selected)
-          .filter((k) => selected[k])
-          .map((k) => values.findIndex((v) => v.k == k)),
-      );
+      announce();
     },
   );
   const toggleSelect = (me: MouseEvent | null, ke: KeyboardEvent | null, k: string, i: number) => {
