@@ -9,6 +9,7 @@
     ShareDBConnection,
   } from "$lib/chartStores/data.svelte";
   import {
+    caretPosition,
     extendMarks,
     placeCaret,
     readEditor,
@@ -175,9 +176,116 @@
     measureToolbar();
   });
 
-  // Presence is reused only to show who else is here — this field is never locked,
-  // since concurrent editing is the whole point.
+  // Presence shows who else is here (this field is never locked, since concurrent editing is
+  // the whole point) and carries each collaborator's caret index for the overlay below.
   let editors = $derived<PresenceData[]>(connection.editorsAt(path));
+
+  // --- Remote carets ---
+  // Each remote editor's caret arrives via presence as a document character index. Between
+  // announcements (a collaborator only re-announces when their own selection changes) the index
+  // goes stale as the document changes, so every change we apply — local edits and remote ops —
+  // transforms the tracked indices through it, exactly like the local caret in `applyRemote`.
+  let editorWrapEl = $state<HTMLDivElement>();
+  type RemoteCaret = {
+    key: string;
+    name: string;
+    color: string;
+    left: number;
+    top: number;
+    height: number;
+  };
+  let remoteCarets = $state<RemoteCaret[]>([]);
+  // Key of the caret whose name flag is shown (hover is tracked manually — see onEditorMouseMove).
+  let hoveredCaret = $state<string | null>(null);
+  // Per-session caret state: the last index that session announced, and that index transformed
+  // through every change applied since. A changed announcement resets the transform.
+  // Deliberately non-reactive — the rendered output is the `remoteCarets` state above.
+  /* eslint-disable-next-line svelte/prefer-svelte-reactivity */
+  const caretIndices = new Map<string, { announced: number; index: number }>();
+
+  /** Shift tracked remote caret indices through a change we just applied to the document. */
+  const transformRemoteCarets = (change: Delta) => {
+    for (const state of caretIndices.values()) {
+      state.index = change.transformPosition(state.index);
+    }
+  };
+
+  /** Recompute the pixel position of every remote caret from the current DOM. */
+  const updateRemoteCarets = () => {
+    if (!editorEl || !editorWrapEl) {
+      return;
+    }
+    const wrapRect = editorWrapEl.getBoundingClientRect();
+    const next: RemoteCaret[] = [];
+    // Non-reactive scratch set, only used within this call.
+    /* eslint-disable-next-line svelte/prefer-svelte-reactivity */
+    const seen = new Set<string>();
+    for (const editor of editors) {
+      if (typeof editor.caret !== "number") {
+        continue;
+      }
+      const key = editor.presenceId ?? editor.id;
+      seen.add(key);
+      let state = caretIndices.get(key);
+      if (!state || state.announced !== editor.caret) {
+        state = { announced: editor.caret, index: editor.caret };
+        caretIndices.set(key, state);
+      }
+      // Clamp to the last valid position (the document ends with a "\n" that isn't addressable).
+      // An announcement can race the op it reflects and end up transformed past the end; without
+      // the clamp such a caret falls back to the block-element rect and renders as a full-height
+      // bar at the line start.
+      const index = Math.min(state.index, Math.max(0, currentDelta.length() - 1));
+      const pos = caretPosition(editorEl, index);
+      if (!pos) {
+        continue;
+      }
+      next.push({
+        key,
+        name: editor.name,
+        color: editor.color,
+        left: pos.left - wrapRect.left,
+        top: pos.top - wrapRect.top,
+        height: pos.height,
+      });
+    }
+    // Forget sessions that left the field so their state doesn't linger.
+    for (const key of caretIndices.keys()) {
+      if (!seen.has(key)) {
+        caretIndices.delete(key);
+      }
+    }
+    remoteCarets = next;
+    if (hoveredCaret != null && !seen.has(hoveredCaret)) {
+      hoveredCaret = null;
+    }
+  };
+
+  // Reposition when presence changes (reads `editors`, so it tracks it).
+  $effect(() => updateRemoteCarets());
+
+  // The caret bars are pointer-events: none so they never steal clicks from the contenteditable
+  // beneath; hover for the name flag is resolved by hand from mouse coordinates instead.
+  const onEditorMouseMove = (e: MouseEvent) => {
+    if (remoteCarets.length === 0) {
+      return;
+    }
+    const wrapRect = editorWrapEl?.getBoundingClientRect();
+    if (!wrapRect) {
+      return;
+    }
+    const x = e.clientX - wrapRect.left;
+    const y = e.clientY - wrapRect.top;
+    const hit = remoteCarets.find(
+      (caret) =>
+        x >= caret.left - 4 &&
+        x <= caret.left + 5 &&
+        y >= caret.top - 2 &&
+        y <= caret.top + caret.height + 2,
+    );
+    hoveredCaret = hit?.key ?? null;
+  };
+  const onEditorMouseLeave = () => (hoveredCaret = null);
 
   /** Read the current document Delta for this field straight from the doc snapshot. */
   const readDoc = (): Delta => {
@@ -202,6 +310,8 @@
     if (change.ops.length > 0) {
       connection.submitRichTextChange(path, change);
       currentDelta = delta;
+      transformRemoteCarets(change);
+      updateRemoteCarets();
     }
   };
 
@@ -221,6 +331,8 @@
       placeCaret(editorEl, change.transformPosition(caret));
     }
     currentDelta = next;
+    transformRemoteCarets(change);
+    updateRemoteCarets();
   };
 
   /** Reflect the block type and active inline marks at the caret in the toolbar. */
@@ -236,6 +348,12 @@
     }
     // Remember the in-editor selection so a color can be applied after the ColorPicker takes focus.
     savedRange = range.cloneRange();
+
+    // Announce the caret to collaborators. Only while the editor itself has focus — a stale
+    // selection can still point in here after focus moved to another field's input.
+    if (document.activeElement === editorEl) {
+      connection.setLocalSelection(path, readEditor(editorEl, selection, defaultBlock).caret);
+    }
 
     // Climb from the caret to the line's block, collecting inline marks on the way (same
     // detection as readEditor, via the shared registry-driven `extendMarks`).
@@ -421,10 +539,14 @@
     renderDelta(editorEl, currentDelta, defaultBlock);
     connection.doc.on("op", onOp);
     document.addEventListener("selectionchange", syncToolbar);
-    resizeObserver = new ResizeObserver(() => measureToolbar());
+    resizeObserver = new ResizeObserver(() => {
+      measureToolbar();
+      updateRemoteCarets(); // reflow moves the carets' pixel positions
+    });
     if (toolbarEl) {
       resizeObserver.observe(toolbarEl);
     }
+    resizeObserver.observe(editorEl);
     // Measure once the bar has laid out, then again next frame so the menu button's own width
     // (and any late font metrics) are accounted for.
     tick().then(() => {
@@ -571,20 +693,50 @@
     {/if}
   </div>
 
+  <!-- The mousemove/mouseleave handlers only resolve hover for the caret name flags. -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
-    bind:this={editorEl}
-    class="rich-text-editor"
-    contenteditable="true"
-    role="textbox"
-    tabindex="0"
-    aria-multiline="true"
-    aria-label={label ?? "Rich text"}
-    spellcheck="false"
-    oninput={onInput}
-    oncompositionstart={onCompositionStart}
-    oncompositionend={onCompositionEnd}
-    onpaste={onPaste}
-  ></div>
+    class="rich-text-editor-wrap"
+    bind:this={editorWrapEl}
+    onmousemove={onEditorMouseMove}
+    onmouseleave={onEditorMouseLeave}
+  >
+    <div
+      bind:this={editorEl}
+      class="rich-text-editor"
+      contenteditable="true"
+      role="textbox"
+      tabindex="0"
+      aria-multiline="true"
+      aria-label={label ?? "Rich text"}
+      spellcheck="false"
+      oninput={onInput}
+      oncompositionstart={onCompositionStart}
+      oncompositionend={onCompositionEnd}
+      onpaste={onPaste}
+      onscroll={updateRemoteCarets}
+    ></div>
+    <!-- Collaborators' carets, painted over the editor (never inside the contenteditable, so
+         serialization and execCommand never see them). pointer-events: none throughout — hover
+         for the name flag comes from the wrapper's mousemove. -->
+    {#if remoteCarets.length > 0}
+      <div class="rich-text-carets" aria-hidden="true">
+        {#each remoteCarets as caret (caret.key)}
+          <div
+            class="rich-text-caret"
+            class:hovered={hoveredCaret === caret.key}
+            class:flag-below={caret.top < 28}
+            style:left="{caret.left}px"
+            style:top="{caret.top}px"
+            style:height="{caret.height}px"
+            style:--caret-color={caret.color}
+          >
+            <span class="rich-text-caret-flag">{caret.name}</span>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -792,7 +944,66 @@
     text-underline-offset: 2px;
   }
 
-  /* Editor area */
+  /* Editor area. The wrap hosts the remote-caret overlay; it clips so carets on content
+     scrolled out of the editor don't paint outside it. */
+  .rich-text-editor-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+  .rich-text-carets {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .rich-text-caret {
+    position: absolute;
+    width: 2px;
+    border-radius: 1px;
+    background: var(--caret-color);
+  }
+  /* The little knob that marks the caret as a collaborator's (the hover target's center). */
+  .rich-text-caret::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    left: -2px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--caret-color);
+  }
+  /* Name flag, revealed while the pointer is on the caret. */
+  .rich-text-caret-flag {
+    position: absolute;
+    bottom: 100%;
+    left: -2px;
+    margin-bottom: 4px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--caret-color);
+    color: var(--fg-on-accent);
+    font-size: 11px;
+    line-height: 1.3;
+    font-weight: var(--weight-medium);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(2px);
+    transition:
+      opacity var(--duration-micro) var(--ease-standard),
+      transform var(--duration-micro) var(--ease-standard);
+  }
+  .rich-text-caret.hovered .rich-text-caret-flag {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Near the top edge the flag would leave the (clipping) wrap; open it below the caret. */
+  .rich-text-caret.flag-below .rich-text-caret-flag {
+    bottom: auto;
+    top: 100%;
+    margin-bottom: 0;
+    margin-top: 4px;
+  }
+
   .rich-text-editor {
     padding: 14px 18px 16px;
     min-height: 110px;

@@ -21,11 +21,21 @@ export const serializeAddress = (address: PresenceAddress): string => JSON.strin
 export interface PresenceData {
   /** Serialized {@link PresenceAddress} of the focused field, or "" when idle. */
   selected: string;
+  /**
+   * Caret position inside the selected field as a document character index (rich-text fields
+   * only), or null when unknown. Relayed as-is by the server.
+   */
+  caret?: number | null;
   // name/color/id/image are stamped server-side from the authenticated session.
   color: string;
   name: string;
   id: string;
   image?: string;
+  /**
+   * ShareDB presence id of the session that announced this data — stamped client-side on
+   * receive. Unlike `id` (the user id) it is unique per session, so it can key per-caret state.
+   */
+  presenceId?: string;
 }
 
 export class ShareDBConnection {
@@ -42,6 +52,8 @@ export class ShareDBConnection {
   #localPresence?: LocalPresence<PresenceData>;
   #localPresenceId?: string;
   #lastSelected = "";
+  // Announcement waiting for our pending ops to be acked (see #flushPresence).
+  #pendingPresence: { selected: string; caret: number | null } | null = null;
 
   #pinger?: NodeJS.Timeout;
 
@@ -107,6 +119,7 @@ export class ShareDBConnection {
       this.#localPresence = undefined;
       this.#localPresenceId = undefined;
       this.#lastSelected = "";
+      this.#pendingPresence = null;
     }
     if (this.#socket) {
       this.#socket.removeEventListener("error", this.#onSocketError);
@@ -156,10 +169,12 @@ export class ShareDBConnection {
         } else {
           presences[presenceId] = {
             selected: data.selected ?? "",
+            caret: typeof data.caret === "number" ? data.caret : null,
             color: data.color ?? "",
             name: data.name ?? "",
             id: data.id ?? "",
             image: data.image,
+            presenceId,
           };
         }
         this.presences = { ...presences };
@@ -188,7 +203,10 @@ export class ShareDBConnection {
     // Get initial value of document and subscribe to changes
     doc.subscribe((e) => onData(e));
     doc.on("op", () => onData()); // Trigger when we have done something
-    doc.on("nothing pending", () => onData()); // Trigger after version has been updated
+    doc.on("nothing pending", () => {
+      onData(); // Trigger after version has been updated
+      this.#flushPresence(); // our ops are acked, a deferred caret announcement may go out
+    });
 
     if (synced) {
       fetch("/api/chart/" + docId)
@@ -262,17 +280,39 @@ export class ShareDBConnection {
     }
   }
 
-  /** Announce which field this session is editing, or pass null to clear. */
-  setLocalSelection(address: PresenceAddress | null) {
+  /**
+   * Announce which field this session is editing, or pass null to clear. Rich-text fields also
+   * pass their caret as a document character index so collaborators can render it.
+   */
+  setLocalSelection(address: PresenceAddress | null, caret: number | null = null) {
     if (!this.#localPresence) {
       return;
     }
     const selected = address ? serializeAddress(address) : "";
-    if (selected === this.#lastSelected) {
+    const caretValue = selected && typeof caret === "number" ? caret : null;
+    const submitKey = `${selected} ${caretValue}`;
+    if (submitKey === this.#lastSelected) {
       return;
     }
-    this.#lastSelected = selected;
-    this.#localPresence.submit({ selected } as PresenceData, (err) => {
+    this.#lastSelected = submitKey;
+    this.#pendingPresence = { selected, caret: caretValue };
+    this.#flushPresence();
+  }
+
+  /**
+   * Submit the latest announcement, but only while none of our ops are awaiting the server.
+   * ShareDB queues ops while one is in flight, yet presence messages skip that queue — an
+   * announcement sent mid-burst would reach collaborators *before* the ops its caret index is
+   * expressed against, and they would transform it through those ops a second time. Deferred
+   * announcements are flushed by the doc's "nothing pending" event.
+   */
+  #flushPresence() {
+    if (!this.#pendingPresence || !this.#localPresence || this.#doc.hasWritePending()) {
+      return;
+    }
+    const payload = this.#pendingPresence;
+    this.#pendingPresence = null;
+    this.#localPresence.submit(payload as PresenceData, (err) => {
       if (err) {
         logger.error("presence submit", err);
       }

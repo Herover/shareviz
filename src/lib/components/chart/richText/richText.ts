@@ -473,12 +473,12 @@ export const selectEnclosingAnchor = (selection: Selection, root: HTMLElement): 
   return false;
 };
 
-/** Place the caret at a document character index, mirroring `readEditor`'s counting. */
-export const placeCaret = (root: HTMLElement, index: number): void => {
-  const selection = window.getSelection();
-  if (!selection) {
-    return;
-  }
+/**
+ * Resolve a document character index to a DOM position within `root`, mirroring `readEditor`'s
+ * counting. An index past the end resolves to the end of the last block. Shared by `placeCaret`
+ * (the local caret) and `caretPosition` (remote presence carets).
+ */
+const resolveIndex = (root: HTMLElement, index: number): { node: Node; offset: number } => {
   let remaining = Math.max(0, index);
 
   const placeWithinBlock = (block: Element): { node: Node; offset: number } | null => {
@@ -506,21 +506,12 @@ export const placeCaret = (root: HTMLElement, index: number): void => {
     return null;
   };
 
-  const setAt = (node: Node, offset: number) => {
-    const range = document.createRange();
-    range.setStart(node, offset);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
-  };
-
   // Each line is one block; <ul>/<ol> are containers, so flatten them to their <li> lines.
   const blocks = Array.from(root.children).flatMap((child) =>
     child.tagName === "UL" || child.tagName === "OL" ? Array.from(child.children) : [child],
   );
   if (blocks.length === 0) {
-    setAt(root, 0);
-    return;
+    return { node: root, offset: 0 };
   }
 
   for (let b = 0; b < blocks.length; b++) {
@@ -528,19 +519,66 @@ export const placeCaret = (root: HTMLElement, index: number): void => {
       // the "\n" separating this block from the previous one
       if (remaining === 0) {
         const placed = placeWithinBlock(blocks[b]);
-        setAt(placed?.node ?? blocks[b], placed?.offset ?? 0);
-        return;
+        return placed ?? { node: blocks[b], offset: 0 };
       }
       remaining -= 1;
     }
     const placed = placeWithinBlock(blocks[b]);
     if (placed) {
-      setAt(placed.node, placed.offset);
-      return;
+      return placed;
     }
   }
 
   // Index past the end: place at the end of the last block.
   const lastBlock = blocks[blocks.length - 1];
-  setAt(lastBlock, lastBlock.childNodes.length);
+  return { node: lastBlock, offset: lastBlock.childNodes.length };
+};
+
+/** Place the caret at a document character index, mirroring `readEditor`'s counting. */
+export const placeCaret = (root: HTMLElement, index: number): void => {
+  const selection = window.getSelection();
+  if (!selection) {
+    return;
+  }
+  const { node, offset } = resolveIndex(root, index);
+  const range = document.createRange();
+  range.setStart(node, offset);
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
+};
+
+/** Viewport-relative box of a caret at a document character index (for presence carets). */
+export interface CaretPosition {
+  left: number;
+  top: number;
+  height: number;
+}
+
+/**
+ * Measure where a caret at a document character index would sit, in viewport coordinates
+ * (subtract the overlay's own rect to position an element). Returns null if the position
+ * can't be measured (e.g. detached root).
+ */
+export const caretPosition = (root: HTMLElement, index: number): CaretPosition | null => {
+  const { node, offset } = resolveIndex(root, index);
+  const range = document.createRange();
+  try {
+    range.setStart(node, offset);
+  } catch {
+    return null;
+  }
+  range.collapse(true);
+  const rect = range.getBoundingClientRect();
+  if (rect.height > 0) {
+    return { left: rect.left, top: rect.top, height: rect.height };
+  }
+  // A collapsed range anchored on an element (empty line: block containing only <br>)
+  // reports a zero rect; fall back to the enclosing element's own box.
+  const el = node.nodeType === Node.ELEMENT_NODE ? (node as HTMLElement) : node.parentElement;
+  if (!el) {
+    return null;
+  }
+  const elRect = el.getBoundingClientRect();
+  return elRect.height > 0 ? { left: elRect.left, top: elRect.top, height: elRect.height } : null;
 };
