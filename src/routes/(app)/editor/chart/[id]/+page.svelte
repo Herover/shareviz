@@ -201,7 +201,9 @@
     if (!store.chartInfo) {
       return;
     }
-    updatePublications(store.chartInfo.id);
+    updatePublications(store.chartInfo.id).catch((err) =>
+      logger.error("unable to load publications", err),
+    );
   });
 
   let publisize = () => {};
