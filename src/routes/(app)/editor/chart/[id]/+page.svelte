@@ -162,6 +162,18 @@
         break;
       }
 
+      case "scatter": {
+        // Annotation drags report the changed coordinates, ready to store
+        const [i, a, annotationIndex, changes] = e.v;
+        if (a == "annotations" && chartStore.data?.elements[i]) {
+          const elementStore = chartStore.scopeElement(i);
+          Object.entries(changes as { [key: string]: unknown }).forEach(([key, value]) => {
+            elementStore.submitOp(["annotations", annotationIndex, key, { r: 1, i: value }]);
+          });
+        }
+        break;
+      }
+
       default:
         logger.log("attempting to edit unknown key " + e.k);
         break;
