@@ -1,135 +1,220 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  /** eslint-disable @typescript-eslint/strict-boolean-expressions */
-  import { HBarTotalLabelStyle, type Root } from "$lib/chart";
-  import { group, orDefault } from "$lib/utils";
+  import chroma from "chroma-js";
+  import type { ByKey, Color, HBar, ResponsiveColor } from "$lib/chart";
+  import { HBarTotalLabelStyle } from "$lib/chart";
+  import { AxisStore } from "$lib/chartStores/axis.svelte";
   import AxisEditor from "../AxisEditor.svelte";
-  import { formatData } from "./data";
-  import { max } from "d3-array";
+  import CategoryList from "../CategoryList.svelte";
+  import type { EditorComponentProps } from "../chartComponents";
   import ColorPicker from "../ColorPicker/ColorPicker.svelte";
   import PresenceField from "../PresenceField.svelte";
-  import { HBarStore } from "$lib/chartStores/hbar.svelte";
-  import type { ShareDBConnection } from "$lib/chartStores/data.svelte";
-  import type { ComputedData } from "$lib/data";
-  import chroma from "chroma-js";
-  import { untrack } from "svelte";
 
-  interface Props {
-    spec: Root;
-    chartData: ComputedData;
-    index: number;
-    id: string;
-    connection: ShareDBConnection;
-  }
+  let { spec, chartSpec, chartData, connection, store, id }: EditorComponentProps<HBar> = $props();
 
-  let { spec, chartData, id, connection }: Props = $props();
-
-  let hbarStore = untrack(() => new HBarStore(connection, id));
-
-  let colorScale = $derived(hbarStore.colors());
-
-  let dataSet = $derived(spec.data.sets.find((set) => set.id == hbarStore.data.dataSet));
-
-  let columns = $derived([
-    ...orDefault(
-      dataSet?.transpose?.map((e) => ({ key: e.toKey, type: e.keyType })),
-      [],
-    ),
-    ...orDefault(
-      dataSet?.transpose?.map((e) => ({ key: e.toValue, type: e.valueType })),
-      [],
-    ),
-    ...orDefault(dataSet?.rows, []),
-  ]);
-
-  const deleteColor = (ci: number) => {
-    colorScale.removeColorScaleColor(ci);
-  };
-  const addColor = (ci: number) => {
-    colorScale.addColorScaleColor(ci);
+  // New color keys get a random color that is visible on a white background,
+  // users are expected to adjust them afterwards.
+  const randomColor = (): ResponsiveColor => {
+    const c = chroma
+      .hsl(Math.random() * 360, 0.5 + Math.random() * 0.3, 0.3 + Math.random() * 0.25)
+      .hex();
+    return { light: { c, v: c } };
   };
 
-  let groups = $derived(formatData(hbarStore.data, chartData, [] /* colorScale.data.byKey */));
-  // FIXME: Having this as a $effect here means changes to data wont get detected, and it might
-  // cause issues when there's multiple clients watching at the same time.
-  $effect(() => {
-    const computed = max(groups, (d) => max(d.d, (dd) => max(dd.value, (ddd) => ddd.to)));
-    if (
-      typeof computed == "number" &&
-      !Number.isNaN(computed) &&
-      computed != hbarStore.data.scale.dataRange?.[1]
-    ) {
-      hbarStore.setScaleTo(computed);
-    }
-  });
+  let columns = $derived(chartData[chartSpec.dataSet]?.rows ?? []);
 
-  let unusedGroups = $derived(
-    orDefault(groups[0]?.d[0]?.value, [])
-      .map((d) => d.label)
-      .filter((k) => colorScale.data.byKey.findIndex((c) => c.k == k) == -1),
+  // Bars are colored by their sub category when one is set, otherwise by their category
+  let colorColumn = $derived(
+    chartSpec.subCategories != "" ? chartSpec.subCategories : chartSpec.categories,
   );
-  let automateColorKeys = $derived(() => {
-    if (
-      typeof hbarStore.data.dataSet != "undefined" &&
-      typeof chartData[hbarStore.data.dataSet] != "undefined"
-    ) {
-      const key = hbarStore.data.subCategories || hbarStore.data.categories;
-      const dataSet = chartData[hbarStore.data.dataSet];
-      const groups = group(key, dataSet.data, (k) => k);
-      groups.forEach((k) => {
-        if (!colorScale.data.byKey.find((d) => d.k == k)) {
-          const n = colorScale.data.byKey.length;
-          const keyIndex = typeof n != "undefined" ? n : 0;
-          const c = `lch(${25 + Math.random() * 50}% ${80 + Math.random() * 20} ${Math.random() * 360})`;
-          colorScale.addColorScaleColor(
-            keyIndex,
-            k,
-            // TODO: only use known "good" color schemes
-            {
-              c: chroma(c).hex(),
-              v: c,
-            },
-            k,
-          );
-        }
-      });
-    }
-  });
-  // $: if (hbarStore.data.categories != "" && hbarStore.data.subCategories != "") {
-  //   automateColorKeys();
-  // }
 
-  let removeExtraColorKeys = $derived(() => {
+  // Check if the data appears to have changed in a way where color keys have been added/removed
+  const colorValues = $derived(
+    colorColumn == ""
+      ? []
+      : Object.keys(
+          chartData[chartSpec.dataSet]?.data.reduce((acc, d) => {
+            acc[d[colorColumn]] = true;
+            return acc;
+          }, {}) ?? {},
+        ),
+  );
+  $effect(() => {
     if (
-      typeof hbarStore.data.dataSet != "undefined" &&
-      typeof chartData[hbarStore.data.dataSet] != "undefined"
+      colorValues.length != chartSpec.colors.byKey.length ||
+      [...colorValues].sort().join() !=
+        chartSpec.colors.byKey
+          .map((d) => d.k)
+          .sort()
+          .join()
     ) {
-      const key =
-        typeof hbarStore.data.subCategories != "undefined"
-          ? hbarStore.data.subCategories
-          : hbarStore.data.categories;
-      const dataSet = chartData[hbarStore.data.dataSet];
-      const groups = group(key, dataSet.data, (k) => k);
-      let removed = 0;
-      colorScale.data.byKey.forEach((c, keyIndex) => {
-        if (typeof groups.find((k) => c.k == k) == "undefined") {
-          colorScale.removeColorScaleColor(keyIndex - removed);
-          removed++;
-        }
+      const newVal: ByKey[] = colorValues.map((k) => {
+        const existing = chartSpec.colors.byKey.find((c) => c.k == k);
+        return {
+          k,
+          c: existing?.c ?? randomColor(),
+          legend: existing?.legend ?? k,
+        };
       });
+      store.submitOp([
+        "colors",
+        "byKey",
+        {
+          r: 1,
+          i: newVal,
+        },
+      ]);
     }
   });
 
-  let moveColorKeyUp = $derived((i: number) => {
-    colorScale.moveColorUp(i);
-  });
-  let moveColorKeyDown = $derived((i: number) => {
-    colorScale.moveColorDown(i);
-  });
+  const setDataSet = (v: string) =>
+    store.submitOp([
+      "dataSet",
+      {
+        r: 1,
+        i: v,
+      },
+    ]);
+  const setCategories = (v: string) =>
+    store.submitOp([
+      "categories",
+      {
+        r: 1,
+        i: v,
+      },
+    ]);
+  const setSubCategories = (v: string) =>
+    store.submitOp([
+      "subCategories",
+      {
+        r: 1,
+        i: v,
+      },
+    ]);
+  const setStackSubCategories = (v: boolean) =>
+    store.submitOp([
+      "stackSubCategories",
+      {
+        r: 1,
+        i: v,
+      },
+    ]);
+  const setPortionSubCategories = (v: boolean) =>
+    store.submitOp([
+      "portionSubCategories",
+      {
+        r: 1,
+        i: v,
+      },
+    ]);
+  const setValue = (v: string) =>
+    store.submitOp([
+      "value",
+      {
+        r: 1,
+        i: v,
+      },
+    ]);
+  const setLabelWidth = (v: number) => {
+    if (Number.isNaN(v)) return;
+    store.submitOp([
+      "labelWidth",
+      {
+        r: 1,
+        i: v,
+      },
+    ]);
+  };
+  const setRectLabels = (v: boolean) =>
+    store.submitOp([
+      "rectLabels",
+      {
+        r: 1,
+        i: v,
+      },
+    ]);
+  const setTotalLabels = (v: string) =>
+    store.submitOp([
+      "totalLabels",
+      {
+        r: 1,
+        i: v,
+      },
+    ]);
+  const setRepeat = (v: string) =>
+    store.submitOp([
+      "repeat",
+      {
+        r: 1,
+        i: v,
+      },
+    ]);
 
-  let totalLabel = $state(hbarStore.data.totalLabels);
+  const totalLabelOptions = [
+    { k: HBarTotalLabelStyle.NONE, l: "None" },
+    { k: HBarTotalLabelStyle.OUTSIDE, l: "After bars" },
+  ];
+
+  const colorSearch = (str: string, d: { k: string; d: unknown }): boolean => {
+    return d.k.toLocaleLowerCase().includes(str.toLocaleLowerCase());
+  };
+
+  let selectedColors: number[] = $state([]);
+  const selectColor = (values: { [key: string]: boolean }, indexes: number[]) => {
+    selectedColors = indexes;
+  };
+  const moveColorDown = (k: string, i: number): void => {
+    store.submitOp(["colors", "byKey", [i, { p: 0 }], [i + 1, { d: 0 }]]);
+  };
+  const moveColorUp = (k: string, i: number): void => {
+    store.submitOp(["colors", "byKey", [i - 1, { d: 0 }], [i, { p: 0 }]]);
+  };
+  const setColorLegend = (val: string) => {
+    selectedColors.forEach((n) => {
+      store.submitOp([
+        "colors",
+        "byKey",
+        n,
+        "legend",
+        {
+          r: 1,
+          i: val,
+        },
+      ]);
+    });
+  };
+  const setColor = (val: Color) => {
+    selectedColors.forEach((n) => {
+      store.submitOp([
+        "colors",
+        "byKey",
+        n,
+        "c",
+        {
+          r: 1,
+          i: { light: val },
+        },
+      ]);
+    });
+  };
+  const setDefaultColor = (val: Color) =>
+    store.submitOp([
+      "colors",
+      "default",
+      {
+        r: 1,
+        i: { light: val },
+      },
+    ]);
+
+  // Stable key of the singly-selected color, used for the shared presence address.
+  let selColorKey = $derived(
+    selectedColors.length === 1 ? chartSpec.colors.byKey[selectedColors[0]]?.k : undefined,
+  );
 </script>
+
+<h3 class="editor-sub-section">General</h3>
 
 <div class="editor-row">
   <div class="editor-column-label">
@@ -140,9 +225,9 @@
       {#snippet field({ locked })}
         <select
           id="hbar-data-set"
-          value={hbarStore.data.dataSet}
+          value={chartSpec.dataSet}
           disabled={locked}
-          onchange={(e) => hbarStore.setDataSet(e.currentTarget.value)}
+          onchange={(e) => setDataSet(e.currentTarget.value)}
         >
           <option></option>
           {#each spec.data.sets as set (set.id)}
@@ -154,42 +239,22 @@
   </div>
 </div>
 
-<div class="editor-row">
-  <div class="editor-column-label">
-    <label for="hbar-label-width">Label width</label>
-  </div>
-  <div>
-    <PresenceField address={["chart", "elements", id, "d", "labelWidth"]} {connection}>
-      {#snippet field({ locked })}
-        <input
-          id="hbar-label-width"
-          value={hbarStore.data.labelWidth}
-          readonly={locked}
-          onkeyup={(e) => hbarStore.setLabelWidth(Number.parseInt(e.currentTarget.value))}
-          onchange={(e) => hbarStore.setLabelWidth(Number.parseInt(e.currentTarget.value))}
-          type="number"
-        />
-      {/snippet}
-    </PresenceField>
-  </div>
-</div>
-
-{#if dataSet}
+{#if chartSpec.dataSet}
   <div class="editor-row">
     <div class="editor-column-label">
-      <label for="hbar-categories">Categories from</label>
+      <label for="hbar-categories">One bar for every</label>
     </div>
     <div>
       <PresenceField address={["chart", "elements", id, "d", "categories"]} {connection}>
         {#snippet field({ locked })}
           <select
             id="hbar-categories"
-            value={hbarStore.data.categories}
+            value={chartSpec.categories}
             disabled={locked}
-            onchange={(e) => hbarStore.setCategories(e.currentTarget.value)}
+            onchange={(e) => setCategories(e.currentTarget.value)}
           >
             <option></option>
-            {#each columns as column, i (i)}
+            {#each columns as column (column.key)}
               <option>{column.key}</option>
             {/each}
           </select>
@@ -200,19 +265,19 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <label for="hbar-sub-categories">Sub categories from</label>
+      <label for="hbar-sub-categories">Split bars by</label>
     </div>
     <div>
       <PresenceField address={["chart", "elements", id, "d", "subCategories"]} {connection}>
         {#snippet field({ locked })}
           <select
             id="hbar-sub-categories"
-            value={hbarStore.data.subCategories}
+            value={chartSpec.subCategories}
             disabled={locked}
-            onchange={(e) => hbarStore.setSubCategories(e.currentTarget.value)}
+            onchange={(e) => setSubCategories(e.currentTarget.value)}
           >
             <option></option>
-            {#each columns as column, i (i)}
+            {#each columns as column (column.key)}
               <option>{column.key}</option>
             {/each}
           </select>
@@ -220,49 +285,6 @@
       </PresenceField>
     </div>
   </div>
-
-  <div class="editor-row">
-    <div class="editor-column-label">
-      <label for="hbar-stack-sub-categories">Stack sub categories</label>
-    </div>
-    <div>
-      <PresenceField address={["chart", "elements", id, "d", "stackSubCategories"]} {connection}>
-        {#snippet field({ locked })}
-          <input
-            id="hbar-stack-sub-categories"
-            checked={hbarStore.data.stackSubCategories}
-            disabled={locked}
-            onchange={(e) => hbarStore.setStackSubCategories(e.currentTarget.checked)}
-            type="checkbox"
-          />
-        {/snippet}
-      </PresenceField>
-    </div>
-  </div>
-
-  {#if hbarStore.data.stackSubCategories}
-    <div class="editor-row">
-      <div class="editor-column-label">
-        <label for="hbar-total">Total</label>
-      </div>
-      <div>
-        <PresenceField
-          address={["chart", "elements", id, "d", "portionSubCategories"]}
-          {connection}
-        >
-          {#snippet field({ locked })}
-            <input
-              id="hbar-total"
-              checked={hbarStore.data.portionSubCategories}
-              disabled={locked}
-              onchange={(e) => hbarStore.setPortionSubCategories(e.currentTarget.checked)}
-              type="checkbox"
-            />
-          {/snippet}
-        </PresenceField>
-      </div>
-    </div>
-  {/if}
 
   <div class="editor-row">
     <div class="editor-column-label">
@@ -273,13 +295,13 @@
         {#snippet field({ locked })}
           <select
             id="hbar-values-from"
-            value={hbarStore.data.value}
+            value={chartSpec.value}
             disabled={locked}
-            onchange={(e) => hbarStore.setValue(e.currentTarget.value)}
+            onchange={(e) => setValue(e.currentTarget.value)}
           >
             <option></option>
-            {#each columns.filter((r) => r.type == "number") as row, i (i)}
-              <option>{row.key}</option>
+            {#each columns.filter((r) => r.type == "number") as column (column.key)}
+              <option>{column.key}</option>
             {/each}
           </select>
         {/snippet}
@@ -287,129 +309,84 @@
     </div>
   </div>
 
-  <p>Colors</p>
-  {#if colorScale}
-    <table class="color-control">
-      <thead>
-        <tr><th></th><th>Key</th><th>Color</th><th></th><th>Label</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td></td>
-          <td><input value="default" disabled /> </td>
-          <td>
-            <input value={colorScale.data.default.light.c} disabled />
-          </td>
-          <td>
-            <PresenceField
-              address={["chart", "elements", id, "d", "colors", "default"]}
-              {connection}
-            >
-              {#snippet field({ locked })}
-                <ColorPicker
-                  color={colorScale.data.default.light.v}
-                  disabled={locked}
-                  onchange={(s) => colorScale.setColorScaleDefaultColor(s)}
-                />
-              {/snippet}
-            </PresenceField>
-          </td>
-          <td> </td>
-          <td> </td>
-        </tr>
-        {#each colorScale.data.byKey as color, i (color.k)}
-          <tr>
-            <td style="width:38px;">
-              <button
-                disabled={i == 0}
-                onclick={() => moveColorKeyUp(i)}
-                class="color-control-arrow">&#x25B2;</button
-              >
-              <button
-                disabled={i == colorScale.data.byKey.length - 1}
-                onclick={() => moveColorKeyDown(i)}
-                class="color-control-arrow">&#x25BC;</button
-              >
-            </td>
-            <td>
-              <PresenceField
-                address={["chart", "elements", id, "d", "colors", "byKey", i, "k"]}
-                {connection}
-              >
-                {#snippet field({ locked })}
-                  <select
-                    value={color.k}
-                    disabled={locked}
-                    onchange={(e) => colorScale.setColorScaleKey(i, e.currentTarget.value)}
-                  >
-                    <option></option>
-                    {#if color.k}
-                      <option>{color.k}</option>
-                    {/if}
-                    {#each unusedGroups as k (k)}
-                      <option>{k}</option>
-                    {/each}
-                  </select>
-                {/snippet}
-              </PresenceField>
-            </td>
-            <td>
-              <input value={color.c.light.c} disabled />
-            </td>
-            <td>
-              <PresenceField
-                address={["chart", "elements", id, "d", "colors", "byKey", i, "c"]}
-                {connection}
-              >
-                {#snippet field({ locked })}
-                  <ColorPicker
-                    color={color.c.light.c}
-                    chartColors={colorScale.data.byKey.map((c) => c.c?.light.c).filter((c) => c)}
-                    disabled={locked}
-                    onchange={(s) => colorScale.setColorScaleColor(i, s)}
-                  />
-                {/snippet}
-              </PresenceField>
-            </td>
-            <td>
-              <PresenceField
-                address={["chart", "elements", id, "d", "colors", "byKey", i, "legend"]}
-                {connection}
-              >
-                {#snippet field({ locked })}
-                  <input
-                    value={color.legend}
-                    readonly={locked}
-                    onchange={(e) => colorScale.setColorScaleLegend(i, e.currentTarget.value)}
-                    onkeyup={(e) => colorScale.setColorScaleLegend(i, e.currentTarget.value)}
-                  />
-                {/snippet}
-              </PresenceField>
-            </td>
-            <td>
-              <button onclick={() => deleteColor(i)}> Delete </button>
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-    <button onclick={() => addColor(colorScale.data.byKey.length)}>Add new</button>
-    <button onclick={automateColorKeys}>Add missing data keys</button>
-    <button onclick={removeExtraColorKeys}>Remove extra data keys</button>
+  {#if chartSpec.subCategories != ""}
+    <div class="editor-row">
+      <div class="editor-column-label">
+        <label for="hbar-stack-sub-categories">Stack sub categories</label>
+      </div>
+      <div>
+        <PresenceField address={["chart", "elements", id, "d", "stackSubCategories"]} {connection}>
+          {#snippet field({ locked })}
+            <input
+              id="hbar-stack-sub-categories"
+              checked={chartSpec.stackSubCategories}
+              disabled={locked}
+              onchange={(e) => setStackSubCategories(e.currentTarget.checked)}
+              type="checkbox"
+            />
+          {/snippet}
+        </PresenceField>
+      </div>
+    </div>
+
+    {#if chartSpec.stackSubCategories}
+      <div class="editor-row">
+        <div class="editor-column-label">
+          <label for="hbar-portion-sub-categories">Show as % of total</label>
+        </div>
+        <div>
+          <PresenceField
+            address={["chart", "elements", id, "d", "portionSubCategories"]}
+            {connection}
+          >
+            {#snippet field({ locked })}
+              <input
+                id="hbar-portion-sub-categories"
+                checked={chartSpec.portionSubCategories}
+                disabled={locked}
+                onchange={(e) => setPortionSubCategories(e.currentTarget.checked)}
+                type="checkbox"
+              />
+            {/snippet}
+          </PresenceField>
+        </div>
+      </div>
+    {/if}
   {/if}
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <label for="hbar-rect-labels">Rectangle labels</label>
+      <label for="hbar-label-width">Label width</label>
+      <span class="editor-label-hint">(px)</span>
+    </div>
+    <div>
+      <PresenceField address={["chart", "elements", id, "d", "labelWidth"]} {connection}>
+        {#snippet field({ locked })}
+          <input
+            id="hbar-label-width"
+            value={chartSpec.labelWidth}
+            readonly={locked}
+            onchange={(e) => setLabelWidth(Number.parseInt(e.currentTarget.value))}
+            type="number"
+            min="0"
+          />
+        {/snippet}
+      </PresenceField>
+    </div>
+  </div>
+
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <label for="hbar-rect-labels">Value labels on bars</label>
     </div>
     <div>
       <PresenceField address={["chart", "elements", id, "d", "rectLabels"]} {connection}>
         {#snippet field({ locked })}
           <input
             id="hbar-rect-labels"
-            checked={hbarStore.data.rectLabels}
+            checked={chartSpec.rectLabels}
             disabled={locked}
-            onchange={(e) => hbarStore.setRectLabels(e.currentTarget.checked)}
+            onchange={(e) => setRectLabels(e.currentTarget.checked)}
             type="checkbox"
           />
         {/snippet}
@@ -419,15 +396,23 @@
 
   <div class="editor-row">
     <div class="editor-column-label">
-      <span>Total labels</span>
+      <label for="hbar-total-labels">Total labels</label>
     </div>
     <div>
-      {#each Object.values(HBarTotalLabelStyle) as location (location)}
-        <label>
-          <input type="radio" value={location} bind:group={totalLabel} />
-          {location}
-        </label><br />
-      {/each}
+      <PresenceField address={["chart", "elements", id, "d", "totalLabels"]} {connection}>
+        {#snippet field({ locked })}
+          <select
+            id="hbar-total-labels"
+            value={chartSpec.totalLabels}
+            disabled={locked}
+            onchange={(e) => setTotalLabels(e.currentTarget.value)}
+          >
+            {#each totalLabelOptions as option (option.k)}
+              <option value={option.k}>{option.l}</option>
+            {/each}
+          </select>
+        {/snippet}
+      </PresenceField>
     </div>
   </div>
 
@@ -440,45 +425,107 @@
         {#snippet field({ locked })}
           <select
             id="hbar-repeat-for-each"
-            value={hbarStore.data.repeat}
+            value={chartSpec.repeat}
             disabled={locked}
-            onchange={(e) => hbarStore.setRepeat(e.currentTarget.value)}
+            onchange={(e) => setRepeat(e.currentTarget.value)}
           >
             <option></option>
-            {#each columns as row, i (i)}
-              <option>{row.key}</option>
+            {#each columns as column (column.key)}
+              <option>{column.key}</option>
             {/each}
           </select>
         {/snippet}
       </PresenceField>
     </div>
   </div>
+
+  <h3 class="editor-sub-section">Colors</h3>
+
+  <div class="editor-row">
+    <div class="editor-column-label">
+      <span>Default color</span>
+    </div>
+    <div>
+      <PresenceField address={["chart", "elements", id, "d", "colors", "default"]} {connection}>
+        {#snippet field({ locked })}
+          <ColorPicker
+            color={chartSpec.colors.default.light.v}
+            disabled={locked}
+            onchange={(e) => setDefaultColor(e)}
+          />
+        {/snippet}
+      </PresenceField>
+    </div>
+  </div>
+
+  {#if colorColumn != ""}
+    {#snippet colorTitle(d: { k: string })}
+      {d.k}
+    {/snippet}
+    <CategoryList
+      moveDown={moveColorDown}
+      moveUp={moveColorUp}
+      onSelectedChanged={selectColor}
+      searchFn={colorSearch}
+      title={colorTitle}
+      values={chartSpec.colors.byKey.map((d) => ({ k: d.k, d }))}
+      {connection}
+      addressFor={(item) => ["chart", "elements", id, "d", "colors", "byKey", item.k]}
+    />
+
+    <div class="editor-row">
+      <div class="editor-column-label">
+        <label for="hbar-color-legend">Legend label</label>
+      </div>
+      <div>
+        <PresenceField
+          address={["chart", "elements", id, "d", "colors", "byKey", selColorKey ?? "", "legend"]}
+          connection={selColorKey ? connection : undefined}
+        >
+          {#snippet field({ locked })}
+            <input
+              id="hbar-color-legend"
+              type="text"
+              value={selectedColors.length == 1
+                ? (chartSpec.colors.byKey[selectedColors[0]]?.legend ?? "")
+                : ""}
+              onkeyup={(e) => setColorLegend(e.currentTarget.value)}
+              disabled={selectedColors.length == 0 || locked}
+            />
+          {/snippet}
+        </PresenceField>
+      </div>
+    </div>
+
+    <div class="editor-row">
+      <div class="editor-column-label">
+        <span>Color</span>
+      </div>
+      <div>
+        <PresenceField
+          address={["chart", "elements", id, "d", "colors", "byKey", selColorKey ?? "", "c"]}
+          connection={selColorKey ? connection : undefined}
+        >
+          {#snippet field({ locked })}
+            <ColorPicker
+              color={selectedColors.length == 1
+                ? (chartSpec.colors.byKey[selectedColors[0]]?.c.light.v ?? "")
+                : ""}
+              disabled={selectedColors.length == 0 || locked}
+              onchange={(e) => setColor(e)}
+            />
+          {/snippet}
+        </PresenceField>
+      </div>
+    </div>
+  {/if}
+
+  <h3 class="editor-sub-section">Axis</h3>
+  <AxisEditor
+    conf={new AxisStore(connection, chartSpec.axis, [...store.pathPrefix(), "axis"])}
+    {connection}
+    address={["chart", "elements", id, "d", "axis"]}
+    showRepeatControl={chartSpec.repeat != ""}
+    idPrefix="hbar-"
+  />
 {/if}
-
-<b>Axis</b>
-<AxisEditor
-  conf={hbarStore.axis()}
-  {connection}
-  address={["chart", "elements", id, "d", "axis"]}
-  showRepeatControl={hbarStore.data.repeat != ""}
-  idPrefix="hbar-"
-/>
-
-<style>
-  .color-control {
-    width: 100%;
-    box-sizing: border-box;
-  }
-  .color-control input,
-  .color-control select {
-    width: 100%;
-    box-sizing: border-box;
-  }
-  .color-control-arrow {
-    width: 16px;
-    border: 0px;
-    background: none;
-    margin: 0px;
-    padding: 0px;
-  }
-</style>

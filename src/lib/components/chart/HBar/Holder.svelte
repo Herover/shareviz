@@ -1,34 +1,22 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  import type { Root, HBar as hBarType } from "$lib/chart";
+  import { max } from "d3-array";
+  import type { HBar as hBarType } from "$lib/chart";
   import { AxisRepeatMode } from "$lib/chart";
-  import type { ComputedData } from "$lib/data";
-  import { group } from "$lib/utils";
+  import type { ChartComponentProps } from "../chartComponents";
   import HBar from "./HBar.svelte";
   import { formatData } from "./data";
 
-  interface Props {
-    chartSpec: Root;
-    componentSpec: hBarType;
-    data: ComputedData;
-    chartWidth: number;
-    editor?: boolean;
-    index: number;
-  }
-
-  let {
-    chartSpec,
-    componentSpec,
-    data,
-    chartWidth,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    editor = false,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    index,
-  }: Props = $props();
+  let { chartSpec, componentSpec, data, chartWidth }: ChartComponentProps<hBarType> = $props();
 
   let groups = $derived(formatData(componentSpec, data, componentSpec.colors.byKey));
+
+  // The value scale always starts at zero and ends at the largest (stacked) value
+  let maxValue = $derived(
+    max(groups, (d) => max(d.d, (dd) => max(dd.value, (ddd) => ddd.to))) ?? 1,
+  );
+  let domain = $derived(componentSpec.portionSubCategories ? [0, 100] : [0, maxValue]);
 
   let labelOverflows: number[] = $state([]);
   let labelOverflow = $derived(
@@ -39,7 +27,7 @@
   let showAxis = $derived((type: AxisRepeatMode, i: number) => {
     if (type == AxisRepeatMode.ALL) return true;
     else if (type == AxisRepeatMode.FIRST && i == 0) return true;
-    else if (type == AxisRepeatMode.LAST && i == group.length - 1) return true;
+    else if (type == AxisRepeatMode.LAST && i == groups.length - 1) return true;
     return false;
   });
 </script>
@@ -51,6 +39,7 @@
     labelWidth={componentSpec.labelWidth}
     valueWidth={width - componentSpec.labelWidth - labelOverflow}
     {width}
+    {domain}
     values={d}
     label={k}
     showLegend={i == 0}

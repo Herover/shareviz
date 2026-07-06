@@ -4,13 +4,11 @@ import {
   AxisLocation,
   AxisOrientation,
   AxisRepeatMode,
-  HBarTotalLabelStyle,
   LabelLocation,
   LabelStyleLine,
   LineMissingStyle,
   LineSymbol,
   type Chart,
-  type HBar,
   type Line,
 } from "$lib/chart";
 import ShareDB from "sharedb/lib/client";
@@ -168,77 +166,6 @@ export class ChartStore {
     ]);
   }
 
-  addBarChart(elementIndex: number) {
-    this.#doc.submitOp([
-      "chart",
-      "elements",
-      elementIndex,
-      {
-        i: {
-          type: "hBar",
-          id: crypto.randomUUID(),
-          d: {
-            dataSet: "",
-            categories: "",
-            subCategories: "",
-            stackSubCategories: true,
-            portionSubCategories: false,
-            value: "",
-            labelWidth: 170,
-            repeat: "",
-            scale: {
-              name: "x",
-              dataKey: "antal",
-              type: "linear",
-              dataRange: [0, 1],
-            },
-            colors: {
-              default: { light: { c: "#888888", v: "#888888" } },
-              byKey: [],
-            },
-            rectLabels: false,
-            totalLabels: HBarTotalLabelStyle.NONE,
-            axis: {
-              location: AxisLocation.START,
-              labelSpace: 0,
-              orientation: AxisOrientation.HORIZONTAL,
-              repeat: AxisRepeatMode.FIRST,
-              major: {
-                grid: true,
-                enabled: true,
-                tickSize: 8,
-                tickWidth: 1,
-                labelDivide: 1000000,
-                labelThousands: ",",
-                afterLabel: " mio.",
-                auto: {
-                  from: "",
-                  each: 5000000,
-                  labels: true,
-                },
-                ticks: [],
-              },
-              minor: {
-                grid: false,
-                enabled: false,
-                tickSize: 8,
-                tickWidth: 1,
-                labelDivide: 1000000,
-                labelThousands: ",",
-                afterLabel: " mio.",
-                auto: {
-                  from: "",
-                  each: 1000000,
-                  labels: false,
-                },
-                ticks: [],
-              },
-            },
-          } as HBar,
-        },
-      },
-    ]);
-  }
   addLineChart(elementIndex: number) {
     this.#doc.submitOp([
       "chart",

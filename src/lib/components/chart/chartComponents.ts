@@ -7,6 +7,7 @@ import type { Root } from "$lib/chart";
 import HBar from "./HBar";
 import Line from "./Line";
 import Range from "./Range";
+import Scatter from "./Scatter";
 import ChartText from "./richText/ChartText";
 import ErrorText from "./ErrorText.svelte";
 import type { ChartStore } from "$lib/chartStores/chart.svelte";
@@ -71,8 +72,9 @@ export const registerComponent = (component: ChartComponent) => {
 
 // FIXME: remove type conversions when ChartComponent is fixed
 registerComponent(Line as unknown as ChartComponent);
-registerComponent(HBar as unknown as ChartComponent);
+registerComponent(HBar);
 registerComponent(Range);
+registerComponent(Scatter);
 registerComponent(ChartText);
 
 export const getComponent = async (key: string): Promise<any> => {

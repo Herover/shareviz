@@ -181,7 +181,6 @@ export interface HBar {
   value: string;
   labelWidth: number;
   repeat: string;
-  scale: Scale;
   colors: Colors;
   rectLabels: boolean;
   totalLabels: HBarTotalLabelStyle;

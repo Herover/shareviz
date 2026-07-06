@@ -1,10 +1,7 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { scaleLinear } from "d3-scale";
-  import { onMount } from "svelte";
   import type { Root, HBar } from "$lib/chart";
   import { AxisLocation } from "$lib/chart";
   import Axis from "../Axis.svelte";
@@ -15,6 +12,7 @@
   interface Props {
     labelWidth: number;
     valueWidth: number;
+    domain: number[];
     values: {
       label: string;
       value: { label: string; value: number; from: number; to: number }[];
@@ -26,12 +24,12 @@
     showAxisLabels: boolean;
     width: number;
     labelOverflow: (overflow: number) => void;
-    size?: (d: { height: number }) => void;
   }
 
   let {
     labelWidth,
     valueWidth,
+    domain,
     values,
     chartSpec,
     hBarSpec,
@@ -40,13 +38,11 @@
     showAxisLabels,
     width,
     labelOverflow = () => {},
-    size = () => {},
   }: Props = $props();
 
   const valueHeight = 26;
   const barMargin = 0;
   const blockMargin = 16;
-  let legendHeight = 0;
   let rightOverflow = $state(0);
 
   let labelOverflows: number[] = $state([]);
@@ -69,12 +65,8 @@
   let barHeight = $derived(valueHeight - barMargin * 2);
   let blockHeight = $derived((hBarSpec.stackSubCategories ? 1 : bars) * valueHeight);
 
-  let valueScale = $derived(
-    scaleLinear()
-      .range([0, valueWidth])
-      .domain(hBarSpec.portionSubCategories ? [0, 100] : hBarSpec.scale.dataRange || [0, 1]),
-  );
-  // "#ff8888", "#aa2222"
+  let valueScale = $derived(scaleLinear().range([0, valueWidth]).domain(domain));
+
   let color = $derived((d: { label: string }) => {
     const c = hBarSpec.colors.byKey.find((e) => e.k == d.label);
     if (c) {
@@ -83,33 +75,7 @@
     return hBarSpec.colors.default.light.c;
   });
 
-  let height = $derived(
-    (blockHeight + blockMargin) * values.length -
-      blockMargin +
-      // bars * barMargin +
-      legendHeight +
-      scaleHeight,
-  );
-  onMount(() =>
-    size({
-      height:
-        (blockHeight + blockMargin) * values.length -
-        blockMargin +
-        // bars * barMargin +
-        legendHeight +
-        scaleHeight,
-    }),
-  );
-  run(() => {
-    size({
-      height:
-        (blockHeight + blockMargin) * values.length -
-        blockMargin +
-        // bars * barMargin +
-        legendHeight +
-        scaleHeight,
-    });
-  });
+  let height = $derived((blockHeight + blockMargin) * values.length - blockMargin + scaleHeight);
 
   let dataSet = $derived(chartSpec.data.sets.find((set) => set.id == hBarSpec.dataSet));
 </script>
