@@ -15,9 +15,13 @@ export async function GET({ params, locals }) {
   }
 
   try {
-    const charts = await db.getUserTeamCharts(user.id, params.id);
+    // A chart is accessible through one of the user's teams or as a personal chart
+    let charts = await db.getUserTeamCharts(user.id, params.id);
     if (charts.length == 0) {
-      throw new Error("chart not found");
+      charts = await db.getUserCharts(user.id, params.id);
+    }
+    if (charts.length == 0) {
+      return json({ message: "chart not found" }, { status: 404 });
     }
     return json({ chart: charts[0] });
   } catch (err) {
@@ -37,10 +41,13 @@ export async function PUT({ params, request, locals }) {
   const { name, folderId }: { name?: string; folderId?: string } = await request.json();
 
   try {
-    // Check if user can access chart
-    const charts = await db.getUserTeamCharts(user.id, params.id);
+    // Check if user can access chart, through a team or as a personal chart
+    let charts = await db.getUserTeamCharts(user.id, params.id);
     if (charts.length == 0) {
-      throw new Error("chart not found");
+      charts = await db.getUserCharts(user.id, params.id);
+    }
+    if (charts.length == 0) {
+      return json({ message: "chart not found" }, { status: 404 });
     }
 
     await db.updateChart(params.id, { name, folderId });

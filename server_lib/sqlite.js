@@ -624,7 +624,16 @@ export const db = {
       .innerJoin(usersTeams, eq(usersTeams.userId, users.id))
       .innerJoin(charts, eq(charts.teamId, usersTeams.teamId))
       .where(and(eq(users.id, userId), eq(charts.id, chartId)));
-    return lst.length != 0;
+    if (lst.length != 0) {
+      return true;
+    }
+
+    // Not accessible through a team, may be one of the user's personal charts
+    const personal = await drizzledb
+      .select()
+      .from(userCharts)
+      .where(and(eq(userCharts.userId, userId), eq(userCharts.chartId, chartId)));
+    return personal.length != 0;
   },
 };
 
