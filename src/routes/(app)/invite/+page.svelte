@@ -9,7 +9,7 @@
 
   let canJoin = $derived($page.data.organizationName != null);
 
-  let join = $derived(async () => {
+  const join = async () => {
     const r = await fetch("/api/invite", {
       method: "PUT",
       body: JSON.stringify({ code: $page.data.code }),
@@ -20,7 +20,7 @@
     } else {
       goto(resolve("/(app)/(main)/me", {}));
     }
-  });
+  };
 </script>
 
 {#if message}

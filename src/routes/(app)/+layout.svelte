@@ -325,6 +325,8 @@
       --border-default: var(--color-warm-700);
       --border-strong: var(--color-warm-500);
       --accent-primary-hover: var(--color-terra-900);
+      --accent-primary-subtle: var(--color-terra-800);
+      --accent-secondary-subtle: var(--color-slate-800);
 
       /* Data-type badge surfaces — shifted for dark legibility */
       --badge-num-bg: var(--color-slate-800);
@@ -479,6 +481,19 @@
     }
     button.btn-primary:hover {
       background-color: var(--accent-primary-hover);
+    }
+
+    /* Shared bits of the settings pages (org + team settings). */
+    .member-count {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--fg-tertiary);
+    }
+    .action-btn {
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     /* ============================================================

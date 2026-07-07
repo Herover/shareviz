@@ -10,8 +10,8 @@
 
 <h3>Your user</h3>
 
-<div class="editor-row">
-  <div class="editor-column-label text-align-left">
+<div class="user-row">
+  <div class="user-label">
     Display name
     <br />
     <i>The name is loaded when you log in from your login method/identity provider</i>
@@ -21,8 +21,8 @@
   </div>
 </div>
 
-<div class="editor-row">
-  <div class="editor-column-label text-align-left">Your login methods/identity providers</div>
+<div class="user-row">
+  <div class="user-label">Your login methods/identity providers</div>
   <div>
     {#each data.accounts as account (account.id)}
       {account.provider}: {account.expiresAt
@@ -37,3 +37,17 @@
 <form action="/signout" method="post"><button type="submit">Sign out</button></form>
 
 <button onclick={() => settings.cycleTheme()}> Switch theme </button>
+
+<style>
+  .user-row {
+    display: grid;
+    grid-template-columns: 40% 1fr;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+  }
+  .user-label {
+    font-size: 1.1rem;
+    color: var(--fg-secondary);
+  }
+</style>

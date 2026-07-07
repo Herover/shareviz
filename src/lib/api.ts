@@ -32,7 +32,6 @@ export async function addTeam(name: string, organizationId: string): Promise<str
   });
   const data = await res.json();
   if (res.status != 200) {
-    const data = await res.json();
     throw new Error(data.message);
   }
   return data.teamId;

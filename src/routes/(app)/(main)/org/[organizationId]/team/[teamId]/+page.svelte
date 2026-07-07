@@ -189,12 +189,6 @@
 </SettingsLayout>
 
 <style>
-  .member-count {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--fg-tertiary);
-  }
-
   .add-member {
     display: flex;
     align-items: center;
@@ -234,11 +228,9 @@
     border-color: var(--border-focus);
     box-shadow: 0 0 0 3px var(--accent-primary-subtle);
   }
-
-  .action-btn {
-    height: 34px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+  /* The chevron is a data URI, so it can't follow CSS variables — swap it for
+     a lighter one in dark mode. */
+  :global(body.dark-mode) .select-wrap select {
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23a8907a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   }
 </style>

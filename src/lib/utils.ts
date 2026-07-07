@@ -159,7 +159,7 @@ export const formatRelativeTime = (date: number): string => {
   } else if (
     d.getDate() == now.getDate() &&
     d.getMonth() == now.getMonth() &&
-    d.getFullYear == now.getFullYear
+    d.getFullYear() == now.getFullYear()
   ) {
     return `${Math.floor(msAgo / (60 * 60 * 1000))} hours ago`;
   } else {
@@ -178,7 +178,7 @@ export const formatRelativeTime = (date: number): string => {
 };
 export const formatDate = (date: number): string => {
   const d = new Date(date);
-  return `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
+  return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
 };
 
 export const createDebouncer = (debounceTime: number) => {
@@ -186,20 +186,18 @@ export const createDebouncer = (debounceTime: number) => {
   let debounceLastTime = 0;
   return (watch: any[], fn: () => any) => {
     const t = Date.now();
+    const idle = debounceLastTime + debounceTime < t;
     debounceLastTime = t;
-    if (debounceLastTime + debounceTime < t) {
+    if (idle && debounceTimer == null) {
       fn();
     } else {
       if (debounceTimer != null) {
         clearTimeout(debounceTimer);
       }
-      debounceTimer = setTimeout(
-        () => {
-          debounceTimer = null;
-          fn();
-        },
-        t - (debounceLastTime + debounceTime),
-      );
+      debounceTimer = setTimeout(() => {
+        debounceTimer = null;
+        fn();
+      }, debounceTime);
     }
   };
 };

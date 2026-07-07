@@ -287,19 +287,6 @@
 </SettingsLayout>
 
 <style>
-  .member-count {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--fg-tertiary);
-  }
-
-  .action-btn {
-    height: 34px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-
   /* ════════ TEAMS ════════ */
   .team-block {
     padding: 18px 24px;
@@ -399,14 +386,13 @@
     border-bottom: 0;
   }
   .invite-table tbody tr:hover {
-    background: var(--color-warm-100);
+    background: var(--bg-base);
   }
   .invite-table tbody tr.is-new {
     background: var(--accent-primary-subtle);
   }
-  .code-cell {
-    align-items: center;
-    gap: 10px;
+  .code-cell .code + .used-badge {
+    margin-left: 10px;
   }
   .code {
     font-family: var(--font-mono);

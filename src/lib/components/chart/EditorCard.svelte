@@ -30,8 +30,8 @@
     padding: var(--space-3) var(--space-4);
   }
   .header {
-    background-color: var(--color-warm-50);
-    color: var(--color-warm-600);
+    background-color: var(--bg-base);
+    color: var(--fg-tertiary);
     border-bottom: 1px solid var(--border-default);
     font-weight: var(--weight-bold);
   }

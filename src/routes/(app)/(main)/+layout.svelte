@@ -1,35 +1,18 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  import { goto, invalidateAll } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { addTeam } from "$lib/api";
+  import { addNewTeam } from "$lib/teamActions";
   import NavDropdown from "$lib/components/NavDropdown.svelte";
   import Icon from "$lib/components/Icon.svelte";
   import Brand from "$lib/components/Brand.svelte";
-  import { notifications } from "$lib/notificationStore";
 
   interface Props {
     children?: import("svelte").Snippet;
   }
 
   let { children }: Props = $props();
-
-  const addNewTeam = async () => {
-    try {
-      const newTeamId = await addTeam("New Team", page.params.organizationId ?? "");
-      goto(
-        resolve("/(app)/(main)/org/[organizationId]/team/[teamId]", {
-          organizationId: page.params.organizationId ?? "",
-          teamId: newTeamId,
-        }),
-      );
-      invalidateAll();
-    } catch (err) {
-      notifications.addError((err as Error).message);
-    }
-  };
 </script>
 
 <header class="ch-nav">
@@ -86,7 +69,10 @@
                 </a>
               {/each}
               <div class="ch-pop-divider"></div>
-              <button class="ch-pop-cta" onclick={() => addNewTeam()}>
+              <button
+                class="ch-pop-cta"
+                onclick={() => addNewTeam(page.params.organizationId ?? "")}
+              >
                 <Icon name="plus" size={14} stroke={2.2} />
                 New team
               </button>

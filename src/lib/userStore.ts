@@ -34,7 +34,7 @@ export const user = (function create() {
   return {
     subscribe,
     update: fetchLoggedIn,
-    geUserCharts: async (): Promise<
+    getUserCharts: async (): Promise<
       { id: string; name: string; chartRef: string; created: number; updated: number }[]
     > => {
       const resp = await fetch(`/api/user/charts`, {

@@ -3,6 +3,7 @@
 .editor-column-label {
   font-size: 1.1rem;
   color: var(--fg-secondary);
+  text-align: right;
 }
 .editor-column-label-description,
 .editor-sub-section-description {
@@ -16,9 +17,6 @@
   color: var(--fg-tertiary);
   font-size: var(--text-sm);
 }
-.editor-column-label {
-  text-align: right;
-}
 .editor-row {
   display: grid;
   grid-template-columns: 40% 1fr;
@@ -31,8 +29,4 @@
 }
 .text-align-right {
   text-align: right;
-}
-.editor-explain-box {
-  padding-right: var(--spacing);
-  padding-right: calc(var(--spacing) * 0.5);
 }

@@ -21,7 +21,6 @@
 </script>
 
 <div class="member" class:removable={onRemove}>
-  <!-- <Avatar {name} {id} /> -->
   <div class="avatar">
     <UserBadge user={{ id, name: name ?? "" }} fill />
   </div>

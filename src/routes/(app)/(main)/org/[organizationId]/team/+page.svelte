@@ -1,13 +1,11 @@
 <!-- SPDX-License-Identifier: MPL-2.0 -->
 
 <script lang="ts">
-  import { goto, invalidateAll } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { addTeam } from "$lib/api";
   import { TEAM_ROLES } from "$lib/consts";
   import { formatRelativeTime } from "$lib/utils";
-  import { notifications } from "$lib/notificationStore";
+  import { addNewTeam } from "$lib/teamActions";
   import PageHead from "$lib/components/PageHead.svelte";
   import UserBadge from "$lib/components/chart/UserBadge.svelte";
   import Icon from "$lib/components/Icon.svelte";
@@ -18,21 +16,6 @@
   const orgName = $derived(page.data.organization?.organizations?.name ?? "");
 
   const roleLabel = (role: number) => (role === TEAM_ROLES.ADMIN ? "Admin" : "Member");
-
-  const addNewTeam = async () => {
-    try {
-      const newTeamId = await addTeam("New Team", page.params.organizationId ?? "");
-      await goto(
-        resolve("/(app)/(main)/org/[organizationId]/team/[teamId]", {
-          organizationId: page.params.organizationId ?? "",
-          teamId: newTeamId,
-        }),
-      );
-      invalidateAll();
-    } catch (err) {
-      notifications.addError((err as Error).message);
-    }
-  };
 </script>
 
 <PageHead overline={orgName} title="Your teams" />
@@ -47,7 +30,10 @@
       >{data.teamCards.length}
       {data.teamCards.length === 1 ? "team" : "teams"}</span
     >
-    <button class="btn-primary teams-new" onclick={addNewTeam}>
+    <button
+      class="btn-primary teams-new"
+      onclick={() => addNewTeam(page.params.organizationId ?? "")}
+    >
       <Icon name="plus" size={15} stroke={2.2} />
       New team
     </button>
@@ -57,7 +43,10 @@
 {#if data.teamCards.length === 0}
   <div class="teams-empty">
     <p>You're not part of any teams in this organization yet.</p>
-    <button class="btn-primary teams-new" onclick={addNewTeam}>
+    <button
+      class="btn-primary teams-new"
+      onclick={() => addNewTeam(page.params.organizationId ?? "")}
+    >
       <Icon name="plus" size={15} stroke={2.2} />
       New team
     </button>
